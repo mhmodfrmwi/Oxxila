@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+
+  --color-oxxila-purple: #7c5cff;
+  --color-oxxila-accent: #7b65fb;
+  --color-oxxila-purple-light: #9b8afb;
+  --color-oxxila-purple-muted: #b4a9ff;
+
+  --color-page-light: #f5f6ff;
+  --color-page-dark: #14151a;
+
+  --color-card-light: #ffffff;
+  --color-card-dark: #252631;
+
+  --color-input-light: #f4f5ff;
+  --color-input-dark: #1e1f2a;
+
+  --color-text-primary-light: #1a1a2e;
+  --color-text-primary-dark: #ffffff;
+  --color-text-secondary-light: #6b7280;
+  --color-text-secondary-dark: #9ca3af;
+  --color-typography-secondary-text: #aea7ff;
+
+  --color-border-light: #e5e7f0;
+  --color-border-dark: #3a3b4a;
+
+  --radius-card: 32px;
+  --radius-input: 12px;
+  --radius-button: 12px;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+  }
+
+  #root {
+    min-height: 100dvh;
+  }
+}
