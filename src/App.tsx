@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { ChangePasswordPage } from './pages/ChangePasswordPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
+import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { VerifyOtpPage } from './pages/VerifyOtpPage'
@@ -14,6 +16,14 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/forgot-password/verify" element={<VerifyOtpPage />} />
       <Route path="/change-password" element={<ChangePasswordPage />} />
+      <Route
+        path="/home"
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   )
 }

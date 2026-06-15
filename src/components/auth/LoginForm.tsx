@@ -1,8 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
-import { useOAuthCallback } from '../../hooks/useOAuthCallback'
 import { ApiError } from '../../lib/api'
 import { Button } from '../ui/Button'
 import { InputField } from '../ui/InputField'
@@ -12,10 +11,11 @@ import { SocialLoginButtons } from './SocialLoginButtons'
 
 export function LoginForm() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { theme } = useTheme()
-  const { login, logout, user, isAuthenticated } = useAuth()
-  const { oauthError } = useOAuthCallback()
+  const { login, isAuthenticated } = useAuth()
   const isDark = theme === 'dark'
+  const oauthError = (location.state as { oauthError?: string } | null)?.oauthError ?? ''
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(
     (location.state as { message?: string } | null)?.message ?? '',
@@ -23,7 +23,13 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if ((location.state as { message?: string } | null)?.message) {
+    if (isAuthenticated) {
+      navigate('/home', { replace: true })
+    }
+  }, [isAuthenticated, navigate])
+
+  useEffect(() => {
+    if ((location.state as { message?: string; oauthError?: string } | null)?.message) {
       window.history.replaceState({}, document.title)
     }
   }, [location.state])
@@ -41,25 +47,12 @@ export function LoginForm() {
 
     try {
       const nextUser = await login({ email, password })
-      setSuccess(`Welcome back, ${nextUser.name}!`)
-      event.currentTarget.reset()
+      navigate('/home', {
+        replace: true,
+        state: { message: `Welcome back, ${nextUser.name}!` },
+      })
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Unable to log in. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function handleLogout() {
-    setError('')
-    setSuccess('')
-    setLoading(true)
-
-    try {
-      await logout()
-      setSuccess('You have been logged out.')
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Unable to log out. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -81,21 +74,12 @@ export function LoginForm() {
 
       {(error || oauthError) && (
         <div className="mb-4">
-          <FormMessage message={error || oauthError || ''} />
+          <FormMessage message={error || oauthError} />
         </div>
-      )}      {success && <div className="mb-4"><FormMessage message={success} type="success" /></div>}
+      )}
+      {success && <div className="mb-4"><FormMessage message={success} type="success" /></div>}
 
-      {isAuthenticated && user ? (
-        <div className="space-y-5">
-          <p className={isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light'}>
-            Signed in as <strong className={isDark ? 'text-white' : 'text-text-primary-light'}>{user.email}</strong>
-          </p>
-          <Button type="button" fullWidth pill className="h-14 sm:h-[65px]" onClick={handleLogout} disabled={loading}>
-            {loading ? 'Logging out...' : 'Log out'}
-          </Button>
-        </div>
-      ) : (
-        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
           <InputField
             label="Email Address"
             type="email"
@@ -128,11 +112,10 @@ export function LoginForm() {
 
           <SocialLoginButtons disabled={loading} />
 
-          <Button type="submit" fullWidth pill className="h-14 sm:h-[65px]" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
-          </Button>
-        </form>
-      )}
+        <Button type="submit" fullWidth pill className="h-14 sm:h-[65px]" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </Button>
+      </form>
 
       <p
         className={[

@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { extractOAuthCallback, getOAuthErrorMessage } from '../utils/oauth'
 
+const POST_LOGIN_PATH = '/home'
+
 export function useOAuthCallback() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -17,7 +19,7 @@ export function useOAuthCallback() {
 
     if (accessToken) {
       setSession(accessToken, user)
-      navigate(location.pathname, {
+      navigate(POST_LOGIN_PATH, {
         replace: true,
         state: { message: 'Signed in successfully with your social account.' },
       })
@@ -25,9 +27,12 @@ export function useOAuthCallback() {
     }
 
     if (error) {
-      navigate(location.pathname, { replace: true })
+      navigate('/login', {
+        replace: true,
+        state: { oauthError: oauthError ?? 'Social sign-in failed. Please try again.' },
+      })
     }
-  }, [accessToken, error, location.pathname, navigate, setSession, user])
+  }, [accessToken, error, navigate, oauthError, setSession, user])
 
   return { oauthError }
 }
