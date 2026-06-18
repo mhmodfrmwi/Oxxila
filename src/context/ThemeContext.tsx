@@ -18,11 +18,17 @@ function applyTheme(theme: Theme) {
   document.documentElement.classList.toggle('dark', theme === 'dark')
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
+function readStoredTheme(): Theme {
+  try {
     const stored = localStorage.getItem(STORAGE_KEY)
     return stored === 'dark' || stored === 'light' ? stored : 'light'
-  })
+  } catch {
+    return 'light'
+  }
+}
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setThemeState] = useState<Theme>(() => readStoredTheme())
 
   useEffect(() => {
     applyTheme(theme)

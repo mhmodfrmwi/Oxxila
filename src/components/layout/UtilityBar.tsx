@@ -15,20 +15,20 @@ export function UtilityBar() {
           : "border-border-light bg-page-light",
       ].join(" ")}
     >
-      <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-3 py-2.5 sm:px-4 sm:py-3 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:px-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-input-light text-oxxila-accent dark:bg-input-dark">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-3 py-2.5 sm:px-4 sm:py-3 min-[769px]:flex-row min-[769px]:items-center min-[769px]:justify-between min-[769px]:gap-4 lg:px-6">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-input-light text-oxxila-accent dark:bg-input-dark">
             <Truck size={18} />
           </div>
-          <div>
-            <p className="text-sm font-medium">Free shipping over $50 orders</p>
-            <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">Free shipping over $50 orders</p>
+            <p className="truncate text-xs text-text-secondary-light dark:text-text-secondary-dark">
               Limited-time offer
             </p>
           </div>
         </div>
 
-        <div className="relative w-full lg:max-w-sm">
+        <div className="relative w-full min-[769px]:max-w-sm min-[769px]:flex-1">
           <label htmlFor="site-search" className="sr-only">
             Search
           </label>
@@ -40,12 +40,15 @@ export function UtilityBar() {
             id="site-search"
             type="search"
             placeholder="Search for..."
-            className="w-full rounded-full py-2.5 pl-10 pr-4 text-sm bg-input-light dark:bg-input-dark focus:outline-none focus:ring-2 focus:ring-oxxila-accent/50"
+            className="h-11 w-full rounded-full py-2.5 pl-10 pr-4 text-sm bg-input-light dark:bg-input-dark focus:outline-none focus:ring-2 focus:ring-oxxila-accent/50"
           />
         </div>
 
-        <div className="flex w-full items-center justify-around gap-4 text-sm lg:w-auto lg:min-w-[300px]">
-          <button type="button" className="flex items-start gap-2.5 text-left">
+        <div className="flex w-full items-center justify-between gap-3 text-sm min-[769px]:w-auto min-[769px]:min-w-[280px] min-[769px]:justify-end min-[1025px]:min-w-[300px]">
+          <button
+            type="button"
+            className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 text-left min-[769px]:flex-initial"
+          >
             <img
               src={langIcon}
               alt=""
@@ -60,7 +63,7 @@ export function UtilityBar() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="flex items-start gap-2.5 text-left"
+            className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 text-left min-[769px]:flex-initial"
           >
             <Moon size={30} strokeWidth={1.75} className="text-typography-secondary-text" aria-hidden />
             <span className="flex flex-col items-start">

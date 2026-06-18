@@ -31,7 +31,7 @@ export function Button({
     <button
       type={type}
       className={[
-        'inline-flex items-center justify-center gap-2 px-6 py-4',
+        'inline-flex min-h-11 items-center justify-center gap-2 px-6 py-3',
         'text-base font-semibold transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
         'disabled:pointer-events-none disabled:opacity-50',

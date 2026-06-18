@@ -42,7 +42,7 @@ export function AuthVisual({
           />
         </div>
 
-        <div className="relative flex min-h-[380px] flex-col justify-between p-10 sm:min-h-[420px]  lg:min-h-[780px] lg:p-18">
+        <div className="relative flex min-h-[320px] flex-col justify-between p-5 sm:min-h-[420px] sm:p-8 lg:min-h-[780px] lg:p-12 xl:p-18">
           <div className="flex items-start justify-between gap-4">
             <nav aria-label="Auth navigation" className="flex gap-4">
               <NavLink
@@ -72,7 +72,7 @@ export function AuthVisual({
                 Login
               </NavLink>
             </nav>
-            <Logo linkTo="/" variant="icon" className=" h-15 w-15" />
+            <Logo linkTo="/home" variant="icon" className=" h-15 w-15" />
           </div>
 
           <div className="my-auto flex w-full flex-col gap-4">

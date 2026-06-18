@@ -7,7 +7,7 @@ import {
 } from '../api/auth'
 import { AUTH_TOKEN_KEY } from '../config/api'
 import { ApiError } from '../lib/api'
-import { parseOAuthUserFromToken } from '../utils/oauth'
+import { parseOAuthUserFromToken, createFallbackOAuthUser } from '../utils/oauth'
 
 interface AuthContextValue {
   user: AuthUser | null
@@ -33,8 +33,10 @@ function readStoredUser(): AuthUser | null {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUserState] = useState<AuthUser | null>(() => {
-    if (!localStorage.getItem(AUTH_TOKEN_KEY)) return null
-    return readStoredUser()
+    const token = localStorage.getItem(AUTH_TOKEN_KEY)
+    if (!token) return null
+
+    return readStoredUser() ?? parseOAuthUserFromToken(token)
   })
 
   const setUser = useCallback((nextUser: AuthUser | null) => {
@@ -49,11 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const setSession = useCallback(
     (accessToken: string, nextUser?: AuthUser | null) => {
       localStorage.setItem(AUTH_TOKEN_KEY, accessToken)
-      const resolvedUser = nextUser ?? parseOAuthUserFromToken(accessToken)
-
-      if (resolvedUser && (resolvedUser.id || resolvedUser.email)) {
-        setUser(resolvedUser)
-      }
+      const resolvedUser =
+        nextUser ?? parseOAuthUserFromToken(accessToken) ?? createFallbackOAuthUser()
+      setUser(resolvedUser)
     },
     [setUser],
   )
@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       user,
-      isAuthenticated: Boolean(user && localStorage.getItem(AUTH_TOKEN_KEY)),
+      isAuthenticated: Boolean(localStorage.getItem(AUTH_TOKEN_KEY) && user),
       login,
       logout,
       setUser,

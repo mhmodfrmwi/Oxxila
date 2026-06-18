@@ -2,12 +2,26 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
+import { HOME_PATH } from '../../config/routes'
 import { ApiError } from '../../lib/api'
+import { getOAuthErrorMessage, getOAuthSearchParams } from '../../utils/oauth'
+import { consumeOAuthError } from '../../utils/oauthBootstrap'
 import { Button } from '../ui/Button'
 import { InputField } from '../ui/InputField'
 import { AuthCard } from './AuthCard'
 import { FormMessage } from './FormMessage'
 import { SocialLoginButtons } from './SocialLoginButtons'
+
+function readOAuthError(locationState: unknown): string {
+  const fromBootstrap = consumeOAuthError()
+  if (fromBootstrap) return fromBootstrap
+
+  const fromState = (locationState as { oauthError?: string } | null)?.oauthError
+  if (fromState) return fromState
+
+  const params = getOAuthSearchParams(window.location.search, '')
+  return getOAuthErrorMessage(params.get('error')) ?? ''
+}
 
 export function LoginForm() {
   const location = useLocation()
@@ -15,7 +29,7 @@ export function LoginForm() {
   const { theme } = useTheme()
   const { login, isAuthenticated } = useAuth()
   const isDark = theme === 'dark'
-  const oauthError = (location.state as { oauthError?: string } | null)?.oauthError ?? ''
+  const [oauthError] = useState(() => readOAuthError(location.state))
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(
     (location.state as { message?: string } | null)?.message ?? '',
@@ -24,7 +38,7 @@ export function LoginForm() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/home', { replace: true })
+      navigate(HOME_PATH, { replace: true })
     }
   }, [isAuthenticated, navigate])
 
@@ -47,7 +61,7 @@ export function LoginForm() {
 
     try {
       const nextUser = await login({ email, password })
-      navigate('/home', {
+      navigate(HOME_PATH, {
         replace: true,
         state: { message: `Welcome back, ${nextUser.name}!` },
       })

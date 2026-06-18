@@ -1,38 +1,69 @@
-import { useEffect, useMemo } from 'react'
+import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { HOME_PATH } from '../config/routes'
 import { useAuth } from '../context/AuthContext'
-import { extractOAuthCallback, getOAuthErrorMessage } from '../utils/oauth'
+import {
+  clearOAuthUrl,
+  extractOAuthCallback,
+  getOAuthErrorMessage,
+  getOAuthSearchParams,
+  OAUTH_FAILURE_PATH,
+} from '../utils/oauth'
+import { consumeOAuthError } from '../utils/oauthBootstrap'
 
-const POST_LOGIN_PATH = '/home'
-
+/** Fallback OAuth handler when bootstrap did not run (e.g. client-side navigation). */
 export function useOAuthCallback() {
   const location = useLocation()
   const navigate = useNavigate()
   const { setSession } = useAuth()
+  const handledRef = useRef(false)
 
-  const params = useMemo(() => new URLSearchParams(location.search), [location.search])
+  const params = useMemo(
+    () => getOAuthSearchParams(location.search, location.hash),
+    [location.search, location.hash],
+  )
   const { accessToken, error, user } = useMemo(() => extractOAuthCallback(params), [params])
   const oauthError = getOAuthErrorMessage(error)
 
-  useEffect(() => {
-    if (!accessToken && !error) return
+  useLayoutEffect(() => {
+    if (handledRef.current) return
 
     if (accessToken) {
+      handledRef.current = true
       setSession(accessToken, user)
-      navigate(POST_LOGIN_PATH, {
-        replace: true,
-        state: { message: 'Signed in successfully with your social account.' },
-      })
+      clearOAuthUrl(HOME_PATH)
+      if (location.pathname !== HOME_PATH) {
+        navigate(HOME_PATH, { replace: true })
+      }
       return
     }
 
     if (error) {
-      navigate('/login', {
+      handledRef.current = true
+      consumeOAuthError()
+      const message = oauthError ?? 'Social sign-in failed. Please try again.'
+      clearOAuthUrl(OAUTH_FAILURE_PATH)
+      navigate(OAUTH_FAILURE_PATH, {
         replace: true,
-        state: { oauthError: oauthError ?? 'Social sign-in failed. Please try again.' },
+        state: { oauthError: message },
       })
+      return
     }
-  }, [accessToken, error, navigate, oauthError, setSession, user])
+
+    if (location.pathname === HOME_PATH && (location.search || location.hash)) {
+      clearOAuthUrl(HOME_PATH)
+    }
+  }, [
+    accessToken,
+    error,
+    location.hash,
+    location.pathname,
+    location.search,
+    navigate,
+    oauthError,
+    setSession,
+    user,
+  ])
 
   return { oauthError }
 }

@@ -1,11 +1,13 @@
-import { ChevronDown, ShoppingBag, User, X } from 'lucide-react'
+import { ChevronDown, LogOut, ShoppingBag, User, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { HOME_PATH } from '../../config/routes'
+import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import { Logo } from '../ui/Logo'
 
 const navLinks = [
-  { label: 'Home', to: '/' },
+  { label: 'Home', to: HOME_PATH },
   { label: 'Shop', to: '/shop' },
   { label: 'Categories', to: '/categories', hasChevron: true },
   { label: 'Docs', to: '/docs' },
@@ -22,9 +24,12 @@ function BurgerIcon() {
 }
 
 export function Navbar() {
+  const navigate = useNavigate()
   const { theme } = useTheme()
+  const { isAuthenticated, logout } = useAuth()
   const isDark = theme === 'dark'
   const [menuOpen, setMenuOpen] = useState(false)
+  const [authLoading, setAuthLoading] = useState(false)
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
@@ -32,6 +37,29 @@ export function Navbar() {
       document.body.style.overflow = ''
     }
   }, [menuOpen])
+
+  async function handleLogout() {
+    if (authLoading) return
+
+    setAuthLoading(true)
+
+    try {
+      await logout()
+      setMenuOpen(false)
+      navigate(HOME_PATH, { replace: true })
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const authActionClass = [
+    'inline-flex min-h-11 items-center gap-2 rounded px-2 text-sm font-medium sm:px-3',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-purple',
+    isDark
+      ? 'text-text-secondary-dark hover:text-text-primary-dark'
+      : 'text-text-secondary-light hover:text-text-primary-light',
+    authLoading ? 'pointer-events-none opacity-60' : '',
+  ].join(' ')
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     [
@@ -62,13 +90,13 @@ export function Navbar() {
       ].join(' ')}
     >
       <nav
-        className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-3 py-3 sm:px-4 sm:py-4 lg:px-6"
+        className="mx-auto flex max-w-[1440px] items-center justify-between gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3 lg:px-6 lg:py-4"
         aria-label="Main navigation"
       >
         <button
           type="button"
           className={[
-            'rounded-lg p-2 md:hidden',
+            'flex min-h-11 min-w-11 items-center justify-center rounded-lg md:hidden',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-purple',
             isDark
               ? 'text-text-primary-dark hover:bg-input-dark'
@@ -92,15 +120,15 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="flex flex-1 justify-center md:flex-none">
+        <div className="flex min-w-0 flex-1 items-center justify-center md:flex-none">
           <Logo />
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-3">
           <button
             type="button"
             className={[
-              'rounded-full p-2 transition-colors',
+              'flex min-h-11 min-w-11 items-center justify-center rounded-full transition-colors',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-purple',
               isDark
                 ? 'text-text-primary-dark hover:bg-input-dark'
@@ -110,22 +138,28 @@ export function Navbar() {
           >
             <ShoppingBag size={20} aria-hidden />
           </button>
-          <NavLink
-            to="/login"
-            className={[
-              'inline-flex items-center gap-2 text-sm font-medium',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-purple rounded',
-              isDark
-                ? 'text-text-secondary-dark hover:text-text-primary-dark'
-                : 'text-text-secondary-light hover:text-text-primary-light',
-            ].join(' ')}
-          >
-            <User size={18} aria-hidden />
-            <span className="hidden leading-tight sm:inline">
-              Sign in / Register
-              <span className="hidden lg:block"> Account</span>
-            </span>
-          </NavLink>
+          {isAuthenticated ? (
+            <button
+              type="button"
+              className={authActionClass}
+              onClick={() => void handleLogout()}
+              disabled={authLoading}
+              aria-busy={authLoading}
+            >
+              <LogOut size={18} aria-hidden />
+              <span className="hidden leading-tight sm:inline">
+                {authLoading ? 'Logging out...' : 'Log out'}
+              </span>
+            </button>
+          ) : (
+            <NavLink to="/login" className={authActionClass}>
+              <User size={18} aria-hidden />
+              <span className="hidden leading-tight sm:inline">
+                Sign in / Register
+                <span className="hidden xl:inline"> Account</span>
+              </span>
+            </NavLink>
+          )}
         </div>
       </nav>
 
@@ -171,6 +205,37 @@ export function Navbar() {
                   </NavLink>
                 </li>
               ))}
+              <li className="pt-2">
+                {isAuthenticated ? (
+                  <button
+                    type="button"
+                    className={[
+                      'flex w-full items-center gap-2 rounded-xl px-4 py-3 text-base font-medium transition-colors',
+                      isDark
+                        ? 'text-text-primary-dark hover:bg-input-dark'
+                        : 'text-text-primary-light hover:bg-input-light',
+                      authLoading ? 'pointer-events-none opacity-60' : '',
+                    ].join(' ')}
+                    onClick={() => void handleLogout()}
+                    disabled={authLoading}
+                    aria-busy={authLoading}
+                  >
+                    <LogOut size={18} aria-hidden />
+                    {authLoading ? 'Logging out...' : 'Log out'}
+                  </button>
+                ) : (
+                  <NavLink
+                    to="/login"
+                    className={mobileLinkClass}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <User size={18} aria-hidden />
+                      Sign in / Register
+                    </span>
+                  </NavLink>
+                )}
+              </li>
             </ul>
           </div>
         </>

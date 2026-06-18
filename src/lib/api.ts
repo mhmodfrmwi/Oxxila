@@ -44,17 +44,16 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
 
-  let payload: ApiResponse<T> | null = null
-
   try {
-    payload = (await response.json()) as ApiResponse<T>
-  } catch {
+    const payload = (await response.json()) as ApiResponse<T>
+
+    if (!response.ok || !payload.success) {
+      throw new ApiError(payload.message || 'Something went wrong. Please try again.', response.status)
+    }
+
+    return payload
+  } catch (error) {
+    if (error instanceof ApiError) throw error
     throw new ApiError('Unexpected server response. Please try again.', response.status)
   }
-
-  if (!response.ok || !payload.success) {
-    throw new ApiError(payload.message || 'Something went wrong. Please try again.', response.status)
-  }
-
-  return payload
 }

@@ -11,6 +11,45 @@
       rel="stylesheet"
     />
     <title>Oxxila</title>
+    <script>
+      try {
+        var theme = localStorage.getItem('oxxila-theme');
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch (e) {}
+    </script>
+    <script>
+      (function () {
+        try {
+          var hash = location.hash;
+          if (!hash) return;
+          var match = hash.slice(1).match(/(?:^|&)(?:accessToken|access_token|token|jwt)=([^&]+)/);
+          if (!match) return;
+          var token = decodeURIComponent(match[1]);
+          localStorage.setItem('oxxila_access_token', token);
+          try {
+            var segment = token.split('.')[1];
+            if (segment) {
+              var payload = JSON.parse(
+                atob(segment.replace(/-/g, '+').replace(/_/g, '/')),
+              );
+              localStorage.setItem(
+                'oxxila_user',
+                JSON.stringify({
+                  id: String(payload.userId || payload.id || payload.sub || ''),
+                  name: String(payload.name || payload.username || 'User'),
+                  email: String(payload.email || ''),
+                  role: String(payload.role || 'user'),
+                }),
+              );
+            }
+          } catch (e) {}
+          history.replaceState({}, document.title, '/home');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
