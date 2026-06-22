@@ -1,0 +1,23 @@
+/**
+ * Typography tokens — Playfair Display is the global font family.
+ */
+
+:root,
+[data-theme='light'],
+[data-theme='dark'] {
+  --font-family-base: 'Playfair Display', Georgia, serif;
+  --font-family-display: var(--font-family-base);
+
+  --font-size-base: 1.25rem;
+  --line-height-base: 1.2;
+
+  /* Typography/small — buttons, nav links */
+  --font-family-small: var(--font-family-base);
+  --font-size-small: 1rem;
+  --line-height-small: 1.2;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+}

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import type { FeaturedImage } from '../../../types/catalog'
 import { useLandingCatalogContext } from '../../../hooks/useLandingCatalogContext'
+import { Heading } from '../../ui/Heading'
 import { footerInstagramImages } from '../landingData'
 import { InstagramIcon } from './SocialIcons'
 
@@ -16,9 +17,7 @@ export function InstagramGrid() {
 
   return (
     <div>
-      <h3 className="font-serif text-lg font-medium text-[#1A1A1A] dark:text-[#F5F5F5]">
-        Follow on Instagram
-      </h3>
+      <Heading variant="card">Follow on Instagram</Heading>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-3.5">
         {images.map((image, index) => (
           <motion.a
@@ -26,7 +25,7 @@ export function InstagramGrid() {
             href="https://instagram.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative aspect-square cursor-pointer overflow-hidden rounded-3xl bg-[#E5E7EB] dark:bg-[#171B2E]"
+            className="group relative aspect-square cursor-pointer overflow-hidden rounded-3xl bg-border-subtle"
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}

@@ -23,8 +23,8 @@ export function CarouselControls({ count, activeIndex, onSelect }: CarouselContr
               className={[
                 'block h-2 rounded-full transition-all duration-300 ease-out',
                 isActive
-                  ? 'w-8 bg-oxxila-accent dark:bg-[#9886FF]'
-                  : 'w-2 bg-[#C0B5DE]/60 hover:bg-oxxila-accent/60 dark:bg-white/20 dark:hover:bg-white/40',
+                  ? 'w-8 bg-button-primary'
+                  : 'w-2 bg-accent-muted/60 hover:bg-button-primary/60 dark:bg-white/20 dark:hover:bg-white/40',
               ].join(' ')}
             />
           </button>

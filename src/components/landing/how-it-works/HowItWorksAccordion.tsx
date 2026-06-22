@@ -20,8 +20,8 @@ export function HowItWorksAccordion({ openId, onOpenChange }: HowItWorksAccordio
             className={[
               'overflow-hidden rounded-3xl border transition-colors duration-300',
               isOpen
-                ? 'border-transparent bg-white shadow-lg shadow-black/5 dark:border-white/[0.08] dark:bg-[#171B2E] dark:shadow-[0_8px_40px_rgba(123,101,251,0.12)]'
-                : 'border-[#E5E7EB] bg-transparent hover:border-[#8B7CF8]/40 dark:border-white/[0.08] dark:hover:border-[#A78BFA]/40',
+                ? 'border-transparent bg-card shadow-lg shadow-black/5 dark:shadow-[0_8px_40px_var(--accent-glow)]'
+                : 'border-border-subtle bg-transparent hover:border-accent-soft/40',
             ].join(' ')}
           >
             <button
@@ -30,7 +30,7 @@ export function HowItWorksAccordion({ openId, onOpenChange }: HowItWorksAccordio
               aria-expanded={isOpen}
               onClick={() => onOpenChange(isOpen ? '' : step.id)}
             >
-              <span className="min-w-0 font-serif text-base font-medium text-[#1A1A1A] min-[481px]:text-lg sm:text-xl dark:text-[#F5F5F5]">
+              <span className="min-w-0 font-serif text-base font-medium text-primary-text min-[481px]:text-lg sm:text-xl">
                 {step.title}
               </span>
 
@@ -38,8 +38,8 @@ export function HowItWorksAccordion({ openId, onOpenChange }: HowItWorksAccordio
                 className={[
                   'flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all duration-300',
                   isOpen
-                    ? 'bg-[#8B7CF8] text-white dark:bg-[#A78BFA]'
-                    : 'bg-[#8B7CF8]/10 text-[#8B7CF8] dark:bg-[#A78BFA]/15 dark:text-[#A78BFA]',
+                    ? 'bg-button-primary text-on-emphasis'
+                    : 'bg-accent-soft/10 text-accent-soft',
                 ].join(' ')}
                 aria-hidden
               >
@@ -60,7 +60,7 @@ export function HowItWorksAccordion({ openId, onOpenChange }: HowItWorksAccordio
                   transition={{ duration: 0.35, ease: 'easeInOut' }}
                 >
                   <div className="px-5 pb-5 sm:px-6 sm:pb-6">
-                    <p className="text-sm leading-relaxed text-[#6B7280] sm:text-base dark:text-[#B3B3B3]">
+                    <p className="text-sm leading-relaxed text-secondary-text sm:text-base">
                       {step.description}
                     </p>
                   </div>

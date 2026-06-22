@@ -25,7 +25,7 @@ export function TrustedBySection() {
 
   return (
     <section
-      className="bg-page-light py-8 dark:bg-page-dark sm:py-10 lg:py-14"
+      className="bg-background py-8 sm:py-10 lg:py-14"
       aria-label="Trusted by leading companies"
     >
       <div className="relative w-full [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] sm:[mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">

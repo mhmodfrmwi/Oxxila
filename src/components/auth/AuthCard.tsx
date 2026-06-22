@@ -15,7 +15,7 @@ export function AuthCard({ activeTab, children, imagePosition }: AuthCardProps) 
   const flipImage = activeTab === 'login'
 
   return (
-    <article className="flex w-full flex-col overflow-hidden rounded-3xl bg-card-light shadow-xl dark:bg-card-dark max-lg:rounded-none lg:min-h-[780px] lg:flex-row">
+    <article className="flex w-full flex-col overflow-hidden rounded-3xl bg-card shadow-xl max-lg:rounded-none lg:min-h-[780px] lg:flex-row">
       {imagePosition === 'left' && (
         <AuthVisual activeTab={activeTab} className={visualOrder} flipImage={flipImage} />
       )}

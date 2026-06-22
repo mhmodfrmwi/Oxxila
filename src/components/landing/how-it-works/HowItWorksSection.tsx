@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Play, X } from 'lucide-react'
 import { useState } from 'react'
 import { FadeUp } from '../../ui/FadeUp'
+import { SectionHeader } from '../SectionHeader'
 import { howItWorksThumb } from '../landingData'
 import { HowItWorksAccordion } from './HowItWorksAccordion'
 
@@ -11,12 +12,10 @@ export function HowItWorksSection() {
 
   return (
     <>
-      <section className="bg-[#F7F7FB] py-10 sm:py-14 lg:py-20 dark:bg-page-dark">
-        <div className="mx-auto max-w-[1340px] px-4 sm:px-5 lg:px-6">
-          <FadeUp className="text-center">
-            <h2 className="font-serif text-3xl font-medium text-[#1A1A1A] md:text-4xl lg:text-5xl dark:text-[#F5F5F5]">
-              How it works
-            </h2>
+      <section className="bg-surface-subtle py-10 sm:py-14 lg:py-20">
+        <div className="container-content">
+          <FadeUp>
+            <SectionHeader title="How it works" align="center" />
           </FadeUp>
 
           <div className="mt-8 grid items-start gap-8 min-[769px]:mt-12 min-[769px]:grid-cols-2 min-[769px]:items-center min-[769px]:gap-10 lg:mt-14 lg:gap-14">
@@ -75,7 +74,7 @@ export function HowItWorksSection() {
             />
 
             <motion.div
-              className="relative z-10 w-full max-w-3xl overflow-hidden rounded-3xl bg-[#171B2E] shadow-2xl"
+              className="relative z-10 w-full max-w-3xl overflow-hidden rounded-3xl bg-surface-subtle shadow-2xl"
               initial={{ scale: 0.92, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.92, opacity: 0 }}

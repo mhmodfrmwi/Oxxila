@@ -6,6 +6,7 @@ import {
   type LoginPayload,
 } from '../api/auth'
 import { AUTH_TOKEN_KEY } from '../config/api'
+import { STORAGE_KEYS } from '../config/storage'
 import { ApiError } from '../lib/api'
 import { parseOAuthUserFromToken, createFallbackOAuthUser } from '../utils/oauth'
 
@@ -21,7 +22,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 function readStoredUser(): AuthUser | null {
-  const raw = localStorage.getItem('oxxila_user')
+  const raw = localStorage.getItem(STORAGE_KEYS.user)
   if (!raw) return null
 
   try {
@@ -42,9 +43,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const setUser = useCallback((nextUser: AuthUser | null) => {
     setUserState(nextUser)
     if (nextUser) {
-      localStorage.setItem('oxxila_user', JSON.stringify(nextUser))
+      localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(nextUser))
     } else {
-      localStorage.removeItem('oxxila_user')
+      localStorage.removeItem(STORAGE_KEYS.user)
     }
   }, [])
 

@@ -1,0 +1,111 @@
+/**
+ * Oxilla design tokens — source of truth from Figma.
+ * Semantic names only; values swap per theme via data-theme on <html>.
+ */
+
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  /* Background */
+  --background: #f5f6ff;
+  --card-background: #ffffff;
+  --surface-muted: #e8e4f0;
+  --surface-subtle: #f7f7fb;
+  --input-background: #f0edff;
+
+  /* Text */
+  --primary-text: #5d5a88;
+  --secondary-text: #9491b8;
+  --placeholder-text: #cccccc;
+  --helper-text: #b5b5b5;
+  --text-on-color: #ffffff;
+
+  /* Border */
+  --border-interactive: #464646;
+  --border-subtle: #e5e7eb;
+
+  /* Links */
+  --primary-link: #0280e0;
+  --hover-primary-link: #519fda;
+  --primary-link-active: #0267b4;
+
+  /* Icons */
+  --primary-icon: #161616;
+  --secondary-icon: #7b65fb;
+  --icon-on-color: #ffffff;
+
+  /* Buttons */
+  --primary-button: #7b65fb;
+  --primary-button-hover: #e7deff;
+  --primary-button-active: #c0b5de;
+  --secondary-button: #c0b5de;
+  --secondary-button-hover: #bfbfbf;
+  --secondary-button-active: #b3b3b3;
+  --danger-button: #da1e28;
+
+  /* Support */
+  --support-error: #da1e28;
+  --support-success: #24a148;
+  --support-warning: #f1c21b;
+  --support-info: #0043ce;
+
+  /* Brand accents (derived for UI states) */
+  --accent: #7b65fb;
+  --accent-muted: #c0b5de;
+  --accent-soft: #8b7cf8;
+  --accent-glow: rgb(123 101 251 / 0.15);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Background */
+  --background: #1e2229;
+  --card-background: #2f2d40;
+  --surface-muted: #2a2b3d;
+  --surface-subtle: #171b2e;
+  --input-background: #171b2e;
+
+  /* Text */
+  --primary-text: #c0bcf2;
+  --secondary-text: #9a9a9a;
+  --placeholder-text: #cccccc;
+  --helper-text: #b5b5b5;
+  --text-on-color: #ffffff;
+
+  /* Border */
+  --border-interactive: #c8c8c8;
+  --border-subtle: rgb(255 255 255 / 0.08);
+
+  /* Links */
+  --primary-link: #45acff;
+  --hover-primary-link: #63bbff;
+  --primary-link-active: #2e99f2;
+
+  /* Icons */
+  --primary-icon: #ffffff;
+  --secondary-icon: #7b65fb;
+  --icon-on-color: #ffffff;
+
+  /* Buttons */
+  --primary-button: #9886ff;
+  --primary-button-hover: #e7deff;
+  --primary-button-active: #c0b5de;
+  --secondary-button: #655a83;
+  --secondary-button-hover: #bfbfbf;
+  --secondary-button-active: #b3b3b3;
+  --danger-button: #fa4d56;
+
+  /* Support */
+  --support-error: #fa4d56;
+  --support-success: #42be65;
+  --support-warning: #f1c21b;
+  --support-info: #4589ff;
+
+  /* Brand accents */
+  --accent: #7b65fb;
+  --accent-muted: #9886ff;
+  --accent-soft: #a78bfa;
+  --accent-glow: rgb(123 101 251 / 0.25);
+}

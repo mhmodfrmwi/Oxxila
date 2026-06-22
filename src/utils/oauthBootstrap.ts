@@ -1,4 +1,5 @@
 import { AUTH_TOKEN_KEY } from '../config/api'
+import { STORAGE_KEYS } from '../config/storage'
 import { HOME_PATH } from '../config/routes'
 import {
   createFallbackOAuthUser,
@@ -10,8 +11,8 @@ import {
   parseOAuthUserFromToken,
 } from './oauth'
 
-const USER_KEY = 'oxxila_user'
-const OAUTH_ERROR_KEY = 'oxxila_oauth_error'
+const USER_KEY = STORAGE_KEYS.user
+const OAUTH_ERROR_KEY = STORAGE_KEYS.oauthError
 
 /**
  * Process OAuth redirects before React mounts.

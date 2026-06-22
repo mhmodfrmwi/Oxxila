@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { forgotPassword } from '../../api/auth'
 import { ApiError } from '../../lib/api'
 import { Button } from '../ui/Button'
+import { Heading } from '../ui/Heading'
 import { AuthSimpleCard } from './AuthSimpleCard'
 import { FormMessage } from './FormMessage'
 
@@ -43,10 +44,8 @@ export function VerifyOtpForm() {
     return (
       <AuthSimpleCard>
         <header className="mb-8 text-center sm:text-left">
-          <h1 className="font-serif text-3xl font-medium text-text-primary-light dark:text-text-primary-dark sm:text-4xl">
-            Check your email
-          </h1>
-          <p className="mt-2 text-sm text-text-secondary-light dark:text-text-secondary-dark sm:text-base">
+          <Heading variant="page">Check your email</Heading>
+          <p className="mt-2 text-sm text-secondary-text sm:text-base">
             Start from the forgot password page so we know which email to use.
           </p>
         </header>
@@ -60,10 +59,8 @@ export function VerifyOtpForm() {
   return (
     <AuthSimpleCard>
       <header className="mb-8 text-center sm:text-left">
-        <h1 className="font-serif text-3xl font-medium text-text-primary-light dark:text-text-primary-dark sm:text-4xl">
-          Check your email
-        </h1>
-        <p className="mt-2 text-sm text-text-secondary-light dark:text-text-secondary-dark sm:text-base">
+        <Heading variant="page">Check your email</Heading>
+        <p className="mt-2 text-sm text-secondary-text sm:text-base">
           We sent a password reset link to <strong>{email}</strong>. Open the link in your email to set a new password.
           The link expires in 60 minutes.
         </p>
@@ -78,11 +75,11 @@ export function VerifyOtpForm() {
         </Button>
       </div>
 
-      <p className="mt-8 text-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+      <p className="mt-8 text-center text-sm text-secondary-text">
         Didn&apos;t receive an email?{' '}
         <button
           type="button"
-          className="font-semibold text-oxxila-accent hover:text-oxxila-purple-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-accent rounded disabled:opacity-50"
+          className="font-semibold text-link hover:text-link-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-link rounded disabled:opacity-50"
           onClick={handleResend}
           disabled={loading}
         >
@@ -90,10 +87,10 @@ export function VerifyOtpForm() {
         </button>
       </p>
 
-      <p className="mt-3 text-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+      <p className="mt-3 text-center text-sm text-secondary-text">
         <Link
           to="/forgot-password"
-          className="font-semibold text-oxxila-accent hover:text-oxxila-purple-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-accent rounded"
+          className="font-semibold text-link hover:text-link-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-link rounded"
         >
           Change email
         </Link>

@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { STORAGE_KEYS } from '../config/storage'
 
 export type Theme = 'light' | 'dark'
 
@@ -10,17 +11,15 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
-const STORAGE_KEY = 'oxxila-theme'
-
 function applyTheme(theme: Theme) {
-  localStorage.setItem(STORAGE_KEY, theme)
+  localStorage.setItem(STORAGE_KEYS.theme, theme)
   document.documentElement.dataset.theme = theme
   document.documentElement.classList.toggle('dark', theme === 'dark')
 }
 
 function readStoredTheme(): Theme {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = localStorage.getItem(STORAGE_KEYS.theme)
     return stored === 'dark' || stored === 'light' ? stored : 'light'
   } catch {
     return 'light'
@@ -28,7 +27,11 @@ function readStoredTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => readStoredTheme())
+  const [theme, setThemeState] = useState<Theme>(() => {
+    const stored = readStoredTheme()
+    applyTheme(stored)
+    return stored
+  })
 
   useEffect(() => {
     applyTheme(theme)

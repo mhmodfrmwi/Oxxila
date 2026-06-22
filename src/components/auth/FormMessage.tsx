@@ -10,8 +10,8 @@ export function FormMessage({ message, type = 'error' }: FormMessageProps) {
       className={[
         'rounded-xl px-4 py-3 text-sm',
         type === 'error'
-          ? 'bg-red-500/10 text-red-600 dark:text-red-400'
-          : 'bg-green-500/10 text-green-700 dark:text-green-400',
+          ? 'bg-support-error/10 text-support-error'
+          : 'bg-support-success/10 text-support-success',
       ].join(' ')}
     >
       {message}

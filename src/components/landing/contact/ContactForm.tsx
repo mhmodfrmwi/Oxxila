@@ -1,6 +1,9 @@
 import { motion } from 'framer-motion'
 import { Check, Loader2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
+import { gradientCtaClasses, successCtaClasses } from '../../ui/buttonStyles'
+import { typeSmallClasses } from '../../ui/typography'
+import { cn } from '../../../lib/cn'
 
 type FieldName = 'name' | 'email' | 'message'
 type FormStatus = 'idle' | 'loading' | 'success'
@@ -19,17 +22,15 @@ interface FormErrors {
 
 const inputBase = [
   'peer min-h-11 h-14 w-full rounded-2xl border px-4 pt-5 pb-1.5 text-sm outline-none transition-all duration-300 sm:text-base',
-  'bg-[#F0EDFF] text-[#1A1A1A] placeholder-transparent',
-  'border-transparent focus:border-[#8B7CF8]/50 focus:ring-2 focus:ring-[#8B7CF8]/25',
-  'dark:bg-[#171B2E] dark:text-[#F5F5F5] dark:focus:border-[#A78BFA]/50 dark:focus:ring-[#A78BFA]/20',
+  'bg-input text-primary-text placeholder-transparent',
+  'border-transparent focus:border-accent-soft/50 focus:ring-2 focus:ring-accent-soft/25',
 ].join(' ')
 
 const labelBase = [
-  'pointer-events-none absolute left-4 text-[#9CA3AF] transition-all duration-200',
+  'pointer-events-none absolute left-4 text-placeholder-text transition-all duration-200',
   'top-1/2 -translate-y-1/2 text-sm',
-  'peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-[#8B7CF8]',
+  'peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-accent-soft',
   'peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs',
-  'dark:peer-focus:text-[#A78BFA]',
 ].join(' ')
 
 function validate(values: FormValues): FormErrors {
@@ -66,7 +67,7 @@ function FloatingField({
   onBlur,
 }: FloatingFieldProps) {
   const errorRing = error
-    ? 'border-red-400 ring-2 ring-red-400/20 dark:border-red-400/70 dark:ring-red-400/15'
+    ? 'border-support-error ring-2 ring-support-error/20'
     : ''
 
   return (
@@ -102,7 +103,7 @@ function FloatingField({
         {label}
       </label>
       {error && (
-        <p id={`${id}-error`} className="mt-1.5 text-xs text-red-500 dark:text-red-400" role="alert">
+        <p id={`${id}-error`} className="mt-1.5 text-xs text-support-error" role="alert">
           {error}
         </p>
       )}
@@ -193,14 +194,13 @@ export function ContactForm() {
         disabled={status === 'loading' || status === 'success'}
         whileHover={status === 'idle' ? { y: -2 } : undefined}
         whileTap={status === 'idle' ? { scale: 0.99 } : undefined}
-        className={[
-          'flex h-14 w-full items-center justify-center gap-2 rounded-full text-base font-semibold text-white',
+        className={cn(
+          'flex h-14 w-full items-center justify-center gap-2 rounded-full text-on-emphasis',
+          typeSmallClasses,
           'transition-all duration-300',
-          status === 'success'
-            ? 'bg-emerald-500 shadow-lg shadow-emerald-500/25'
-            : 'bg-gradient-to-r from-[#8B7CF8] to-[#A78BFA] shadow-lg shadow-[#8B7CF8]/25 hover:shadow-xl hover:shadow-[#8B7CF8]/35 dark:from-[#A78BFA] dark:to-[#8B7CF8] dark:shadow-[#A78BFA]/20 dark:hover:shadow-[#A78BFA]/35',
-          status === 'loading' ? 'cursor-wait opacity-90' : '',
-        ].join(' ')}
+          status === 'success' ? successCtaClasses : gradientCtaClasses,
+          status === 'loading' && 'cursor-wait opacity-90',
+        )}
       >
         {status === 'loading' && (
           <>

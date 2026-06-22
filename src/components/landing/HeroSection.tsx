@@ -10,6 +10,7 @@ import {
   heroLeftProduct,
   heroRightProduct,
 } from "./landingData";
+import { typeSmallClasses } from "../ui/typography";
 
 const HERO_WIDTH = 1440;
 const HERO_HEIGHT = 796;
@@ -35,18 +36,19 @@ function centerStyle(x: number, y: number) {
 
 const ctaPrimaryClass = [
   "inline-flex min-h-11 w-full items-center justify-center rounded-full px-6",
-  "bg-[#7B65FB] text-sm font-semibold text-white transition-colors sm:text-base",
-  "hover:bg-oxxila-purple-light",
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-accent focus-visible:ring-offset-2",
+  typeSmallClasses,
+  "bg-button-primary text-on-emphasis transition-colors",
+  "hover:bg-button-primary-hover hover:text-primary-text",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2",
   "min-[481px]:w-auto min-[481px]:min-w-[200px]",
 ].join(" ");
 
 const ctaSecondaryClass = [
   "inline-flex min-h-11 w-full items-center justify-center rounded-full border px-6",
-  "border-[#7B65FB] bg-[#F5F6FF] text-sm font-semibold text-[#7B65FB] transition-colors sm:text-base",
-  "hover:bg-white",
-  "dark:border-oxxila-accent dark:bg-page-dark dark:text-oxxila-purple-muted dark:hover:bg-card-dark",
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-accent focus-visible:ring-offset-2",
+  typeSmallClasses,
+  "border-button-primary bg-background text-button-primary transition-colors",
+  "hover:bg-card",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2",
   "min-[481px]:w-auto min-[481px]:min-w-[200px]",
 ].join(" ");
 
@@ -55,11 +57,11 @@ export function HeroSection() {
   const isDark = theme === "dark";
 
   return (
-    <section className="relative overflow-hidden bg-page-light py-8 dark:bg-page-dark sm:py-12 lg:py-20">
+    <section className="relative overflow-hidden bg-background py-8 sm:py-12 lg:py-20">
       <div className="mx-auto w-full max-w-[1440px]">
         {/* Mobile & tablet: stacked layout */}
         <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-5 min-[1025px]:hidden">
-          <div className="relative mx-auto max-w-lg overflow-hidden rounded-3xl bg-[#E8E4F0] dark:bg-[#2A2B3D]">
+          <div className="relative mx-auto max-w-lg overflow-hidden rounded-3xl bg-surface-muted">
             <img
               src={isDark ? heroBrushDark : heroImage}
               alt=""
@@ -75,10 +77,10 @@ export function HeroSection() {
           </div>
 
           <div className="mx-auto mt-8 max-w-xl text-center">
-            <h1 className="font-serif text-4xl font-medium leading-[1.15] text-[#5D5A88] dark:text-white md:text-5xl my-4 lg:text-6xl">
+            <h1 className="font-serif text-4xl font-medium leading-[1.15] text-primary-text md:text-5xl my-4 lg:text-6xl">
               Oxxila is the store which combines trust and convenience
             </h1>
-            <p className="mx-auto mt-4 max-w-md font-serif text-sm italic leading-relaxed text-[#5D5A88] dark:text-white/80 md:text-base lg:text-lg">
+            <p className="mx-auto mt-4 max-w-md font-serif text-sm italic leading-relaxed text-primary-text/80 md:text-base lg:text-lg">
               We show you ingredients, after results step by step, usage so
               every purchase is informed and confident.
             </p>
@@ -119,8 +121,8 @@ export function HeroSection() {
                 y2="30"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stopColor="#F2F1FA" stopOpacity="0" />
-                <stop offset="1" stopColor="#F5F6FF" />
+                <stop stopColor="var(--surface-muted)" stopOpacity="0" />
+                <stop offset="1" stopColor="var(--background)" />
               </linearGradient>
             </defs>
 
@@ -180,10 +182,10 @@ export function HeroSection() {
               />
             </g>
 
-            <circle cx="1325" cy="430.149" r="35" fill="#7B65FB" />
+            <circle cx="1325" cy="430.149" r="35" fill="var(--button-primary)" />
             <g
               fill="none"
-              stroke="#FFFFFF"
+              stroke="var(--text-on-color)"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -192,10 +194,10 @@ export function HeroSection() {
               <path d="M1325 423.483L1325 426.149" />
             </g>
 
-            <circle cx="115" cy="650.149" r="35" fill="#7B65FB" />
+            <circle cx="115" cy="650.149" r="35" fill="var(--button-primary)" />
             <g
               fill="none"
-              stroke="#FFFFFF"
+              stroke="var(--text-on-color)"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -210,13 +212,13 @@ export function HeroSection() {
               className="absolute inset-x-0 text-center"
               style={{ top: pctY(92) }}
             >
-              <h1 className="font-serif text-5xl font-medium leading-[1.15] text-[#5D5A88] dark:text-white xl:text-6xl 2xl:text-7xl">
+              <h1 className="font-serif text-5xl font-medium leading-[1.15] text-primary-text xl:text-6xl 2xl:text-7xl">
                 Oxxila is the store which combines <br /> trust and convenience
               </h1>
             </div>
 
             <p
-              className="absolute inset-x-0 mx-auto max-w-3xl px-6 text-center font-serif text-lg italic leading-snug text-[#5D5A88] dark:text-white/80"
+              className="absolute inset-x-0 mx-auto max-w-3xl px-6 text-center font-serif text-lg italic leading-snug text-primary-text/80"
               style={{ top: pctY(228) }}
             >
               We show you ingredients, after results step by step, usage so
@@ -241,7 +243,10 @@ export function HeroSection() {
 
           <Link
             to="/shop"
-            className="absolute z-30 flex min-h-11 items-center justify-center rounded-full bg-[#7B65FB] text-base font-semibold text-white transition-colors hover:bg-oxxila-purple-light"
+            className={[
+              "absolute z-30 flex min-h-11 items-center justify-center rounded-full bg-button-primary text-on-emphasis transition-colors hover:bg-button-primary-hover hover:text-primary-text",
+              typeSmallClasses,
+            ].join(" ")}
             style={{
               left: pctX(432),
               top: pctY(726),
@@ -254,7 +259,10 @@ export function HeroSection() {
 
           <a
             href="#contact"
-            className="absolute z-30 flex min-h-11 items-center justify-center rounded-full border border-[#7B65FB] bg-[#F5F6FF] text-base font-semibold text-[#7B65FB] transition-colors hover:bg-white dark:border-oxxila-accent dark:bg-page-dark dark:text-oxxila-purple-muted dark:hover:bg-card-dark"
+            className={[
+              "absolute z-30 flex min-h-11 items-center justify-center rounded-full border border-button-primary bg-background text-button-primary transition-colors hover:bg-card",
+              typeSmallClasses,
+            ].join(" ")}
             style={{
               left: pctX(728.5),
               top: pctY(726.5),

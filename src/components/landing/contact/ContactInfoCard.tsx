@@ -15,24 +15,23 @@ export function ContactInfoCard({ icon: Icon, label, value, href, delay = 0 }: C
       <span
         className={[
           'flex h-11 w-11 shrink-0 items-center justify-center rounded-full border',
-          'border-[#8B7CF8]/30 text-[#8B7CF8]',
-          'transition-colors duration-300 group-hover:border-[#8B7CF8] group-hover:bg-[#8B7CF8]/10',
-          'dark:border-[#A78BFA]/35 dark:text-[#A78BFA] dark:group-hover:border-[#A78BFA] dark:group-hover:bg-[#A78BFA]/10',
+          'border-accent-soft/30 text-accent-soft',
+          'transition-colors duration-300 group-hover:border-accent-soft group-hover:bg-accent-soft/10',
         ].join(' ')}
         aria-hidden
       >
         <Icon size={20} strokeWidth={1.5} />
       </span>
       <span className="min-w-0 text-left">
-        <span className="block text-sm font-medium text-[#8B7CF8] dark:text-[#A78BFA]">{label}</span>
-        <span className="mt-0.5 block text-sm text-[#1A1A1A] sm:text-base dark:text-[#F5F5F5]">{value}</span>
+        <span className="block text-sm font-medium text-accent-soft">{label}</span>
+        <span className="mt-0.5 block text-sm text-primary-text sm:text-base">{value}</span>
       </span>
     </>
   )
 
   const className = [
     'group flex items-center gap-4 rounded-2xl p-3 transition-all duration-300',
-    'hover:-translate-y-0.5 hover:bg-white/60 dark:hover:bg-white/[0.04]',
+    'hover:-translate-y-0.5 hover:bg-card/60',
   ].join(' ')
 
   return (

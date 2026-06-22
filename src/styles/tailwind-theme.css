@@ -1,0 +1,102 @@
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme inline {
+  --font-sans: var(--font-family-base);
+  --font-serif: var(--font-family-base);
+
+  --text-small: var(--font-size-small);
+  --text-small--line-height: var(--line-height-small);
+
+  /* Backgrounds */
+  --color-background: var(--background);
+  --color-card: var(--card-background);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-input: var(--input-background);
+
+  /* Text */
+  --color-primary-text: var(--primary-text);
+  --color-secondary-text: var(--secondary-text);
+  --color-placeholder-text: var(--placeholder-text);
+  --color-helper-text: var(--helper-text);
+  --color-on-emphasis: var(--text-on-color);
+
+  /* Borders */
+  --color-border-interactive: var(--border-interactive);
+  --color-border-subtle: var(--border-subtle);
+
+  /* Links */
+  --color-link: var(--primary-link);
+  --color-link-hover: var(--hover-primary-link);
+  --color-link-active: var(--primary-link-active);
+
+  /* Icons */
+  --color-icon-primary: var(--primary-icon);
+  --color-icon-secondary: var(--secondary-icon);
+  --color-icon-on-emphasis: var(--icon-on-color);
+
+  /* Buttons */
+  --color-button-primary: var(--primary-button);
+  --color-button-primary-hover: var(--primary-button-hover);
+  --color-button-primary-active: var(--primary-button-active);
+  --color-button-secondary: var(--secondary-button);
+  --color-button-secondary-hover: var(--secondary-button-hover);
+  --color-button-secondary-active: var(--secondary-button-active);
+  --color-button-danger: var(--danger-button);
+
+  /* Support */
+  --color-support-error: var(--support-error);
+  --color-support-success: var(--support-success);
+  --color-support-warning: var(--support-warning);
+  --color-support-info: var(--support-info);
+
+  /* Brand */
+  --color-accent: var(--accent);
+  --color-accent-muted: var(--accent-muted);
+  --color-accent-soft: var(--accent-soft);
+
+  --radius-card: 32px;
+  --radius-input: 12px;
+  --radius-button: 12px;
+
+  --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@utility container-content {
+  margin-inline: auto;
+  max-width: 1340px;
+  padding-inline: 1rem;
+
+  @media (width >= 640px) {
+    padding-inline: 1.25rem;
+  }
+
+  @media (width >= 1024px) {
+    padding-inline: 1.5rem;
+  }
+}
+
+/** Typography/small — buttons & nav links */
+@utility type-small {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: 0;
+  text-align: center;
+}

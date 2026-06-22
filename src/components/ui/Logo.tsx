@@ -29,7 +29,7 @@ export function Logo({
       return (
         <Link
           to={linkTo}
-          className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-purple rounded"
+          className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
           aria-label="Oxxila home"
         >
           {icon}
@@ -64,7 +64,7 @@ export function Logo({
     return (
       <Link
         to={linkTo}
-        className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-purple rounded"
+        className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
         aria-label="Oxxila home"
       >
         {content}

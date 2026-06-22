@@ -1,5 +1,6 @@
 import { Mail, MapPin, Phone } from 'lucide-react'
 import { FadeUp } from '../../ui/FadeUp'
+import { SectionHeader } from '../SectionHeader'
 import { contactInfo } from '../landingData'
 import { ContactForm } from './ContactForm'
 import { ContactInfoCard } from './ContactInfoCard'
@@ -12,17 +13,15 @@ const iconMap = {
 
 export function ContactSection() {
   return (
-    <section id="contact" className="relative overflow-hidden bg-white py-10 sm:py-14 lg:py-20 dark:bg-page-dark">
+    <section id="contact" className="relative overflow-hidden bg-card py-10 sm:py-14 lg:py-20">
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,124,248,0.08)_0%,transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(167,139,250,0.12)_0%,transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--accent-glow)_0%,transparent_50%)]"
         aria-hidden
       />
 
-      <div className="relative mx-auto max-w-[1340px] px-4 sm:px-5 lg:px-6">
-        <FadeUp className="text-center">
-          <h2 className="font-serif text-3xl font-medium text-[#1A1A1A] md:text-4xl lg:text-5xl dark:text-[#F5F5F5]">
-            Contact us
-          </h2>
+      <div className="relative container-content">
+        <FadeUp>
+          <SectionHeader title="Contact us" align="center" />
         </FadeUp>
 
         <div className="mt-8 lg:mt-12">

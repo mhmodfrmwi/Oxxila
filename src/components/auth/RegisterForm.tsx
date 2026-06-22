@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { register } from '../../api/auth'
-import { useTheme } from '../../context/ThemeContext'
 import { ApiError } from '../../lib/api'
 import { Button } from '../ui/Button'
+import { Heading } from '../ui/Heading'
 import { InputField } from '../ui/InputField'
 import { AuthCard } from './AuthCard'
 import { FormMessage } from './FormMessage'
@@ -12,8 +12,6 @@ import { SocialLoginButtons } from './SocialLoginButtons'
 
 export function RegisterForm() {
   const navigate = useNavigate()
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -46,20 +44,8 @@ export function RegisterForm() {
   return (
     <AuthCard activeTab="signup" imagePosition="left">
       <header className="mb-8">
-        <h1
-          className={[
-            'font-serif text-4xl font-medium sm:text-[2.75rem]',
-            isDark ? 'text-white' : 'text-text-primary-light',
-          ].join(' ')}
-        >
-          Create your account
-        </h1>
-        <p
-          className={[
-            'mt-2 font-serif text-xl',
-            isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light',
-          ].join(' ')}
-        >
+        <Heading variant="page-lg">Create your account</Heading>
+        <p className="mt-2 font-serif text-xl text-secondary-text">
           Welcome to Oxxila
         </p>
       </header>
@@ -118,14 +104,9 @@ export function RegisterForm() {
         </Button>
       </form>
 
-      <p
-        className={[
-          'mt-6 text-center text-sm',
-          isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light',
-        ].join(' ')}
-      >
+      <p className="mt-6 text-center text-sm text-secondary-text">
         Already have an account?{' '}
-        <Link to="/login" className="font-medium text-oxxila-accent hover:text-oxxila-purple-light">
+        <Link to="/login" className="font-medium text-link hover:text-link-hover">
           Login here
         </Link>
       </p>

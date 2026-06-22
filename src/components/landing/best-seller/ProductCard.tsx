@@ -81,15 +81,14 @@ export function ProductCard({
       <div
         className={[
           'overflow-hidden rounded-[24px] border p-3',
-          'bg-white/90 shadow-xl shadow-black/5 backdrop-blur-sm',
-          'border-border-light/80',
-          'dark:border-white/10 dark:bg-[#1E1F2E]/75 dark:shadow-2xl dark:shadow-black/40 dark:backdrop-blur-xl',
+          'bg-card/90 shadow-xl shadow-black/5 backdrop-blur-sm',
+          'border-border-subtle/80',
           'transition-shadow duration-300',
-          isActive ? 'dark:shadow-oxxila-accent/10' : '',
+          isActive ? 'shadow-accent/10' : '',
         ].join(' ')}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-[#E8E4F0] dark:bg-[#2A2B3D]">
-          <span className="absolute top-3 left-3 z-10 rounded-full bg-[#C0B5DE]/70 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-[#5D4E8C] uppercase dark:bg-[#9886FF]/30 dark:text-[#E0D9FF]">
+        <div className="relative overflow-hidden rounded-2xl bg-surface-muted">
+          <span className="absolute top-3 left-3 z-10 rounded-full bg-accent-muted/70 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-primary-text uppercase">
             Best seller
           </span>
 
@@ -109,9 +108,8 @@ export function ProductCard({
             onClick={(e) => e.stopPropagation()}
             className={[
               'absolute bottom-3 left-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
-              'bg-white/90 text-oxxila-accent shadow-md',
-              'transition-all duration-200 hover:scale-110 hover:bg-oxxila-accent hover:text-white',
-              'dark:bg-[#9886FF]/25 dark:text-[#E0D9FF] dark:hover:bg-[#9886FF] dark:hover:text-white',
+              'bg-card/90 text-icon-secondary shadow-md',
+              'transition-all duration-200 hover:scale-110 hover:bg-button-primary hover:text-on-emphasis',
             ].join(' ')}
           >
             <Heart size={16} aria-hidden />
@@ -123,9 +121,8 @@ export function ProductCard({
             onClick={(e) => e.stopPropagation()}
             className={[
               'absolute right-3 bottom-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
-              'bg-white/90 text-oxxila-accent shadow-md',
-              'transition-all duration-200 hover:scale-110 hover:bg-oxxila-accent hover:text-white',
-              'dark:bg-[#9886FF]/25 dark:text-[#E0D9FF] dark:hover:bg-[#9886FF] dark:hover:text-white',
+              'bg-card/90 text-icon-secondary shadow-md',
+              'transition-all duration-200 hover:scale-110 hover:bg-button-primary hover:text-on-emphasis',
             ].join(' ')}
           >
             <ShoppingBag size={16} aria-hidden />
@@ -133,22 +130,22 @@ export function ProductCard({
         </div>
 
         <div className="space-y-2.5 pt-3">
-          <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-snug font-medium text-[#2D2A4A] dark:text-white">
+          <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-snug font-medium text-primary-text">
             {product.title}
           </h3>
 
           <div className="flex items-end justify-between gap-2">
             <div className="flex items-baseline gap-2">
-              <span className="text-base font-bold text-[#2D2A4A] dark:text-white">
+              <span className="text-base font-bold text-primary-text">
                 ${product.price}
               </span>
-              <span className="text-sm text-text-secondary-light line-through dark:text-text-secondary-dark">
+              <span className="text-sm text-secondary-text line-through">
                 ${product.originalPrice}
               </span>
             </div>
 
-            <div className="flex shrink-0 items-center gap-1 text-xs text-text-secondary-light dark:text-text-secondary-dark">
-              <Star size={12} className="fill-[#F1C21B] text-[#F1C21B]" aria-hidden />
+            <div className="flex shrink-0 items-center gap-1 text-xs text-secondary-text">
+              <Star size={12} className="fill-support-warning text-support-warning" aria-hidden />
               <span>
                 {product.rating} ({formatReviewCount(product.reviewCount)})
               </span>

@@ -2,6 +2,7 @@ import { Truck, Zap } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import authHeroImage from "../../assets/Auth-Pages-Image.svg";
 import { Logo } from "../ui/Logo";
+import { typeSmallClasses } from "../ui/typography";
 import { InfoCard } from "./InfoCard";
 
 interface AuthVisualProps {
@@ -49,7 +50,8 @@ export function AuthVisual({
                 to="/register"
                 className={({ isActive }) =>
                   [
-                    "text-sm font-medium text-white/80 hover:text-white",
+                    typeSmallClasses,
+                    "text-white/80 hover:text-white",
                     isActive || activeTab === "signup"
                       ? "text-white underline underline-offset-4"
                       : "",
@@ -62,7 +64,8 @@ export function AuthVisual({
                 to="/login"
                 className={({ isActive }) =>
                   [
-                    "text-sm font-medium text-white/80 hover:text-white",
+                    typeSmallClasses,
+                    "text-white/80 hover:text-white",
                     isActive || activeTab === "login"
                       ? "text-white underline underline-offset-4"
                       : "",

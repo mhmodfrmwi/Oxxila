@@ -1,3 +1,6 @@
+import { cn } from '../../lib/cn'
+import { Heading } from '../ui/Heading'
+
 interface SectionHeaderProps {
   title: string
   subtitle?: string
@@ -13,16 +16,19 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   return (
     <header
-      className={[
+      className={cn(
         align === 'center' ? 'text-center' : 'text-left',
         className,
-      ].join(' ')}
+      )}
     >
-      <h2 className="font-serif text-3xl font-medium text-text-primary-light dark:text-text-primary-dark md:text-4xl lg:text-5xl">
-        {title}
-      </h2>
+      <Heading variant="section">{title}</Heading>
       {subtitle && (
-        <p className="mt-2 max-w-2xl text-sm text-text-secondary-light dark:text-text-secondary-dark md:text-base lg:text-lg">
+        <p
+          className={cn(
+            'mt-2 max-w-2xl text-sm text-secondary-text md:text-base lg:text-lg',
+            align === 'center' && 'mx-auto',
+          )}
+        >
           {subtitle}
         </p>
       )}

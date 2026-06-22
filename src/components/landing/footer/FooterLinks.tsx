@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { Heading } from '../../ui/Heading'
 
 interface FooterLinkItem {
   label: string
@@ -15,9 +16,7 @@ interface FooterLinksProps {
 export function FooterLinks({ title, links, variant = 'slide' }: FooterLinksProps) {
   return (
     <div>
-      <h3 className="font-serif text-lg font-medium text-[#1A1A1A] dark:text-[#F5F5F5]">
-        {title}
-      </h3>
+      <Heading variant="card">{title}</Heading>
       <ul className="mt-4 space-y-3 sm:space-y-3.5">
         {links.map((link) => (
           <li key={link.label}>
@@ -25,10 +24,10 @@ export function FooterLinks({ title, links, variant = 'slide' }: FooterLinksProp
               <Link
                 to={link.to}
                 className={[
-                  'inline-block text-sm text-[#6B7280] transition-colors duration-300 dark:text-[#A1A1AA]',
+                  'inline-block text-sm text-secondary-text transition-colors duration-300',
                   variant === 'underline'
-                    ? 'hover:text-[#8B7CF8] hover:underline hover:underline-offset-4 dark:hover:text-[#A78BFA]'
-                    : 'hover:text-[#8B7CF8] dark:hover:text-[#A78BFA]',
+                    ? 'hover:text-accent-soft hover:underline hover:underline-offset-4'
+                    : 'hover:text-accent-soft',
                 ].join(' ')}
               >
                 {link.label}

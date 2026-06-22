@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { resetPassword } from '../../api/auth'
 import { ApiError } from '../../lib/api'
 import { Button } from '../ui/Button'
+import { Heading } from '../ui/Heading'
 import { InputField } from '../ui/InputField'
 import { AuthSimpleCard } from './AuthSimpleCard'
 import { FormMessage } from './FormMessage'
@@ -57,8 +58,8 @@ export function ChangePasswordForm() {
   return (
     <AuthSimpleCard>
       <header className="mb-8 text-center sm:text-left">
-        <h1 className="font-serif text-3xl font-medium text-text-primary-light dark:text-text-primary-dark sm:text-4xl">Change password</h1>
-        <p className="mt-2 text-sm text-text-secondary-light dark:text-text-secondary-dark sm:text-base">
+        <Heading variant="page">Change password</Heading>
+        <p className="mt-2 text-sm text-secondary-text sm:text-base">
           Create a new password for your Oxxila account.
         </p>
       </header>
@@ -100,10 +101,10 @@ export function ChangePasswordForm() {
         </Button>
       </form>
 
-      <p className="mt-8 text-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+      <p className="mt-8 text-center text-sm text-secondary-text">
         <Link
           to="/login"
-          className="font-semibold text-oxxila-accent hover:text-oxxila-purple-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-accent rounded"
+          className="font-semibold text-link hover:text-link-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-link rounded"
         >
           Back to login
         </Link>

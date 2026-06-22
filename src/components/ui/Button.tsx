@@ -1,6 +1,9 @@
 import { type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { cn } from '../../lib/cn'
+import { gradientCtaClasses } from './buttonStyles'
+import { typeSmallClasses } from './typography'
 
-type ButtonVariant = 'primary' | 'social' | 'ghost'
+type ButtonVariant = 'primary' | 'gradient' | 'social' | 'ghost'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
@@ -11,11 +14,12 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'bg-oxxila-accent text-white hover:bg-oxxila-purple-light focus-visible:ring-oxxila-accent',
+    'bg-button-primary text-on-emphasis hover:bg-button-primary-hover focus-visible:ring-button-primary',
+  gradient: cn(gradientCtaClasses, 'text-on-emphasis focus-visible:ring-button-primary'),
   social:
-    'bg-input-light text-text-primary-light border border-border-light hover:bg-oxxila-purple/10 dark:bg-input-dark dark:text-text-primary-dark dark:border-border-dark dark:hover:bg-oxxila-purple/20',
+    'bg-input text-primary-text border border-border-subtle hover:bg-accent/10',
   ghost:
-    'bg-transparent text-oxxila-accent hover:text-oxxila-purple-light focus-visible:ring-oxxila-accent',
+    'bg-transparent text-link hover:text-link-hover focus-visible:ring-link',
 }
 
 export function Button({
@@ -30,18 +34,17 @@ export function Button({
   return (
     <button
       type={type}
-      className={[
+      className={cn(
         'inline-flex min-h-11 items-center justify-center gap-2 px-6 py-3',
-        'text-base font-semibold transition-colors',
+        typeSmallClasses,
+        'transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
         'disabled:pointer-events-none disabled:opacity-50',
         pill ? 'rounded-full' : 'rounded-button',
         variantClasses[variant],
-        fullWidth ? 'w-full' : '',
+        fullWidth && 'w-full',
         className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      )}
       {...props}
     >
       {children}

@@ -1,6 +1,9 @@
 import { motion } from 'framer-motion'
 import { Check, Loader2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
+import { gradientCtaClasses, successCtaClasses } from '../../ui/buttonStyles'
+import { typeSmallClasses } from '../../ui/typography'
+import { cn } from '../../../lib/cn'
 
 type FormStatus = 'idle' | 'loading' | 'success'
 
@@ -51,15 +54,13 @@ export function NewsletterForm() {
           }}
           className={[
             'h-11 w-full rounded-full px-5 text-sm outline-none transition-all duration-300 sm:h-14 sm:max-w-[419px]',
-            'bg-white text-[#1A1A1A] placeholder:text-[#9CA3AF]',
-            'border border-[#E5E7EB] focus:border-[#8B7CF8]/50 focus:ring-2 focus:ring-[#8B7CF8]/20',
-            'dark:bg-[#171B2E] dark:text-[#F5F5F5] dark:placeholder:text-[#A1A1AA]',
-            'dark:border-white/[0.08] dark:focus:border-[#A78BFA]/50 dark:focus:ring-[#A78BFA]/20',
-            error ? 'border-red-400 ring-2 ring-red-400/15' : '',
+            'bg-card text-primary-text placeholder:text-placeholder-text',
+            'border border-border-subtle focus:border-accent-soft/50 focus:ring-2 focus:ring-accent-soft/20',
+            error ? 'border-support-error ring-2 ring-support-error/15' : '',
           ].join(' ')}
         />
         {error && (
-          <p id="footer-newsletter-error" className="mt-1.5 text-xs text-red-500 dark:text-red-400" role="alert">
+          <p id="footer-newsletter-error" className="mt-1.5 text-xs text-support-error" role="alert">
             {error}
           </p>
         )}
@@ -70,14 +71,13 @@ export function NewsletterForm() {
         disabled={status === 'loading' || status === 'success'}
         whileHover={status === 'idle' ? { y: -2 } : undefined}
         whileTap={status === 'idle' ? { scale: 0.99 } : undefined}
-        className={[
-          'flex h-11 w-full min-h-11 items-center justify-center gap-2 rounded-full px-8 text-sm font-semibold text-white sm:h-14 sm:w-auto sm:text-base',
+        className={cn(
+          'flex h-11 w-full min-h-11 items-center justify-center gap-2 rounded-full px-8 text-on-emphasis sm:h-14 sm:w-auto',
+          typeSmallClasses,
           'transition-all duration-300',
-          status === 'success'
-            ? 'bg-emerald-500 shadow-lg shadow-emerald-500/25'
-            : 'bg-gradient-to-r from-[#8B7CF8] to-[#A78BFA] shadow-lg shadow-[#8B7CF8]/25 hover:shadow-xl hover:shadow-[#8B7CF8]/35 dark:from-[#A78BFA] dark:to-[#8B7CF8] dark:shadow-[#A78BFA]/20',
-          status === 'loading' ? 'cursor-wait opacity-90' : '',
-        ].join(' ')}
+          status === 'success' ? successCtaClasses : gradientCtaClasses,
+          status === 'loading' && 'cursor-wait opacity-90',
+        )}
       >
         {status === 'loading' && (
           <>

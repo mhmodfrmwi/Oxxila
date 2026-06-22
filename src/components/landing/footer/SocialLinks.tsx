@@ -32,9 +32,8 @@ export function SocialLinks() {
             whileTap={{ scale: 0.96 }}
             className={[
               'flex h-11 w-11 items-center justify-center rounded-lg',
-              'bg-[#8B7CF8]/15 text-[#8B7CF8] transition-shadow duration-300',
-              'hover:bg-[#8B7CF8]/25 hover:shadow-lg hover:shadow-[#8B7CF8]/25',
-              'dark:bg-[#A78BFA]/15 dark:text-[#A78BFA] dark:hover:bg-[#A78BFA]/25 dark:hover:shadow-[#A78BFA]/30',
+              'bg-accent-soft/15 text-accent-soft transition-shadow duration-300',
+              'hover:bg-accent-soft/25 hover:shadow-lg hover:shadow-accent-soft/25',
             ].join(' ')}
           >
             <Icon size={16} />

@@ -42,7 +42,7 @@ export function SocialLoginButtons({ className = '', disabled = false }: SocialL
           type="button"
           disabled={disabled}
           onClick={() => handleOAuth(id)}
-          className="flex h-12 items-center justify-center rounded-xl border border-border-light bg-input-light transition-opacity disabled:cursor-not-allowed disabled:opacity-50 dark:border-border-dark dark:bg-input-dark"
+          className="flex h-12 items-center justify-center rounded-xl border border-border-subtle bg-input transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
           aria-label={`Continue with ${name}`}
         >
           <Icon />

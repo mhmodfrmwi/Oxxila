@@ -30,7 +30,7 @@ function getStrength(password: string): { level: StrengthLevel; filled: number; 
   return { level: 'strong', filled: 4, message: 'Strong password.' }
 }
 
-const barColors = ['bg-red-400', 'bg-yellow-400', 'bg-green-400', 'bg-green-500']
+const barColors = ['bg-support-error', 'bg-support-warning', 'bg-support-success', 'bg-support-success']
 
 export function PasswordStrength({ password }: PasswordStrengthProps) {
   const { filled, message } = getStrength(password)
@@ -43,12 +43,12 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
             key={i}
             className={[
               'h-1 flex-1 rounded-full transition-colors',
-              i < filled ? barColors[Math.min(filled - 1, 3)] : 'bg-border-light dark:bg-border-dark',
+              i < filled ? barColors[Math.min(filled - 1, 3)] : 'bg-border-subtle',
             ].join(' ')}
           />
         ))}
       </div>
-      <p className="flex items-center gap-1.5 text-xs text-text-secondary-light dark:text-text-secondary-dark">
+      <p className="flex items-center gap-1.5 text-xs text-secondary-text">
         <Info size={14} aria-hidden />
         {message}
       </p>

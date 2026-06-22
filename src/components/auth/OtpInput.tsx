@@ -45,8 +45,8 @@ export function OtpInput({ length = 6, value, onChange }: OtpInputProps) {
           onChange={(e) => updateDigit(index, e.target.value)}
           onKeyDown={(e) => handleKeyDown(index, e)}
           className={[
-            'h-12 w-10 rounded-xl border border-border-light bg-input-light text-center text-lg font-semibold',
-            'text-text-primary-light focus:border-oxxila-accent focus:outline-none focus:ring-2 focus:ring-oxxila-accent/30',
+            'h-12 w-10 rounded-xl border border-border-subtle bg-input text-center text-lg font-semibold',
+            'text-primary-text focus:border-border-interactive focus:outline-none focus:ring-2 focus:ring-button-primary/30',
             'sm:h-14 sm:w-12',
           ].join(' ')}
           aria-label={`Digit ${index + 1} of ${length}`}

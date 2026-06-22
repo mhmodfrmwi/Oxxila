@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { HOME_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
-import { useTheme } from '../../context/ThemeContext'
 import { Logo } from '../ui/Logo'
+import { typeSmallClasses } from '../ui/typography'
 
 const navLinks = [
   { label: 'Home', to: HOME_PATH },
@@ -25,9 +25,7 @@ function BurgerIcon() {
 
 export function Navbar() {
   const navigate = useNavigate()
-  const { theme } = useTheme()
   const { isAuthenticated, logout } = useAuth()
-  const isDark = theme === 'dark'
   const [menuOpen, setMenuOpen] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
 
@@ -53,42 +51,35 @@ export function Navbar() {
   }
 
   const authActionClass = [
-    'inline-flex min-h-11 items-center gap-2 rounded px-2 text-sm font-medium sm:px-3',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-purple',
-    isDark
-      ? 'text-text-secondary-dark hover:text-text-primary-dark'
-      : 'text-text-secondary-light hover:text-text-primary-light',
+    'inline-flex min-h-11 items-center justify-center gap-2 rounded px-2 sm:px-3',
+    typeSmallClasses,
+    'text-secondary-text hover:text-primary-text',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
     authLoading ? 'pointer-events-none opacity-60' : '',
   ].join(' ')
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     [
-      'inline-flex items-center gap-1 text-sm font-medium transition-colors',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-purple rounded',
+      'inline-flex items-center justify-center gap-1 transition-colors',
+      typeSmallClasses,
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded',
       isActive
-        ? 'text-oxxila-purple underline decoration-oxxila-purple underline-offset-4'
-        : isDark
-          ? 'text-text-secondary-dark hover:text-text-primary-dark'
-          : 'text-text-secondary-light hover:text-text-primary-light',
+        ? 'text-accent underline decoration-accent underline-offset-4'
+        : 'text-secondary-text hover:text-primary-text',
     ].join(' ')
 
   const mobileLinkClass = ({ isActive }: { isActive: boolean }) =>
     [
-      'block rounded-xl px-4 py-3 text-base font-medium transition-colors',
+      'block rounded-xl px-4 py-3 transition-colors',
+      typeSmallClasses,
+      'text-left',
       isActive
-        ? 'bg-oxxila-accent/10 text-oxxila-accent'
-        : isDark
-          ? 'text-text-primary-dark hover:bg-input-dark'
-          : 'text-text-primary-light hover:bg-input-light',
+        ? 'bg-accent/10 text-accent'
+        : 'text-primary-text hover:bg-input',
     ].join(' ')
 
   return (
-    <header
-      className={[
-        'relative z-40 border-b',
-        isDark ? 'border-border-dark bg-page-dark' : 'border-border-light bg-card-light',
-      ].join(' ')}
-    >
+    <header className="relative z-40 border-b border-border-subtle bg-card">
       <nav
         className="mx-auto flex max-w-[1440px] items-center justify-between gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3 lg:px-6 lg:py-4"
         aria-label="Main navigation"
@@ -97,10 +88,8 @@ export function Navbar() {
           type="button"
           className={[
             'flex min-h-11 min-w-11 items-center justify-center rounded-lg md:hidden',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-purple',
-            isDark
-              ? 'text-text-primary-dark hover:bg-input-dark'
-              : 'text-text-primary-light hover:bg-input-light',
+            'text-primary-text hover:bg-input',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
           ].join(' ')}
           aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={menuOpen}
@@ -129,10 +118,8 @@ export function Navbar() {
             type="button"
             className={[
               'flex min-h-11 min-w-11 items-center justify-center rounded-full transition-colors',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oxxila-purple',
-              isDark
-                ? 'text-text-primary-dark hover:bg-input-dark'
-                : 'text-text-primary-light hover:bg-input-light',
+              'text-primary-text hover:bg-input',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
             ].join(' ')}
             aria-label="Shopping bag"
           >
@@ -171,14 +158,7 @@ export function Navbar() {
             aria-label="Close menu overlay"
             onClick={() => setMenuOpen(false)}
           />
-          <div
-            className={[
-              'fixed inset-y-0 left-0 z-50 w-[min(320px,85vw)] border-r p-5 shadow-xl md:hidden',
-              isDark
-                ? 'border-border-dark bg-card-dark'
-                : 'border-border-light bg-card-light',
-            ].join(' ')}
-          >
+          <div className="fixed inset-y-0 left-0 z-50 w-[min(320px,85vw)] border-r border-border-subtle bg-card p-5 shadow-xl md:hidden">
             <div className="mb-6 flex items-center justify-between">
               <Logo />
               <button
@@ -210,10 +190,10 @@ export function Navbar() {
                   <button
                     type="button"
                     className={[
-                      'flex w-full items-center gap-2 rounded-xl px-4 py-3 text-base font-medium transition-colors',
-                      isDark
-                        ? 'text-text-primary-dark hover:bg-input-dark'
-                        : 'text-text-primary-light hover:bg-input-light',
+                      'flex w-full items-center gap-2 rounded-xl px-4 py-3 transition-colors',
+                      typeSmallClasses,
+                      'justify-start text-left',
+                      'text-primary-text hover:bg-input',
                       authLoading ? 'pointer-events-none opacity-60' : '',
                     ].join(' ')}
                     onClick={() => void handleLogout()}

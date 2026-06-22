@@ -8,9 +8,9 @@ import { SocialLinks } from './SocialLinks'
 
 export function Footer() {
   return (
-    <footer className="relative bg-[#F7F7FB] text-[#1A1A1A] dark:bg-page-dark dark:text-[#F5F5F5]">
+    <footer className="relative bg-surface-subtle text-primary-text">
       <div
-        className="h-px w-full bg-gradient-to-r from-transparent via-[#8B7CF8] to-transparent dark:via-[#A78BFA]"
+        className="h-px w-full bg-gradient-to-r from-transparent via-accent-soft to-transparent"
         aria-hidden
       />
 
@@ -22,7 +22,7 @@ export function Footer() {
                 linkTo="/home"
                 className="dark:[&_img:nth-child(2)]:brightness-0 dark:[&_img:nth-child(2)]:invert"
               />
-              <p className="mt-4 max-w-sm font-serif text-sm leading-relaxed text-[#6B7280] sm:text-base dark:text-[#A1A1AA]">
+              <p className="mt-4 max-w-sm font-serif text-sm leading-relaxed text-secondary-text sm:text-base">
                 Discover clinically proven skincare products designed to help you achieve healthy,
                 glowing skin.
               </p>
@@ -38,9 +38,9 @@ export function Footer() {
           </div>
         </FadeUp>
 
-        <div className="mt-12 border-t border-[#E5E7EB] pt-8 dark:border-white/[0.08] lg:mt-14">
+        <div className="mt-12 border-t border-border-subtle pt-8 lg:mt-14">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-[#6B7280] dark:text-[#A1A1AA]">
+            <p className="text-sm text-secondary-text">
               © 2026 Oxxila. All Rights Reserved.
             </p>
             <SocialLinks />

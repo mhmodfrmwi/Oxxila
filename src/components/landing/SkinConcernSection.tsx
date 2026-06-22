@@ -15,13 +15,13 @@ export function SkinConcernSection() {
   const { skinConcerns, loading } = useLandingCatalogContext();
 
   return (
-    <section className="bg-page-light py-10 dark:bg-page-dark sm:py-14 lg:py-20">
+    <section className="bg-background py-10 sm:py-14 lg:py-20">
       <div className="mx-auto max-w-[1340px] px-4 sm:px-5 lg:px-6">
         <SectionHeader
           align="center"
           title="Shop by skin concern"
           subtitle="Find clinically-proven solutions tailored to your skin"
-          className="mx-auto [&_p]:mx-auto [&_p]:text-[#8B83C7] dark:[&_p]:text-[#AEA7FF]"
+          className="mx-auto [&_p]:mx-auto [&_p]:text-secondary-text"
         />
 
         <div

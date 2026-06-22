@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
+import { Heading } from "../ui/Heading";
 
 interface CategoryCardProps {
   name: string;
@@ -11,17 +12,15 @@ export function CategoryCard({ name, image, href }: CategoryCardProps) {
   const content = (
     <>
       <div className="flex items-start justify-between gap-2 p-3 sm:p-4 sm:pb-0">
-        <h3 className="min-w-0 font-serif text-sm font-medium text-[#2D2A4A] sm:text-base dark:text-white">
+        <Heading variant="card-sm" className="min-w-0">
           {name}
-        </h3>
+        </Heading>
         <span
           className={[
             "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-            "bg-[#C0B5DE]/40 text-oxxila-accent",
-            "dark:bg-[#9886FF]/30 dark:text-[#C4B8FF]",
+            "bg-accent-muted/40 text-icon-secondary",
             "transition-colors duration-[400ms] ease-out",
-            "group-hover:bg-oxxila-accent group-hover:text-white",
-            "dark:group-hover:bg-[#9886FF]",
+            "group-hover:bg-button-primary group-hover:text-on-emphasis",
           ].join(" ")}
         >
           <ArrowUpRight size={16} aria-hidden />
@@ -40,8 +39,7 @@ export function CategoryCard({ name, image, href }: CategoryCardProps) {
 
   const className = [
     "group relative z-0 flex w-[min(200px,78vw)] shrink-0 snap-center flex-col overflow-hidden rounded-3xl",
-    "bg-white shadow-md shadow-black/5",
-    "dark:bg-[#2D2B3D] dark:shadow-md dark:shadow-black/10",
+    "bg-card shadow-md shadow-black/5",
     "transition-[transform,box-shadow] duration-[400ms] ease-out",
     "motion-reduce:transition-none",
     "min-[481px]:w-auto min-[481px]:min-w-0 min-[481px]:shrink",

@@ -1,12 +1,12 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { useTheme } from '../../context/ThemeContext'
 import { HOME_PATH } from '../../config/routes'
 import { ApiError } from '../../lib/api'
 import { getOAuthErrorMessage, getOAuthSearchParams } from '../../utils/oauth'
 import { consumeOAuthError } from '../../utils/oauthBootstrap'
 import { Button } from '../ui/Button'
+import { Heading } from '../ui/Heading'
 import { InputField } from '../ui/InputField'
 import { AuthCard } from './AuthCard'
 import { FormMessage } from './FormMessage'
@@ -26,9 +26,7 @@ function readOAuthError(locationState: unknown): string {
 export function LoginForm() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { theme } = useTheme()
   const { login, isAuthenticated } = useAuth()
-  const isDark = theme === 'dark'
   const [oauthError] = useState(() => readOAuthError(location.state))
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(
@@ -75,15 +73,8 @@ export function LoginForm() {
   return (
     <AuthCard activeTab="login" imagePosition="right">
       <header className="mb-8">
-        <h1
-          className={[
-            'font-serif text-4xl font-medium sm:text-[2.75rem]',
-            isDark ? 'text-white' : 'text-text-primary-light',
-          ].join(' ')}
-        >
-          Welcome back
-        </h1>
-        <p className="mt-2 font-serif text-xl italic text-oxxila-purple-muted">Happy to see you again</p>
+        <Heading variant="page-lg">Welcome back</Heading>
+        <p className="mt-2 font-serif text-xl italic text-accent-muted">Happy to see you again</p>
       </header>
 
       {(error || oauthError) && (
@@ -117,7 +108,7 @@ export function LoginForm() {
             <div className="mt-2 text-right">
               <Link
                 to="/forgot-password"
-                className="text-sm text-oxxila-accent hover:text-oxxila-purple-light"
+                className="text-sm text-link hover:text-link-hover"
               >
                 Forgot password?
               </Link>
@@ -131,14 +122,9 @@ export function LoginForm() {
         </Button>
       </form>
 
-      <p
-        className={[
-          'mt-6 text-center text-sm',
-          isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light',
-        ].join(' ')}
-      >
+      <p className="mt-6 text-center text-sm text-secondary-text">
         Don&apos;t have an account?{' '}
-        <Link to="/register" className="font-medium text-oxxila-accent hover:text-oxxila-purple-light">
+        <Link to="/register" className="font-medium text-link hover:text-link-hover">
           Create account
         </Link>
       </p>
