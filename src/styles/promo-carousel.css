@@ -1,0 +1,210 @@
+/**
+ * Fixed promo countdown card artwork — frozen per slide variant.
+ * Intentionally NOT tied to [data-theme]; backgrounds match Figma light/dark slides.
+ */
+
+.promo-countdown-card {
+  position: relative;
+  display: flex;
+  min-height: clamp(11.5rem, 27vw, 14rem);
+  align-items: center;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.promo-countdown-card__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.promo-countdown-card__bg-stripe {
+  position: absolute;
+  top: 50%;
+  left: 37.5%;
+  z-index: 1;
+  width: 17.5%;
+  height: 250%;
+  transform: translate(-50%, -50%) rotate(20deg);
+  pointer-events: none;
+}
+
+/* ——— Light slide (Figma) ——— */
+.promo-countdown-card[data-promo-countdown-variant='light'] {
+  --pcc-title-color: #4d4d6e;
+  --pcc-label-color: #ffffff;
+  --pcc-timer-color: #ffffff;
+  --pcc-badge-bg: rgb(62 58 95 / 0.38);
+  --pcc-badge-icon: #1a1a2e;
+}
+
+.promo-countdown-card[data-promo-countdown-variant='light'] .promo-countdown-card__bg {
+  background: linear-gradient(
+    90deg,
+    #c8c2f2 0%,
+    #ddd8f4 14%,
+    #f0eef8 28%,
+    #faf9fe 36%,
+    #6f58f0 54%,
+    #4f3db8 68%,
+    #1f1642 86%,
+    #0d0b1f 100%
+  );
+}
+
+.promo-countdown-card[data-promo-countdown-variant='light'] .promo-countdown-card__bg-stripe {
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #f8f6ff 28%,
+    #b9a9ff 62%,
+    #7b61ff 100%
+  );
+  opacity: 1;
+}
+
+/* ——— Dark slide (Figma) ——— */
+.promo-countdown-card[data-promo-countdown-variant='dark'] {
+  --pcc-title-color: #ffffff;
+  --pcc-label-color: #ffffff;
+  --pcc-timer-color: #ffffff;
+  --pcc-badge-bg: rgb(255 255 255 / 0.16);
+  --pcc-badge-icon: #ffffff;
+}
+
+.promo-countdown-card[data-promo-countdown-variant='dark'] .promo-countdown-card__bg {
+  background: linear-gradient(
+    90deg,
+    #5e4db2 0%,
+    #5e4db2 36%,
+    #4a4196 43%,
+    #2f2868 58%,
+    #18142f 76%,
+    #0e0e1a 100%
+  );
+}
+
+.promo-countdown-card[data-promo-countdown-variant='dark'] .promo-countdown-card__bg-stripe {
+  background: linear-gradient(
+    180deg,
+    #d4c9fb 0%,
+    #c7b8f9 48%,
+    #b8a8f0 100%
+  );
+  opacity: 0.92;
+}
+
+.promo-countdown-card__content {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 100%;
+  min-height: inherit;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+}
+
+@media (width >= 640px) {
+  .promo-countdown-card__content {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 2rem;
+    padding: 0 3rem;
+  }
+}
+
+@media (width >= 1024px) {
+  .promo-countdown-card__content {
+    gap: 2.5rem;
+    padding: 0 4rem;
+  }
+}
+
+@media (width >= 1280px) {
+  .promo-countdown-card__content {
+    padding: 0 5rem;
+  }
+}
+
+.promo-countdown-card__title {
+  margin: 0;
+  color: var(--pcc-title-color);
+  font-family: var(--font-family-base);
+  font-size: clamp(1.75rem, 3.2vw, 3.25rem);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-align: center;
+  transform: translateY(0.125rem);
+}
+
+@media (width >= 640px) {
+  .promo-countdown-card__title {
+    text-align: left;
+  }
+}
+
+.promo-countdown-card__badge {
+  display: flex;
+  height: clamp(5rem, 11vw, 7rem);
+  width: clamp(5rem, 11vw, 7rem);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: var(--pcc-badge-bg);
+  color: var(--pcc-badge-icon);
+}
+
+.promo-countdown-card__badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-15deg);
+}
+
+.promo-countdown-card__badge-icon svg {
+  height: clamp(2.25rem, 4.8vw, 3rem);
+  width: clamp(2.25rem, 4.8vw, 3rem);
+}
+
+.promo-countdown-card__timer-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
+  text-align: right;
+}
+
+.promo-countdown-card__label {
+  margin: 0;
+  color: var(--pcc-label-color);
+  font-family: var(--font-family-base);
+  font-size: clamp(0.6875rem, 1.1vw, 0.8125rem);
+  font-weight: var(--font-weight-regular);
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.promo-countdown-card__timer {
+  margin: 0;
+  color: var(--pcc-timer-color);
+  font-family: var(--font-family-base);
+  font-size: clamp(1.875rem, 3.6vw, 3.25rem);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  transition: opacity 0.3s ease;
+}
+
+.promo-countdown-card__timer-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+@media (width >= 640px) {
+  .promo-countdown-card__timer-wrap {
+    justify-content: flex-end;
+  }
+}

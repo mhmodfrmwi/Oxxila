@@ -24,7 +24,7 @@ export function CarouselControls({ count, activeIndex, onSelect }: CarouselContr
                 'block h-2 rounded-full transition-all duration-300 ease-out',
                 isActive
                   ? 'w-8 bg-button-primary'
-                  : 'w-2 bg-accent-muted/60 hover:bg-button-primary/60 dark:bg-white/20 dark:hover:bg-white/40',
+                  : 'w-2 bg-accent-muted/60 hover:bg-button-primary/60 dark:bg-on-emphasis/20 dark:hover:bg-on-emphasis/40',
               ].join(' ')}
             />
           </button>

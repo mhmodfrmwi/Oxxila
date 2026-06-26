@@ -12,7 +12,7 @@ export function HowItWorksSection() {
 
   return (
     <>
-      <section className="bg-surface-subtle py-10 sm:py-14 lg:py-20">
+      <section className="bg-background py-10 sm:py-14 lg:py-20">
         <div className="container-content">
           <FadeUp>
             <SectionHeader title="How it works" align="center" />
@@ -39,7 +39,7 @@ export function HowItWorksSection() {
                     'absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full',
                     'border border-white/30 bg-white/25 text-white backdrop-blur-md',
                     'transition-transform duration-300 ease-out group-hover:scale-110',
-                    'dark:border-white/20 dark:bg-white/10',
+                    'dark:border-on-emphasis/20 dark:bg-on-emphasis/10',
                   ].join(' ')}
                   aria-hidden
                 >

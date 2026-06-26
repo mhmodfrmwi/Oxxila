@@ -1,50 +1,127 @@
-import { CategoryCard } from "./CategoryCard";
-import { useLandingCatalogContext } from "../../hooks/useLandingCatalogContext";
-import { SectionHeader } from "./SectionHeader";
+import { useMediaQuery } from '../../hooks/useMediaQuery'
+import { ContentSection } from '../layout/ContentSection'
+import { StripCarousel } from '../carousel/StripCarousel'
+import { CategoryCard } from './CategoryCard'
+import { useLandingCatalogContext } from '../../hooks/useLandingCatalogContext'
+import { SectionHeader } from './SectionHeader'
+import { cn } from '../../lib/cn'
 
-function ConcernSkeleton() {
+const TABLET_GRID_BREAKPOINT = '(min-width: 640px)'
+const LARGE_GRID_BREAKPOINT = '(min-width: 1024px)'
+
+function ConcernSkeleton({ layout }: { layout: 'grid' | 'carousel' }) {
   return (
     <div
-      className="h-[220px] w-[min(200px,78vw)] shrink-0 animate-pulse rounded-3xl bg-white/70 dark:bg-white/5 min-[481px]:w-auto"
+      className={cn(
+        'h-[min(280px,72vw)] animate-pulse rounded-3xl bg-surface-muted/70 dark:bg-surface-subtle/30',
+        layout === 'carousel'
+          ? 'w-[min(200px,78vw)] shrink-0 min-[480px]:w-[210px]'
+          : 'min-w-0 w-full',
+      )}
       aria-hidden
     />
-  );
+  )
 }
 
-export function SkinConcernSection() {
-  const { skinConcerns, loading } = useLandingCatalogContext();
+function ConcernGrid({ columns }: { columns: 3 | 6 }) {
+  const { skinConcerns, loading } = useLandingCatalogContext()
 
   return (
-    <section className="bg-background py-10 sm:py-14 lg:py-20">
-      <div className="mx-auto max-w-[1340px] px-4 sm:px-5 lg:px-6">
-        <SectionHeader
-          align="center"
-          title="Shop by skin concern"
-          subtitle="Find clinically-proven solutions tailored to your skin"
-          className="mx-auto [&_p]:mx-auto [&_p]:text-secondary-text"
-        />
+    <div
+      className={cn(
+        'grid gap-4',
+        columns === 6 ? 'grid-cols-3 gap-4 lg:grid-cols-6 lg:gap-5' : 'grid-cols-3 gap-4',
+      )}
+    >
+      {loading
+        ? Array.from({ length: 6 }).map((_, index) => (
+            <ConcernSkeleton key={index} layout="grid" />
+          ))
+        : skinConcerns.map((concern) => (
+            <CategoryCard
+              key={concern.id}
+              name={concern.name}
+              image={concern.image}
+              href={concern.href}
+              layout="grid"
+            />
+          ))}
+    </div>
+  )
+}
 
-        <div
-          className={[
-            "mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 pt-2",
-            "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-            "min-[481px]:grid min-[481px]:grid-cols-2 min-[481px]:gap-4 min-[481px]:overflow-visible min-[481px]:pb-0 min-[481px]:pt-4",
-            "min-[769px]:grid-cols-3 min-[769px]:gap-5",
-            "min-[1025px]:grid-cols-6 min-[1025px]:pt-6",
-          ].join(" ")}
-        >
-          {loading
-            ? Array.from({ length: 6 }).map((_, index) => <ConcernSkeleton key={index} />)
-            : skinConcerns.map((concern) => (
-                <CategoryCard
-                  key={concern.id}
-                  name={concern.name}
-                  image={concern.image}
-                  href={concern.href}
-                />
-              ))}
-        </div>
+function ConcernCarousel() {
+  const { skinConcerns, loading } = useLandingCatalogContext()
+
+  if (loading) {
+    return (
+      <div className="flex gap-4 overflow-hidden">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <ConcernSkeleton key={index} layout="carousel" />
+        ))}
       </div>
-    </section>
-  );
+    )
+  }
+
+  return (
+    <StripCarousel
+      items={skinConcerns}
+      getItemKey={(concern) => concern.id}
+      ariaLabel="Skin concerns"
+      renderItem={(concern) => (
+        <CategoryCard
+          name={concern.name}
+          image={concern.image}
+          href={concern.href}
+          layout="carousel"
+        />
+      )}
+    />
+  )
+}
+
+export interface SkinConcernSectionProps {
+  title?: string
+  subtitle?: string
+  align?: 'left' | 'center'
+  size?: 'default' | 'compact'
+  className?: string
+}
+
+export function SkinConcernSection({
+  title = 'Skin concerns',
+  subtitle,
+  align = 'left',
+  size = 'compact',
+  className,
+}: SkinConcernSectionProps) {
+  const isTabletGrid = useMediaQuery(TABLET_GRID_BREAKPOINT)
+  const isLargeGrid = useMediaQuery(LARGE_GRID_BREAKPOINT)
+
+  return (
+    <ContentSection
+      aria-labelledby="skin-concerns-heading"
+      className={className}
+      padding={size === 'default' ? 'spacious' : 'default'}
+    >
+      <SectionHeader
+        id="skin-concerns-heading"
+        align={align}
+        title={title}
+        subtitle={subtitle}
+        size={size}
+        className={align === 'center' ? 'mx-auto [&_p]:mx-auto [&_p]:text-secondary-text' : undefined}
+      />
+
+      <div className={cn(size === 'default' && 'mt-8 min-[1025px]:pt-6')}>
+        {isLargeGrid ? (
+          <ConcernGrid columns={6} />
+        ) : isTabletGrid ? (
+          <ConcernGrid columns={3} />
+        ) : (
+          <ConcernCarousel />
+        )}
+      </div>
+    </ContentSection>
+  )
 }

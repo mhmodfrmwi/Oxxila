@@ -1,4 +1,5 @@
 import { Layout } from '../components/layout/Layout'
+import { PageBleed } from '../components/layout/PageBleed'
 import { BestSellerSection } from '../components/landing/best-seller/BestSellerSection'
 import { ContactSection } from '../components/landing/contact/ContactSection'
 import { HowItWorksSection } from '../components/landing/how-it-works/HowItWorksSection'
@@ -12,15 +13,20 @@ export function LandingPage() {
   return (
     <Layout>
       <LandingCatalogProvider>
-        <div className="-mx-3 -my-4 overflow-x-clip sm:-mx-4 sm:-my-5 lg:-mx-6 lg:-my-6">
+        <PageBleed>
           <HeroSection />
           <TrustedBySection />
-          <SkinConcernSection />
+          <SkinConcernSection
+            title="Shop by skin concern"
+            subtitle="Find clinically-proven solutions tailored to your skin"
+            align="center"
+            size="default"
+          />
           <BestSellerSection />
           <HowItWorksSection />
           <ContactSection />
           <Footer />
-        </div>
+        </PageBleed>
       </LandingCatalogProvider>
     </Layout>
   )

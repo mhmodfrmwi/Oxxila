@@ -13,12 +13,7 @@ const iconMap = {
 
 export function ContactSection() {
   return (
-    <section id="contact" className="relative overflow-hidden bg-card py-10 sm:py-14 lg:py-20">
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--accent-glow)_0%,transparent_50%)]"
-        aria-hidden
-      />
-
+    <section id="contact" className="relative overflow-hidden bg-background py-10 sm:py-14 lg:py-20">
       <div className="relative container-content">
         <FadeUp>
           <SectionHeader title="Contact us" align="center" />

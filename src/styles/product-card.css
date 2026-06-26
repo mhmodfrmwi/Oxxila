@@ -1,0 +1,7 @@
+/**
+ * Fixed product image frame — stays white in every app theme so product
+ * photography reads consistently (matches Figma light & dark artwork).
+ */
+.product-card-frame {
+  background-color: #ffffff;
+}

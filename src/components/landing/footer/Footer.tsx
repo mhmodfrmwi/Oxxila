@@ -8,7 +8,7 @@ import { SocialLinks } from './SocialLinks'
 
 export function Footer() {
   return (
-    <footer className="relative bg-surface-subtle text-primary-text">
+    <footer className="relative bg-background text-primary-text">
       <div
         className="h-px w-full bg-gradient-to-r from-transparent via-accent-soft to-transparent"
         aria-hidden

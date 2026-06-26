@@ -1,7 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { STORAGE_KEYS } from '../config/storage'
-
-export type Theme = 'light' | 'dark'
+import { applyTheme, readStoredTheme, type Theme } from '../theme/applyTheme'
 
 interface ThemeContextValue {
   theme: Theme
@@ -10,21 +8,6 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
-
-function applyTheme(theme: Theme) {
-  localStorage.setItem(STORAGE_KEYS.theme, theme)
-  document.documentElement.dataset.theme = theme
-  document.documentElement.classList.toggle('dark', theme === 'dark')
-}
-
-function readStoredTheme(): Theme {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEYS.theme)
-    return stored === 'dark' || stored === 'light' ? stored : 'light'
-  } catch {
-    return 'light'
-  }
-}
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
@@ -38,7 +21,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme])
 
   const setTheme = (next: Theme) => setThemeState(next)
-  const toggleTheme = () => setThemeState((t) => (t === 'light' ? 'dark' : 'light'))
+  const toggleTheme = () => setThemeState((current) => (current === 'light' ? 'dark' : 'light'))
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
@@ -52,3 +35,5 @@ export function useTheme() {
   if (!ctx) throw new Error('useTheme must be used within ThemeProvider')
   return ctx
 }
+
+export type { Theme }

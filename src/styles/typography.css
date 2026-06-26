@@ -1,10 +1,9 @@
 /**
  * Typography tokens — Playfair Display is the global font family.
+ * Font tokens are theme-independent; color tokens live in tokens.css.
  */
 
-:root,
-[data-theme='light'],
-[data-theme='dark'] {
+:root {
   --font-family-base: 'Playfair Display', Georgia, serif;
   --font-family-display: var(--font-family-base);
 

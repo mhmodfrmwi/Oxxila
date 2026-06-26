@@ -1,5 +1,8 @@
 @import './styles/tokens.css';
 @import './styles/typography.css';
+@import './styles/promo-banner.css';
+@import './styles/product-card.css';
+@import './styles/promo-carousel.css';
 @import 'tailwindcss';
 @import './styles/tailwind-theme.css';
 @import './styles/base.css';

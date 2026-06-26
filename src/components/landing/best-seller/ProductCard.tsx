@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Heart, ShoppingBag, Star } from 'lucide-react'
+import { formatReviewCount } from '../../../utils/formatReviewCount'
 
 export interface BestSellerProduct {
   id: string
@@ -18,14 +19,6 @@ interface ProductCardProps {
   isActive: boolean
   isMobile: boolean
   onSelect: () => void
-}
-
-function formatReviewCount(count: number) {
-  if (count >= 1000) {
-    const value = count / 1000
-    return `${value % 1 === 0 ? value.toFixed(0) : value.toFixed(1)}k`
-  }
-  return String(count)
 }
 
 function getCardMotion(offset: number, isMobile: boolean) {

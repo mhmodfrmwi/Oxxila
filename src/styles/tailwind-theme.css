@@ -54,6 +54,7 @@
   --color-accent: var(--accent);
   --color-accent-muted: var(--accent-muted);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-glow: var(--accent-glow);
 
   --radius-card: 32px;
   --radius-input: 12px;

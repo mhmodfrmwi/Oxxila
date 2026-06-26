@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { getWrappedOffset } from '../../carousel/getWrappedOffset'
+import { useCarouselAutoplay } from '../../../hooks/useCarouselAutoplay'
 import { gradientCtaClasses } from '../../ui/buttonStyles'
 import { typeSmallClasses } from '../../ui/typography'
 import { useLandingCatalogContext } from '../../../hooks/useLandingCatalogContext'
@@ -14,17 +16,9 @@ const AUTOPLAY_MS = 4000
 const SWIPE_THRESHOLD = 50
 const MOBILE_BREAKPOINT = 769
 
-function getWrappedOffset(index: number, activeIndex: number, total: number) {
-  let diff = index - activeIndex
-  if (diff > total / 2) diff -= total
-  if (diff < -total / 2) diff += total
-  return diff
-}
-
 export function BestSellerSection() {
   const { bestSellers, loading } = useLandingCatalogContext()
   const [activeIndex, setActiveIndex] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
   const isMobile = useMaxWidth(MOBILE_BREAKPOINT)
   const total = bestSellers.length
   const activeSlide = total === 0 ? 0 : Math.min(activeIndex, total - 1)
@@ -40,19 +34,14 @@ export function BestSellerSection() {
   const goNext = useCallback(() => goTo(activeSlide + 1), [activeSlide, goTo])
   const goPrev = useCallback(() => goTo(activeSlide - 1), [activeSlide, goTo])
 
-  useEffect(() => {
-    if (isPaused || total === 0) return
-    const timer = window.setInterval(goNext, AUTOPLAY_MS)
-    return () => window.clearInterval(timer)
-  }, [goNext, isPaused, total])
+  const { onMouseEnter, onMouseLeave } = useCarouselAutoplay({
+    enabled: total > 0,
+    intervalMs: AUTOPLAY_MS,
+    onAdvance: goNext,
+  })
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-background via-input to-background py-10 sm:py-14 lg:py-20">
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--accent-glow)_0%,transparent_55%)]"
-        aria-hidden
-      />
-
+    <section className="relative overflow-hidden bg-background py-10 sm:py-14 lg:py-20">
       <div className="relative container-content">
         <SectionHeader
           title="Oxxila best seller"
@@ -62,8 +51,8 @@ export function BestSellerSection() {
 
         <div
           className="relative mt-8 sm:mt-10 lg:mt-12"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
         >
           <div
             className="pointer-events-none absolute top-1/2 left-1/2 z-0 h-[min(360px,65vw)] w-[min(360px,65vw)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/15 blur-[80px] sm:h-[min(420px,70vw)] sm:w-[min(420px,70vw)]"
@@ -72,7 +61,7 @@ export function BestSellerSection() {
 
           {loading ? (
             <div className="relative mx-auto flex h-[400px] max-w-4xl items-center justify-center sm:h-[430px] min-[769px]:h-[460px]">
-              <div className="h-[360px] w-[min(260px,85vw)] animate-pulse rounded-[24px] bg-white/70 dark:bg-white/10" />
+              <div className="h-[360px] w-[min(260px,85vw)] animate-pulse rounded-[24px] bg-surface-muted/70 dark:bg-surface-subtle/40" />
             </div>
           ) : (
             <motion.div

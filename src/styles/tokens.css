@@ -1,9 +1,9 @@
 /**
  * Oxilla design tokens — source of truth from Figma.
- * Semantic names only; values swap per theme via data-theme on <html>.
+ * Theme colors apply ONLY via [data-theme] on <html> (see src/theme/applyTheme.ts).
+ * Do not pair :root with light tokens — it leaks light values when data-theme="dark".
  */
 
-:root,
 [data-theme='light'] {
   color-scheme: light;
 
@@ -50,7 +50,7 @@
   --support-warning: #f1c21b;
   --support-info: #0043ce;
 
-  /* Brand accents (derived for UI states) */
+  /* Brand accents */
   --accent: #7b65fb;
   --accent-muted: #c0b5de;
   --accent-soft: #8b7cf8;

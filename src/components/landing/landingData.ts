@@ -31,7 +31,7 @@ export const skinConcerns = [
   { id: 'sensitive', name: 'Sensitive skin', image: concernSensitive },
   { id: 'drought', name: 'Drought', image: concernDrought },
   { id: 'wrinkles', name: 'Wrinkles', image: concernWrinkles },
-  { id: 'fine-lines', name: 'Fine lines', image: concernFineLines },
+  { id: 'wide-pores', name: 'Wide pores', image: concernFineLines },
 ] as const
 
 export const bestSellerProducts = [

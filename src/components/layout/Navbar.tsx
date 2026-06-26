@@ -1,14 +1,14 @@
 import { ChevronDown, LogOut, ShoppingBag, User, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { HOME_PATH } from '../../config/routes'
+import { HOME_PATH, SHOP_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { Logo } from '../ui/Logo'
 import { typeSmallClasses } from '../ui/typography'
 
 const navLinks = [
   { label: 'Home', to: HOME_PATH },
-  { label: 'Shop', to: '/shop' },
+  { label: 'Shop', to: SHOP_PATH },
   { label: 'Categories', to: '/categories', hasChevron: true },
   { label: 'Docs', to: '/docs' },
 ]
@@ -51,8 +51,7 @@ export function Navbar() {
   }
 
   const authActionClass = [
-    'inline-flex min-h-11 items-center justify-center gap-2 rounded px-2 sm:px-3',
-    typeSmallClasses,
+    'inline-flex min-h-11 items-center gap-2 rounded px-2 sm:px-3',
     'text-secondary-text hover:text-primary-text',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
     authLoading ? 'pointer-events-none opacity-60' : '',
@@ -60,13 +59,36 @@ export function Navbar() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     [
-      'inline-flex items-center justify-center gap-1 transition-colors',
+      'relative inline-flex items-center justify-center gap-1 pb-2 transition-colors',
       typeSmallClasses,
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded',
       isActive
-        ? 'text-accent underline decoration-accent underline-offset-4'
+        ? 'text-primary-text'
         : 'text-secondary-text hover:text-primary-text',
     ].join(' ')
+
+  function NavLinkContent({
+    label,
+    hasChevron,
+    isActive,
+  }: {
+    label: string
+    hasChevron?: boolean
+    isActive: boolean
+  }) {
+    return (
+      <>
+        {label}
+        {hasChevron && <ChevronDown size={14} aria-hidden />}
+        {isActive && (
+          <span
+            className="absolute bottom-0 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-accent"
+            aria-hidden
+          />
+        )}
+      </>
+    )
+  }
 
   const mobileLinkClass = ({ isActive }: { isActive: boolean }) =>
     [
@@ -102,8 +124,13 @@ export function Navbar() {
           {navLinks.map((link) => (
             <li key={link.to}>
               <NavLink to={link.to} className={linkClass}>
-                {link.label}
-                {link.hasChevron && <ChevronDown size={14} aria-hidden />}
+                {({ isActive }) => (
+                  <NavLinkContent
+                    label={link.label}
+                    hasChevron={link.hasChevron}
+                    isActive={isActive}
+                  />
+                )}
               </NavLink>
             </li>
           ))}
@@ -141,9 +168,9 @@ export function Navbar() {
           ) : (
             <NavLink to="/login" className={authActionClass}>
               <User size={18} aria-hidden />
-              <span className="hidden leading-tight sm:inline">
-                Sign in / Register
-                <span className="hidden xl:inline"> Account</span>
+              <span className={['hidden flex-col items-start leading-tight sm:inline-flex', typeSmallClasses, 'text-left'].join(' ')}>
+                <span>Sign in / Register</span>
+                <span className="text-secondary-text">Account</span>
               </span>
             </NavLink>
           )}

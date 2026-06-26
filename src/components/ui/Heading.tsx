@@ -1,12 +1,22 @@
 import { type ElementType, type ReactNode } from 'react'
 import { cn } from '../../lib/cn'
 
-type HeadingVariant = 'page' | 'page-lg' | 'section' | 'card' | 'card-sm' | 'hero' | 'hero-lg'
+type HeadingVariant =
+  | 'page'
+  | 'page-lg'
+  | 'section'
+  | 'section-compact'
+  | 'card'
+  | 'card-sm'
+  | 'hero'
+  | 'hero-lg'
 
 const variantClasses: Record<HeadingVariant, string> = {
   page: 'font-serif text-3xl font-medium text-primary-text sm:text-4xl',
   'page-lg': 'font-serif text-4xl font-medium text-primary-text sm:text-[2.75rem]',
   section: 'font-serif text-3xl font-medium text-primary-text md:text-4xl lg:text-5xl',
+  'section-compact':
+    'font-serif text-[length:calc(var(--font-size-base)*1.6)] font-medium text-primary-text sm:text-3xl lg:text-4xl',
   card: 'font-serif text-lg font-medium text-primary-text',
   'card-sm': 'font-serif text-sm font-medium text-primary-text sm:text-base',
   hero: 'font-serif text-4xl font-medium leading-[1.15] text-primary-text md:text-5xl lg:text-6xl',
@@ -17,6 +27,7 @@ const defaultElement: Record<HeadingVariant, ElementType> = {
   page: 'h1',
   'page-lg': 'h1',
   section: 'h2',
+  'section-compact': 'h2',
   card: 'h3',
   'card-sm': 'h3',
   hero: 'h1',
@@ -26,6 +37,7 @@ const defaultElement: Record<HeadingVariant, ElementType> = {
 interface HeadingProps {
   variant?: HeadingVariant
   as?: ElementType
+  id?: string
   className?: string
   children: ReactNode
 }
@@ -33,13 +45,14 @@ interface HeadingProps {
 export function Heading({
   variant = 'section',
   as,
+  id,
   className,
   children,
 }: HeadingProps) {
   const Component = as ?? defaultElement[variant]
 
   return (
-    <Component className={cn(variantClasses[variant], className)}>
+    <Component id={id} className={cn(variantClasses[variant], className)}>
       {children}
     </Component>
   )
