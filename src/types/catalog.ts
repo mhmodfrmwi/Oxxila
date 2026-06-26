@@ -34,6 +34,49 @@ export interface ApiProduct {
   soldCount?: number
   brand?: ApiBrand
   category?: { _id: string; name: string; slug: string }
+  description?: string
+  advantages?: string
+  composition?: string
+  stock?: number
+  offerEndsAt?: string | null
+  subCategory?: ApiSubCategory[]
+  isSensitiveSkin?: boolean
+  isBundle?: boolean
+  catalog?: unknown | null
+  certificationImage?: string | null
+  isCertified?: boolean
+  isActive?: boolean
+  views?: number
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface ApiSubCategory {
+  _id: string
+  name: string
+  slug: string
+  image?: string
+}
+
+export type ApiProductDetail = ApiProduct
+
+export interface ApiReviewUser {
+  _id?: string
+  name?: string
+  avatar?: string
+  photo?: string
+}
+
+export interface ApiReview {
+  _id: string
+  rating: number
+  title?: string
+  comment?: string
+  review?: string
+  createdAt?: string
+  helpful?: number
+  helpfulCount?: number
+  user?: ApiReviewUser
 }
 
 export interface SkinConcernDisplay {

@@ -1,11 +1,21 @@
 import { API_BASE_URL, AUTH_TOKEN_KEY } from '../config/api'
 
+export interface ApiPagination {
+  currentPage: number
+  limit: number
+  numberOfPages: number
+  totalDocuments: number
+  nextPage: number | null
+  prevPage: number | null
+}
+
 export interface ApiResponse<T = unknown> {
   success: boolean
   statusCode?: number
   status?: string
   message: string
   data?: T
+  pagination?: ApiPagination
 }
 
 export class ApiError extends Error {
@@ -48,7 +58,10 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     const payload = (await response.json()) as ApiResponse<T>
 
     if (!response.ok || !payload.success) {
-      throw new ApiError(payload.message || 'Something went wrong. Please try again.', response.status)
+      throw new ApiError(
+        payload.message || 'Something went wrong. Please try again.',
+        payload.statusCode ?? response.status,
+      )
     }
 
     return payload

@@ -1,9 +1,12 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { HOME_PATH, SHOP_PATH } from './config/routes'
+import { CATEGORIES_PATH, HOME_PATH, PRODUCTS_PATH, SHOP_PATH } from './config/routes'
+import { DEFAULT_CATEGORY_SLUG } from './components/category/categoryData'
 import { ChangePasswordPage } from './pages/ChangePasswordPage'
+import { CategoryPage } from './pages/CategoryPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { LandingPage } from './pages/LandingPage'
 import { LoginPage } from './pages/LoginPage'
+import { ProductPage } from './pages/ProductPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ShopPage } from './pages/ShopPage'
 import { VerifyOtpPage } from './pages/VerifyOtpPage'
@@ -13,6 +16,12 @@ export default function App() {
     <Routes>
       <Route path={HOME_PATH} element={<LandingPage />} />
       <Route path={SHOP_PATH} element={<ShopPage />} />
+      <Route
+        path={CATEGORIES_PATH}
+        element={<Navigate to={`${CATEGORIES_PATH}/${DEFAULT_CATEGORY_SLUG}`} replace />}
+      />
+      <Route path={`${CATEGORIES_PATH}/:slug`} element={<CategoryPage />} />
+      <Route path={`${PRODUCTS_PATH}/:slug`} element={<ProductPage />} />
       <Route path="/" element={<Navigate to={HOME_PATH} replace />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />

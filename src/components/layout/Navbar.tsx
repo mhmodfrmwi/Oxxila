@@ -1,7 +1,7 @@
 import { ChevronDown, LogOut, ShoppingBag, User, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { HOME_PATH, SHOP_PATH } from '../../config/routes'
+import { HOME_PATH, SHOP_PATH, CATEGORIES_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { Logo } from '../ui/Logo'
 import { typeSmallClasses } from '../ui/typography'
@@ -9,7 +9,7 @@ import { typeSmallClasses } from '../ui/typography'
 const navLinks = [
   { label: 'Home', to: HOME_PATH },
   { label: 'Shop', to: SHOP_PATH },
-  { label: 'Categories', to: '/categories', hasChevron: true },
+  { label: 'Categories', to: CATEGORIES_PATH, hasChevron: true },
   { label: 'Docs', to: '/docs' },
 ]
 

@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion'
 import { Heart, ShoppingBag, Star } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { PRODUCTS_PATH } from '../../../config/routes'
 import { formatReviewCount } from '../../../utils/formatReviewCount'
 
 export interface BestSellerProduct {
@@ -57,95 +59,111 @@ export function ProductCard({
   const motionProps = getCardMotion(offset, isMobile)
   const isVisible = isMobile ? offset === 0 : Math.abs(offset) <= 2
 
+  const cardContent = (
+    <div
+      className={[
+        'overflow-hidden rounded-[24px] border p-3',
+        'bg-card/90 shadow-xl shadow-black/5 backdrop-blur-sm',
+        'border-border-subtle/80',
+        'transition-shadow duration-300',
+        isActive ? 'shadow-accent/10' : '',
+        product.slug ? 'cursor-pointer' : '',
+      ].join(' ')}
+    >
+      <div className="relative overflow-hidden rounded-2xl bg-surface-muted">
+        <span className="absolute top-3 left-3 z-10 rounded-full bg-accent-muted/70 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-primary-text uppercase">
+          Best seller
+        </span>
+
+        <div className="overflow-hidden">
+          <img
+            src={product.image}
+            alt={product.title}
+            className="aspect-[4/5] w-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-105"
+            loading="lazy"
+            draggable={false}
+          />
+        </div>
+
+        <button
+          type="button"
+          aria-label="Add to wishlist"
+          onClick={(e) => e.stopPropagation()}
+          className={[
+            'absolute bottom-3 left-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
+            'bg-card/90 text-icon-secondary shadow-md',
+            'transition-all duration-200 hover:scale-110 hover:bg-button-primary hover:text-on-emphasis',
+          ].join(' ')}
+        >
+          <Heart size={16} aria-hidden />
+        </button>
+
+        <button
+          type="button"
+          aria-label="Add to cart"
+          onClick={(e) => e.stopPropagation()}
+          className={[
+            'absolute right-3 bottom-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
+            'bg-card/90 text-icon-secondary shadow-md',
+            'transition-all duration-200 hover:scale-110 hover:bg-button-primary hover:text-on-emphasis',
+          ].join(' ')}
+        >
+          <ShoppingBag size={16} aria-hidden />
+        </button>
+      </div>
+
+      <div className="space-y-2.5 pt-3">
+        <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-snug font-medium text-primary-text">
+          {product.title}
+        </h3>
+
+        <div className="flex items-end justify-between gap-2">
+          <div className="flex items-baseline gap-2">
+            <span className="text-base font-bold text-primary-text">
+              ${product.price}
+            </span>
+            <span className="text-sm text-secondary-text line-through">
+              ${product.originalPrice}
+            </span>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1 text-xs text-secondary-text">
+            <Star size={12} className="fill-support-warning text-support-warning" aria-hidden />
+            <span>
+              {product.rating} ({formatReviewCount(product.reviewCount)})
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <motion.article
       layout
       animate={motionProps}
       transition={{ duration: 0.6, ease: 'easeInOut' }}
       className={[
-        'absolute top-0 left-1/2 w-[min(260px,85vw)] -translate-x-1/2 cursor-pointer sm:w-[280px]',
+        'absolute top-0 left-1/2 w-[min(260px,85vw)] -translate-x-1/2 sm:w-[280px]',
         'group/card',
         !isVisible ? 'pointer-events-none' : '',
+        !product.slug ? 'cursor-pointer' : '',
       ].join(' ')}
       style={{ zIndex: motionProps.zIndex }}
       onClick={onSelect}
       whileHover={isActive ? { y: -8 } : undefined}
     >
-      <div
-        className={[
-          'overflow-hidden rounded-[24px] border p-3',
-          'bg-card/90 shadow-xl shadow-black/5 backdrop-blur-sm',
-          'border-border-subtle/80',
-          'transition-shadow duration-300',
-          isActive ? 'shadow-accent/10' : '',
-        ].join(' ')}
-      >
-        <div className="relative overflow-hidden rounded-2xl bg-surface-muted">
-          <span className="absolute top-3 left-3 z-10 rounded-full bg-accent-muted/70 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-primary-text uppercase">
-            Best seller
-          </span>
-
-          <div className="overflow-hidden">
-            <img
-              src={product.image}
-              alt={product.title}
-              className="aspect-[4/5] w-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-105"
-              loading="lazy"
-              draggable={false}
-            />
-          </div>
-
-          <button
-            type="button"
-            aria-label="Add to wishlist"
-            onClick={(e) => e.stopPropagation()}
-            className={[
-              'absolute bottom-3 left-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
-              'bg-card/90 text-icon-secondary shadow-md',
-              'transition-all duration-200 hover:scale-110 hover:bg-button-primary hover:text-on-emphasis',
-            ].join(' ')}
-          >
-            <Heart size={16} aria-hidden />
-          </button>
-
-          <button
-            type="button"
-            aria-label="Add to cart"
-            onClick={(e) => e.stopPropagation()}
-            className={[
-              'absolute right-3 bottom-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
-              'bg-card/90 text-icon-secondary shadow-md',
-              'transition-all duration-200 hover:scale-110 hover:bg-button-primary hover:text-on-emphasis',
-            ].join(' ')}
-          >
-            <ShoppingBag size={16} aria-hidden />
-          </button>
-        </div>
-
-        <div className="space-y-2.5 pt-3">
-          <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-snug font-medium text-primary-text">
-            {product.title}
-          </h3>
-
-          <div className="flex items-end justify-between gap-2">
-            <div className="flex items-baseline gap-2">
-              <span className="text-base font-bold text-primary-text">
-                ${product.price}
-              </span>
-              <span className="text-sm text-secondary-text line-through">
-                ${product.originalPrice}
-              </span>
-            </div>
-
-            <div className="flex shrink-0 items-center gap-1 text-xs text-secondary-text">
-              <Star size={12} className="fill-support-warning text-support-warning" aria-hidden />
-              <span>
-                {product.rating} ({formatReviewCount(product.reviewCount)})
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+      {product.slug ? (
+        <Link
+          to={`${PRODUCTS_PATH}/${product.slug}`}
+          className="block"
+          onClick={(event) => event.stopPropagation()}
+        >
+          {cardContent}
+        </Link>
+      ) : (
+        cardContent
+      )}
     </motion.article>
   )
 }

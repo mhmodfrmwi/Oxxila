@@ -3,7 +3,7 @@ import { cn } from '../../lib/cn'
 import { gradientCtaClasses } from './buttonStyles'
 import { typeSmallClasses } from './typography'
 
-type ButtonVariant = 'primary' | 'gradient' | 'social' | 'ghost'
+type ButtonVariant = 'primary' | 'gradient' | 'outline' | 'social' | 'ghost'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
@@ -16,6 +16,8 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary:
     'bg-button-primary text-on-emphasis hover:bg-button-primary-hover focus-visible:ring-button-primary',
   gradient: cn(gradientCtaClasses, 'text-on-emphasis focus-visible:ring-button-primary'),
+  outline:
+    'border-2 border-button-primary bg-card text-button-primary hover:bg-button-primary-hover/40 focus-visible:ring-button-primary',
   social:
     'bg-input text-primary-text border border-border-subtle hover:bg-accent/10',
   ghost:

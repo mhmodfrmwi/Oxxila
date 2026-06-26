@@ -1,24 +1,40 @@
-import { Heart, ShoppingBag, Star } from 'lucide-react'
+import { Heart, ShoppingBag } from 'lucide-react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
+import { IconActionButton } from '../../ui/IconActionButton'
+import { ProductBadge } from '../../ui/ProductBadge'
+import { ProductRating } from '../../ui/ProductRating'
 import { formatProductPrice } from '../../../utils/formatProductPrice'
-import { formatReviewCount } from '../../../utils/formatReviewCount'
+import { PRODUCT_IMAGE_PLACEHOLDER } from '../../../utils/productImage'
 import type { RecommendedProduct } from './recommendedProductsData'
 
 interface ProductCardProps {
   product: RecommendedProduct
+  layout?: 'carousel' | 'grid'
   className?: string
 }
 
-export function ProductCard({ product, className }: ProductCardProps) {
+const carouselWidthClasses =
+  'w-[168px] shrink-0 sm:w-[184px] md:w-[196px] lg:w-[212px]'
+
+const carouselImageHeightClasses =
+  'h-[168px] sm:h-[184px] md:h-[196px] lg:h-[212px]'
+
+export function ProductCard({ product, layout = 'carousel', className }: ProductCardProps) {
   const { brand, title, price, originalPrice, rating, reviewCount, image, imageAlt, badge, href } =
     product
+  const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null)
+  const imageSrc = failedImageUrl === image ? PRODUCT_IMAGE_PLACEHOLDER : image
+
+  const isGrid = layout === 'grid'
 
   return (
     <article
       className={cn(
-        'group/card w-[168px] shrink-0 sm:w-[184px] md:w-[196px] lg:w-[212px]',
+        'group/card',
+        isGrid ? 'min-w-0 w-full' : carouselWidthClasses,
         className,
       )}
     >
@@ -37,53 +53,50 @@ export function ProductCard({ product, className }: ProductCardProps) {
           )}
         >
           {badge && (
-            <span
-              className={cn(
-                'absolute top-3 left-3 z-10 rounded-full px-2.5 py-1',
-                'text-[10px] font-medium tracking-wide uppercase',
-                'bg-button-primary-hover text-primary-text',
-                'dark:bg-button-primary dark:text-on-emphasis',
-              )}
-            >
-              {badge}
+            <span className="absolute top-3 left-3 z-10">
+              <ProductBadge>{badge}</ProductBadge>
             </span>
           )}
 
-          <div className="h-[168px] w-full overflow-hidden sm:h-[184px] md:h-[196px] lg:h-[212px]">
+          <div
+            className={cn(
+              'w-full overflow-hidden',
+              isGrid ? 'aspect-square' : carouselImageHeightClasses,
+            )}
+          >
             <img
-              src={image}
+              src={imageSrc}
               alt={imageAlt}
               className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-[1.04]"
               loading="lazy"
               draggable={false}
+              onError={() => {
+                if (failedImageUrl !== image) {
+                  setFailedImageUrl(image)
+                }
+              }}
             />
           </div>
 
-          <button
-            type="button"
-            aria-label="Add to wishlist"
-            onClick={(event) => event.preventDefault()}
-            className={cn(
-              'absolute bottom-3 left-3 z-10 flex h-10 w-10 items-center justify-center rounded-full',
-              'bg-button-primary text-on-emphasis shadow-md shadow-black/10',
-              'transition-transform duration-200 [@media(hover:hover)]:hover:scale-110',
-            )}
-          >
-            <Heart size={16} aria-hidden />
-          </button>
+          <IconActionButton
+            icon={Heart}
+            label="Add to wishlist"
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+            }}
+            className="absolute bottom-3 left-3 z-10"
+          />
 
-          <button
-            type="button"
-            aria-label="Add to cart"
-            onClick={(event) => event.preventDefault()}
-            className={cn(
-              'absolute right-3 bottom-3 z-10 flex h-10 w-10 items-center justify-center rounded-full',
-              'bg-button-primary text-on-emphasis shadow-md shadow-black/10',
-              'transition-transform duration-200 [@media(hover:hover)]:hover:scale-110',
-            )}
-          >
-            <ShoppingBag size={16} aria-hidden />
-          </button>
+          <IconActionButton
+            icon={ShoppingBag}
+            label="Add to cart"
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+            }}
+            className="absolute right-3 bottom-3 z-10"
+          />
         </div>
 
         <div className="mt-3 space-y-2">
@@ -104,12 +117,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
               )}
             </div>
 
-            <div className="flex shrink-0 items-center gap-1 text-xs text-secondary-text">
-              <Star size={12} className="fill-support-warning text-support-warning" aria-hidden />
-              <span>
-                {rating} ({formatReviewCount(reviewCount)})
-              </span>
-            </div>
+            <ProductRating rating={rating} reviewCount={reviewCount} />
           </div>
         </div>
       </Link>

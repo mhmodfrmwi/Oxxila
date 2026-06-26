@@ -8,6 +8,8 @@ import type {
   FeaturedImage,
   SkinConcernDisplay,
 } from '../types/catalog'
+import { resolveProductImageUrl } from './productImage'
+import { resolveProductPricing } from './productPricing'
 
 export const SKIN_CONCERN_ORDER = [
   'acne',
@@ -32,17 +34,16 @@ const FALLBACK_CONCERN_IMAGES = Object.fromEntries(
 ) as Record<string, string>
 
 export function mapProductToBestSeller(product: ApiProduct): BestSellerProduct {
-  const hasDiscount =
-    product.priceAfterDiscount !== null && product.priceAfterDiscount < product.price
+  const { price } = resolveProductPricing(product)
 
   return {
     id: product._id,
     title: product.name,
-    price: hasDiscount ? product.priceAfterDiscount! : product.price,
+    price,
     originalPrice: product.price,
-    rating: product.ratingsAverage,
-    reviewCount: product.ratingsQuantity,
-    image: product.images[0] ?? '',
+    rating: product.ratingsAverage ?? 0,
+    reviewCount: product.ratingsQuantity ?? 0,
+    image: resolveProductImageUrl(product.images?.[0]),
     slug: product.slug,
   }
 }
@@ -99,7 +100,7 @@ export function buildFeaturedImages(products: ApiProduct[]): FeaturedImage[] {
     .slice(0, 4)
     .map((product) => ({
       id: product._id,
-      src: product.images[0],
+      src: resolveProductImageUrl(product.images[0]),
       alt: product.name,
     }))
 

@@ -1,0 +1,305 @@
+/**
+ * Reviews section — scoped to .reviews-section-* only.
+ */
+
+.reviews-section {
+  --rs-card-radius: 16px;
+  --rs-card-padding: 24px;
+  --rs-column-gap: 2rem;
+  --rs-bar-height: 6px;
+  --rs-bar-track: rgb(101 90 131 / 0.4);
+  --rs-divider: #c8c8c8;
+  padding-block: 3rem;
+}
+
+@media (width >= 768px) {
+  .reviews-section {
+    --rs-column-gap: 2.5rem;
+    padding-block: 4rem;
+  }
+}
+
+@media (width >= 1024px) {
+  .reviews-section {
+    --rs-column-gap: 4rem;
+    padding-block: 0 5rem;
+  }
+}
+
+[data-theme='dark'] .reviews-section {
+  --rs-bar-track: rgb(101 90 131 / 0.4);
+  --rs-divider: rgb(255 255 255 / 0.12);
+}
+
+.reviews-section-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--rs-column-gap);
+}
+
+@media (width >= 1024px) {
+  .reviews-section-grid {
+    grid-template-columns: minmax(0, 416px) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+/* Rating summary card */
+.reviews-summary-card {
+  border-radius: var(--rs-card-radius);
+  background-color: var(--card-background);
+  padding: var(--rs-card-padding);
+}
+
+.reviews-summary-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+
+.reviews-summary-score {
+  font-family: var(--font-family-base);
+  font-size: 2.5rem;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--primary-text);
+}
+
+@media (width >= 640px) {
+  .reviews-summary-score {
+    font-size: 3rem;
+  }
+}
+
+.reviews-summary-stars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.reviews-summary-count {
+  width: 100%;
+  margin: 12px 0 0;
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.25rem;
+  letter-spacing: 0;
+  color: var(--secondary-text);
+}
+
+.reviews-summary-distribution {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 28px;
+}
+
+.reviews-rating-bar {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.reviews-rating-bar-label {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.25rem;
+  color: var(--primary-text);
+}
+
+.reviews-rating-bar-track {
+  position: relative;
+  height: var(--rs-bar-height);
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: var(--rs-bar-track);
+}
+
+.reviews-rating-bar-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: 9999px;
+  background-color: var(--primary-button);
+}
+
+.reviews-rating-bar-percent {
+  min-width: 2.25rem;
+  text-align: right;
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.25rem;
+  color: var(--secondary-text);
+}
+
+.reviews-summary-cta {
+  margin-top: 28px;
+  height: 56px;
+  min-height: 56px;
+  width: 100%;
+  border-radius: 28px;
+  font-family: var(--font-family-base);
+  font-size: 1rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25rem;
+  letter-spacing: 0;
+}
+
+.reviews-summary-cta:hover {
+  background-color: var(--accent-soft);
+}
+
+/* Reviews list */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.reviews-list-item + .reviews-list-item {
+  border-top: 0.5px solid var(--rs-divider);
+  margin-top: 28px;
+  padding-top: 28px;
+}
+
+.reviews-view-all-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.reviews-view-all-btn {
+  height: 55px;
+  min-height: 55px;
+  min-width: min(100%, 815px);
+  border-radius: 27.5px;
+  border-width: 1px;
+  padding-inline: 2rem;
+  font-family: var(--font-family-base);
+  font-size: 1rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25rem;
+  letter-spacing: 0;
+  background-color: var(--background);
+}
+
+.reviews-view-all-btn:hover {
+  background-color: rgb(123 101 251 / 0.08);
+}
+
+[data-theme='dark'] .reviews-view-all-btn:hover {
+  background-color: rgb(152 134 255 / 0.15);
+}
+
+/* Review card */
+.review-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.review-card-stars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.review-card-date {
+  flex-shrink: 0;
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.25rem;
+  color: var(--secondary-text);
+}
+
+.review-card-title {
+  margin: 12px 0 0;
+  font-family: var(--font-family-base);
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.35;
+  color: var(--primary-text);
+}
+
+.review-card-comment {
+  margin: 10px 0 0;
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.625rem;
+  color: var(--secondary-text);
+}
+
+.review-card-reviewer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.review-card-avatar {
+  height: 24px;
+  width: 24px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: var(--surface-muted);
+  object-fit: cover;
+}
+
+.review-card-name {
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25rem;
+  color: var(--primary-text);
+}
+
+.review-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 16px;
+}
+
+.review-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.25rem;
+  color: var(--secondary-text);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.review-card-action:hover {
+  color: var(--primary-text);
+}
+
+.review-card-action:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary-button);
+  border-radius: 4px;
+}
+
+.review-card-action svg {
+  flex-shrink: 0;
+  color: var(--primary-button);
+}

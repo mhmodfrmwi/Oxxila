@@ -2,6 +2,8 @@
 @import './styles/typography.css';
 @import './styles/promo-banner.css';
 @import './styles/product-card.css';
+@import './styles/category-filters.css';
+@import './styles/product-detail.css';
 @import './styles/promo-carousel.css';
 @import 'tailwindcss';
 @import './styles/tailwind-theme.css';

@@ -7,11 +7,12 @@ import {
   buildFeaturedImages,
   buildSkinConcerns,
 } from '../utils/catalogMappers'
-import type { FeaturedImage, SkinConcernDisplay } from '../types/catalog'
+import type { ApiProduct, FeaturedImage, SkinConcernDisplay } from '../types/catalog'
 
 export interface LandingCatalogState {
   loading: boolean
   error: string | null
+  products: ApiProduct[]
   bestSellers: BestSellerProduct[]
   skinConcerns: SkinConcernDisplay[]
   featuredImages: FeaturedImage[]
@@ -20,6 +21,7 @@ export interface LandingCatalogState {
 const initialState: LandingCatalogState = {
   loading: true,
   error: null,
+  products: [],
   bestSellers: [],
   skinConcerns: [],
   featuredImages: [],
@@ -42,6 +44,7 @@ export function useLandingCatalog(): LandingCatalogState {
         setState({
           loading: false,
           error: null,
+          products,
           bestSellers: buildBestSellers(products),
           skinConcerns: buildSkinConcerns(products),
           featuredImages: buildFeaturedImages(products),
@@ -52,6 +55,7 @@ export function useLandingCatalog(): LandingCatalogState {
         setState({
           loading: false,
           error: error instanceof ApiError ? error.message : 'Unable to load store data.',
+          products: [],
           bestSellers: buildBestSellers([]),
           skinConcerns: buildSkinConcerns([]),
           featuredImages: buildFeaturedImages([]),
