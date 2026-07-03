@@ -7,7 +7,7 @@ import { AvailabilityFilter } from './AvailabilityFilter'
 import { BrandFilter } from './BrandFilter'
 import { CategoryFilter } from './CategoryFilter'
 import { ConcernsFilter } from './ConcernsFilter'
-import { countActiveFilters, defaultFilterState, type FilterState } from './filterState'
+import { countActiveFilters, type FilterState } from './filterState'
 import { filterClearAllClasses, filterSidebarHeadingClasses } from './filterStyles'
 import { OffersFilter } from './OffersFilter'
 import { PriceFilter } from './PriceFilter'
@@ -18,6 +18,7 @@ interface FilterSidebarProps {
   className?: string
   filters: FilterState
   onFiltersChange: (patch: Partial<FilterState>) => void
+  onFiltersReset: () => void
   subcategories: ApiSubCategory[]
   brands: ApiBrand[]
 }
@@ -26,6 +27,7 @@ export function FilterSidebar({
   className,
   filters,
   onFiltersChange,
+  onFiltersReset,
   subcategories,
   brands,
 }: FilterSidebarProps) {
@@ -33,7 +35,7 @@ export function FilterSidebar({
   const activeCount = countActiveFilters(filters)
 
   function clearAll() {
-    onFiltersChange(defaultFilterState)
+    onFiltersReset()
   }
 
   const filterGroups = (

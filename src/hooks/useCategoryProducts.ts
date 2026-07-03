@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { getProducts } from '../api/catalog'
 import type { SortOption } from '../components/category/categoryData'
-import type { FilterState } from '../components/category/filters/filterState'
+import { getFiltersQueryKey, type FilterState } from '../components/category/filters/filterState'
 import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
 import { ApiError } from '../lib/api'
 import type { ApiPagination } from '../lib/api'
@@ -31,6 +31,7 @@ export function useCategoryProducts(
   limit: number,
 ) {
   const [state, setState] = useState<CategoryProductsState>(emptyState)
+  const filtersKey = getFiltersQueryKey(filters)
 
   useEffect(() => {
     if (!categoryId) {
@@ -39,14 +40,17 @@ export function useCategoryProducts(
     }
 
     let cancelled = false
+    const queryParams = buildProductQueryParams(filters, sort, { categoryId, page, limit })
+
+    if (import.meta.env.DEV) {
+      console.log('[category-products] GET /products', queryParams)
+    }
 
     async function load() {
       setState((previous) => ({ ...previous, loading: true, error: null }))
 
       try {
-        const response = await getProducts(
-          buildProductQueryParams(filters, sort, { categoryId, page, limit }),
-        )
+        const response = await getProducts(queryParams)
 
         if (cancelled) return
 
@@ -73,7 +77,7 @@ export function useCategoryProducts(
     return () => {
       cancelled = true
     }
-  }, [categoryId, filters, sort, page, limit])
+  }, [categoryId, filtersKey, sort, page, limit])
 
   return state
 }

@@ -20,7 +20,7 @@ import {
   toCategoryMeta,
   type SortOption,
 } from './categoryData'
-import { defaultFilterState, type FilterState } from './filters/filterState'
+import { createDefaultFilterState, type FilterState } from './filters/filterState'
 import { FilterSidebar } from './filters/FilterSidebar'
 
 export function CategoryPageContent() {
@@ -41,7 +41,7 @@ export function CategoryPageContent() {
     [brands, category?._id],
   )
 
-  const [filters, setFilters] = useState<FilterState>(defaultFilterState)
+  const [filters, setFilters] = useState<FilterState>(() => createDefaultFilterState())
   const [sort, setSort] = useState<SortOption>('featured')
   const [pageByCategory, setPageByCategory] = useState<Partial<Record<string, number>>>({})
 
@@ -61,9 +61,19 @@ export function CategoryPageContent() {
   const totalResults = pagination?.totalDocuments ?? products.length
 
   useEffect(() => {
-    setFilters(defaultFilterState)
+    setFilters(createDefaultFilterState())
     setSort('featured')
   }, [slug])
+
+  useEffect(() => {
+    if (!meta || !pagination) return
+    if (currentPage > pagination.numberOfPages) {
+      setPageByCategory((previous) => ({
+        ...previous,
+        [meta.slug]: Math.max(1, pagination.numberOfPages),
+      }))
+    }
+  }, [meta?.slug, pagination?.numberOfPages, currentPage])
 
   const handlePageChange = (page: number) => {
     if (!meta) return
@@ -72,6 +82,14 @@ export function CategoryPageContent() {
 
   const handleFiltersChange = (patch: Partial<FilterState>) => {
     setFilters((current) => ({ ...current, ...patch }))
+    if (meta) {
+      setPageByCategory((previous) => ({ ...previous, [meta.slug]: 1 }))
+    }
+  }
+
+  const handleFiltersReset = () => {
+    setFilters(createDefaultFilterState())
+    setSort('featured')
     if (meta) {
       setPageByCategory((previous) => ({ ...previous, [meta.slug]: 1 }))
     }
@@ -127,6 +145,7 @@ export function CategoryPageContent() {
             className="lg:col-start-1 lg:row-span-2"
             filters={filters}
             onFiltersChange={handleFiltersChange}
+            onFiltersReset={handleFiltersReset}
             subcategories={subcategories}
             brands={categoryBrands}
           />
