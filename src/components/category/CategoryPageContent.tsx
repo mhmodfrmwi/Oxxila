@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { CATEGORIES_PATH, HOME_PATH } from '../../config/routes'
 import { useBrowsingHistory } from '../../hooks/useBrowsingHistory'
@@ -41,9 +41,15 @@ export function CategoryPageContent() {
     [brands, category?._id],
   )
 
-  const [filters, setFilters] = useState<FilterState>(() => createDefaultFilterState())
-  const [sort, setSort] = useState<SortOption>('featured')
+  const [filtersBySlug, setFiltersBySlug] = useState<Partial<Record<string, FilterState>>>({})
+  const [sortBySlug, setSortBySlug] = useState<Partial<Record<string, SortOption>>>({})
   const [pageByCategory, setPageByCategory] = useState<Partial<Record<string, number>>>({})
+
+  const filters = useMemo(
+    () => filtersBySlug[slug] ?? createDefaultFilterState(),
+    [filtersBySlug, slug],
+  )
+  const sort = sortBySlug[slug] ?? 'featured'
 
   const currentPage = meta ? (pageByCategory[meta.slug] ?? 1) : 1
   const { products, loading, error, pagination } = useCategoryProducts(
@@ -57,23 +63,19 @@ export function CategoryPageContent() {
   const { products: browsingProducts, loading: browsingLoading } = useBrowsingHistory(6)
 
   const totalPages = pagination?.numberOfPages ?? 1
-  const safePage = Math.min(currentPage, Math.max(1, totalPages))
-  const totalResults = pagination?.totalDocuments ?? products.length
 
-  useEffect(() => {
-    setFilters(createDefaultFilterState())
-    setSort('featured')
-  }, [slug])
-
-  useEffect(() => {
-    if (!meta || !pagination) return
-    if (currentPage > pagination.numberOfPages) {
+  if (meta && pagination && currentPage > totalPages) {
+    const clampedPage = Math.max(1, totalPages)
+    if (currentPage !== clampedPage) {
       setPageByCategory((previous) => ({
         ...previous,
-        [meta.slug]: Math.max(1, pagination.numberOfPages),
+        [meta.slug]: clampedPage,
       }))
     }
-  }, [meta?.slug, pagination?.numberOfPages, currentPage])
+  }
+
+  const safePage = Math.min(currentPage, Math.max(1, totalPages))
+  const totalResults = pagination?.totalDocuments ?? products.length
 
   const handlePageChange = (page: number) => {
     if (!meta) return
@@ -81,22 +83,25 @@ export function CategoryPageContent() {
   }
 
   const handleFiltersChange = (patch: Partial<FilterState>) => {
-    setFilters((current) => ({ ...current, ...patch }))
+    setFiltersBySlug((previous) => ({
+      ...previous,
+      [slug]: { ...(previous[slug] ?? createDefaultFilterState()), ...patch },
+    }))
     if (meta) {
       setPageByCategory((previous) => ({ ...previous, [meta.slug]: 1 }))
     }
   }
 
   const handleFiltersReset = () => {
-    setFilters(createDefaultFilterState())
-    setSort('featured')
+    setFiltersBySlug((previous) => ({ ...previous, [slug]: createDefaultFilterState() }))
+    setSortBySlug((previous) => ({ ...previous, [slug]: 'featured' }))
     if (meta) {
       setPageByCategory((previous) => ({ ...previous, [meta.slug]: 1 }))
     }
   }
 
   const handleSortChange = (nextSort: SortOption) => {
-    setSort(nextSort)
+    setSortBySlug((previous) => ({ ...previous, [slug]: nextSort }))
     if (meta) {
       setPageByCategory((previous) => ({ ...previous, [meta.slug]: 1 }))
     }

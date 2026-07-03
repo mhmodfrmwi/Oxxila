@@ -12,16 +12,15 @@ export function useBrowsingHistory(limit = 6) {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setProducts([])
-      setLoading(false)
-      return
-    }
+    if (!isAuthenticated) return
 
     let cancelled = false
-    setLoading(true)
 
     async function load() {
+      await Promise.resolve()
+      if (cancelled) return
+
+      setLoading(true)
       try {
         const response = await getBrowsingHistory()
         if (cancelled) return
@@ -50,5 +49,8 @@ export function useBrowsingHistory(limit = 6) {
     }
   }, [isAuthenticated, limit])
 
-  return { products, loading }
+  return {
+    products: isAuthenticated ? products : [],
+    loading: isAuthenticated ? loading : false,
+  }
 }

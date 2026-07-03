@@ -1,6 +1,13 @@
 // src/context/CartContext.tsx
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { addToCart as addToCartRequest, getCart } from '../api/cart'
+import {
+  addToCart as addToCartRequest,
+  applyCoupon as applyCouponRequest,
+  getCart,
+  removeCartItem as removeCartItemRequest,
+  removeCoupon as removeCouponRequest,
+  updateCartItem as updateCartItemRequest,
+} from '../api/cart'
 import { useAuth } from './AuthContext'
 import { ApiError } from '../lib/api'
 import type { ApiCart } from '../types/cart'
@@ -9,7 +16,13 @@ interface CartContextValue {
   cart: ApiCart | null
   itemCount: number
   loading: boolean
+  updatingItemId: string | null
+  couponLoading: boolean
   addToCart: (productId: string, quantity?: number) => Promise<void>
+  updateCartItem: (itemId: string, quantity: number) => Promise<void>
+  removeCartItem: (itemId: string) => Promise<void>
+  applyCoupon: (code: string) => Promise<void>
+  removeCoupon: () => Promise<void>
   refreshCart: () => Promise<void>
 }
 
@@ -19,6 +32,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth()
   const [cart, setCart] = useState<ApiCart | null>(null)
   const [loading, setLoading] = useState(false)
+  const [updatingItemId, setUpdatingItemId] = useState<string | null>(null)
+  const [couponLoading, setCouponLoading] = useState(false)
 
   const refreshCart = useCallback(async () => {
     if (!isAuthenticated) {
@@ -40,31 +55,114 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated])
 
   useEffect(() => {
-    void refreshCart()
-  }, [refreshCart])
+    if (!isAuthenticated) return
 
-  const addToCart = useCallback(
-    async (productId: string, quantity = 1) => {
-      const response = await addToCartRequest(productId, quantity)
+    let cancelled = false
+
+    async function load() {
+      await Promise.resolve()
+      if (cancelled) return
+
+      setLoading(true)
+      try {
+        const response = await getCart()
+        if (!cancelled) setCart(response.data ?? null)
+      } catch (error) {
+        if (!cancelled && error instanceof ApiError && error.statusCode === 401) {
+          setCart(null)
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    void load()
+
+    return () => {
+      cancelled = true
+    }
+  }, [isAuthenticated])
+
+  const addToCart = useCallback(async (productId: string, quantity = 1) => {
+    const response = await addToCartRequest(productId, quantity)
+    setCart(response.data ?? null)
+  }, [])
+
+  const updateCartItem = useCallback(async (itemId: string, quantity: number) => {
+    setUpdatingItemId(itemId)
+    try {
+      const response = await updateCartItemRequest(itemId, quantity)
       setCart(response.data ?? null)
-    },
-    [],
-  )
+    } finally {
+      setUpdatingItemId(null)
+    }
+  }, [])
+
+  const removeCartItem = useCallback(async (itemId: string) => {
+    setUpdatingItemId(itemId)
+    try {
+      const response = await removeCartItemRequest(itemId)
+      setCart(response.data ?? null)
+    } finally {
+      setUpdatingItemId(null)
+    }
+  }, [])
+
+  const applyCoupon = useCallback(async (code: string) => {
+    setCouponLoading(true)
+    try {
+      const response = await applyCouponRequest(code)
+      setCart(response.data ?? null)
+    } finally {
+      setCouponLoading(false)
+    }
+  }, [])
+
+  const removeCoupon = useCallback(async () => {
+    setCouponLoading(true)
+    try {
+      const response = await removeCouponRequest()
+      setCart(response.data ?? null)
+    } finally {
+      setCouponLoading(false)
+    }
+  }, [])
+
+  const resolvedCart = isAuthenticated ? cart : null
+  const resolvedLoading = isAuthenticated ? loading : false
 
   const itemCount = useMemo(
-    () => cart?.items.reduce((total, item) => total + item.quantity, 0) ?? 0,
-    [cart],
+    () => resolvedCart?.items.reduce((total, item) => total + item.quantity, 0) ?? 0,
+    [resolvedCart],
   )
 
   const value = useMemo(
     () => ({
-      cart,
+      cart: resolvedCart,
       itemCount,
-      loading,
+      loading: resolvedLoading,
+      updatingItemId,
+      couponLoading,
       addToCart,
+      updateCartItem,
+      removeCartItem,
+      applyCoupon,
+      removeCoupon,
       refreshCart,
     }),
-    [cart, itemCount, loading, addToCart, refreshCart],
+    [
+      resolvedCart,
+      itemCount,
+      resolvedLoading,
+      updatingItemId,
+      couponLoading,
+      addToCart,
+      updateCartItem,
+      removeCartItem,
+      applyCoupon,
+      removeCoupon,
+      refreshCart,
+    ],
   )
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>

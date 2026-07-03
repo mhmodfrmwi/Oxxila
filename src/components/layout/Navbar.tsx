@@ -1,7 +1,7 @@
 import { ChevronDown, LogOut, ShoppingBag, User, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
-import { HOME_PATH, SHOP_PATH, CATEGORIES_PATH } from '../../config/routes'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { HOME_PATH, SHOP_PATH, CATEGORIES_PATH, CART_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { Logo } from '../ui/Logo'
@@ -143,8 +143,8 @@ export function Navbar() {
         </div>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-3">
-          <button
-            type="button"
+          <Link
+            to={CART_PATH}
             className={[
               'relative flex min-h-11 min-w-11 items-center justify-center rounded-full transition-colors',
               'text-primary-text hover:bg-input',
@@ -158,7 +158,7 @@ export function Navbar() {
                 {itemCount > 99 ? '99+' : itemCount}
               </span>
             )}
-          </button>
+          </Link>
           {isAuthenticated ? (
             <button
               type="button"

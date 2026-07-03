@@ -28,3 +28,18 @@ export function removeCartItem(itemId: string) {
     auth: true,
   })
 }
+
+export function applyCoupon(code: string) {
+  return apiRequest<ApiCart>('/cart/coupon', {
+    method: 'POST',
+    auth: true,
+    body: { code },
+  })
+}
+
+export function removeCoupon() {
+  return apiRequest<ApiCart>('/cart/coupon', {
+    method: 'DELETE',
+    auth: true,
+  })
+}

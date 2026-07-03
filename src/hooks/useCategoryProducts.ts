@@ -34,10 +34,7 @@ export function useCategoryProducts(
   const filtersKey = getFiltersQueryKey(filters)
 
   useEffect(() => {
-    if (!categoryId) {
-      setState({ ...emptyState, loading: false })
-      return
-    }
+    if (!categoryId) return
 
     let cancelled = false
     const queryParams = buildProductQueryParams(filters, sort, { categoryId, page, limit })
@@ -77,7 +74,11 @@ export function useCategoryProducts(
     return () => {
       cancelled = true
     }
-  }, [categoryId, filtersKey, sort, page, limit])
+  }, [categoryId, filters, filtersKey, sort, page, limit])
+
+  if (!categoryId) {
+    return { ...emptyState, loading: false }
+  }
 
   return state
 }

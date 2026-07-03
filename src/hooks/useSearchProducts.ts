@@ -8,29 +8,34 @@ import type { ApiPagination } from '../lib/api'
 import { sortOptionToApiSort } from '../utils/productQueryParams'
 import { mapApiProductToRecommendedProduct } from '../utils/productDetailMappers'
 
+const emptySearchResult = {
+  loading: false,
+  error: null as string | null,
+  products: [] as RecommendedProduct[],
+  pagination: null as ApiPagination | null,
+}
+
 export function useSearchProducts(keyword: string, sort: SortOption, page: number, limit = 12) {
+  const trimmedKeyword = keyword.trim()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [products, setProducts] = useState<RecommendedProduct[]>([])
   const [pagination, setPagination] = useState<ApiPagination | null>(null)
 
   useEffect(() => {
-    const trimmed = keyword.trim()
-    if (!trimmed) {
-      setProducts([])
-      setPagination(null)
-      setLoading(false)
-      return
-    }
+    if (!trimmedKeyword) return
 
     let cancelled = false
-    setLoading(true)
-    setError(null)
 
     async function load() {
+      await Promise.resolve()
+      if (cancelled) return
+
+      setLoading(true)
+      setError(null)
       try {
         const response = await getProducts({
-          keyword: trimmed,
+          keyword: trimmedKeyword,
           page,
           limit,
           sort: sortOptionToApiSort(sort),
@@ -55,7 +60,11 @@ export function useSearchProducts(keyword: string, sort: SortOption, page: numbe
     return () => {
       cancelled = true
     }
-  }, [keyword, sort, page, limit])
+  }, [trimmedKeyword, sort, page, limit])
+
+  if (!trimmedKeyword) {
+    return emptySearchResult
+  }
 
   return { loading, error, products, pagination }
 }

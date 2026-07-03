@@ -18,7 +18,21 @@ export function SearchPage() {
   const keyword = searchParams.get('keyword') ?? searchParams.get('q') ?? ''
   const concerns = searchParams.get('concerns') ?? searchParams.get('concern') ?? ''
   const [sort, setSort] = useState<SortOption>('featured')
-  const [page, setPage] = useState(1)
+  const searchQueryKey = useMemo(
+    () => `${keyword}\0${concerns}\0${sort}`,
+    [keyword, concerns, sort],
+  )
+  const [paginationState, setPaginationState] = useState({ searchQueryKey, page: 1 })
+
+  if (paginationState.searchQueryKey !== searchQueryKey) {
+    setPaginationState({ searchQueryKey, page: 1 })
+  }
+
+  const page = paginationState.page
+  const setPage = (nextPage: number) => {
+    setPaginationState({ searchQueryKey, page: nextPage })
+  }
+
   const [concernProducts, setConcernProducts] = useState<RecommendedProduct[]>([])
   const [concernLoading, setConcernLoading] = useState(false)
   const [concernPagination, setConcernPagination] = useState<{
@@ -28,21 +42,18 @@ export function SearchPage() {
 
   const { products, loading, error, pagination } = useSearchProducts(keyword, sort, page, PRODUCTS_PER_PAGE)
 
-  useEffect(() => {
-    setPage(1)
-  }, [keyword, concerns, sort])
+  const isConcernBrowse = !keyword.trim() && Boolean(concerns.trim())
 
   useEffect(() => {
-    if (keyword.trim() || !concerns.trim()) {
-      setConcernProducts([])
-      setConcernPagination(null)
-      return
-    }
+    if (!isConcernBrowse) return
 
     let cancelled = false
-    setConcernLoading(true)
 
     async function loadByConcern() {
+      await Promise.resolve()
+      if (cancelled) return
+
+      setConcernLoading(true)
       try {
         const response = await getProducts({
           concerns,
@@ -71,9 +82,8 @@ export function SearchPage() {
     return () => {
       cancelled = true
     }
-  }, [keyword, concerns, page, sort])
+  }, [isConcernBrowse, concerns, page, sort])
 
-  const isConcernBrowse = !keyword.trim() && Boolean(concerns.trim())
   const displayProducts = isConcernBrowse ? concernProducts : products
   const displayLoading = isConcernBrowse ? concernLoading : loading
   const displayPagination = isConcernBrowse ? concernPagination : pagination

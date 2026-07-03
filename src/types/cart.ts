@@ -17,7 +17,7 @@ export interface ApiCartItem {
 }
 
 export interface ApiCart {
-  _id: string
+  _id?: string
   items: ApiCartItem[]
   couponCode: string | null
   discountAmount: number

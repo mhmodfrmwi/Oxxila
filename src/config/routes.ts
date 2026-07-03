@@ -8,3 +8,5 @@ export const CATEGORIES_PATH = '/categories'
 export const PRODUCTS_PATH = '/products'
 
 export const LOGIN_PATH = '/login'
+
+export const CART_PATH = '/cart'

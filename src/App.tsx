@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { CATEGORIES_PATH, HOME_PATH, PRODUCTS_PATH, SHOP_PATH } from './config/routes'
+import { CATEGORIES_PATH, HOME_PATH, PRODUCTS_PATH, SHOP_PATH, CART_PATH } from './config/routes'
 import { CategoryIndexRedirect } from './components/category/CategoryIndexRedirect'
 import { ChangePasswordPage } from './pages/ChangePasswordPage'
 import { CategoryPage } from './pages/CategoryPage'
@@ -10,6 +10,7 @@ import { ProductPage } from './pages/ProductPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { SearchPage } from './pages/SearchPage'
 import { ShopPage } from './pages/ShopPage'
+import { CartPage } from './pages/CartPage'
 import { VerifyOtpPage } from './pages/VerifyOtpPage'
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
     <Routes>
       <Route path={HOME_PATH} element={<LandingPage />} />
       <Route path={SHOP_PATH} element={<ShopPage />} />
+      <Route path={CART_PATH} element={<CartPage />} />
       <Route path="/search" element={<SearchPage />} />
       <Route path={CATEGORIES_PATH} element={<CategoryIndexRedirect />} />
       <Route path={`${CATEGORIES_PATH}/:slug`} element={<CategoryPage />} />

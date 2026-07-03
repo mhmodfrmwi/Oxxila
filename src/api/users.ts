@@ -15,3 +15,13 @@ export function getBrowsingHistory() {
 export function getRecommendations() {
   return apiRequest<ApiProduct[]>('/users/recommendations', { auth: true })
 }
+
+export interface UserAddress {
+  _id: string
+  city: string
+  address: string
+}
+
+export function getMyAddresses() {
+  return apiRequest<{ addresses: UserAddress[] }>('/users/profile/addresses', { auth: true })
+}

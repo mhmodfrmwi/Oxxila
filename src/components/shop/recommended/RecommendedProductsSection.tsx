@@ -14,15 +14,15 @@ export function RecommendedProductsSection() {
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setRecommendedFromApi([])
-      return
-    }
+    if (!isAuthenticated) return
 
     let cancelled = false
-    setLoadingRecommendations(true)
 
     async function load() {
+      await Promise.resolve()
+      if (cancelled) return
+
+      setLoadingRecommendations(true)
       try {
         const response = await getRecommendations()
         if (cancelled) return
@@ -46,7 +46,7 @@ export function RecommendedProductsSection() {
     return catalogProducts.map(mapApiProductToRecommendedProduct)
   }, [isAuthenticated, recommendedFromApi, catalogProducts])
 
-  const loading = catalogLoading || loadingRecommendations
+  const loading = catalogLoading || (isAuthenticated && loadingRecommendations)
 
   return (
     <ContentSection aria-labelledby="recommended-products-heading">
