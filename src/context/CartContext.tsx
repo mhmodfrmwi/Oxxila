@@ -85,7 +85,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = useCallback(async (productId: string, quantity = 1) => {
     const response = await addToCartRequest(productId, quantity)
-    setCart(response.data ?? null)
+    if (!response.data) {
+      throw new ApiError('Cart was not updated. Please try again.')
+    }
+    setCart(response.data)
   }, [])
 
   const updateCartItem = useCallback(async (itemId: string, quantity: number) => {

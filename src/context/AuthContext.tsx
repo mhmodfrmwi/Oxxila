@@ -7,7 +7,7 @@ import {
 } from '../api/auth'
 import { AUTH_TOKEN_KEY } from '../config/api'
 import { STORAGE_KEYS } from '../config/storage'
-import { ApiError } from '../lib/api'
+import { ApiError, getAccessToken } from '../lib/api'
 import { parseOAuthUserFromToken, createFallbackOAuthUser } from '../utils/oauth'
 
 interface AuthContextValue {
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       user,
-      isAuthenticated: Boolean(localStorage.getItem(AUTH_TOKEN_KEY) && user),
+      isAuthenticated: Boolean(getAccessToken() && user),
       login,
       logout,
       setUser,

@@ -35,6 +35,19 @@ interface RequestOptions extends Omit<RequestInit, 'body' | 'credentials'> {
   withCredentials?: boolean
 }
 
+export function getAccessToken(): string | null {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY)?.trim()
+  return token || null
+}
+
+async function parseApiPayload<T>(response: Response): Promise<ApiResponse<T>> {
+  try {
+    return (await response.json()) as ApiResponse<T>
+  } catch {
+    throw new ApiError('Unexpected server response. Please try again.', response.status)
+  }
+}
+
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
   const { body, auth = false, withCredentials = false, headers, ...rest } = options
 
@@ -44,10 +57,11 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   }
 
   if (auth) {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY)
-    if (token) {
-      requestHeaders.set('Authorization', `Bearer ${token}`)
+    const token = getAccessToken()
+    if (!token) {
+      throw new ApiError('You are not logged in. Please log in to continue.', 401)
     }
+    requestHeaders.set('Authorization', `Bearer ${token}`)
   }
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -57,19 +71,14 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
 
-  try {
-    const payload = (await response.json()) as ApiResponse<T>
+  const payload = await parseApiPayload<T>(response)
 
-    if (!response.ok || !payload.success) {
-      throw new ApiError(
-        payload.message || 'Something went wrong. Please try again.',
-        payload.statusCode ?? response.status,
-      )
-    }
-
-    return payload
-  } catch (error) {
-    if (error instanceof ApiError) throw error
-    throw new ApiError('Unexpected server response. Please try again.', response.status)
+  if (!response.ok || !payload.success) {
+    throw new ApiError(
+      payload.message || 'Something went wrong. Please try again.',
+      payload.statusCode ?? response.status,
+    )
   }
+
+  return payload
 }

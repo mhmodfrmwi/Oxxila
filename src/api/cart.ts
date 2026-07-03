@@ -1,16 +1,26 @@
 // src/api/cart.ts
-import { apiRequest } from '../lib/api'
+import { apiRequest, ApiError } from '../lib/api'
 import type { ApiCart } from '../types/cart'
+
+const OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i
 
 export function getCart() {
   return apiRequest<ApiCart>('/cart', { auth: true })
 }
 
 export function addToCart(productId: string, quantity = 1) {
+  const normalizedId = productId.trim()
+  if (!OBJECT_ID_PATTERN.test(normalizedId)) {
+    return Promise.reject(new ApiError('Invalid product ID.', 400))
+  }
+
   return apiRequest<ApiCart>('/cart', {
     method: 'POST',
     auth: true,
-    body: { productId, quantity },
+    body: {
+      productId: normalizedId,
+      quantity: Math.max(1, Math.floor(Number(quantity))),
+    },
   })
 }
 

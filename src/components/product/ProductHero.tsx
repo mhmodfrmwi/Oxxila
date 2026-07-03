@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { cn } from '../../lib/cn'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
-import { ApiError } from '../../lib/api'
+import { LOGIN_PATH } from '../../config/routes'
+import { ApiError, getAccessToken } from '../../lib/api'
 import { Button } from '../ui/Button'
 import { ProductBadge } from '../ui/ProductBadge'
 import { ProductRating } from '../ui/ProductRating'
@@ -57,6 +58,7 @@ export function ProductHero({ product, className }: ProductHeroProps) {
   const { addToCart } = useCart()
   const [cartLoading, setCartLoading] = useState(false)
   const [cartMessage, setCartMessage] = useState<string | null>(null)
+  const [cartMessageIsError, setCartMessageIsError] = useState(false)
 
   const {
     brand,
@@ -96,26 +98,36 @@ export function ProductHero({ product, className }: ProductHeroProps) {
     discountPercent != null && discountPercent > 0 ? `${discountPercent}% off` : null
 
   async function handleAddToCart() {
-    if (!isAuthenticated) {
-      navigate('/login')
+    if (!isAuthenticated || !getAccessToken()) {
+      navigate(LOGIN_PATH)
+      return
+    }
+
+    if (!product.id?.trim()) {
+      setCartMessage('Unable to add this product. Product ID is missing.')
+      setCartMessageIsError(true)
       return
     }
 
     if (stockCount <= 0) {
       setCartMessage('This product is out of stock.')
+      setCartMessageIsError(true)
       return
     }
 
     setCartLoading(true)
     setCartMessage(null)
+    setCartMessageIsError(false)
 
     try {
       await addToCart(product.id, quantity)
       setCartMessage('Added to cart.')
+      setCartMessageIsError(false)
     } catch (error) {
       setCartMessage(
         error instanceof ApiError ? error.message : 'Unable to add item to cart.',
       )
+      setCartMessageIsError(true)
     } finally {
       setCartLoading(false)
     }
@@ -262,7 +274,13 @@ export function ProductHero({ product, className }: ProductHeroProps) {
         </div>
 
         {cartMessage && (
-          <p className="text-sm text-secondary-text" role="status">
+          <p
+            className={cn(
+              'text-sm',
+              cartMessageIsError ? 'text-support-error' : 'text-support-success',
+            )}
+            role={cartMessageIsError ? 'alert' : 'status'}
+          >
             {cartMessage}
           </p>
         )}
