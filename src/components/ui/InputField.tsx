@@ -1,9 +1,12 @@
+// src/components/ui/InputField.tsx
 import { Eye, EyeOff } from 'lucide-react'
 import { useId, useState, type InputHTMLAttributes } from 'react'
+import { cn } from '../../lib/cn'
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string
   showPasswordToggle?: boolean
+  error?: string
 }
 
 export function InputField({
@@ -12,9 +15,11 @@ export function InputField({
   showPasswordToggle = false,
   type = 'text',
   className = '',
+  error,
   ...props
 }: InputFieldProps) {
   const generatedId = useId()
+  const errorId = useId()
   const id = externalId ?? generatedId
   const [visible, setVisible] = useState(false)
 
@@ -30,15 +35,16 @@ export function InputField({
         <input
           id={id}
           type={inputType}
-          className={[
+          className={cn(
             'w-full rounded-xl px-4 py-3.5 text-base',
             'bg-input text-primary-text placeholder:text-placeholder-text',
             'focus:outline-none focus:ring-2 focus:ring-button-primary/50',
-            showPasswordToggle ? 'pr-11' : '',
+            showPasswordToggle && 'pr-11',
+            error && 'border border-support-error focus:ring-support-error/40',
             className,
-          ]
-            .filter(Boolean)
-            .join(' ')}
+          )}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
           {...props}
         />
         {showPasswordToggle && (
@@ -52,6 +58,11 @@ export function InputField({
           </button>
         )}
       </div>
+      {error && (
+        <p id={errorId} className="text-xs text-support-error" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   )
 }

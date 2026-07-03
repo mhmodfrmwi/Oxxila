@@ -5,6 +5,10 @@
 @import './styles/category-filters.css';
 @import './styles/product-detail.css';
 @import './styles/cart.css';
+@import './styles/add-address.css';
+@import './styles/payment.css';
+@import './styles/order-confirmation.css';
+@import './styles/track-order.css';
 @import './styles/promo-carousel.css';
 @import 'tailwindcss';
 @import './styles/tailwind-theme.css';

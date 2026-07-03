@@ -1,4 +1,6 @@
 // src/components/cart/CartShippingBar.tsx
+import { Link } from 'react-router-dom'
+import { ADD_ADDRESS_PATH } from '../../config/routes'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../ui/interactionStyles'
 import type { UserAddress } from '../../api/users'
@@ -27,18 +29,19 @@ export function CartShippingBar({ address, loading, className }: CartShippingBar
           </>
         )}
       </p>
-      <button
-        type="button"
+      <Link
+        to={ADD_ADDRESS_PATH}
         className={cn(
           'text-sm font-medium text-link underline underline-offset-2',
           'hover:text-link-hover',
           focusRingClasses,
           'rounded-sm',
+          loading && 'pointer-events-none opacity-50',
         )}
-        disabled={loading}
+        aria-disabled={loading}
       >
         Change address
-      </button>
+      </Link>
     </div>
   )
 }

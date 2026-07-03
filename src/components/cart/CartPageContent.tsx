@@ -1,7 +1,8 @@
 // src/components/cart/CartPageContent.tsx
 import { useMemo, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { HOME_PATH, LOGIN_PATH } from '../../config/routes'
+import { useNavigate } from 'react-router-dom'
+import { HOME_PATH, LOGIN_PATH, PAYMENT_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { useBrowsingHistory } from '../../hooks/useBrowsingHistory'
@@ -21,6 +22,7 @@ import { CartShippingBar } from './CartShippingBar'
 import { OrderSummaryCard } from './OrderSummaryCard'
 
 export function CartPageContent() {
+  const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const {
     cart,
@@ -144,6 +146,7 @@ export function CartPageContent() {
                     checkoutDisabled={Boolean(updatingItemId)}
                     onApplyCoupon={applyCoupon}
                     onRemoveCoupon={removeCoupon}
+                    onCtaClick={() => navigate(PAYMENT_PATH)}
                   />
                 )}
               </div>

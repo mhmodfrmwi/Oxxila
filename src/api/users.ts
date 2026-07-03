@@ -25,3 +25,31 @@ export interface UserAddress {
 export function getMyAddresses() {
   return apiRequest<{ addresses: UserAddress[] }>('/users/profile/addresses', { auth: true })
 }
+
+export interface CreateAddressPayload {
+  city: string
+  address: string
+}
+
+export function createMyAddress(payload: CreateAddressPayload) {
+  return apiRequest<{ address: UserAddress }>('/users/profile/addresses', {
+    method: 'POST',
+    auth: true,
+    body: payload,
+  })
+}
+
+export function updateMyAddress(addressId: string, payload: Partial<CreateAddressPayload>) {
+  return apiRequest<{ address: UserAddress }>(`/users/profile/addresses/${addressId}`, {
+    method: 'PUT',
+    auth: true,
+    body: payload,
+  })
+}
+
+export function deleteMyAddress(addressId: string) {
+  return apiRequest(`/users/profile/addresses/${addressId}`, {
+    method: 'DELETE',
+    auth: true,
+  })
+}

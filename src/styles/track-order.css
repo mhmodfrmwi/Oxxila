@@ -1,0 +1,275 @@
+/* src/styles/track-order.css */
+.track-order-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--primary-link);
+  transition: color 0.2s ease;
+}
+
+.track-order-back-link:hover {
+  color: var(--hover-primary-link);
+}
+
+.track-order-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.track-order-title {
+  font-family: var(--font-family-serif, var(--font-family-base));
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.15;
+  color: var(--primary-text);
+}
+
+.track-order-date {
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--secondary-text);
+}
+
+.track-order-header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+}
+
+.track-order-header-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.track-order-header-meta-label {
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--secondary-text);
+}
+
+.track-order-header-meta-value {
+  font-family: var(--font-family-serif, var(--font-family-base));
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--primary-text);
+}
+
+.track-order-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  background: rgb(123 101 251 / 0.12);
+  border: 1px solid rgb(123 101 251 / 0.25);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-button);
+}
+
+.track-order-stepper-card {
+  margin-bottom: 1.25rem;
+  padding: 1.5rem 1rem 1.75rem;
+}
+
+.track-order-status .order-confirmation-status-track {
+  max-width: none;
+}
+
+.track-order-status .order-confirmation-status-step--upcoming .order-confirmation-status-node {
+  border-color: rgb(123 101 251 / 0.2);
+  background: rgb(123 101 251 / 0.08);
+  color: rgb(123 101 251 / 0.55);
+}
+
+.track-order-status .order-confirmation-status-step--upcoming:not(:last-child)::after {
+  background: rgb(123 101 251 / 0.18);
+}
+
+.track-order-delivery-banner {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  border-radius: 1rem;
+  background: rgb(123 101 251 / 0.1);
+  border: 1px solid rgb(123 101 251 / 0.16);
+}
+
+.track-order-delivery-banner-accent {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.35rem;
+  background: var(--primary-button);
+}
+
+.track-order-delivery-banner-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  padding: 1.125rem 1.25rem 1.125rem 1.5rem;
+}
+
+.track-order-delivery-banner-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  color: var(--primary-button);
+}
+
+.track-order-delivery-banner-title {
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-button);
+}
+
+.track-order-delivery-banner-subtitle {
+  margin-top: 0.125rem;
+  font-size: 0.8125rem;
+  color: var(--secondary-text);
+}
+
+.track-order-delivery-banner-right {
+  text-align: right;
+}
+
+.track-order-delivery-banner-tracking-label {
+  font-size: 0.625rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--secondary-text);
+}
+
+.track-order-delivery-banner-tracking-value {
+  margin-top: 0.25rem;
+  font-family: var(--font-family-serif, var(--font-family-base));
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--primary-text);
+}
+
+.track-order-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .track-order-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
+    align-items: start;
+    gap: 1.5rem;
+  }
+}
+
+.track-order-shipping-card {
+  border-radius: 1rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--card-background);
+  box-shadow: 0 4px 24px rgb(93 90 136 / 0.08);
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .track-order-shipping-card {
+  box-shadow: 0 4px 24px rgb(0 0 0 / 0.25);
+}
+
+.track-order-shipping-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1.25rem;
+  font-family: var(--font-family-serif, var(--font-family-base));
+  font-size: 1.0625rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--primary-text);
+}
+
+.track-order-summary-card {
+  border-radius: 1rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--card-background);
+  box-shadow: 0 4px 24px rgb(93 90 136 / 0.08);
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .track-order-summary-card {
+  box-shadow: 0 4px 24px rgb(0 0 0 / 0.25);
+}
+
+.track-order-summary-card .cart-summary-card {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
+}
+
+.track-order-cancel-btn {
+  margin-top: 1rem;
+  min-height: 3rem;
+  border-color: var(--support-error);
+  background: var(--support-error);
+  color: white;
+}
+
+.track-order-cancel-btn:hover:not(:disabled) {
+  background: rgb(185 28 28);
+  border-color: rgb(185 28 28);
+}
+
+.track-order-cancel-btn:disabled {
+  opacity: 0.55;
+}
+
+.track-order-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .track-order-actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .track-order-actions .order-confirmation-action {
+    min-width: 11rem;
+  }
+}
+
+.track-order-temperature-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  color: var(--secondary-text);
+}
+
+@media (max-width: 767px) {
+  .track-order-stepper-card {
+    padding-inline: 0.75rem;
+  }
+
+  .track-order-status .order-confirmation-status-label {
+    font-size: 0.625rem;
+  }
+
+  .track-order-delivery-banner-right {
+    width: 100%;
+    text-align: left;
+  }
+}

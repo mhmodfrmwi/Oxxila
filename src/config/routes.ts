@@ -9,4 +9,38 @@ export const PRODUCTS_PATH = '/products'
 
 export const LOGIN_PATH = '/login'
 
+export const REGISTER_PATH = '/register'
+
+export const FORGOT_PASSWORD_PATH = '/forgot-password'
+
+export const VERIFY_OTP_PATH = '/forgot-password/verify'
+
+export const RESET_PASSWORD_PATH = '/reset-password'
+
+export const CHANGE_PASSWORD_PATH = '/change-password'
+
+export const SEARCH_PATH = '/search'
+
 export const CART_PATH = '/cart'
+
+export const MY_ACCOUNT_PATH = '/account'
+
+export const ADDRESSES_PATH = '/account/addresses'
+
+export const ADD_ADDRESS_PATH = '/account/addresses/add'
+
+export const CHECKOUT_PATH = '/checkout'
+
+export const PAYMENT_PATH = '/checkout/payment'
+
+export const ORDER_CONFIRMATION_PATH = '/checkout/confirmation'
+
+export function orderConfirmationPath(orderId: string) {
+  return `${ORDER_CONFIRMATION_PATH}/${orderId}`
+}
+
+export const TRACK_ORDER_PATH = '/track/order'
+
+export function trackOrderPath(orderId: string) {
+  return `${TRACK_ORDER_PATH}/${orderId}`
+}

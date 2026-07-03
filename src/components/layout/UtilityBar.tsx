@@ -2,6 +2,7 @@ import { useState, type KeyboardEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Moon, Package, Search } from 'lucide-react'
 import langIcon from '../../assets/Lang-image.png'
+import { SEARCH_PATH } from '../../config/routes'
 import { useTheme } from '../../context/ThemeContext'
 import { typeSmallClasses } from '../ui/typography'
 
@@ -27,7 +28,7 @@ export function UtilityBar({ promo = defaultPromo }: UtilityBarProps) {
   function submitSearch() {
     const keyword = searchValue.trim()
     if (!keyword) return
-    navigate(`/search?keyword=${encodeURIComponent(keyword)}`)
+    navigate(`${SEARCH_PATH}?keyword=${encodeURIComponent(keyword)}`)
   }
 
   function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {

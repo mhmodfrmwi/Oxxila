@@ -65,22 +65,33 @@ export function ProductDescriptionCard({
         role="tablist"
         aria-label="Product information"
       >
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            role="tab"
-            aria-selected={activeTab === tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={cn('product-detail-tab', focusRingClasses)}
-            data-active={activeTab === tab.id ? 'true' : 'false'}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {tabs.map((tab) => {
+          const tabId = `product-tab-${tab.id}`
+          const panelId = `product-panel-${tab.id}`
+          return (
+            <button
+              key={tab.id}
+              id={tabId}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              aria-controls={panelId}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn('product-detail-tab', focusRingClasses)}
+              data-active={activeTab === tab.id ? 'true' : 'false'}
+            >
+              {tab.label}
+            </button>
+          )
+        })}
       </div>
 
-      <div className="product-detail-description-panel" role="tabpanel">
+      <div
+        id={`product-panel-${activeTab}`}
+        className="product-detail-description-panel"
+        role="tabpanel"
+        aria-labelledby={`product-tab-${activeTab}`}
+      >
         {tabContent[activeTab]}
       </div>
     </article>

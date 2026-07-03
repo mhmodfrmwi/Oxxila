@@ -1,35 +1,113 @@
+// src/App.tsx
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { CATEGORIES_PATH, HOME_PATH, PRODUCTS_PATH, SHOP_PATH, CART_PATH } from './config/routes'
+import {
+  ADD_ADDRESS_PATH,
+  ADDRESSES_PATH,
+  CART_PATH,
+  CATEGORIES_PATH,
+  CHANGE_PASSWORD_PATH,
+  CHECKOUT_PATH,
+  FORGOT_PASSWORD_PATH,
+  HOME_PATH,
+  LOGIN_PATH,
+  MY_ACCOUNT_PATH,
+  ORDER_CONFIRMATION_PATH,
+  PAYMENT_PATH,
+  PRODUCTS_PATH,
+  REGISTER_PATH,
+  RESET_PASSWORD_PATH,
+  SEARCH_PATH,
+  SHOP_PATH,
+  TRACK_ORDER_PATH,
+  VERIFY_OTP_PATH,
+} from './config/routes'
 import { CategoryIndexRedirect } from './components/category/CategoryIndexRedirect'
-import { ChangePasswordPage } from './pages/ChangePasswordPage'
-import { CategoryPage } from './pages/CategoryPage'
-import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
-import { LandingPage } from './pages/LandingPage'
-import { LoginPage } from './pages/LoginPage'
-import { ProductPage } from './pages/ProductPage'
-import { RegisterPage } from './pages/RegisterPage'
-import { SearchPage } from './pages/SearchPage'
-import { ShopPage } from './pages/ShopPage'
-import { CartPage } from './pages/CartPage'
-import { VerifyOtpPage } from './pages/VerifyOtpPage'
+import { RouteFallback } from './components/ui/RouteFallback'
+
+const LandingPage = lazy(() =>
+  import('./pages/LandingPage').then((module) => ({ default: module.LandingPage })),
+)
+const ShopPage = lazy(() =>
+  import('./pages/ShopPage').then((module) => ({ default: module.ShopPage })),
+)
+const CartPage = lazy(() =>
+  import('./pages/CartPage').then((module) => ({ default: module.CartPage })),
+)
+const AccountPage = lazy(() =>
+  import('./pages/AccountPage').then((module) => ({ default: module.AccountPage })),
+)
+const AddressesPage = lazy(() =>
+  import('./pages/AddressesPage').then((module) => ({ default: module.AddressesPage })),
+)
+const CheckoutPage = lazy(() =>
+  import('./pages/CheckoutPage').then((module) => ({ default: module.CheckoutPage })),
+)
+const PaymentPage = lazy(() =>
+  import('./pages/PaymentPage').then((module) => ({ default: module.PaymentPage })),
+)
+const OrderConfirmationPage = lazy(() =>
+  import('./pages/OrderConfirmationPage').then((module) => ({
+    default: module.OrderConfirmationPage,
+  })),
+)
+const TrackOrderPage = lazy(() =>
+  import('./pages/TrackOrderPage').then((module) => ({ default: module.TrackOrderPage })),
+)
+const AddAddressPage = lazy(() =>
+  import('./pages/AddAddressPage').then((module) => ({ default: module.AddAddressPage })),
+)
+const SearchPage = lazy(() =>
+  import('./pages/SearchPage').then((module) => ({ default: module.SearchPage })),
+)
+const CategoryPage = lazy(() =>
+  import('./pages/CategoryPage').then((module) => ({ default: module.CategoryPage })),
+)
+const ProductPage = lazy(() =>
+  import('./pages/ProductPage').then((module) => ({ default: module.ProductPage })),
+)
+const LoginPage = lazy(() =>
+  import('./pages/LoginPage').then((module) => ({ default: module.LoginPage })),
+)
+const RegisterPage = lazy(() =>
+  import('./pages/RegisterPage').then((module) => ({ default: module.RegisterPage })),
+)
+const ForgotPasswordPage = lazy(() =>
+  import('./pages/ForgotPasswordPage').then((module) => ({ default: module.ForgotPasswordPage })),
+)
+const VerifyOtpPage = lazy(() =>
+  import('./pages/VerifyOtpPage').then((module) => ({ default: module.VerifyOtpPage })),
+)
+const ChangePasswordPage = lazy(() =>
+  import('./pages/ChangePasswordPage').then((module) => ({ default: module.ChangePasswordPage })),
+)
 
 export default function App() {
   return (
-    <Routes>
-      <Route path={HOME_PATH} element={<LandingPage />} />
-      <Route path={SHOP_PATH} element={<ShopPage />} />
-      <Route path={CART_PATH} element={<CartPage />} />
-      <Route path="/search" element={<SearchPage />} />
-      <Route path={CATEGORIES_PATH} element={<CategoryIndexRedirect />} />
-      <Route path={`${CATEGORIES_PATH}/:slug`} element={<CategoryPage />} />
-      <Route path={`${PRODUCTS_PATH}/:slug`} element={<ProductPage />} />
-      <Route path="/" element={<Navigate to={HOME_PATH} replace />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/forgot-password/verify" element={<VerifyOtpPage />} />
-      <Route path="/reset-password/:token" element={<ChangePasswordPage />} />
-      <Route path="/change-password" element={<ChangePasswordPage />} />
-    </Routes>
+    <Suspense fallback={<RouteFallback />}>
+      <Routes>
+        <Route path={HOME_PATH} element={<LandingPage />} />
+        <Route path={SHOP_PATH} element={<ShopPage />} />
+        <Route path={CART_PATH} element={<CartPage />} />
+        <Route path={MY_ACCOUNT_PATH} element={<AccountPage />} />
+        <Route path={ADDRESSES_PATH} element={<AddressesPage />} />
+        <Route path={CHECKOUT_PATH} element={<CheckoutPage />} />
+        <Route path={PAYMENT_PATH} element={<PaymentPage />} />
+        <Route path={`${ORDER_CONFIRMATION_PATH}/:orderId`} element={<OrderConfirmationPage />} />
+        <Route path={`${TRACK_ORDER_PATH}/:orderId`} element={<TrackOrderPage />} />
+        <Route path={ADD_ADDRESS_PATH} element={<AddAddressPage />} />
+        <Route path={SEARCH_PATH} element={<SearchPage />} />
+        <Route path={CATEGORIES_PATH} element={<CategoryIndexRedirect />} />
+        <Route path={`${CATEGORIES_PATH}/:slug`} element={<CategoryPage />} />
+        <Route path={`${PRODUCTS_PATH}/:slug`} element={<ProductPage />} />
+        <Route path="/" element={<Navigate to={HOME_PATH} replace />} />
+        <Route path={LOGIN_PATH} element={<LoginPage />} />
+        <Route path={REGISTER_PATH} element={<RegisterPage />} />
+        <Route path={FORGOT_PASSWORD_PATH} element={<ForgotPasswordPage />} />
+        <Route path={VERIFY_OTP_PATH} element={<VerifyOtpPage />} />
+        <Route path={`${RESET_PASSWORD_PATH}/:token`} element={<ChangePasswordPage />} />
+        <Route path={CHANGE_PASSWORD_PATH} element={<ChangePasswordPage />} />
+      </Routes>
+    </Suspense>
   )
 }

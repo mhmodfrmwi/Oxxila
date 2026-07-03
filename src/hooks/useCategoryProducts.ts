@@ -39,10 +39,6 @@ export function useCategoryProducts(
     let cancelled = false
     const queryParams = buildProductQueryParams(filters, sort, { categoryId, page, limit })
 
-    if (import.meta.env.DEV) {
-      console.log('[category-products] GET /products', queryParams)
-    }
-
     async function load() {
       setState((previous) => ({ ...previous, loading: true, error: null }))
 

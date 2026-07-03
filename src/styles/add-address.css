@@ -1,0 +1,123 @@
+/* src/styles/add-address.css */
+.add-address-card {
+  border-radius: 2rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-subtle);
+  box-shadow: 0 8px 32px rgb(93 90 136 / 0.1);
+  padding: 2rem 1.75rem 2.25rem;
+}
+
+[data-theme='dark'] .add-address-card {
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.28);
+}
+
+.add-address-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--card-background);
+  color: var(--primary-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.add-address-close:hover {
+  background: var(--input-background);
+}
+
+.add-address-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--secondary-text);
+  font-family: var(--font-family-serif, var(--font-family-base));
+  font-size: 0.875rem;
+}
+
+.add-address-divider::before,
+.add-address-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.saved-address-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 11rem;
+  padding: 1rem 1.125rem;
+  border-radius: 1rem;
+  border: 2px solid transparent;
+  background: var(--card-background);
+  text-align: left;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.saved-address-card:hover {
+  box-shadow: 0 4px 16px rgb(93 90 136 / 0.08);
+}
+
+.saved-address-card--selected {
+  border-color: var(--primary-button);
+  background: rgb(123 101 251 / 0.08);
+}
+
+.saved-address-card-name {
+  font-family: var(--font-family-serif, var(--font-family-base));
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-text);
+}
+
+.saved-address-card-lines {
+  flex: 1;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--secondary-text);
+}
+
+.saved-address-card-divider {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.75rem;
+}
+
+.saved-address-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.saved-address-card-edit {
+  color: var(--primary-link);
+  transition: color 0.2s ease;
+}
+
+.saved-address-card-edit:hover {
+  color: var(--hover-primary-link);
+}
+
+.saved-address-card-delete {
+  color: var(--support-error);
+  transition: opacity 0.2s ease;
+}
+
+.saved-address-card-delete:disabled {
+  opacity: 0.5;
+}
+
+.add-address-save-btn {
+  min-height: 3.25rem;
+}
+
+@media (min-width: 640px) {
+  .add-address-card {
+    padding: 2.25rem 2.5rem 2.5rem;
+  }
+}
