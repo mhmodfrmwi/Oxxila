@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { HOME_PATH, SHOP_PATH, CATEGORIES_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
+import { useCart } from '../../context/CartContext'
 import { Logo } from '../ui/Logo'
 import { typeSmallClasses } from '../ui/typography'
 
@@ -26,6 +27,7 @@ function BurgerIcon() {
 export function Navbar() {
   const navigate = useNavigate()
   const { isAuthenticated, logout } = useAuth()
+  const { itemCount } = useCart()
   const [menuOpen, setMenuOpen] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
 
@@ -144,13 +146,18 @@ export function Navbar() {
           <button
             type="button"
             className={[
-              'flex min-h-11 min-w-11 items-center justify-center rounded-full transition-colors',
+              'relative flex min-h-11 min-w-11 items-center justify-center rounded-full transition-colors',
               'text-primary-text hover:bg-input',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
             ].join(' ')}
-            aria-label="Shopping bag"
+            aria-label={itemCount > 0 ? `Shopping bag, ${itemCount} items` : 'Shopping bag'}
           >
             <ShoppingBag size={20} aria-hidden />
+            {itemCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-button-primary px-1 text-[10px] font-semibold text-on-emphasis">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
           </button>
           {isAuthenticated ? (
             <button

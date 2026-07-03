@@ -79,7 +79,7 @@ export function buildSkinConcerns(products: ApiProduct[]): SkinConcernDisplay[] 
       slug,
       name: SKIN_CONCERN_LABELS[slug] ?? slug,
       image,
-      href: `/shop?concern=${slug}`,
+      href: `/search?concerns=${slug}`,
     }
   })
 
@@ -90,7 +90,7 @@ export function buildSkinConcerns(products: ApiProduct[]): SkinConcernDisplay[] 
     slug: concern.id,
     name: concern.name,
     image: concern.image,
-    href: `/shop?concern=${concern.id}`,
+    href: `/search?concerns=${concern.id}`,
   }))
 }
 

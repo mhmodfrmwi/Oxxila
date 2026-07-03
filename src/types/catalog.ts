@@ -4,6 +4,7 @@ export interface ApiBrand {
   logo: string
   slug: string
   isActive?: boolean
+  category?: string | { _id: string; name?: string; slug?: string }
 }
 
 export interface ApiCategory {
@@ -42,7 +43,7 @@ export interface ApiProduct {
   subCategory?: ApiSubCategory[]
   isSensitiveSkin?: boolean
   isBundle?: boolean
-  catalog?: unknown | null
+  catalog?: string | null
   certificationImage?: string | null
   isCertified?: boolean
   isActive?: boolean
@@ -74,9 +75,27 @@ export interface ApiReview {
   comment?: string
   review?: string
   createdAt?: string
-  helpful?: number
-  helpfulCount?: number
+  likesCount?: number
   user?: ApiReviewUser
+}
+
+export interface ApiReviewBreakdown {
+  star: number
+  count: number
+  percentage: number
+}
+
+export interface ApiReviewStats {
+  ratingsAverage: number
+  ratingsQuantity: number
+  breakdown: ApiReviewBreakdown[]
+}
+
+export interface ApiFaq {
+  _id: string
+  question: string
+  answer: string
+  isActive?: boolean
 }
 
 export interface SkinConcernDisplay {

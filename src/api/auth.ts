@@ -25,7 +25,7 @@ export interface LoginResponse {
 }
 
 export interface ResetPasswordPayload {
-  password: string
+  newPassword: string
   confirmPassword: string
 }
 
@@ -61,5 +61,17 @@ export function logout() {
   return apiRequest('/auth/logout', {
     method: 'POST',
     auth: true,
+    withCredentials: true,
+  })
+}
+
+export function getMe() {
+  return apiRequest<AuthUser>('/auth/me', { auth: true })
+}
+
+export function refreshAccessToken() {
+  return apiRequest<{ accessToken: string }>('/auth/refresh', {
+    method: 'POST',
+    withCredentials: true,
   })
 }

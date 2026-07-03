@@ -1,7 +1,10 @@
 import { Heart, Package, Share2, ShoppingBag } from 'lucide-react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { cn } from '../../lib/cn'
+import { useAuth } from '../../context/AuthContext'
+import { useCart } from '../../context/CartContext'
+import { ApiError } from '../../lib/api'
 import { Button } from '../ui/Button'
 import { ProductBadge } from '../ui/ProductBadge'
 import { ProductRating } from '../ui/ProductRating'
@@ -49,6 +52,12 @@ function SocialIconButton({
 }
 
 export function ProductHero({ product, className }: ProductHeroProps) {
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
+  const { addToCart } = useCart()
+  const [cartLoading, setCartLoading] = useState(false)
+  const [cartMessage, setCartMessage] = useState<string | null>(null)
+
   const {
     brand,
     brandLogo,
@@ -85,6 +94,32 @@ export function ProductHero({ product, className }: ProductHeroProps) {
 
   const discountLabel =
     discountPercent != null && discountPercent > 0 ? `${discountPercent}% off` : null
+
+  async function handleAddToCart() {
+    if (!isAuthenticated) {
+      navigate('/login')
+      return
+    }
+
+    if (stockCount <= 0) {
+      setCartMessage('This product is out of stock.')
+      return
+    }
+
+    setCartLoading(true)
+    setCartMessage(null)
+
+    try {
+      await addToCart(product.id, quantity)
+      setCartMessage('Added to cart.')
+    } catch (error) {
+      setCartMessage(
+        error instanceof ApiError ? error.message : 'Unable to add item to cart.',
+      )
+    } finally {
+      setCartLoading(false)
+    }
+  }
 
   return (
     <section className={cn('product-detail-hero', className)} aria-label="Product details">
@@ -205,9 +240,16 @@ export function ProductHero({ product, className }: ProductHeroProps) {
         </div>
 
         <div className="product-detail-actions">
-          <Button variant="primary" pill fullWidth className="product-detail-cta">
+          <Button
+            variant="primary"
+            pill
+            fullWidth
+            className="product-detail-cta"
+            onClick={() => void handleAddToCart()}
+            disabled={cartLoading || stockCount <= 0}
+          >
             <ShoppingBag size={18} strokeWidth={1.5} aria-hidden />
-            Add to Cart
+            {cartLoading ? 'Adding...' : 'Add to Cart'}
           </Button>
           <Button
             variant="outline"
@@ -218,6 +260,12 @@ export function ProductHero({ product, className }: ProductHeroProps) {
             One Click Checkout
           </Button>
         </div>
+
+        {cartMessage && (
+          <p className="text-sm text-secondary-text" role="status">
+            {cartMessage}
+          </p>
+        )}
 
         <div className="product-detail-social-actions">
           <SocialIconButton icon={Heart} label="Add to wishlist" />

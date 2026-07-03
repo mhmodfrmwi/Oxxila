@@ -1,14 +1,15 @@
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
-import { shopCategories } from '../../shop/shopData'
+import type { ApiSubCategory } from '../../../types/catalog'
 import { FilterSection } from './FilterSection'
 
 interface CategoryFilterProps {
   selectedIds: string[]
   onChange: (ids: string[]) => void
+  subcategories: ApiSubCategory[]
 }
 
-export function CategoryFilter({ selectedIds, onChange }: CategoryFilterProps) {
+export function CategoryFilter({ selectedIds, onChange, subcategories }: CategoryFilterProps) {
   function toggleCategory(id: string) {
     if (selectedIds.includes(id)) {
       onChange(selectedIds.filter((item) => item !== id))
@@ -17,22 +18,26 @@ export function CategoryFilter({ selectedIds, onChange }: CategoryFilterProps) {
     }
   }
 
+  if (subcategories.length === 0) {
+    return null
+  }
+
   return (
-    <FilterSection title="Category">
+    <FilterSection title="Subcategory">
       <div className="flex flex-wrap gap-2">
-        {shopCategories.map((category) => {
-          const isSelected = selectedIds.includes(category.id)
+        {subcategories.map((subcategory) => {
+          const isSelected = selectedIds.includes(subcategory._id)
 
           return (
             <button
-              key={category.id}
+              key={subcategory._id}
               type="button"
-              onClick={() => toggleCategory(category.id)}
+              onClick={() => toggleCategory(subcategory._id)}
               data-selected={isSelected}
               className={cn('filter-chip px-2.5 py-1.5', focusRingClasses)}
               aria-pressed={isSelected}
             >
-              {category.name}
+              {subcategory.name}
             </button>
           )
         })}

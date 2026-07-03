@@ -1,13 +1,17 @@
+// src/hooks/useProductPageData.ts
 import { useEffect, useRef, useState } from 'react'
-import { getProductReviews, getProducts } from '../api/catalog'
+import { getProductFaqs, getProductReviewStats, getProductReviews, getProducts } from '../api/catalog'
 import type { ReviewsSectionProps } from '../components/product/reviews/types'
+import type { FAQItem } from '../components/product/QuestionsSafetySection'
 import type { ProductDetail } from '../types/productDetail'
 import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
+import { useAuth } from '../context/AuthContext'
 import { ApiError } from '../lib/api'
 import { useLandingCatalogContext } from './useLandingCatalogContext'
 import {
   buildMoreFromBrandProducts,
   buildReviewsSectionData,
+  buildReviewsSectionDataFromStats,
   mapApiProductToProductDetail,
 } from '../utils/productDetailMappers'
 import { resolveProductBySlug } from '../utils/resolveProductBySlug'
@@ -21,6 +25,7 @@ export interface ProductPageDataState {
   errorKind: ProductPageErrorKind
   product: ProductDetail | null
   brandName: string
+  faqs: FAQItem[]
   reviewsData: Pick<
     ReviewsSectionProps,
     'averageRating' | 'totalReviews' | 'distribution' | 'reviews' | 'reviewsTotalDocuments'
@@ -48,6 +53,7 @@ const missingSlugState: ProductPageDataState = {
   errorKind: 'not_found',
   product: null,
   brandName: '',
+  faqs: [],
   reviewsData: emptyReviewsData,
   moreFromBrandProducts: [],
 }
@@ -71,12 +77,14 @@ function resolveError(error: unknown): { message: string; kind: ProductPageError
 export function useProductPageData(slug: string | undefined): ProductPageDataState {
   const normalizedSlug = slug?.trim() ?? ''
   const { products: catalogProducts } = useLandingCatalogContext()
+  const { isAuthenticated } = useAuth()
   const catalogProductsRef = useRef(catalogProducts)
   const [loading, setLoading] = useState(true)
   const [reviewsLoading, setReviewsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [errorKind, setErrorKind] = useState<ProductPageErrorKind>(null)
   const [product, setProduct] = useState<ProductDetail | null>(null)
+  const [faqs, setFaqs] = useState<FAQItem[]>([])
   const [reviewsData, setReviewsData] = useState(emptyReviewsData)
   const [moreFromBrandProducts, setMoreFromBrandProducts] = useState<RecommendedProduct[]>([])
 
@@ -95,12 +103,14 @@ export function useProductPageData(slug: string | undefined): ProductPageDataSta
       setError(null)
       setErrorKind(null)
       setProduct(null)
+      setFaqs([])
       setReviewsData(emptyReviewsData)
       setMoreFromBrandProducts([])
 
       try {
         const apiProduct = await resolveProductBySlug(normalizedSlug, {
           seedProducts: catalogProductsRef.current,
+          auth: isAuthenticated,
         })
         if (cancelled) return
 
@@ -108,10 +118,10 @@ export function useProductPageData(slug: string | undefined): ProductPageDataSta
         setProduct(mappedProduct)
         setLoading(false)
 
-        const brandSlug = apiProduct.brand?.slug
-        if (brandSlug) {
+        const brandId = apiProduct.brand?._id
+        if (brandId) {
           try {
-            const brandProductsResponse = await getProducts({ brand: brandSlug, limit: 20 })
+            const brandProductsResponse = await getProducts({ brand: brandId, limit: 20 })
             if (!cancelled) {
               setMoreFromBrandProducts(
                 buildMoreFromBrandProducts(brandProductsResponse.data ?? [], apiProduct._id),
@@ -123,28 +133,49 @@ export function useProductPageData(slug: string | undefined): ProductPageDataSta
         }
 
         try {
-          const reviewsResponse = await getProductReviews(apiProduct._id, { limit: 10 })
+          const [statsResponse, reviewsResponse] = await Promise.all([
+            getProductReviewStats(apiProduct._id),
+            getProductReviews(apiProduct._id, { limit: 10, sort: '-createdAt' }),
+          ])
           if (cancelled) return
 
+          const stats = statsResponse.data
           setReviewsData({
-            ...buildReviewsSectionData(
-              mappedProduct.rating,
-              mappedProduct.reviewCount,
-              reviewsResponse.data ?? [],
-            ),
-            reviewsTotalDocuments: reviewsResponse.pagination?.totalDocuments,
+            ...(stats
+              ? buildReviewsSectionDataFromStats(stats, reviewsResponse.data ?? [])
+              : buildReviewsSectionData(
+                  mappedProduct.rating,
+                  mappedProduct.reviewCount,
+                  reviewsResponse.data ?? [],
+                )),
+            reviewsTotalDocuments: stats?.ratingsQuantity ?? reviewsResponse.pagination?.totalDocuments,
           })
         } catch {
           if (cancelled) return
           setReviewsData({
             ...buildReviewsSectionData(mappedProduct.rating, mappedProduct.reviewCount, []),
-            reviewsTotalDocuments: undefined,
+            reviewsTotalDocuments: mappedProduct.reviewCount,
           })
+        }
+
+        try {
+          const faqsResponse = await getProductFaqs(apiProduct._id)
+          if (!cancelled) {
+            setFaqs(
+              (faqsResponse.data ?? []).map((faq) => ({
+                question: faq.question,
+                answer: faq.answer,
+              })),
+            )
+          }
+        } catch {
+          if (!cancelled) setFaqs([])
         }
       } catch (loadError) {
         if (cancelled) return
         const resolved = resolveError(loadError)
         setProduct(null)
+        setFaqs([])
         setMoreFromBrandProducts([])
         setReviewsData(emptyReviewsData)
         setError(resolved.message)
@@ -162,7 +193,7 @@ export function useProductPageData(slug: string | undefined): ProductPageDataSta
     return () => {
       cancelled = true
     }
-  }, [normalizedSlug])
+  }, [normalizedSlug, isAuthenticated])
 
   if (!normalizedSlug) {
     return missingSlugState
@@ -175,6 +206,7 @@ export function useProductPageData(slug: string | undefined): ProductPageDataSta
     errorKind,
     product,
     brandName: product?.brand ?? '',
+    faqs,
     reviewsData,
     moreFromBrandProducts,
   }

@@ -7,6 +7,7 @@ export interface ApiPagination {
   totalDocuments: number
   nextPage: number | null
   prevPage: number | null
+  results?: number
 }
 
 export interface ApiResponse<T = unknown> {
@@ -28,13 +29,14 @@ export class ApiError extends Error {
   }
 }
 
-interface RequestOptions extends Omit<RequestInit, 'body'> {
+interface RequestOptions extends Omit<RequestInit, 'body' | 'credentials'> {
   body?: unknown
   auth?: boolean
+  withCredentials?: boolean
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
-  const { body, auth = false, headers, ...rest } = options
+  const { body, auth = false, withCredentials = false, headers, ...rest } = options
 
   const requestHeaders = new Headers(headers)
   if (body !== undefined) {
@@ -51,6 +53,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...rest,
     headers: requestHeaders,
+    credentials: withCredentials ? 'include' : 'same-origin',
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
 

@@ -9,6 +9,8 @@ const slugToIdCache = new Map<string, string>()
 export interface ResolveProductBySlugOptions {
   /** Already-loaded catalog products — checked before any network pagination. */
   seedProducts?: readonly ApiProduct[]
+  /** Pass true when logged in so browsing history is recorded server-side. */
+  auth?: boolean
 }
 
 function idFromSeed(slug: string, seedProducts?: readonly ApiProduct[]): string | undefined {
@@ -18,8 +20,8 @@ function idFromSeed(slug: string, seedProducts?: readonly ApiProduct[]): string 
   return match._id
 }
 
-async function fetchProductDetailById(id: string): Promise<ApiProductDetail> {
-  const response = await getProductById(id)
+async function fetchProductDetailById(id: string, auth = false): Promise<ApiProductDetail> {
+  const response = await getProductById(id, auth)
   if (!response.data) {
     throw new ApiError('Product not found.', 404)
   }
@@ -65,13 +67,14 @@ export async function resolveProductBySlug(
   options?: ResolveProductBySlugOptions,
 ): Promise<ApiProductDetail> {
   const normalizedSlug = slug.trim()
+  const auth = options?.auth ?? false
   if (!normalizedSlug) {
     throw new ApiError('Product not found.', 404)
   }
 
   if (OBJECT_ID_PATTERN.test(normalizedSlug)) {
     try {
-      return await fetchProductDetailById(normalizedSlug)
+      return await fetchProductDetailById(normalizedSlug, auth)
     } catch (error) {
       if (error instanceof ApiError) throw error
       throw new ApiError('Product not found.', 404)
@@ -79,5 +82,5 @@ export async function resolveProductBySlug(
   }
 
   const productId = await findProductIdBySlug(normalizedSlug, options?.seedProducts)
-  return fetchProductDetailById(productId)
+  return fetchProductDetailById(productId, auth)
 }

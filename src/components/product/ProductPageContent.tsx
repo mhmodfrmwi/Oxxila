@@ -1,10 +1,8 @@
-import { useMemo } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { Breadcrumb } from '../ui/Breadcrumb'
 import { HOME_PATH, SHOP_PATH } from '../../config/routes'
-import { useLandingCatalogContext } from '../../hooks/useLandingCatalogContext'
+import { useBrowsingHistory } from '../../hooks/useBrowsingHistory'
 import { useProductPageData } from '../../hooks/useProductPageData'
-import { mapApiProductToRecommendedProduct } from '../../utils/productDetailMappers'
 import { MoreFromMACCosmetics } from './MoreFromMACCosmetics'
 import { PreviouslyBrowsedRelated } from './PreviouslyBrowsedRelated'
 import { ProductHero } from './ProductHero'
@@ -22,7 +20,6 @@ function ProductDetailSkeleton() {
 
 export function ProductPageContent() {
   const { slug } = useParams<{ slug: string }>()
-  const { products: catalogProducts } = useLandingCatalogContext()
   const {
     loading,
     reviewsLoading,
@@ -30,14 +27,12 @@ export function ProductPageContent() {
     errorKind,
     product,
     brandName,
+    faqs,
     reviewsData,
     moreFromBrandProducts,
   } = useProductPageData(slug)
 
-  const previouslyBrowsedProducts = useMemo(
-    () => catalogProducts.slice(0, 6).map(mapApiProductToRecommendedProduct),
-    [catalogProducts],
-  )
+  const { products: previouslyBrowsedProducts } = useBrowsingHistory(6)
 
   if (!slug) {
     return <Navigate to={SHOP_PATH} replace />
@@ -77,8 +72,7 @@ export function ProductPageContent() {
           ]}
         />
         <ProductHero product={product} />
-        {/* TODO: Replace with GET /products/:id/faqs when available. */}
-        <QuestionsSafetySection faqs={[]} />
+        <QuestionsSafetySection faqs={faqs} />
         <ReviewsSection {...reviewsData} loading={reviewsLoading} />
       </div>
 

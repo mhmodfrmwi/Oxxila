@@ -195,7 +195,32 @@ export function mapApiReviewToReview(review: ApiReview): Review | null {
     rating: review.rating,
     title: review.title?.trim() || '',
     comment,
-    helpful: review.helpful ?? review.helpfulCount ?? 0,
+    helpful: review.likesCount ?? 0,
+  }
+}
+
+export function mapApiReviewStatsToDistribution(
+  breakdown: Array<{ star: number; percentage: number }>,
+): RatingDistribution[] {
+  return breakdown.map((item) => ({
+    stars: item.star,
+    percentage: item.percentage,
+  }))
+}
+
+export function buildReviewsSectionDataFromStats(
+  stats: { ratingsAverage: number; ratingsQuantity: number; breakdown: Array<{ star: number; percentage: number }> },
+  apiReviews: readonly ApiReview[],
+) {
+  const reviews = apiReviews
+    .map(mapApiReviewToReview)
+    .filter((review): review is Review => review != null)
+
+  return {
+    averageRating: stats.ratingsAverage,
+    totalReviews: stats.ratingsQuantity,
+    distribution: mapApiReviewStatsToDistribution(stats.breakdown),
+    reviews,
   }
 }
 

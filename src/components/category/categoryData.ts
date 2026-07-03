@@ -1,33 +1,12 @@
+import type { ApiCategory } from '../../types/catalog'
+
 export interface CategoryMeta {
   slug: string
   name: string
   productsPerPage: number
 }
 
-export const categoryMetaBySlug: Record<string, CategoryMeta> = {
-  fragrance: {
-    slug: 'fragrance',
-    name: 'Fragrance',
-    productsPerPage: 12,
-  },
-  makeup: {
-    slug: 'makeup',
-    name: 'Makeup',
-    productsPerPage: 12,
-  },
-  'personal-care': {
-    slug: 'personal-care',
-    name: 'Personal Care',
-    productsPerPage: 12,
-  },
-  'baby-care': {
-    slug: 'baby-care',
-    name: 'Baby Care',
-    productsPerPage: 12,
-  },
-}
-
-export const DEFAULT_CATEGORY_SLUG = 'makeup'
+export const PRODUCTS_PER_PAGE = 12
 
 export const sortOptions = [
   { value: 'featured', label: 'Featured' },
@@ -44,6 +23,22 @@ export const browsingHistoryTitle =
 
 export const relatedBrowsingTitle = 'previously browsed related'
 
-export function isKnownCategorySlug(slug: string): slug is keyof typeof categoryMetaBySlug {
-  return slug in categoryMetaBySlug
+export function findCategoryBySlug(
+  categories: readonly ApiCategory[],
+  slug: string,
+): ApiCategory | undefined {
+  return categories.find((category) => category.slug === slug)
+}
+
+export function toCategoryMeta(category: ApiCategory): CategoryMeta {
+  return {
+    slug: category.slug,
+    name: category.name,
+    productsPerPage: PRODUCTS_PER_PAGE,
+  }
+}
+
+export function resolveDefaultCategorySlug(categories: readonly ApiCategory[]): string | null {
+  const active = categories.filter((category) => category.isActive !== false)
+  return active[0]?.slug ?? categories[0]?.slug ?? null
 }

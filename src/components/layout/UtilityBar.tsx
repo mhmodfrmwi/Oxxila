@@ -1,3 +1,5 @@
+import { useState, type KeyboardEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Moon, Package, Search } from 'lucide-react'
 import langIcon from '../../assets/Lang-image.png'
 import { useTheme } from '../../context/ThemeContext'
@@ -19,6 +21,21 @@ interface UtilityBarProps {
 
 export function UtilityBar({ promo = defaultPromo }: UtilityBarProps) {
   const { theme, toggleTheme } = useTheme()
+  const navigate = useNavigate()
+  const [searchValue, setSearchValue] = useState('')
+
+  function submitSearch() {
+    const keyword = searchValue.trim()
+    if (!keyword) return
+    navigate(`/search?keyword=${encodeURIComponent(keyword)}`)
+  }
+
+  function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      submitSearch()
+    }
+  }
 
   return (
     <section className="border-b border-border-subtle bg-background">
@@ -50,6 +67,9 @@ export function UtilityBar({ promo = defaultPromo }: UtilityBarProps) {
             id="site-search"
             type="search"
             placeholder="Search for..."
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
+            onKeyDown={handleSearchKeyDown}
             className="h-11 w-full rounded-full bg-input py-2.5 pl-10 pr-4 text-[length:var(--font-size-small)] leading-[var(--line-height-small)] text-primary-text placeholder:text-placeholder-text focus:outline-none focus:ring-2 focus:ring-button-primary/50"
           />
         </div>

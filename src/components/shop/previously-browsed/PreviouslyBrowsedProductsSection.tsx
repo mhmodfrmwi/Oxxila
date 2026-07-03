@@ -1,6 +1,4 @@
-import { useMemo } from 'react'
-import { useLandingCatalogContext } from '../../../hooks/useLandingCatalogContext'
-import { mapApiProductToRecommendedProduct } from '../../../utils/productDetailMappers'
+import { useBrowsingHistory } from '../../../hooks/useBrowsingHistory'
 import { ContentSection } from '../../layout/ContentSection'
 import { SectionHeader } from '../../landing/SectionHeader'
 import { ProductCarousel } from '../recommended/ProductCarousel'
@@ -8,12 +6,11 @@ import { ProductCarousel } from '../recommended/ProductCarousel'
 export const previouslyBrowsedProductsTitle = 'Previously browsed products'
 
 export function PreviouslyBrowsedProductsSection() {
-  const { products, loading } = useLandingCatalogContext()
+  const { products: previouslyBrowsedProducts, loading } = useBrowsingHistory(6)
 
-  const previouslyBrowsedProducts = useMemo(
-    () => products.slice(0, 6).map(mapApiProductToRecommendedProduct),
-    [products],
-  )
+  if (!loading && previouslyBrowsedProducts.length === 0) {
+    return null
+  }
 
   return (
     <ContentSection aria-labelledby="previously-browsed-products-heading">

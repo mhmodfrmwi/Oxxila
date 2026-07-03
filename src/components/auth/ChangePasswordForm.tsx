@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { resetPassword } from '../../api/auth'
 import { ApiError } from '../../lib/api'
 import { Button } from '../ui/Button'
@@ -10,8 +10,9 @@ import { FormMessage } from './FormMessage'
 
 export function ChangePasswordForm() {
   const navigate = useNavigate()
+  const { token: routeToken } = useParams<{ token?: string }>()
   const [searchParams] = useSearchParams()
-  const token = searchParams.get('token') ?? ''
+  const token = routeToken ?? searchParams.get('token') ?? ''
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
@@ -27,10 +28,10 @@ export function ChangePasswordForm() {
     }
 
     const formData = new FormData(event.currentTarget)
-    const password = String(formData.get('password') ?? '')
+    const newPassword = String(formData.get('newPassword') ?? '')
     const confirmPassword = String(formData.get('confirmPassword') ?? '')
 
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       setError('Passwords do not match.')
       return
     }
@@ -38,7 +39,7 @@ export function ChangePasswordForm() {
     setLoading(true)
 
     try {
-      const response = await resetPassword(token, { password, confirmPassword })
+      const response = await resetPassword(token, { newPassword, confirmPassword })
       setSuccess(response.message)
       event.currentTarget.reset()
 
@@ -77,7 +78,7 @@ export function ChangePasswordForm() {
         <InputField
           label="New password"
           type="password"
-          name="password"
+          name="newPassword"
           autoComplete="new-password"
           placeholder="Min. 8 characters"
           showPasswordToggle
