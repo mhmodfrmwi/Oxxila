@@ -50,17 +50,19 @@ export function CartItemRow({
         aria-label={t('cart.selectItem', { name: item.product.name })}
       />
 
-      <img
-        src={imageSrc}
-        alt={item.product.name}
-        className="cart-item-image"
-        loading="lazy"
-        onError={() => {
-          if (failedImageUrl !== item.product.images[0]) {
-            setFailedImageUrl(item.product.images[0] ?? '')
-          }
-        }}
-      />
+      <div className="cart-item-image-wrap">
+        <img
+          src={imageSrc}
+          alt={item.product.name}
+          className="cart-item-image"
+          loading="lazy"
+          onError={() => {
+            if (failedImageUrl !== item.product.images[0]) {
+              setFailedImageUrl(item.product.images[0] ?? '')
+            }
+          }}
+        />
+      </div>
 
       <div className="cart-item-details min-w-0">
         {brand && <p className="cart-item-brand">{brand}</p>}
@@ -68,12 +70,8 @@ export function CartItemRow({
         {variant && <p className="cart-item-variant">{variant}</p>}
         <p className="cart-item-unit-price">{formatCartPrice(item.price)}</p>
         <p className="cart-item-delivery">{t('cart.freeDelivery')}</p>
-        <p className="cart-item-line-total">
-          {t('cart.lineTotal')}{' '}
-          <span className="font-medium text-primary-text">{formatCartPrice(lineTotal)}</span>
-        </p>
 
-        <div className="mt-3 w-fit">
+        <div className="cart-item-actions">
           <QuantitySelector
             value={item.quantity}
             min={1}
@@ -81,6 +79,10 @@ export function CartItemRow({
             onChange={onQuantityChange}
             className="cart-item-qty"
           />
+          <p className="cart-item-line-total">
+            <span className="cart-item-line-total-label">{t('cart.lineTotal')}</span>
+            <span className="cart-item-line-total-value">{formatCartPrice(lineTotal)}</span>
+          </p>
         </div>
       </div>
 
@@ -91,7 +93,7 @@ export function CartItemRow({
         disabled={disabled}
         aria-label={t('cart.removeItem', { name: item.product.name })}
       >
-        <Trash2 size={18} strokeWidth={1.5} aria-hidden />
+        <Trash2 size={18} strokeWidth={1.75} aria-hidden />
       </button>
     </article>
   )

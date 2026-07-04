@@ -1,5 +1,4 @@
 // src/components/shop/ShopHeroCarousel.tsx
-import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PromoCarousel } from '../carousel/PromoCarousel'
 import { useShopBanners } from '../../hooks/useShopBanners'
@@ -16,24 +15,7 @@ function BannerSkeleton() {
 
 export function ShopHeroCarousel() {
   const { t } = useTranslation()
-  const { slides: rawSlides, loading, error } = useShopBanners()
-
-  const slides = useMemo(
-    () =>
-      rawSlides.map((slide) => ({
-        ...slide,
-        brand: slide.brand === 'OXXILA' ? t('shop.banner.brand') : slide.brand,
-        headline:
-          slide.headline === 'Special Offer' ? t('shop.banner.specialOffer') : slide.headline,
-        ctaLabel: t('shop.banner.shopNow'),
-        badge: slide.badge === 'FEATURED' ? t('shop.banner.featured') : slide.badge,
-        productImageAlt:
-          slide.productImageAlt === 'Special Offer'
-            ? t('shop.banner.specialOffer')
-            : slide.productImageAlt,
-      })),
-    [rawSlides, t],
-  )
+  const { slides, loading, error } = useShopBanners()
 
   const displayError = error ? t('shop.banner.loadError') : null
 
@@ -55,8 +37,8 @@ export function ShopHeroCarousel() {
             items={slides}
             getItemKey={(slide) => slide.id}
             ariaLabel={t('shop.banner.ariaLabel')}
-            renderSlide={(slide, { isActive, onSelect }) => (
-              <ProductPromoCard slide={slide} isActive={isActive} onSelect={onSelect} />
+            renderSlide={(slide, { isActive }) => (
+              <ProductPromoCard slide={slide} isActive={isActive} />
             )}
           />
         )}

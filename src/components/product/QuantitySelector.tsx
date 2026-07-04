@@ -30,8 +30,11 @@ export function QuantitySelector({
   }
 
   const controlClass = cn(
-    'product-detail-qty-btn flex items-center justify-center text-primary-text transition-colors',
-    'hover:bg-input disabled:pointer-events-none disabled:opacity-40',
+    'product-detail-qty-btn flex items-center justify-center text-primary-text',
+    'transition-colors duration-200',
+    'hover:bg-accent/10 hover:text-accent',
+    'active:bg-accent/15 active:text-accent',
+    'disabled:pointer-events-none disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-primary-text',
     focusRingClasses,
   )
 
@@ -41,6 +44,8 @@ export function QuantitySelector({
         'product-detail-qty inline-flex items-center overflow-hidden border border-border-subtle bg-card',
         className,
       )}
+      role="group"
+      aria-label={t('productDetail.quantityValue', { value })}
     >
       <button
         type="button"
@@ -49,7 +54,7 @@ export function QuantitySelector({
         onClick={decrement}
         className={controlClass}
       >
-        <Minus size={16} strokeWidth={1.5} aria-hidden />
+        <Minus size={16} strokeWidth={2} aria-hidden />
       </button>
       <span
         className="product-detail-qty-value"
@@ -65,7 +70,7 @@ export function QuantitySelector({
         onClick={increment}
         className={controlClass}
       >
-        <Plus size={16} strokeWidth={1.5} aria-hidden />
+        <Plus size={16} strokeWidth={2} aria-hidden />
       </button>
     </div>
   )

@@ -1,9 +1,14 @@
-import { useMemo, useState } from 'react'
-import { Navigate, useParams } from 'react-router-dom'
+// src/components/category/CategoryPageContent.tsx
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CATEGORIES_PATH, HOME_PATH } from '../../config/routes'
 import { useBrowsingHistory } from '../../hooks/useBrowsingHistory'
 import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import { useLandingCatalogContext } from '../../hooks/useLandingCatalogContext'
+import {
+  getCollectionTitle,
+  parseCategoryBrowseParams,
+} from '../../utils/categoryBrowseParams'
 import { Breadcrumb } from '../ui/Breadcrumb'
 import { Pagination } from '../ui/Pagination'
 import { ContentSection } from '../layout/ContentSection'
@@ -15,94 +20,118 @@ import { ProductGrid } from './ProductGrid'
 import {
   browsingHistoryTitle,
   findCategoryBySlug,
+  PRODUCTS_PER_PAGE,
   relatedBrowsingTitle,
-  toCategoryMeta,
   type SortOption,
 } from './categoryData'
-import { createDefaultFilterState, type FilterState } from './filters/filterState'
+import type { FilterState } from './filters/filterState'
 import { FilterSidebar } from './filters/FilterSidebar'
 
 export function CategoryPageContent() {
-  const { slug = '' } = useParams<{ slug: string }>()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const browseKey = searchParams.toString()
   const { categories, brands, loading: catalogLoading } = useLandingCatalogContext()
-  const category = useMemo(() => findCategoryBySlug(categories, slug), [categories, slug])
-  const meta = category ? toCategoryMeta(category) : null
-  const subcategories = category?.subcategories ?? []
+
+  const [filters, setFilters] = useState<FilterState>(() =>
+    parseCategoryBrowseParams(searchParams).filters,
+  )
+  const [sort, setSort] = useState<SortOption>(
+    () => parseCategoryBrowseParams(searchParams).sort,
+  )
+  const [categorySlug, setCategorySlug] = useState<string | null>(
+    () => parseCategoryBrowseParams(searchParams).categorySlug,
+  )
+  const [certifiedOnly, setCertifiedOnly] = useState(
+    () => parseCategoryBrowseParams(searchParams).certifiedOnly,
+  )
+  const [collection, setCollection] = useState(
+    () => parseCategoryBrowseParams(searchParams).collection,
+  )
+  const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function applyBrowseParams() {
+      await Promise.resolve()
+      if (cancelled) return
+
+      const parsed = parseCategoryBrowseParams(searchParams)
+      setFilters(parsed.filters)
+      setSort(parsed.sort)
+      setCategorySlug(parsed.categorySlug)
+      setCertifiedOnly(parsed.certifiedOnly)
+      setCollection(parsed.collection)
+      setPage(1)
+    }
+
+    void applyBrowseParams()
+    return () => {
+      cancelled = true
+    }
+  }, [browseKey, searchParams])
+
+  const selectedCategory = useMemo(
+    () => (categorySlug ? findCategoryBySlug(categories, categorySlug) : undefined),
+    [categories, categorySlug],
+  )
+
+  const waitingForCategory =
+    Boolean(categorySlug) && !catalogLoading && categories.length > 0 && !selectedCategory
+
   const categoryBrands = useMemo(() => {
     const activeBrands = brands.filter((brand) => brand.isActive !== false)
+    if (!selectedCategory) return activeBrands
+
     const filtered = activeBrands.filter((brand) => {
       if (!brand.category) return true
       const categoryId =
         typeof brand.category === 'string' ? brand.category : brand.category._id
-      return categoryId === category?._id
+      return categoryId === selectedCategory._id
     })
     return filtered.length > 0 ? filtered : activeBrands
-  }, [brands, category?._id])
+  }, [brands, selectedCategory])
 
-  const [filtersBySlug, setFiltersBySlug] = useState<Partial<Record<string, FilterState>>>({})
-  const [sortBySlug, setSortBySlug] = useState<Partial<Record<string, SortOption>>>({})
-  const [pageByCategory, setPageByCategory] = useState<Partial<Record<string, number>>>({})
+  const subcategories = selectedCategory?.subcategories ?? []
 
-  const filters = useMemo(
-    () => filtersBySlug[slug] ?? createDefaultFilterState(),
-    [filtersBySlug, slug],
-  )
-  const sort = sortBySlug[slug] ?? 'featured'
+  const pageTitle =
+    selectedCategory?.name ??
+    getCollectionTitle(collection) ??
+    'Categories'
 
-  const currentPage = meta ? (pageByCategory[meta.slug] ?? 1) : 1
   const { products, loading, error, pagination } = useCategoryProducts(
-    category?._id,
+    selectedCategory?._id,
     filters,
     sort,
-    currentPage,
-    meta?.productsPerPage ?? 12,
+    page,
+    PRODUCTS_PER_PAGE,
+    {
+      enabled: !waitingForCategory && !(categorySlug && catalogLoading),
+      isCertified: certifiedOnly,
+    },
   )
 
   const { products: browsingProducts, loading: browsingLoading } = useBrowsingHistory(6)
 
   const totalPages = pagination?.numberOfPages ?? 1
-
-  if (meta && pagination && currentPage > totalPages) {
-    const clampedPage = Math.max(1, totalPages)
-    if (currentPage !== clampedPage) {
-      setPageByCategory((previous) => ({
-        ...previous,
-        [meta.slug]: clampedPage,
-      }))
-    }
-  }
-
-  const safePage = Math.min(currentPage, Math.max(1, totalPages))
+  const safePage = Math.min(page, Math.max(1, totalPages))
   const totalResults = pagination?.totalDocuments ?? products.length
 
-  const handlePageChange = (page: number) => {
-    if (!meta) return
-    setPageByCategory((previous) => ({ ...previous, [meta.slug]: page }))
-  }
-
   const handleFiltersChange = (patch: Partial<FilterState>) => {
-    setFiltersBySlug((previous) => ({
-      ...previous,
-      [slug]: { ...(previous[slug] ?? createDefaultFilterState()), ...patch },
-    }))
-    if (meta) {
-      setPageByCategory((previous) => ({ ...previous, [meta.slug]: 1 }))
-    }
+    setFilters((previous) => ({ ...previous, ...patch }))
+    setCollection(null)
+    setPage(1)
   }
 
   const handleFiltersReset = () => {
-    setFiltersBySlug((previous) => ({ ...previous, [slug]: createDefaultFilterState() }))
-    setSortBySlug((previous) => ({ ...previous, [slug]: 'featured' }))
-    if (meta) {
-      setPageByCategory((previous) => ({ ...previous, [meta.slug]: 1 }))
-    }
+    navigate(CATEGORIES_PATH)
   }
 
   const handleSortChange = (nextSort: SortOption) => {
-    setSortBySlug((previous) => ({ ...previous, [slug]: nextSort }))
-    if (meta) {
-      setPageByCategory((previous) => ({ ...previous, [meta.slug]: 1 }))
-    }
+    setSort(nextSort)
+    setCollection(null)
+    setPage(1)
   }
 
   if (!catalogLoading && categories.length === 0) {
@@ -115,18 +144,12 @@ export function CategoryPageContent() {
     )
   }
 
-  if (!catalogLoading && !category) {
-    return <Navigate to={CATEGORIES_PATH} replace />
-  }
-
-  if (!meta) {
+  if (waitingForCategory) {
     return (
       <div className="container-content py-12">
-        <div className="grid grid-cols-2 gap-4 min-[769px]:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="aspect-square animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
-          ))}
-        </div>
+        <p className="text-center text-sm text-secondary-text" role="status">
+          Category not found.
+        </p>
       </div>
     )
   }
@@ -138,8 +161,13 @@ export function CategoryPageContent() {
           className="mb-5 sm:mb-6"
           items={[
             { label: 'Home', href: HOME_PATH },
-            { label: 'Categories', href: CATEGORIES_PATH },
-            { label: meta.name },
+            {
+              label: 'Categories',
+              href: selectedCategory || collection ? CATEGORIES_PATH : undefined,
+            },
+            ...(selectedCategory || collection
+              ? [{ label: pageTitle }]
+              : []),
           ]}
         />
 
@@ -150,14 +178,14 @@ export function CategoryPageContent() {
             onFiltersChange={handleFiltersChange}
             onFiltersReset={handleFiltersReset}
             categories={categories}
-            activeCategorySlug={meta.slug}
+            activeCategorySlug={selectedCategory?.slug}
             subcategories={subcategories}
             brands={categoryBrands}
           />
 
           <div className="min-w-0 space-y-6 lg:col-start-2">
             <CategoryToolbar
-              categoryName={meta.name}
+              categoryName={pageTitle}
               productCount={products.length}
               totalResults={totalResults}
               sort={sort}
@@ -168,15 +196,19 @@ export function CategoryPageContent() {
                 {error}
               </p>
             )}
-            {loading || catalogLoading ? (
+            {loading || (categorySlug && catalogLoading) ? (
               <div className="grid grid-cols-2 gap-4 min-[769px]:grid-cols-3 xl:grid-cols-4">
-                {Array.from({ length: meta.productsPerPage }).map((_, index) => (
-                  <div key={index} className="aspect-square animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
+                {Array.from({ length: PRODUCTS_PER_PAGE }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="aspect-square animate-pulse rounded-[20px] bg-surface-muted"
+                    aria-hidden
+                  />
                 ))}
               </div>
             ) : products.length === 0 ? (
               <p className="py-12 text-center text-sm text-secondary-text" role="status">
-                No products found in this category.
+                No products found.
               </p>
             ) : (
               <ProductGrid products={products} />
@@ -184,7 +216,7 @@ export function CategoryPageContent() {
             <Pagination
               currentPage={safePage}
               totalPages={totalPages}
-              onPageChange={handlePageChange}
+              onPageChange={setPage}
               className="pt-2"
             />
           </div>

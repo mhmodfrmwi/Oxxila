@@ -1,7 +1,8 @@
 // src/components/category/CategoriesLandingContent.tsx
 import { Link } from 'react-router-dom'
-import { CATEGORIES_PATH, HOME_PATH } from '../../config/routes'
+import { HOME_PATH } from '../../config/routes'
 import { useLandingCatalogContext } from '../../hooks/useLandingCatalogContext'
+import { categoryBrowsePath } from '../../utils/categoryBrowseParams'
 import { resolveProductImageUrl } from '../../utils/productImage'
 import { Footer } from '../landing/footer/Footer'
 import { Breadcrumb } from '../ui/Breadcrumb'
@@ -53,7 +54,7 @@ export function CategoriesLandingContent() {
             {activeCategories.map((category) => (
               <li key={category._id}>
                 <Link
-                  to={`${CATEGORIES_PATH}/${category.slug}`}
+                  to={categoryBrowsePath(category.slug)}
                   className={cn(
                     'group flex h-full flex-col overflow-hidden rounded-[20px] border border-border-subtle bg-card',
                     cardHoverLiftClasses,

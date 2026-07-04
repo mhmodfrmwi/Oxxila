@@ -1,49 +1,52 @@
 // src/utils/bannerMappers.ts
 import type { ApiBanner } from '../api/banners'
-import { CATEGORIES_PATH, PRODUCTS_PATH, SHOP_PATH } from '../config/routes'
+import { CATEGORIES_PATH, PRODUCTS_PATH } from '../config/routes'
 import type { ApiCategory } from '../types/catalog'
-import { resolveProductImageUrl } from './productImage'
 import type { ShopHeroSlide } from '../components/shop/shopData'
+import { categoryBrowsePath } from './categoryBrowseParams'
+import { resolveProductImageUrl } from './productImage'
 
-function resolveBannerHref(
+function isExternalHref(href: string): boolean {
+  return /^https?:\/\//i.test(href)
+}
+
+/** Resolve banner destination from API link fields only — no hardcoded marketing paths. */
+export function resolveBannerHref(
   banner: ApiBanner,
-  categories: readonly ApiCategory[],
-): string {
-  if (banner.linkType === 'url' && banner.externalUrl) {
-    return banner.externalUrl
+  categories: readonly ApiCategory[] = [],
+): string | null {
+  switch (banner.linkType) {
+    case 'url': {
+      const url = banner.externalUrl?.trim()
+      return url || null
+    }
+    case 'product': {
+      const productId = banner.linkId?.trim()
+      return productId ? `${PRODUCTS_PATH}/${productId}` : null
+    }
+    case 'category': {
+      const categoryId = banner.linkId?.trim()
+      if (!categoryId) return null
+      const category = categories.find((entry) => entry._id === categoryId)
+      return category?.slug ? categoryBrowsePath(category.slug) : CATEGORIES_PATH
+    }
+    case 'none':
+    default:
+      return null
   }
-
-  if (banner.linkType === 'product' && banner.linkId) {
-    return `${PRODUCTS_PATH}/${banner.linkId}`
-  }
-
-  if (banner.linkType === 'category' && banner.linkId) {
-    const category = categories.find((entry) => entry._id === banner.linkId)
-    if (category?.slug) return `${CATEGORIES_PATH}/${category.slug}`
-    return CATEGORIES_PATH
-  }
-
-  return SHOP_PATH
 }
 
 export function mapBannerToShopHeroSlide(
   banner: ApiBanner,
-  index: number,
+  _index: number,
   categories: readonly ApiCategory[] = [],
 ): ShopHeroSlide {
-  const title = banner.title?.trim() || 'Special Offer'
-  const href = resolveBannerHref(banner, categories)
-
+  const title = banner.title?.trim()
   return {
     id: banner.id,
-    variant: index % 2 === 0 ? 'dark' : 'light',
-    brand: 'OXXILA',
-    headline: title,
-    ctaLabel: 'SHOP NOW',
-    ctaHref: href,
-    productImage: resolveProductImageUrl(banner.image),
-    productImageAlt: title,
-    badge: 'FEATURED',
+    image: resolveProductImageUrl(banner.image),
+    imageAlt: title || 'Promotional banner',
+    href: resolveBannerHref(banner, categories),
   }
 }
 
@@ -53,3 +56,5 @@ export function mapBannersToShopHeroSlides(
 ): ShopHeroSlide[] {
   return banners.map((banner, index) => mapBannerToShopHeroSlide(banner, index, categories))
 }
+
+export { isExternalHref }

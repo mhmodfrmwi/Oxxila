@@ -1,9 +1,12 @@
 // src/components/landing/best-seller/ProductCard.tsx
 import { motion } from 'framer-motion'
 import { Heart, ShoppingBag, Star } from 'lucide-react'
+import { useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { PRODUCTS_PATH } from '../../../config/routes'
+import { useCart } from '../../../context/CartContext'
+import { useToast } from '../../../context/ToastContext'
 import { formatReviewCount } from '../../../utils/formatReviewCount'
 
 export interface BestSellerProduct {
@@ -59,8 +62,33 @@ export function ProductCard({
   onSelect,
 }: ProductCardProps) {
   const { t } = useTranslation()
+  const { addToCart } = useCart()
+  const toast = useToast()
+  const [addingToCart, setAddingToCart] = useState(false)
   const motionProps = getCardMotion(offset, isMobile)
   const isVisible = isMobile ? offset === 0 : Math.abs(offset) <= 2
+
+  async function handleAddToCart(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    if (addingToCart) return
+
+    if (!product.id) {
+      toast.error(t('productDetail.cart.missingId'))
+      return
+    }
+
+    setAddingToCart(true)
+
+    try {
+      await addToCart(product.id, 1)
+    } catch {
+      // CartContext already surfaces the error toast.
+    } finally {
+      setAddingToCart(false)
+    }
+  }
 
   const cardContent = (
     <div
@@ -104,11 +132,15 @@ export function ProductCard({
         <button
           type="button"
           aria-label={t('actions.addToCart')}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(event) => {
+            void handleAddToCart(event)
+          }}
+          disabled={addingToCart}
           className={[
             'absolute end-3 bottom-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
             'bg-card/90 text-icon-secondary shadow-md',
             'transition-all duration-200 hover:scale-110 hover:bg-button-primary hover:text-on-emphasis',
+            'disabled:pointer-events-none disabled:opacity-60',
           ].join(' ')}
         >
           <ShoppingBag size={16} aria-hidden />

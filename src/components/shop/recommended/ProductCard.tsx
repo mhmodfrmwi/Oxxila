@@ -1,8 +1,10 @@
 // src/components/shop/recommended/ProductCard.tsx
 import { Heart, ShoppingBag } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { useCart } from '../../../context/CartContext'
+import { useToast } from '../../../context/ToastContext'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { IconActionButton } from '../../ui/IconActionButton'
@@ -26,12 +28,37 @@ const carouselImageHeightClasses =
 
 export function ProductCard({ product, layout = 'carousel', className }: ProductCardProps) {
   const { t } = useTranslation()
+  const { addToCart } = useCart()
+  const toast = useToast()
   const { brand, title, price, originalPrice, rating, reviewCount, image, imageAlt, badge, href } =
     product
   const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null)
+  const [addingToCart, setAddingToCart] = useState(false)
   const imageSrc = failedImageUrl === image ? PRODUCT_IMAGE_PLACEHOLDER : image
 
   const isGrid = layout === 'grid'
+
+  async function handleAddToCart(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    if (addingToCart) return
+
+    if (!product.id) {
+      toast.error(t('productDetail.cart.missingId'))
+      return
+    }
+
+    setAddingToCart(true)
+
+    try {
+      await addToCart(product.id, 1)
+    } catch {
+      // CartContext already surfaces the error toast.
+    } finally {
+      setAddingToCart(false)
+    }
+  }
 
   return (
     <article
@@ -95,9 +122,9 @@ export function ProductCard({ product, layout = 'carousel', className }: Product
             icon={ShoppingBag}
             label={t('actions.addToCart')}
             onClick={(event) => {
-              event.preventDefault()
-              event.stopPropagation()
+              void handleAddToCart(event)
             }}
+            disabled={addingToCart}
             className="absolute end-3 bottom-3 z-10"
           />
         </div>

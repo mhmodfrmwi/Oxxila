@@ -1,18 +1,15 @@
-import { Layout } from '../components/layout/Layout'
-import { PageBleed } from '../components/layout/PageBleed'
-import { CategoryPageContent } from '../components/category/CategoryPageContent'
+// src/pages/CategoryPage.tsx
+import { Navigate, useParams } from 'react-router-dom'
+import { CATEGORIES_PATH } from '../config/routes'
+import { categoryBrowsePath } from '../utils/categoryBrowseParams'
 
+/** Legacy `/categories/:slug` → Categories listing with that category filter. */
 export function CategoryPage() {
-  return (
-    <Layout
-      utilityPromo={{
-        title: 'Return within 30 days',
-        subtitle: 'from purchase date',
-      }}
-    >
-      <PageBleed>
-        <CategoryPageContent />
-      </PageBleed>
-    </Layout>
-  )
+  const { slug = '' } = useParams<{ slug: string }>()
+
+  if (!slug) {
+    return <Navigate to={CATEGORIES_PATH} replace />
+  }
+
+  return <Navigate to={categoryBrowsePath(slug)} replace />
 }

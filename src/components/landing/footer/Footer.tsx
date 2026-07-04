@@ -1,6 +1,7 @@
 // src/components/landing/footer/Footer.tsx
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { getCollectionHref } from '../../../config/collections'
 import { FadeUp } from '../../ui/FadeUp'
 import { Logo } from '../../ui/Logo'
 import { FooterLinks } from './FooterLinks'
@@ -29,8 +30,8 @@ export function Footer() {
       { label: t('footer.shoppingLinks.shopAll'), to: '/shop' },
       { label: t('footer.shoppingLinks.skinConcerns'), to: '/concerns' },
       { label: t('footer.shoppingLinks.brands'), to: '/brands' },
-      { label: t('footer.shoppingLinks.newArrivals'), to: '/shop?filter=new' },
-      { label: t('footer.shoppingLinks.bestSellers'), to: '/shop?filter=best' },
+      { label: t('footer.shoppingLinks.newArrivals'), to: getCollectionHref('new-arrivals') },
+      { label: t('footer.shoppingLinks.bestSellers'), to: getCollectionHref('best-sellers') },
       { label: t('footer.shoppingLinks.shipping'), to: '/shipping' },
       { label: t('footer.shoppingLinks.returns'), to: '/returns' },
       { label: t('footer.shoppingLinks.trackOrder'), to: '/track' },

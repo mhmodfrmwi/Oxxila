@@ -122,7 +122,7 @@ export function CartPageContent() {
             ) : (
               <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-10">
                 <section aria-label={t('cart.itemsAria')} className="min-w-0">
-                  <div className="rounded-2xl border border-border-subtle bg-card px-4 sm:px-5">
+                  <div className="rounded-2xl border border-border-subtle bg-card px-4 shadow-sm shadow-black/[0.03] dark:shadow-black/20 sm:px-5">
                     {items.map((item) => (
                       <CartItemRow
                         key={item._id}

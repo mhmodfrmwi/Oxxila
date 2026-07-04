@@ -29,17 +29,32 @@ export function useCategoryProducts(
   sort: SortOption,
   page: number,
   limit: number,
+  options?: {
+    /** When false, skip fetch (e.g. waiting for catalog to resolve a category slug). */
+    enabled?: boolean
+    isCertified?: boolean
+  },
 ) {
   const [state, setState] = useState<CategoryProductsState>(emptyState)
   const filtersKey = getFiltersQueryKey(filters)
+  const enabled = options?.enabled !== false
+  const isCertified = options?.isCertified === true
 
   useEffect(() => {
-    if (!categoryId) return
+    if (!enabled) return
 
     let cancelled = false
-    const queryParams = buildProductQueryParams(filters, sort, { categoryId, page, limit })
+    const queryParams = buildProductQueryParams(filters, sort, {
+      categoryId,
+      page,
+      limit,
+      isCertified: isCertified || undefined,
+    })
 
     async function load() {
+      await Promise.resolve()
+      if (cancelled) return
+
       setState((previous) => ({ ...previous, loading: true, error: null }))
 
       try {
@@ -70,10 +85,10 @@ export function useCategoryProducts(
     return () => {
       cancelled = true
     }
-  }, [categoryId, filters, filtersKey, sort, page, limit])
+  }, [categoryId, enabled, filters, filtersKey, isCertified, limit, page, sort])
 
-  if (!categoryId) {
-    return { ...emptyState, loading: false }
+  if (!enabled) {
+    return { ...emptyState, loading: true }
   }
 
   return state

@@ -1,6 +1,6 @@
 // src/config/collections.ts
-import { collectionPath } from './routes'
 import type { GetProductsParams } from '../api/catalog'
+import { collectionBrowsePath } from '../utils/categoryBrowseParams'
 
 export interface CollectionConfig {
   slug: string
@@ -47,5 +47,5 @@ export function getCollectionConfig(slug: string): CollectionConfig | null {
 }
 
 export function getCollectionHref(slug: keyof typeof COLLECTION_CONFIGS | string): string {
-  return collectionPath(slug)
+  return collectionBrowsePath(slug)
 }

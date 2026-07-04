@@ -1,66 +1,10 @@
 /**
- * Fixed marketing banner colors — frozen from Figma light-mode artwork.
+ * Fixed marketing banner shell — frozen from Figma light-mode artwork.
  * Intentionally NOT tied to [data-theme]; promo slides look identical in every app theme.
  */
 .promo-banner {
   --promo-bg: #ffffff;
-  --promo-text: #5d5a88;
-  --promo-text-muted: #9491b8;
-  --promo-on-emphasis: #ffffff;
-  --promo-on-emphasis-muted: rgb(255 255 255 / 0.65);
   --promo-border: rgb(229 231 235 / 0.3);
-  --promo-brand-box: #f7f7fb;
-  --promo-brand-text: #5d5a88;
-  --promo-brand-box-on-dark: #ffffff;
-  --promo-brand-text-on-dark: #161616;
-  --promo-brand-subline-on-dark: rgb(22 22 22 / 0.75);
-  --promo-cta-bg: #7b65fb;
-  --promo-cta-text: #ffffff;
-  --promo-accent: #7b65fb;
-  --promo-accent-soft: #8b7cf8;
-  --promo-accent-muted: #c0b5de;
-  --promo-accent-glow: rgb(123 101 251 / 0.15);
-  --promo-link: #0280e0;
-  --promo-support-info: #0043ce;
   --promo-shadow: rgb(0 0 0 / 0.15);
-  --promo-shadow-active: rgb(123 101 251 / 0.2);
   --promo-ring-active: rgb(255 255 255 / 0.1);
-}
-
-.promo-banner[data-promo-variant='dark'] {
-  --promo-bg: #161616;
-  --promo-text: #ffffff;
-  --promo-text-muted: rgb(255 255 255 / 0.65);
-  --promo-border: rgb(255 255 255 / 0.06);
-  --promo-accent-glow: rgb(123 101 251 / 0.22);
-  --promo-shadow: rgb(0 0 0 / 0.25);
-}
-
-.promo-banner[data-promo-variant='light'] {
-  --promo-bg: #ffffff;
-  --promo-text: #5d5a88;
-  --promo-text-muted: #9491b8;
-  --promo-border: rgb(229 231 235 / 0.3);
-  --promo-accent-glow: rgb(123 101 251 / 0.15);
-  --promo-shadow: rgb(0 0 0 / 0.15);
-}
-
-.promo-banner__cta {
-  background-color: var(--promo-cta-bg);
-  color: var(--promo-cta-text);
-}
-
-.promo-banner__cta:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--promo-bg), 0 0 0 4px var(--promo-cta-bg);
-}
-
-.promo-banner__brand--on-dark {
-  background-color: var(--promo-brand-box-on-dark);
-  color: var(--promo-brand-text-on-dark);
-}
-
-.promo-banner__brand--on-light {
-  background-color: var(--promo-brand-box);
-  color: var(--promo-brand-text);
 }

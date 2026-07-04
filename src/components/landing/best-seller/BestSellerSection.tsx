@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { CarouselFrame } from '../../carousel/CarouselFrame'
 import { getWrappedOffset } from '../../carousel/getWrappedOffset'
+import { getCollectionHref } from '../../../config/collections'
 import { useCarouselAutoplay } from '../../../hooks/useCarouselAutoplay'
 import { gradientCtaClasses } from '../../ui/buttonStyles'
 import { typeSmallClasses } from '../../ui/typography'
@@ -111,7 +112,7 @@ export function BestSellerSection() {
 
         <div className="mt-8 flex justify-center sm:mt-10 lg:mt-12">
           <Link
-            to="/shop?filter=best"
+            to={getCollectionHref('best-sellers')}
             className={cn(
               'inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-full px-8 py-3.5 sm:w-auto sm:min-w-[280px] sm:px-10 sm:py-4',
               gradientCtaClasses,

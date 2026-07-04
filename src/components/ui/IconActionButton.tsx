@@ -9,6 +9,7 @@ interface IconActionButtonProps {
   onClick?: MouseEventHandler<HTMLButtonElement>
   className?: string
   size?: 'sm' | 'md' | 'lg'
+  disabled?: boolean
 }
 
 const sizeClasses = {
@@ -29,16 +30,19 @@ export function IconActionButton({
   onClick,
   className,
   size = 'md',
+  disabled = false,
 }: IconActionButtonProps) {
   return (
     <button
       type="button"
       aria-label={label}
       onClick={onClick}
+      disabled={disabled}
       className={cn(
         'flex items-center justify-center rounded-full',
         'bg-button-primary text-on-emphasis shadow-md shadow-black/10',
         'transition-transform duration-200 [@media(hover:hover)]:hover:scale-110',
+        'disabled:pointer-events-none disabled:opacity-60',
         sizeClasses[size],
         focusRingClasses,
         className,

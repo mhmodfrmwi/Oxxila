@@ -28,6 +28,7 @@ export function buildProductQueryParams(
     keyword?: string
     page?: number
     limit?: number
+    isCertified?: boolean
   },
 ): GetProductsParams {
   const resolvedSort =
@@ -45,6 +46,10 @@ export function buildProductQueryParams(
 
   if (options?.categoryId) {
     params.category = options.categoryId
+  }
+
+  if (options?.isCertified) {
+    params.isCertified = true
   }
 
   if (options?.keyword?.trim()) {

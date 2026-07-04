@@ -1,4 +1,5 @@
-import { CATEGORIES_PATH, PRODUCTS_PATH, SHOP_PATH } from '../config/routes'
+import { PRODUCTS_PATH, SHOP_PATH } from '../config/routes'
+import { categoryBrowsePath } from './categoryBrowseParams'
 import type { ProductDetail, ProductImage } from '../types/productDetail'
 import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
 import type { ApiProduct, ApiReview } from '../types/catalog'
@@ -144,7 +145,7 @@ export function mapApiProductToProductDetail(product: ApiProduct): ProductDetail
     subCategoryName: product.subCategory?.[0]?.name,
     categoryName: product.category?.name ?? '',
     categoryHref: product.category?.slug
-      ? `${CATEGORIES_PATH}/${product.category.slug}`
+      ? categoryBrowsePath(product.category.slug)
       : SHOP_PATH,
     description: product.description ?? '',
     advantages: parseDelimitedList(product.advantages),

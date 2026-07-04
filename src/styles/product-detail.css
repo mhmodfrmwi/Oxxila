@@ -544,6 +544,14 @@
   align-items: stretch;
   justify-content: space-between;
   border-radius: 12px;
+  border-color: var(--border-subtle);
+  background: var(--card-background);
+  box-shadow: 0 1px 2px rgb(93 90 136 / 0.06);
+}
+
+[data-theme='dark'] .product-detail-qty {
+  background: var(--input-background);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
 }
 
 .product-detail-qty-btn {
@@ -557,11 +565,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 2.5rem;
   border-inline: 1px solid var(--border-subtle);
   font-family: var(--font-family-base);
-  font-size: 0.875rem;
-  font-weight: var(--font-weight-medium);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semibold);
   line-height: 1.25rem;
+  font-variant-numeric: tabular-nums;
   color: var(--primary-text);
 }
 

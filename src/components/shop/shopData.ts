@@ -10,23 +10,12 @@ import concernDrought from '../../assets/landing/image3_47_362.png'
 import concernWrinkles from '../../assets/landing/image4_47_362.png'
 import concernFineLines from '../../assets/landing/image5_47_362.png'
 
-export type ShopHeroSlideVariant = 'dark' | 'light'
-
 export interface ShopHeroSlide {
   id: string
-  variant: ShopHeroSlideVariant
-  brand: string
-  brandSubline?: string
-  headline: string
-  ctaLabel: string
-  ctaHref: string
-  productImage: string
-  productImageAlt: string
-  badge?: string
-  badgeParts?: { prefix: string; title: string; suffix: string }
-  statHighlight?: string
-  statBody?: string
-  disclaimer?: string
+  image: string
+  imageAlt: string
+  /** Destination from banner API (`linkType` / `linkId` / `externalUrl`). Null when not linkable. */
+  href: string | null
 }
 
 export interface ShopCategory {
