@@ -1,3 +1,4 @@
+// src/components/ui/Marquee.tsx
 import { type ReactNode } from 'react'
 
 export interface MarqueeProps {
@@ -9,6 +10,12 @@ export interface MarqueeProps {
   trackClassName?: string
 }
 
+/**
+ * Infinite logo/content marquee.
+ * Layout is always LTR so the duplicated track stays seamless.
+ * Animation direction follows `document.documentElement.dir`
+ * (LTR: right → left, RTL: left → right).
+ */
 export function Marquee({
   children,
   duration = 40,
@@ -18,14 +25,12 @@ export function Marquee({
 }: MarqueeProps) {
   return (
     <div
-      className={[
-        'group/marquee relative w-full overflow-hidden',
-        className,
-      ].join(' ')}
+      dir="ltr"
+      className={['group/marquee relative w-full overflow-hidden', className].join(' ')}
     >
       <div
         className={[
-          'flex w-max motion-reduce:animate-none',
+          'marquee-track flex w-max motion-reduce:animate-none',
           pauseOnHover ? 'group-hover/marquee:[animation-play-state:paused]' : '',
           'animate-marquee',
           trackClassName,

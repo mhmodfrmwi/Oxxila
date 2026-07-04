@@ -1,5 +1,8 @@
-import { Link } from "react-router-dom";
-import { useTheme } from "../../context/ThemeContext";
+// src/components/landing/HeroSection.tsx
+import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { useTheme } from '../../context/ThemeContext'
+import { SHOP_PATH } from '../../config/routes'
 import {
   HERO_BLOB_PATH,
   HERO_LEFT_BLOB_PATH,
@@ -9,57 +12,57 @@ import {
   heroImage,
   heroLeftProduct,
   heroRightProduct,
-} from "./landingData";
-import { typeSmallClasses } from "../ui/typography";
+} from './landingData'
+import { typeSmallClasses } from '../ui/typography'
 
-const HERO_WIDTH = 1440;
-const HERO_HEIGHT = 796;
+const HERO_WIDTH = 1440
+const HERO_HEIGHT = 796
 
 const HERO_RIGHT_PIN_PATH =
-  "M1325 416.816C1320.99 416.816 1318.39 419.508 1315.31 420.489C1314.06 420.888 1313.44 421.088 1313.18 421.369C1312.93 421.65 1312.86 422.061 1312.71 422.883C1311.12 431.677 1314.59 439.808 1322.85 442.973C1323.74 443.313 1324.19 443.483 1325 443.483C1325.82 443.483 1326.26 443.313 1327.15 442.973C1335.42 439.808 1338.88 431.677 1337.29 422.883C1337.14 422.061 1337.07 421.65 1336.82 421.369C1336.56 421.087 1335.94 420.888 1334.69 420.489C1331.61 419.508 1329.01 416.816 1325 416.816Z";
+  'M1325 416.816C1320.99 416.816 1318.39 419.508 1315.31 420.489C1314.06 420.888 1313.44 421.088 1313.18 421.369C1312.93 421.65 1312.86 422.061 1312.71 422.883C1311.12 431.677 1314.59 439.808 1322.85 442.973C1323.74 443.313 1324.19 443.483 1325 443.483C1325.82 443.483 1326.26 443.313 1327.15 442.973C1335.42 439.808 1338.88 431.677 1337.29 422.883C1337.14 422.061 1337.07 421.65 1336.82 421.369C1336.56 421.087 1335.94 420.888 1334.69 420.489C1331.61 419.508 1329.01 416.816 1325 416.816Z'
 
 function pctX(value: number) {
-  return `${(value / HERO_WIDTH) * 100}%`;
+  return `${(value / HERO_WIDTH) * 100}%`
 }
 
 function pctY(value: number) {
-  return `${(value / HERO_HEIGHT) * 100}%`;
+  return `${(value / HERO_HEIGHT) * 100}%`
 }
 
 function centerStyle(x: number, y: number) {
   return {
     left: pctX(x),
     top: pctY(y),
-    transform: "translate(-50%, -50%)",
-  };
+    transform: 'translate(-50%, -50%)',
+  }
 }
 
 const ctaPrimaryClass = [
-  "inline-flex min-h-11 w-full items-center justify-center rounded-full px-6",
+  'inline-flex min-h-11 w-full items-center justify-center rounded-full px-6',
   typeSmallClasses,
-  "bg-button-primary text-on-emphasis transition-colors",
-  "hover:bg-button-primary-hover hover:text-primary-text",
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2",
-  "min-[481px]:w-auto min-[481px]:min-w-[200px]",
-].join(" ");
+  'bg-button-primary text-on-emphasis transition-colors',
+  'hover:bg-button-primary-hover hover:text-primary-text',
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2',
+  'min-[481px]:w-auto min-[481px]:min-w-[200px]',
+].join(' ')
 
 const ctaSecondaryClass = [
-  "inline-flex min-h-11 w-full items-center justify-center rounded-full border px-6",
+  'inline-flex min-h-11 w-full items-center justify-center rounded-full border px-6',
   typeSmallClasses,
-  "border-button-primary bg-background text-button-primary transition-colors",
-  "hover:bg-card",
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2",
-  "min-[481px]:w-auto min-[481px]:min-w-[200px]",
-].join(" ");
+  'border-button-primary bg-background text-button-primary transition-colors',
+  'hover:bg-card',
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2',
+  'min-[481px]:w-auto min-[481px]:min-w-[200px]',
+].join(' ')
 
 export function HeroSection() {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+  const { t } = useTranslation()
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
 
   return (
     <section className="relative overflow-hidden bg-background py-8 sm:py-12 lg:py-20">
       <div className="mx-auto w-full max-w-[1440px]">
-        {/* Mobile & tablet: stacked layout */}
         <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-5 min-[1025px]:hidden">
           <div className="relative mx-auto max-w-lg overflow-hidden rounded-3xl bg-surface-muted">
             <img
@@ -70,34 +73,36 @@ export function HeroSection() {
             />
             <img
               src={heroCollageImage}
-              alt="Oxxila skincare products"
+              alt={t('home.hero.productsAlt')}
               className="pointer-events-none absolute inset-0 h-full w-full object-contain p-3 sm:p-4"
               loading="eager"
             />
           </div>
 
           <div className="mx-auto mt-8 max-w-xl text-center">
-            <h1 className="font-serif text-4xl font-medium leading-[1.15] text-primary-text md:text-5xl my-4 lg:text-6xl">
-              Oxxila is the store which combines trust and convenience
+            <h1 className="my-4 font-serif text-4xl font-medium leading-[1.15] text-primary-text md:text-5xl lg:text-6xl">
+              {t('home.hero.title')}
             </h1>
             <p className="mx-auto mt-4 max-w-md font-serif text-sm italic leading-relaxed text-primary-text/80 md:text-base lg:text-lg">
-              We show you ingredients, after results step by step, usage so
-              every purchase is informed and confident.
+              {t('home.hero.subtitle')}
             </p>
           </div>
 
           <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 min-[481px]:max-w-none min-[481px]:flex-row min-[481px]:justify-center">
-            <Link to="/shop" className={ctaPrimaryClass}>
-              Start Shopping
+            <Link to={SHOP_PATH} className={ctaPrimaryClass}>
+              {t('home.hero.startShopping')}
             </Link>
             <a href="#contact" className={ctaSecondaryClass}>
-              Contact Us
+              {t('home.hero.contactUs')}
             </a>
           </div>
         </div>
 
-        {/* Desktop: original SVG hero */}
-        <div className="relative mx-auto hidden aspect-[1440/796] w-full min-[1025px]:block">
+        {/* Fixed composition — keep LTR geometry so decorative layout is unchanged in Arabic */}
+        <div
+          dir="ltr"
+          className="relative mx-auto hidden aspect-[1440/796] w-full min-[1025px]:block"
+        >
           <svg
             viewBox={`0 0 ${HERO_WIDTH} ${HERO_HEIGHT}`}
             className="absolute inset-0 h-full w-full"
@@ -208,12 +213,9 @@ export function HeroSection() {
           </svg>
 
           <div className="pointer-events-none absolute inset-0 z-20">
-            <div
-              className="absolute inset-x-0 text-center"
-              style={{ top: pctY(92) }}
-            >
+            <div className="absolute inset-x-0 text-center" style={{ top: pctY(92) }}>
               <h1 className="font-serif text-5xl font-medium leading-[1.15] text-primary-text xl:text-6xl 2xl:text-7xl">
-                Oxxila is the store which combines <br /> trust and convenience
+                {t('home.hero.titleLine1')} <br /> {t('home.hero.titleLine2')}
               </h1>
             </div>
 
@@ -221,9 +223,7 @@ export function HeroSection() {
               className="absolute inset-x-0 mx-auto max-w-3xl px-6 text-center font-serif text-lg italic leading-snug text-primary-text/80"
               style={{ top: pctY(228) }}
             >
-              We show you ingredients, after results step by step, usage so
-              every purchase is <br className="hidden xl:inline" /> informed and
-              confident.
+              {t('home.hero.subtitleDesktop')}
             </p>
           </div>
 
@@ -231,22 +231,22 @@ export function HeroSection() {
             type="button"
             className="absolute z-30 min-h-11 min-w-11 rounded-full"
             style={centerStyle(115, 650.149)}
-            aria-label="Previous slide"
+            aria-label={t('home.hero.previousSlide')}
           />
 
           <button
             type="button"
             className="absolute z-30 min-h-11 min-w-11 rounded-full"
             style={centerStyle(1325, 430.149)}
-            aria-label="Next slide"
+            aria-label={t('home.hero.nextSlide')}
           />
 
           <Link
-            to="/shop"
+            to={SHOP_PATH}
             className={[
-              "absolute z-30 flex min-h-11 items-center justify-center rounded-full bg-button-primary text-on-emphasis transition-colors hover:bg-button-primary-hover hover:text-primary-text",
+              'absolute z-30 flex min-h-11 items-center justify-center rounded-full bg-button-primary text-on-emphasis transition-colors hover:bg-button-primary-hover hover:text-primary-text',
               typeSmallClasses,
-            ].join(" ")}
+            ].join(' ')}
             style={{
               left: pctX(432),
               top: pctY(726),
@@ -254,15 +254,15 @@ export function HeroSection() {
               height: pctY(70),
             }}
           >
-            Start Shopping
+            {t('home.hero.startShopping')}
           </Link>
 
           <a
             href="#contact"
             className={[
-              "absolute z-30 flex min-h-11 items-center justify-center rounded-full border border-button-primary bg-background text-button-primary transition-colors hover:bg-card",
+              'absolute z-30 flex min-h-11 items-center justify-center rounded-full border border-button-primary bg-background text-button-primary transition-colors hover:bg-card',
               typeSmallClasses,
-            ].join(" ")}
+            ].join(' ')}
             style={{
               left: pctX(728.5),
               top: pctY(726.5),
@@ -270,10 +270,10 @@ export function HeroSection() {
               height: pctY(69),
             }}
           >
-            Contact Us
+            {t('home.hero.contactUs')}
           </a>
         </div>
       </div>
     </section>
-  );
+  )
 }

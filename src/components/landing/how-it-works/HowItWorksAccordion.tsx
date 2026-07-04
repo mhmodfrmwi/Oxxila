@@ -1,6 +1,9 @@
+// src/components/landing/how-it-works/HowItWorksAccordion.tsx
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
-import { howItWorksSteps } from '../landingData'
+import { useTranslation } from 'react-i18next'
+
+const STEP_IDS = ['concern', 'explanations', 'checkout'] as const
 
 interface HowItWorksAccordionProps {
   openId: string
@@ -8,14 +11,16 @@ interface HowItWorksAccordionProps {
 }
 
 export function HowItWorksAccordion({ openId, onOpenChange }: HowItWorksAccordionProps) {
+  const { t } = useTranslation()
+
   return (
-    <div className="space-y-4" role="region" aria-label="How it works steps">
-      {howItWorksSteps.map((step) => {
-        const isOpen = openId === step.id
+    <div className="space-y-4" role="region" aria-label={t('home.howItWorks.stepsAria')}>
+      {STEP_IDS.map((stepId) => {
+        const isOpen = openId === stepId
 
         return (
           <motion.div
-            key={step.id}
+            key={stepId}
             initial={false}
             className={[
               'overflow-hidden rounded-3xl border transition-colors duration-300',
@@ -26,12 +31,12 @@ export function HowItWorksAccordion({ openId, onOpenChange }: HowItWorksAccordio
           >
             <button
               type="button"
-              className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left min-[481px]:gap-4 min-[481px]:px-5 min-[481px]:py-5 sm:px-6 sm:py-6"
+              className="flex w-full items-center justify-between gap-3 px-4 py-4 text-start min-[481px]:gap-4 min-[481px]:px-5 min-[481px]:py-5 sm:px-6 sm:py-6"
               aria-expanded={isOpen}
-              onClick={() => onOpenChange(isOpen ? '' : step.id)}
+              onClick={() => onOpenChange(isOpen ? '' : stepId)}
             >
               <span className="min-w-0 font-serif text-base font-medium text-primary-text min-[481px]:text-lg sm:text-xl">
-                {step.title}
+                {t(`home.howItWorks.steps.${stepId}.title`)}
               </span>
 
               <span
@@ -45,7 +50,9 @@ export function HowItWorksAccordion({ openId, onOpenChange }: HowItWorksAccordio
               >
                 <ChevronDown
                   size={20}
-                  className={['transition-transform duration-300', isOpen ? 'rotate-180' : ''].join(' ')}
+                  className={['transition-transform duration-300', isOpen ? 'rotate-180' : ''].join(
+                    ' ',
+                  )}
                 />
               </span>
             </button>
@@ -61,7 +68,7 @@ export function HowItWorksAccordion({ openId, onOpenChange }: HowItWorksAccordio
                 >
                   <div className="px-5 pb-5 sm:px-6 sm:pb-6">
                     <p className="text-sm leading-relaxed text-secondary-text sm:text-base">
-                      {step.description}
+                      {t(`home.howItWorks.steps.${stepId}.description`)}
                     </p>
                   </div>
                 </motion.div>

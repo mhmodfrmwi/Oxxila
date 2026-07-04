@@ -68,5 +68,86 @@
       "returns": "Returns & Refunds",
       "trackOrder": "Track Your Order"
     }
+  },
+  "home": {
+    "hero": {
+      "title": "Oxxila is the store which combines trust and convenience",
+      "titleLine1": "Oxxila is the store which combines",
+      "titleLine2": "trust and convenience",
+      "subtitle": "We show you ingredients, after results step by step, usage so every purchase is informed and confident.",
+      "subtitleDesktop": "We show you ingredients, after results step by step, usage so every purchase is informed and confident.",
+      "startShopping": "Start Shopping",
+      "contactUs": "Contact Us",
+      "productsAlt": "Oxxila skincare products",
+      "previousSlide": "Previous slide",
+      "nextSlide": "Next slide"
+    },
+    "trustedBy": {
+      "ariaLabel": "Trusted by leading companies"
+    },
+    "skinConcerns": {
+      "title": "Shop by skin concern",
+      "titleCompact": "Skin concerns",
+      "subtitle": "Find clinically-proven solutions tailored to your skin",
+      "ariaLabel": "Skin concerns",
+      "items": {
+        "acne": "Acne",
+        "pigmentation": "Pigmentation",
+        "sensitive-skin": "Sensitive skin",
+        "drought": "Drought",
+        "wrinkles": "Wrinkles",
+        "wide-pores": "Wide pores"
+      }
+    },
+    "bestSellers": {
+      "title": "Oxxila best seller",
+      "subtitle": "Our most loved products, trusted by thousands",
+      "badge": "Best seller",
+      "viewAll": "View all products",
+      "carouselAria": "Product carousel",
+      "goToProduct": "Go to product {{number}}",
+      "addToWishlist": "Add to wishlist",
+      "empty": "No best sellers available right now."
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "stepsAria": "How it works steps",
+      "playVideo": "Play how it works video",
+      "thumbAlt": "Hands applying skincare cream",
+      "videoDialog": "Product video",
+      "closeVideo": "Close video",
+      "close": "Close",
+      "videoPlaceholder": "Video player placeholder — embed your product walkthrough here.",
+      "steps": {
+        "concern": {
+          "title": "Choose Your Skin Concern",
+          "description": "Select your main concern — acne, pigmentation, sensitivity, dryness, or pores — and we'll instantly filter the right products for you."
+        },
+        "explanations": {
+          "title": "Get Clear, Doctor-Based Explanations",
+          "description": "Understand ingredients and routines with expert-backed guidance tailored to your unique skin profile and goals."
+        },
+        "checkout": {
+          "title": "One Step Checkout & Delivery",
+          "description": "Add to cart, checkout securely, and get dermatologist-trusted products delivered straight to your door."
+        }
+      }
+    },
+    "contact": {
+      "title": "Contact us",
+      "name": "Name",
+      "email": "Email address",
+      "message": "Message",
+      "send": "Send",
+      "sending": "Sending…",
+      "sent": "Message sent!",
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Enter a valid email address",
+      "messageRequired": "Message is required",
+      "call": "Call",
+      "emailLabel": "Email",
+      "location": "Location"
+    }
   }
 }

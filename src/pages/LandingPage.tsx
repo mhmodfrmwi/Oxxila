@@ -1,3 +1,5 @@
+// src/pages/LandingPage.tsx
+import { useTranslation } from 'react-i18next'
 import { Layout } from '../components/layout/Layout'
 import { PageBleed } from '../components/layout/PageBleed'
 import { BestSellerSection } from '../components/landing/best-seller/BestSellerSection'
@@ -9,14 +11,16 @@ import { Footer } from '../components/landing/footer/Footer'
 import { TrustedBySection } from '../components/landing/TrustedBySection'
 
 export function LandingPage() {
+  const { t } = useTranslation()
+
   return (
     <Layout>
       <PageBleed>
         <HeroSection />
         <TrustedBySection />
         <SkinConcernSection
-          title="Shop by skin concern"
-          subtitle="Find clinically-proven solutions tailored to your skin"
+          title={t('home.skinConcerns.title')}
+          subtitle={t('home.skinConcerns.subtitle')}
           align="center"
           size="default"
         />

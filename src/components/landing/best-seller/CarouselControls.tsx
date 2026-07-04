@@ -1,3 +1,6 @@
+// src/components/landing/best-seller/CarouselControls.tsx
+import { useTranslation } from 'react-i18next'
+
 interface CarouselControlsProps {
   count: number
   activeIndex: number
@@ -5,8 +8,14 @@ interface CarouselControlsProps {
 }
 
 export function CarouselControls({ count, activeIndex, onSelect }: CarouselControlsProps) {
+  const { t } = useTranslation()
+
   return (
-    <div className="flex items-center justify-center gap-1" role="tablist" aria-label="Product carousel">
+    <div
+      className="flex items-center justify-center gap-1"
+      role="tablist"
+      aria-label={t('home.bestSellers.carouselAria')}
+    >
       {Array.from({ length: count }).map((_, index) => {
         const isActive = index === activeIndex
         return (
@@ -15,7 +24,7 @@ export function CarouselControls({ count, activeIndex, onSelect }: CarouselContr
             type="button"
             role="tab"
             aria-selected={isActive}
-            aria-label={`Go to product ${index + 1}`}
+            aria-label={t('home.bestSellers.goToProduct', { number: index + 1 })}
             onClick={() => onSelect(index)}
             className="flex min-h-11 min-w-11 items-center justify-center rounded-full"
           >

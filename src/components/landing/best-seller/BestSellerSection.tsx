@@ -1,5 +1,7 @@
+// src/components/landing/best-seller/BestSellerSection.tsx
 import { motion } from 'framer-motion'
 import { useCallback, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { getWrappedOffset } from '../../carousel/getWrappedOffset'
 import { useCarouselAutoplay } from '../../../hooks/useCarouselAutoplay'
@@ -17,6 +19,7 @@ const SWIPE_THRESHOLD = 50
 const MOBILE_BREAKPOINT = 769
 
 export function BestSellerSection() {
+  const { t } = useTranslation()
   const { bestSellers, loading } = useLandingCatalogContext()
   const [activeIndex, setActiveIndex] = useState(0)
   const isMobile = useMaxWidth(MOBILE_BREAKPOINT)
@@ -44,8 +47,8 @@ export function BestSellerSection() {
     <section className="relative overflow-hidden bg-background py-10 sm:py-14 lg:py-20">
       <div className="relative container-content">
         <SectionHeader
-          title="Oxxila best seller"
-          subtitle="Our most loved products, trusted by thousands"
+          title={t('home.bestSellers.title')}
+          subtitle={t('home.bestSellers.subtitle')}
           align="center"
         />
 
@@ -63,8 +66,13 @@ export function BestSellerSection() {
             <div className="relative mx-auto flex h-[400px] max-w-4xl items-center justify-center sm:h-[430px] min-[769px]:h-[460px]">
               <div className="h-[360px] w-[min(260px,85vw)] animate-pulse rounded-[24px] bg-surface-muted/70 dark:bg-surface-subtle/40" />
             </div>
+          ) : total === 0 ? (
+            <p className="py-12 text-center text-sm text-secondary-text" role="status">
+              {t('home.bestSellers.empty')}
+            </p>
           ) : (
             <motion.div
+              dir="ltr"
               className="relative mx-auto h-[400px] max-w-4xl [perspective:1200px] sm:h-[430px] min-[769px]:h-[460px]"
               drag={isMobile ? 'x' : false}
               dragConstraints={{ left: 0, right: 0 }}
@@ -111,7 +119,7 @@ export function BestSellerSection() {
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2',
             )}
           >
-            View all products
+            {t('home.bestSellers.viewAll')}
           </Link>
         </div>
       </div>

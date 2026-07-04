@@ -41,7 +41,7 @@ export function CategoryCard({
           )}
           aria-hidden
         >
-          <ArrowUpRight size={15} strokeWidth={2.25} />
+          <ArrowUpRight size={15} strokeWidth={2.25} className="rtl:-scale-x-100" />
         </span>
       </div>
       <div className="px-4 pb-4 sm:px-5 sm:pb-5">

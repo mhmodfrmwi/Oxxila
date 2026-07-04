@@ -1,3 +1,5 @@
+// src/components/landing/SkinConcernSection.tsx
+import { useTranslation } from 'react-i18next'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { ContentSection } from '../layout/ContentSection'
 import { StripCarousel } from '../carousel/StripCarousel'
@@ -8,6 +10,12 @@ import { cn } from '../../lib/cn'
 
 const TABLET_GRID_BREAKPOINT = '(min-width: 640px)'
 const LARGE_GRID_BREAKPOINT = '(min-width: 1024px)'
+
+function concernLabel(t: (key: string) => string, id: string, fallback: string) {
+  const key = `home.skinConcerns.items.${id}`
+  const translated = t(key)
+  return translated === key ? fallback : translated
+}
 
 function ConcernSkeleton({ layout }: { layout: 'grid' | 'carousel' }) {
   return (
@@ -24,6 +32,7 @@ function ConcernSkeleton({ layout }: { layout: 'grid' | 'carousel' }) {
 }
 
 function ConcernGrid({ columns }: { columns: 3 | 6 }) {
+  const { t } = useTranslation()
   const { skinConcerns, loading } = useLandingCatalogContext()
 
   return (
@@ -40,7 +49,7 @@ function ConcernGrid({ columns }: { columns: 3 | 6 }) {
         : skinConcerns.map((concern) => (
             <CategoryCard
               key={concern.id}
-              name={concern.name}
+              name={concernLabel(t, concern.id, concern.name)}
               image={concern.image}
               href={concern.href}
               layout="grid"
@@ -51,6 +60,7 @@ function ConcernGrid({ columns }: { columns: 3 | 6 }) {
 }
 
 function ConcernCarousel() {
+  const { t } = useTranslation()
   const { skinConcerns, loading } = useLandingCatalogContext()
 
   if (loading) {
@@ -67,10 +77,10 @@ function ConcernCarousel() {
     <StripCarousel
       items={skinConcerns}
       getItemKey={(concern) => concern.id}
-      ariaLabel="Skin concerns"
+      ariaLabel={t('home.skinConcerns.ariaLabel')}
       renderItem={(concern) => (
         <CategoryCard
-          name={concern.name}
+          name={concernLabel(t, concern.id, concern.name)}
           image={concern.image}
           href={concern.href}
           layout="carousel"
@@ -89,14 +99,16 @@ export interface SkinConcernSectionProps {
 }
 
 export function SkinConcernSection({
-  title = 'Skin concerns',
+  title,
   subtitle,
   align = 'left',
   size = 'compact',
   className,
 }: SkinConcernSectionProps) {
+  const { t } = useTranslation()
   const isTabletGrid = useMediaQuery(TABLET_GRID_BREAKPOINT)
   const isLargeGrid = useMediaQuery(LARGE_GRID_BREAKPOINT)
+  const resolvedTitle = title ?? t('home.skinConcerns.titleCompact')
 
   return (
     <ContentSection
@@ -107,7 +119,7 @@ export function SkinConcernSection({
       <SectionHeader
         id="skin-concerns-heading"
         align={align}
-        title={title}
+        title={resolvedTitle}
         subtitle={subtitle}
         size={size}
         className={align === 'center' ? 'mx-auto [&_p]:mx-auto [&_p]:text-secondary-text' : undefined}

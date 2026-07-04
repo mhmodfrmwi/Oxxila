@@ -1,12 +1,15 @@
+// src/components/landing/how-it-works/HowItWorksSection.tsx
 import { AnimatePresence, motion } from 'framer-motion'
 import { Play, X } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { FadeUp } from '../../ui/FadeUp'
 import { SectionHeader } from '../SectionHeader'
 import { howItWorksThumb } from '../landingData'
 import { HowItWorksAccordion } from './HowItWorksAccordion'
 
 export function HowItWorksSection() {
+  const { t } = useTranslation()
   const [openStepId, setOpenStepId] = useState('concern')
   const [isVideoOpen, setIsVideoOpen] = useState(false)
 
@@ -15,20 +18,20 @@ export function HowItWorksSection() {
       <section className="bg-background py-10 sm:py-14 lg:py-20">
         <div className="container-content">
           <FadeUp>
-            <SectionHeader title="How it works" align="center" />
+            <SectionHeader title={t('home.howItWorks.title')} align="center" />
           </FadeUp>
 
           <div className="mt-8 grid items-start gap-8 min-[769px]:mt-12 min-[769px]:grid-cols-2 min-[769px]:items-center min-[769px]:gap-10 lg:mt-14 lg:gap-14">
             <FadeUp delay={0.1}>
               <button
                 type="button"
-                className="group relative block w-full overflow-hidden rounded-3xl text-left"
+                className="group relative block w-full overflow-hidden rounded-3xl text-start"
                 onClick={() => setIsVideoOpen(true)}
-                aria-label="Play how it works video"
+                aria-label={t('home.howItWorks.playVideo')}
               >
                 <img
                   src={howItWorksThumb}
-                  alt="Hands applying skincare cream"
+                  alt={t('home.howItWorks.thumbAlt')}
                   className="aspect-[4/3] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 sm:aspect-[16/11]"
                   loading="lazy"
                 />
@@ -43,7 +46,7 @@ export function HowItWorksSection() {
                   ].join(' ')}
                   aria-hidden
                 >
-                  <Play size={28} className="ml-1 fill-white" />
+                  <Play size={28} className="ms-1 fill-white" />
                 </span>
               </button>
             </FadeUp>
@@ -64,12 +67,12 @@ export function HowItWorksSection() {
             exit={{ opacity: 0 }}
             role="dialog"
             aria-modal="true"
-            aria-label="Product video"
+            aria-label={t('home.howItWorks.videoDialog')}
           >
             <button
               type="button"
               className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-              aria-label="Close video"
+              aria-label={t('home.howItWorks.closeVideo')}
               onClick={() => setIsVideoOpen(false)}
             />
 
@@ -82,8 +85,8 @@ export function HowItWorksSection() {
             >
               <button
                 type="button"
-                className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-                aria-label="Close"
+                className="absolute end-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+                aria-label={t('home.howItWorks.close')}
                 onClick={() => setIsVideoOpen(false)}
               >
                 <X size={20} />
@@ -91,7 +94,7 @@ export function HowItWorksSection() {
 
               <div className="flex aspect-video items-center justify-center bg-black/40 p-8 text-center">
                 <p className="text-sm text-white/80 sm:text-base">
-                  Video player placeholder — embed your product walkthrough here.
+                  {t('home.howItWorks.videoPlaceholder')}
                 </p>
               </div>
             </motion.div>

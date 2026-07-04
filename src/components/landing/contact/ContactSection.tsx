@@ -1,4 +1,6 @@
+// src/components/landing/contact/ContactSection.tsx
 import { Mail, MapPin, Phone } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { FadeUp } from '../../ui/FadeUp'
 import { SectionHeader } from '../SectionHeader'
 import { contactInfo } from '../landingData'
@@ -11,12 +13,20 @@ const iconMap = {
   location: MapPin,
 } as const
 
+const labelKeyMap = {
+  call: 'home.contact.call',
+  email: 'home.contact.emailLabel',
+  location: 'home.contact.location',
+} as const
+
 export function ContactSection() {
+  const { t } = useTranslation()
+
   return (
     <section id="contact" className="relative overflow-hidden bg-background py-10 sm:py-14 lg:py-20">
       <div className="relative container-content">
         <FadeUp>
-          <SectionHeader title="Contact us" align="center" />
+          <SectionHeader title={t('home.contact.title')} align="center" />
         </FadeUp>
 
         <div className="mt-8 lg:mt-12">
@@ -30,7 +40,7 @@ export function ContactSection() {
               <ContactInfoCard
                 key={item.id}
                 icon={Icon}
-                label={item.label}
+                label={t(labelKeyMap[item.id])}
                 value={item.value}
                 href={item.href}
                 delay={0.1 + index * 0.08}

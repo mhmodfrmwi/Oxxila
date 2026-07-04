@@ -1,6 +1,8 @@
+// src/components/landing/contact/ContactForm.tsx
 import { motion } from 'framer-motion'
 import { Check, Loader2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { gradientCtaClasses, successCtaClasses } from '../../ui/buttonStyles'
 import { typeSmallClasses } from '../../ui/typography'
 import { cn } from '../../../lib/cn'
@@ -27,23 +29,11 @@ const inputBase = [
 ].join(' ')
 
 const labelBase = [
-  'pointer-events-none absolute left-4 text-placeholder-text transition-all duration-200',
+  'pointer-events-none absolute start-4 text-placeholder-text transition-all duration-200',
   'top-1/2 -translate-y-1/2 text-sm',
   'peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-accent-soft',
   'peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs',
 ].join(' ')
-
-function validate(values: FormValues): FormErrors {
-  const errors: FormErrors = {}
-  if (!values.name.trim()) errors.name = 'Name is required'
-  if (!values.email.trim()) {
-    errors.email = 'Email is required'
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-    errors.email = 'Enter a valid email address'
-  }
-  if (!values.message.trim()) errors.message = 'Message is required'
-  return errors
-}
 
 interface FloatingFieldProps {
   id: FieldName
@@ -66,9 +56,7 @@ function FloatingField({
   onChange,
   onBlur,
 }: FloatingFieldProps) {
-  const errorRing = error
-    ? 'border-support-error ring-2 ring-support-error/20'
-    : ''
+  const errorRing = error ? 'border-support-error ring-2 ring-support-error/20' : ''
 
   return (
     <div className="relative">
@@ -112,6 +100,7 @@ function FloatingField({
 }
 
 export function ContactForm() {
+  const { t } = useTranslation()
   const [values, setValues] = useState<FormValues>({ name: '', email: '', message: '' })
   const [errors, setErrors] = useState<FormErrors>({})
   const [touched, setTouched] = useState<Record<FieldName, boolean>>({
@@ -120,6 +109,18 @@ export function ContactForm() {
     message: false,
   })
   const [status, setStatus] = useState<FormStatus>('idle')
+
+  function validate(formValues: FormValues): FormErrors {
+    const nextErrors: FormErrors = {}
+    if (!formValues.name.trim()) nextErrors.name = t('home.contact.nameRequired')
+    if (!formValues.email.trim()) {
+      nextErrors.email = t('home.contact.emailRequired')
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email)) {
+      nextErrors.email = t('home.contact.emailInvalid')
+    }
+    if (!formValues.message.trim()) nextErrors.message = t('home.contact.messageRequired')
+    return nextErrors
+  }
 
   function updateField(field: FieldName, value: string) {
     setValues((prev) => ({ ...prev, [field]: value }))
@@ -164,7 +165,7 @@ export function ContactForm() {
     >
       <FloatingField
         id="name"
-        label="Name"
+        label={t('home.contact.name')}
         value={values.name}
         error={touched.name ? errors.name : undefined}
         onChange={(v) => updateField('name', v)}
@@ -172,7 +173,7 @@ export function ContactForm() {
       />
       <FloatingField
         id="email"
-        label="Email address"
+        label={t('home.contact.email')}
         type="email"
         value={values.email}
         error={touched.email ? errors.email : undefined}
@@ -181,7 +182,7 @@ export function ContactForm() {
       />
       <FloatingField
         id="message"
-        label="Message"
+        label={t('home.contact.message')}
         multiline
         value={values.message}
         error={touched.message ? errors.message : undefined}
@@ -205,16 +206,16 @@ export function ContactForm() {
         {status === 'loading' && (
           <>
             <Loader2 size={20} className="animate-spin" aria-hidden />
-            Sending…
+            {t('home.contact.sending')}
           </>
         )}
         {status === 'success' && (
           <>
             <Check size={20} aria-hidden />
-            Message sent!
+            {t('home.contact.sent')}
           </>
         )}
-        {status === 'idle' && 'Send'}
+        {status === 'idle' && t('home.contact.send')}
       </motion.button>
     </motion.form>
   )

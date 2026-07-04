@@ -1,5 +1,7 @@
+// src/components/landing/best-seller/ProductCard.tsx
 import { motion } from 'framer-motion'
 import { Heart, ShoppingBag, Star } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { PRODUCTS_PATH } from '../../../config/routes'
 import { formatReviewCount } from '../../../utils/formatReviewCount'
@@ -56,6 +58,7 @@ export function ProductCard({
   isMobile,
   onSelect,
 }: ProductCardProps) {
+  const { t } = useTranslation()
   const motionProps = getCardMotion(offset, isMobile)
   const isVisible = isMobile ? offset === 0 : Math.abs(offset) <= 2
 
@@ -71,8 +74,8 @@ export function ProductCard({
       ].join(' ')}
     >
       <div className="relative overflow-hidden rounded-2xl bg-surface-muted">
-        <span className="absolute top-3 left-3 z-10 rounded-full bg-accent-muted/70 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-primary-text uppercase">
-          Best seller
+        <span className="absolute start-3 top-3 z-10 rounded-full bg-accent-muted/70 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-primary-text uppercase">
+          {t('home.bestSellers.badge')}
         </span>
 
         <div className="overflow-hidden">
@@ -87,10 +90,10 @@ export function ProductCard({
 
         <button
           type="button"
-          aria-label="Add to wishlist"
+          aria-label={t('home.bestSellers.addToWishlist')}
           onClick={(e) => e.stopPropagation()}
           className={[
-            'absolute bottom-3 left-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
+            'absolute bottom-3 start-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
             'bg-card/90 text-icon-secondary shadow-md',
             'transition-all duration-200 hover:scale-110 hover:bg-button-primary hover:text-on-emphasis',
           ].join(' ')}
@@ -100,10 +103,10 @@ export function ProductCard({
 
         <button
           type="button"
-          aria-label="Add to cart"
+          aria-label={t('actions.addToCart')}
           onClick={(e) => e.stopPropagation()}
           className={[
-            'absolute right-3 bottom-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
+            'absolute end-3 bottom-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
             'bg-card/90 text-icon-secondary shadow-md',
             'transition-all duration-200 hover:scale-110 hover:bg-button-primary hover:text-on-emphasis',
           ].join(' ')}

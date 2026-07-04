@@ -63,6 +63,7 @@
   --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
 }
 
+/* LTR: logos scroll right → left */
 @keyframes marquee {
   from {
     transform: translate3d(0, 0, 0);
@@ -72,10 +73,25 @@
   }
 }
 
+/* RTL: logos scroll left → right (same distance, opposite direction) */
+@keyframes marquee-rtl {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @utility animate-marquee {
   animation: marquee var(--marquee-duration, 40s) linear infinite;
   will-change: transform;
   backface-visibility: hidden;
+}
+
+/* Reverse animation only — track layout stays LTR for a seamless loop */
+html[dir='rtl'] .marquee-track.animate-marquee {
+  animation-name: marquee-rtl;
 }
 
 @utility container-content {
