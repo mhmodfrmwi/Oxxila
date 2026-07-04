@@ -622,5 +622,77 @@
       "access_denied": "تم إلغاء تسجيل الدخول.",
       "failed": "فشل تسجيل الدخول الاجتماعي. يرجى المحاولة مرة أخرى."
     }
+  },
+  "profile": {
+    "myAccount": "حسابي",
+    "title": "ملفي الشخصي",
+    "subtitle": "حدّث معلوماتك الشخصية وبيانات التواصل.",
+    "sidebarAria": "الشريط الجانبي للحساب",
+    "navAria": "تنقل الحساب",
+    "nav": {
+      "myProfile": "ملفي الشخصي",
+      "myOrders": "طلباتي",
+      "myAddresses": "عناويني",
+      "changePassword": "تغيير كلمة المرور",
+      "logout": "تسجيل الخروج"
+    },
+    "fields": {
+      "firstName": "الاسم الأول",
+      "firstNamePlaceholder": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "lastNamePlaceholder": "اسم العائلة",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "Example@example.com",
+      "phone": "رقم الهاتف",
+      "phonePlaceholder": "رقمك"
+    },
+    "photoAlt": "صورة الملف الشخصي",
+    "changePhoto": "تغيير صورة الملف الشخصي",
+    "uploadingPhoto": "جاري رفع الصورة...",
+    "saveChanges": "حفظ التغييرات",
+    "saving": "جاري الحفظ...",
+    "updateSuccess": "تم تحديث الملف الشخصي بنجاح",
+    "updateFailed": "فشل التحديث",
+    "avatarUpdated": "تم تحديث صورة الملف الشخصي",
+    "avatarUpdateFailed": "تعذر تحديث صورة الملف الشخصي",
+    "loadFailed": "تعذر تحميل ملفك الشخصي. يرجى المحاولة مرة أخرى.",
+    "invalidForm": "نموذج غير صالح",
+    "fillRequired": "يرجى تعبئة جميع الحقول المطلوبة.",
+    "validation": {
+      "firstNameRequired": "الاسم الأول مطلوب",
+      "nameTooShort": "يجب أن يتكون الاسم من حرفين على الأقل",
+      "nameTooLong": "الاسم طويل جدًا",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
+      "phoneTooLong": "رقم الهاتف طويل جدًا"
+    },
+    "orders": {
+      "title": "طلباتي",
+      "empty": "لا توجد طلبات لعرضها بعد. ابدأ التسوق لتقديم طلبك الأول."
+    },
+    "addresses": {
+      "title": "عناويني",
+      "description": "إدارة عناوين الشحن المحفوظة في حسابك.",
+      "addNew": "إضافة عنوان جديد",
+      "loadFailed": "تعذر تحميل العناوين. يرجى المحاولة مرة أخرى."
+    },
+    "password": {
+      "title": "تغيير كلمة المرور",
+      "subtitle": "اختر كلمة مرور قوية لم تستخدمها من قبل.",
+      "current": "كلمة المرور الحالية",
+      "new": "كلمة المرور الجديدة",
+      "confirm": "تأكيد كلمة المرور",
+      "submit": "تحديث كلمة المرور",
+      "submitting": "جاري التحديث...",
+      "currentRequired": "كلمة المرور الحالية مطلوبة",
+      "newRequired": "كلمة المرور الجديدة مطلوبة",
+      "newTooShort": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+      "confirmRequired": "يرجى تأكيد كلمة المرور الجديدة",
+      "mismatch": "كلمتا المرور غير متطابقتين",
+      "invalidForm": "نموذج غير صالح",
+      "fillRequired": "يرجى تعبئة جميع الحقول المطلوبة.",
+      "updateSuccess": "تم تحديث كلمة المرور بنجاح",
+      "updateFailed": "تعذر تحديث كلمة المرور"
+    }
   }
 }

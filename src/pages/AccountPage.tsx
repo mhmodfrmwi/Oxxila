@@ -1,7 +1,11 @@
 // src/pages/AccountPage.tsx
-import { Navigate } from 'react-router-dom'
-import { ADDRESSES_PATH } from '../config/routes'
+import { AccountLayout } from '../components/account/AccountLayout'
+import { ProfilePageContent } from '../components/account/ProfilePageContent'
 
 export function AccountPage() {
-  return <Navigate to={ADDRESSES_PATH} replace />
+  return (
+    <AccountLayout>
+      <ProfilePageContent />
+    </AccountLayout>
+  )
 }

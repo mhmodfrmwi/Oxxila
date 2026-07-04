@@ -2,6 +2,8 @@
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import {
+  ACCOUNT_CHANGE_PASSWORD_PATH,
+  ACCOUNT_ORDERS_PATH,
   ADD_ADDRESS_PATH,
   ADDRESSES_PATH,
   CART_PATH,
@@ -36,6 +38,16 @@ const CartPage = lazy(() =>
 )
 const AccountPage = lazy(() =>
   import('./pages/AccountPage').then((module) => ({ default: module.AccountPage })),
+)
+const AccountOrdersPage = lazy(() =>
+  import('./pages/AccountOrdersPage').then((module) => ({
+    default: module.AccountOrdersPage,
+  })),
+)
+const AccountChangePasswordPage = lazy(() =>
+  import('./pages/AccountChangePasswordPage').then((module) => ({
+    default: module.AccountChangePasswordPage,
+  })),
 )
 const AddressesPage = lazy(() =>
   import('./pages/AddressesPage').then((module) => ({ default: module.AddressesPage })),
@@ -96,7 +108,12 @@ export default function App() {
         <Route path={SHOP_PATH} element={<ShopPage />} />
         <Route path={CART_PATH} element={<CartPage />} />
         <Route path={MY_ACCOUNT_PATH} element={<AccountPage />} />
+        <Route path={ACCOUNT_ORDERS_PATH} element={<AccountOrdersPage />} />
         <Route path={ADDRESSES_PATH} element={<AddressesPage />} />
+        <Route
+          path={ACCOUNT_CHANGE_PASSWORD_PATH}
+          element={<AccountChangePasswordPage />}
+        />
         <Route path={CHECKOUT_PATH} element={<CheckoutPage />} />
         <Route path={PAYMENT_PATH} element={<PaymentPage />} />
         <Route path={`${ORDER_CONFIRMATION_PATH}/:orderId`} element={<OrderConfirmationPage />} />

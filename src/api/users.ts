@@ -8,12 +8,63 @@ export interface BrowsingHistoryEntry {
   viewedAt: string
 }
 
+export interface UserProfile {
+  _id?: string
+  id?: string
+  name: string
+  email: string
+  phone?: string
+  avatar?: string
+  role?: string
+}
+
+export interface UpdateProfilePayload {
+  name?: string
+  email?: string
+  phone?: string
+}
+
+export interface UpdatePasswordPayload {
+  oldPassword: string
+  newPassword: string
+}
+
 export function getBrowsingHistory() {
   return apiRequest<BrowsingHistoryEntry[]>('/users/browsing-history', { auth: true })
 }
 
 export function getRecommendations() {
   return apiRequest<ApiProduct[]>('/users/recommendations', { auth: true })
+}
+
+export function getUserProfile() {
+  return apiRequest<UserProfile>('/users/getMe', { auth: true })
+}
+
+export function updateUserProfile(payload: UpdateProfilePayload) {
+  return apiRequest<UserProfile>('/users/updateMe', {
+    method: 'PATCH',
+    auth: true,
+    body: payload,
+  })
+}
+
+export function uploadUserAvatar(file: File) {
+  const body = new FormData()
+  body.append('avatar', file)
+  return apiRequest<UserProfile>('/users/updateMyAvatar', {
+    method: 'PATCH',
+    auth: true,
+    body,
+  })
+}
+
+export function updateUserPassword(payload: UpdatePasswordPayload) {
+  return apiRequest('/users/updateMyPassword', {
+    method: 'PATCH',
+    auth: true,
+    body: payload,
+  })
 }
 
 export interface UserAddress {
@@ -41,7 +92,7 @@ export function createMyAddress(payload: CreateAddressPayload) {
 
 export function updateMyAddress(addressId: string, payload: Partial<CreateAddressPayload>) {
   return apiRequest<{ address: UserAddress }>(`/users/profile/addresses/${addressId}`, {
-    method: 'PUT',
+    method: 'PATCH',
     auth: true,
     body: payload,
   })

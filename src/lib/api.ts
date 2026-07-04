@@ -52,7 +52,9 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const { body, auth = false, withCredentials = false, headers, ...rest } = options
 
   const requestHeaders = new Headers(headers)
-  if (body !== undefined) {
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData
+
+  if (body !== undefined && !isFormData) {
     requestHeaders.set('Content-Type', 'application/json')
   }
 
@@ -68,7 +70,12 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     ...rest,
     headers: requestHeaders,
     credentials: withCredentials ? 'include' : 'same-origin',
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body:
+      body === undefined
+        ? undefined
+        : isFormData
+          ? (body as FormData)
+          : JSON.stringify(body),
   })
 
   const payload = await parseApiPayload<T>(response)

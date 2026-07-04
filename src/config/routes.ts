@@ -25,9 +25,13 @@ export const CART_PATH = '/cart'
 
 export const MY_ACCOUNT_PATH = '/account'
 
+export const ACCOUNT_ORDERS_PATH = '/account/orders'
+
 export const ADDRESSES_PATH = '/account/addresses'
 
 export const ADD_ADDRESS_PATH = '/account/addresses/add'
+
+export const ACCOUNT_CHANGE_PASSWORD_PATH = '/account/change-password'
 
 export const CHECKOUT_PATH = '/checkout'
 

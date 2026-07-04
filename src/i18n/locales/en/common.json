@@ -622,5 +622,77 @@
       "access_denied": "Sign-in was cancelled.",
       "failed": "Social sign-in failed. Please try again."
     }
+  },
+  "profile": {
+    "myAccount": "My Account",
+    "title": "My Profile",
+    "subtitle": "Update your personal information and contact details.",
+    "sidebarAria": "Account sidebar",
+    "navAria": "Account navigation",
+    "nav": {
+      "myProfile": "My Profile",
+      "myOrders": "My Orders",
+      "myAddresses": "My Addresses",
+      "changePassword": "Change Password",
+      "logout": "Logout"
+    },
+    "fields": {
+      "firstName": "First Name",
+      "firstNamePlaceholder": "First name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Last name",
+      "email": "Email",
+      "emailPlaceholder": "Example@example.com",
+      "phone": "Phone Number",
+      "phonePlaceholder": "Your Number"
+    },
+    "photoAlt": "Profile photo",
+    "changePhoto": "Change profile photo",
+    "uploadingPhoto": "Uploading photo...",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "updateSuccess": "Profile updated successfully",
+    "updateFailed": "Update failed",
+    "avatarUpdated": "Profile photo updated",
+    "avatarUpdateFailed": "Unable to update profile photo",
+    "loadFailed": "Unable to load your profile. Please try again.",
+    "invalidForm": "Invalid form",
+    "fillRequired": "Please fill in all required fields.",
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "nameTooShort": "Name must be at least 2 characters",
+      "nameTooLong": "Name is too long",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Enter a valid email address",
+      "phoneTooLong": "Phone number is too long"
+    },
+    "orders": {
+      "title": "My Orders",
+      "empty": "You have no orders to display yet. Start shopping to place your first order."
+    },
+    "addresses": {
+      "title": "My Addresses",
+      "description": "Manage the shipping addresses saved to your account.",
+      "addNew": "Add new address",
+      "loadFailed": "Unable to load addresses. Please try again."
+    },
+    "password": {
+      "title": "Change Password",
+      "subtitle": "Choose a strong password you have not used before.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm password",
+      "submit": "Update password",
+      "submitting": "Updating...",
+      "currentRequired": "Current password is required",
+      "newRequired": "New password is required",
+      "newTooShort": "Password must be at least 8 characters",
+      "confirmRequired": "Please confirm your new password",
+      "mismatch": "Passwords do not match",
+      "invalidForm": "Invalid form",
+      "fillRequired": "Please fill in all required fields.",
+      "updateSuccess": "Password updated successfully",
+      "updateFailed": "Unable to update password"
+    }
   }
 }

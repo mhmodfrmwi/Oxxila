@@ -1,7 +1,14 @@
 // src/pages/AddressesPage.tsx
-import { Navigate } from 'react-router-dom'
-import { ADD_ADDRESS_PATH } from '../config/routes'
+import { useTranslation } from 'react-i18next'
+import { AccountAddressesContent } from '../components/account/AccountAddressesContent'
+import { AccountLayout } from '../components/account/AccountLayout'
 
 export function AddressesPage() {
-  return <Navigate to={ADD_ADDRESS_PATH} replace />
+  const { t } = useTranslation()
+
+  return (
+    <AccountLayout breadcrumbLabel={t('profile.nav.myAddresses')}>
+      <AccountAddressesContent />
+    </AccountLayout>
+  )
 }

@@ -5,6 +5,8 @@ export interface AuthUser {
   name: string
   email: string
   role: string
+  phone?: string
+  avatar?: string
 }
 
 export interface LoginPayload {

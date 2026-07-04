@@ -8,11 +8,13 @@ import {
   CATEGORIES_PATH,
   HOME_PATH,
   LOGIN_PATH,
+  MY_ACCOUNT_PATH,
   SHOP_PATH,
 } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { useToast } from '../../context/ToastContext'
+import { UserAvatar } from '../account/UserAvatar'
 import { Logo } from '../ui/Logo'
 import { typeSmallClasses } from '../ui/typography'
 
@@ -29,7 +31,7 @@ function BurgerIcon() {
 export function Navbar() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { isAuthenticated, logout } = useAuth()
+  const { isAuthenticated, user, logout } = useAuth()
   const { itemCount } = useCart()
   const toast = useToast()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -177,18 +179,41 @@ export function Navbar() {
             )}
           </Link>
           {isAuthenticated ? (
-            <button
-              type="button"
-              className={authActionClass}
-              onClick={() => void handleLogout()}
-              disabled={authLoading}
-              aria-busy={authLoading}
-            >
-              <LogOut size={18} aria-hidden />
-              <span className="hidden leading-tight sm:inline">
-                {authLoading ? t('nav.loggingOut') : t('nav.logOut')}
-              </span>
-            </button>
+            <>
+              <NavLink
+                to={MY_ACCOUNT_PATH}
+                className={authActionClass}
+                aria-label={t('nav.account')}
+              >
+                <UserAvatar
+                  name={user?.name ?? ''}
+                  src={user?.avatar}
+                  size="sm"
+                  alt={user?.name}
+                />
+                <span
+                  className={[
+                    'hidden max-w-[8rem] truncate leading-tight sm:inline',
+                    typeSmallClasses,
+                  ].join(' ')}
+                >
+                  {user?.name}
+                </span>
+              </NavLink>
+              <button
+                type="button"
+                className={authActionClass}
+                onClick={() => void handleLogout()}
+                disabled={authLoading}
+                aria-busy={authLoading}
+                aria-label={authLoading ? t('nav.loggingOut') : t('nav.logOut')}
+              >
+                <LogOut size={18} aria-hidden />
+                <span className="hidden leading-tight sm:inline">
+                  {authLoading ? t('nav.loggingOut') : t('nav.logOut')}
+                </span>
+              </button>
+            </>
           ) : (
             <NavLink to={LOGIN_PATH} className={authActionClass}>
               <User size={18} aria-hidden />
@@ -244,22 +269,39 @@ export function Navbar() {
               ))}
               <li className="pt-2">
                 {isAuthenticated ? (
-                  <button
-                    type="button"
-                    className={[
-                      'flex w-full items-center gap-2 rounded-xl px-4 py-3 transition-colors',
-                      typeSmallClasses,
-                      'justify-start text-start',
-                      'text-primary-text hover:bg-input',
-                      authLoading ? 'pointer-events-none opacity-60' : '',
-                    ].join(' ')}
-                    onClick={() => void handleLogout()}
-                    disabled={authLoading}
-                    aria-busy={authLoading}
-                  >
-                    <LogOut size={18} aria-hidden />
-                    {authLoading ? t('nav.loggingOut') : t('nav.logOut')}
-                  </button>
+                  <div className="space-y-1">
+                    <NavLink
+                      to={MY_ACCOUNT_PATH}
+                      className={mobileLinkClass}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <UserAvatar
+                          name={user?.name ?? ''}
+                          src={user?.avatar}
+                          size="sm"
+                          alt={user?.name}
+                        />
+                        {user?.name || t('nav.account')}
+                      </span>
+                    </NavLink>
+                    <button
+                      type="button"
+                      className={[
+                        'flex w-full items-center gap-2 rounded-xl px-4 py-3 transition-colors',
+                        typeSmallClasses,
+                        'justify-start text-start',
+                        'text-primary-text hover:bg-input',
+                        authLoading ? 'pointer-events-none opacity-60' : '',
+                      ].join(' ')}
+                      onClick={() => void handleLogout()}
+                      disabled={authLoading}
+                      aria-busy={authLoading}
+                    >
+                      <LogOut size={18} aria-hidden />
+                      {authLoading ? t('nav.loggingOut') : t('nav.logOut')}
+                    </button>
+                  </div>
                 ) : (
                   <NavLink
                     to={LOGIN_PATH}
