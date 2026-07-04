@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
@@ -25,6 +26,7 @@ function readOAuthError(locationState: unknown): string {
 }
 
 export function LoginForm() {
+  const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
   const { login, isAuthenticated } = useAuth()
@@ -61,12 +63,13 @@ export function LoginForm() {
 
     try {
       const nextUser = await login({ email, password })
-      toast.success('Login successful', `Welcome back, ${nextUser.name}!`)
+      toast.success(t('auth.login.successTitle'), t('auth.login.welcomeBack', { name: nextUser.name }))
       navigate(HOME_PATH, { replace: true })
     } catch (err) {
-      const message = err instanceof ApiError ? err.message : 'Unable to log in. Please try again.'
+      const message =
+        err instanceof ApiError ? err.message : t('auth.login.failedFallback')
       setError(message)
-      toast.error('Login failed', message)
+      toast.error(t('auth.login.failedTitle'), message)
     } finally {
       setLoading(false)
     }
@@ -75,8 +78,8 @@ export function LoginForm() {
   return (
     <AuthCard activeTab="login" imagePosition="right">
       <header className="mb-8">
-        <Heading variant="page-lg">Welcome back</Heading>
-        <p className="mt-2 font-serif text-xl italic text-accent-muted">Happy to see you again</p>
+        <Heading variant="page-lg">{t('auth.login.title')}</Heading>
+        <p className="mt-2 font-serif text-xl italic text-accent-muted">{t('auth.login.subtitle')}</p>
       </header>
 
       {(error || oauthError) && (
@@ -88,31 +91,31 @@ export function LoginForm() {
 
       <form className="space-y-5" onSubmit={handleSubmit} noValidate>
           <InputField
-            label="Email Address"
+            label={t('auth.fields.email')}
             type="email"
             name="email"
             autoComplete="email"
-            placeholder="Example@example.com"
+            placeholder={t('auth.fields.emailPlaceholder')}
             required
           />
 
           <div>
             <InputField
-              label="Password"
+              label={t('auth.fields.password')}
               type="password"
               name="password"
               autoComplete="current-password"
-              placeholder="Min. 8 characters"
+              placeholder={t('auth.fields.passwordPlaceholder')}
               showPasswordToggle
               required
               minLength={8}
             />
-            <div className="mt-2 text-right">
+            <div className="mt-2 text-end">
               <Link
                 to="/forgot-password"
                 className="text-sm text-link hover:text-link-hover"
               >
-                Forgot password?
+                {t('auth.login.forgotPassword')}
               </Link>
             </div>
           </div>
@@ -120,14 +123,14 @@ export function LoginForm() {
           <SocialLoginButtons disabled={loading} />
 
         <Button type="submit" fullWidth pill className="h-14 sm:h-[65px]" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? t('auth.login.submitting') : t('auth.login.submit')}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-secondary-text">
-        Don&apos;t have an account?{' '}
+        {t('auth.login.noAccount')}{' '}
         <Link to="/register" className="font-medium text-link hover:text-link-hover">
-          Create account
+          {t('auth.login.createAccount')}
         </Link>
       </p>
     </AuthCard>

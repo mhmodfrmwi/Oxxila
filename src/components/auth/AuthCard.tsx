@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AuthVisual } from './AuthVisual'
 
 interface AuthCardProps {
@@ -8,6 +9,7 @@ interface AuthCardProps {
 }
 
 export function AuthCard({ activeTab, children, imagePosition }: AuthCardProps) {
+  const { t } = useTranslation()
   const formOrder =
     imagePosition === 'left' ? 'order-1 lg:order-2' : 'order-1'
   const visualOrder =
@@ -25,7 +27,9 @@ export function AuthCard({ activeTab, children, imagePosition }: AuthCardProps) 
           formOrder,
           'flex flex-1 flex-col justify-center px-5 py-8 sm:px-8 sm:py-10 lg:flex-[0.85] lg:px-10 lg:py-12 xl:px-14',
         ].join(' ')}
-        aria-label={activeTab === 'login' ? 'Login form' : 'Registration form'}
+        aria-label={
+          activeTab === 'login' ? t('auth.login.formAria') : t('auth.register.formAria')
+        }
       >
         {children}
       </section>

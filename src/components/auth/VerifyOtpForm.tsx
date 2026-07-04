@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { forgotPassword } from '../../api/auth'
 import { ApiError } from '../../lib/api'
@@ -13,6 +14,7 @@ interface VerifyLocationState {
 }
 
 export function VerifyOtpForm() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const state = (location.state as VerifyLocationState | null) ?? {}
@@ -23,7 +25,7 @@ export function VerifyOtpForm() {
 
   async function handleResend() {
     if (!email) {
-      setError('Please enter your email on the forgot password page first.')
+      setError(t('auth.verify.enterEmailFirst'))
       return
     }
 
@@ -34,7 +36,9 @@ export function VerifyOtpForm() {
       const response = await forgotPassword(email)
       setMessage(response.message)
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Unable to resend reset link. Please try again.')
+      setError(
+        err instanceof ApiError ? err.message : t('auth.verify.resendFailed'),
+      )
     } finally {
       setLoading(false)
     }
@@ -43,14 +47,14 @@ export function VerifyOtpForm() {
   if (!email) {
     return (
       <AuthSimpleCard>
-        <header className="mb-8 text-center sm:text-left">
-          <Heading variant="page">Check your email</Heading>
+        <header className="mb-8 text-center sm:text-start">
+          <Heading variant="page">{t('auth.verify.title')}</Heading>
           <p className="mt-2 text-sm text-secondary-text sm:text-base">
-            Start from the forgot password page so we know which email to use.
+            {t('auth.verify.subtitleNoEmail')}
           </p>
         </header>
         <Button type="button" fullWidth pill className="h-14" onClick={() => navigate('/forgot-password')}>
-          Go to forgot password
+          {t('auth.verify.goToForgot')}
         </Button>
       </AuthSimpleCard>
     )
@@ -58,11 +62,10 @@ export function VerifyOtpForm() {
 
   return (
     <AuthSimpleCard>
-      <header className="mb-8 text-center sm:text-left">
-        <Heading variant="page">Check your email</Heading>
+      <header className="mb-8 text-center sm:text-start">
+        <Heading variant="page">{t('auth.verify.title')}</Heading>
         <p className="mt-2 text-sm text-secondary-text sm:text-base">
-          We sent a password reset link to <strong>{email}</strong>. Open the link in your email to set a new password.
-          The link expires in 60 minutes.
+          {t('auth.verify.subtitleWithEmail', { email })}
         </p>
       </header>
 
@@ -71,19 +74,19 @@ export function VerifyOtpForm() {
 
       <div className="space-y-4">
         <Button type="button" fullWidth pill className="h-14" onClick={() => navigate('/login')}>
-          Back to login
+          {t('auth.verify.backToLogin')}
         </Button>
       </div>
 
       <p className="mt-8 text-center text-sm text-secondary-text">
-        Didn&apos;t receive an email?{' '}
+        {t('auth.verify.didNotReceive')}{' '}
         <button
           type="button"
           className="font-semibold text-link hover:text-link-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-link rounded disabled:opacity-50"
           onClick={handleResend}
           disabled={loading}
         >
-          {loading ? 'Sending...' : 'Resend link'}
+          {loading ? t('auth.verify.sending') : t('auth.verify.resendLink')}
         </button>
       </p>
 
@@ -92,7 +95,7 @@ export function VerifyOtpForm() {
           to="/forgot-password"
           className="font-semibold text-link hover:text-link-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-link rounded"
         >
-          Change email
+          {t('auth.verify.changeEmail')}
         </Link>
       </p>
     </AuthSimpleCard>

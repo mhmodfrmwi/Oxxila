@@ -1,4 +1,5 @@
 // src/components/checkout/PaymentMethodSection.tsx
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { ADD_ADDRESS_PATH } from '../../config/routes'
 import type { usePaymentPage } from '../../hooks/usePaymentPage'
@@ -39,28 +40,30 @@ export function PaymentMethodSection({
   updateBillingField,
   className,
 }: PaymentMethodSectionProps) {
-  const phoneDisplay = phone?.trim() || 'Not set'
+  const { t } = useTranslation()
+  const phoneDisplay = phone?.trim() || t('checkout.payment.notSet')
 
   return (
     <section
-      aria-label="Payment methods"
+      aria-label={t('checkout.payment.methodsAria')}
       className={cn('payment-method-section', className)}
     >
       <div className="payment-billing-panel">
         <p className="payment-phone-line">
-          <span className="payment-phone-line-text">Phone Number {phoneDisplay}</span>
-          {' '}
+          <span className="payment-phone-line-text">
+            {t('checkout.payment.phoneNumber', { phone: phoneDisplay })}
+          </span>{' '}
           <Link
             to={ADD_ADDRESS_PATH}
             className={cn('payment-inline-link', focusRingClasses, 'rounded-sm')}
           >
-            Change Address
+            {t('checkout.payment.changeAddress')}
           </Link>
         </p>
 
         <div className="payment-billing-fields">
           <SelectField
-            label="City"
+            label={t('checkout.payment.city')}
             name="city"
             value={billingForm.districtId}
             onChange={(event) => updateBillingField('districtId', event.target.value)}
@@ -69,7 +72,7 @@ export function PaymentMethodSection({
             className="payment-field-input"
           >
             <option value="" disabled>
-              Your Number
+              {t('checkout.payment.cityPlaceholder')}
             </option>
             {hasDistricts ? (
               <>
@@ -78,7 +81,7 @@ export function PaymentMethodSection({
                     {district.name}
                   </option>
                 ))}
-                <option value="other">Other</option>
+                <option value="other">{t('checkout.payment.other')}</option>
               </>
             ) : (
               governorates
@@ -92,7 +95,7 @@ export function PaymentMethodSection({
           </SelectField>
 
           <SelectField
-            label="Government"
+            label={t('checkout.payment.government')}
             name="government"
             value={billingForm.governorateId}
             onChange={(event) => updateBillingField('governorateId', event.target.value)}
@@ -101,7 +104,7 @@ export function PaymentMethodSection({
             className="payment-field-input"
           >
             <option value="" disabled>
-              Your Gov.
+              {t('checkout.payment.govPlaceholder')}
             </option>
             {governorates.map((governorate) => (
               <option key={governorate._id} value={governorate._id}>
@@ -111,11 +114,11 @@ export function PaymentMethodSection({
           </SelectField>
 
           <TextAreaField
-            label="Address"
+            label={t('checkout.payment.address')}
             name="address"
             value={billingForm.addressLine}
             onChange={(event) => updateBillingField('addressLine', event.target.value)}
-            placeholder="Your Number"
+            placeholder={t('checkout.payment.addressPlaceholder')}
             error={billingErrors.addressLine}
             required
             className="payment-field-input payment-field-textarea"
@@ -139,7 +142,7 @@ export function PaymentMethodSection({
         <PaymentMethodCard
           selected={paymentMethod === 'cod'}
           onSelect={() => setPaymentMethod('cod')}
-          label="Cash on delivery"
+          label={t('checkout.payment.cod')}
         />
       </div>
 
@@ -151,14 +154,13 @@ export function PaymentMethodSection({
           onChange={(event) => handleBillingSameChange(event.target.checked)}
         />
         <span className="payment-billing-checkbox-text">
-          Billing address is the same as shipping address!!
-          {' '}
+          {t('checkout.payment.billingSame')}{' '}
           <Link
             to={ADD_ADDRESS_PATH}
             className={cn('payment-inline-link', focusRingClasses, 'rounded-sm')}
             onClick={(event) => event.stopPropagation()}
           >
-            Change Address
+            {t('checkout.payment.changeAddress')}
           </Link>
         </span>
       </label>

@@ -1,4 +1,5 @@
 // src/components/cart/CartShippingBar.tsx
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { ADD_ADDRESS_PATH } from '../../config/routes'
 import { cn } from '../../lib/cn'
@@ -16,16 +17,24 @@ function formatAddress(address: UserAddress) {
 }
 
 export function CartShippingBar({ address, loading, className }: CartShippingBarProps) {
-  const displayAddress = address ? formatAddress(address) : 'Add a shipping address in account settings'
+  const { t } = useTranslation()
+  const displayAddress = address
+    ? formatAddress(address)
+    : t('cart.shipping.addAddress')
 
   return (
     <div className={cn('cart-shipping-bar', className)}>
       <p className="text-sm text-secondary-text">
         {loading ? (
-          <span className="inline-block h-4 w-64 animate-pulse rounded bg-surface-muted" aria-hidden />
+          <span
+            className="inline-block h-4 w-64 animate-pulse rounded bg-surface-muted"
+            aria-hidden
+          />
         ) : (
           <>
-            Shipping to &lsquo;<span className="text-primary-text">{displayAddress}</span>&rsquo;
+            {t('cart.shipping.to')} &lsquo;
+            <span className="text-primary-text">{displayAddress}</span>
+            &rsquo;
           </>
         )}
       </p>
@@ -40,7 +49,7 @@ export function CartShippingBar({ address, loading, className }: CartShippingBar
         )}
         aria-disabled={loading}
       >
-        Change address
+        {t('cart.shipping.changeAddress')}
       </Link>
     </div>
   )

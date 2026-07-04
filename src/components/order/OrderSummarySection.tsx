@@ -1,5 +1,6 @@
 // src/components/order/OrderSummarySection.tsx
 import { Info } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { ApiOrder } from '../../types/order'
 import { getOrderSummaryProps } from '../../utils/orderFormat'
 import { OrderSummaryCard } from '../cart/OrderSummaryCard'
@@ -15,22 +16,24 @@ interface OrderSummarySectionProps {
 
 export function OrderSummarySection({
   order,
-  totalLabel = 'Total',
+  totalLabel,
   footerNote,
   className,
 }: OrderSummarySectionProps) {
+  const { t } = useTranslation()
   const summary = getOrderSummaryProps(order)
+  const resolvedTotalLabel = totalLabel ?? t('cart.summary.total')
 
   return (
-    <section className={className} aria-label="Order summary">
+    <section className={className} aria-label={t('cart.summary.title')}>
       <OrderSummaryCard
         cart={summary.cart}
         mode="confirmation"
-        title="Order Summary"
+        title={t('cart.summary.title')}
         shippingAmount={summary.shippingAmount}
         shippingCompareAt={summary.shippingCompareAt}
         totalCompareAt={summary.totalCompareAt}
-        totalLabel={totalLabel}
+        totalLabel={resolvedTotalLabel}
         onApplyCoupon={noopCoupon}
         onRemoveCoupon={noopCoupon}
         showPromo={false}

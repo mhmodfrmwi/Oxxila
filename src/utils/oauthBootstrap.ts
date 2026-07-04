@@ -1,6 +1,8 @@
+// src/utils/oauthBootstrap.ts
 import { AUTH_TOKEN_KEY } from '../config/api'
 import { STORAGE_KEYS } from '../config/storage'
 import { HOME_PATH } from '../config/routes'
+import i18n from '../i18n'
 import {
   createFallbackOAuthUser,
   clearOAuthUrl,
@@ -34,7 +36,7 @@ export function bootstrapOAuthFromUrl(): void {
   }
 
   if (error) {
-    const message = getOAuthErrorMessage(error) ?? 'Social sign-in failed. Please try again.'
+    const message = getOAuthErrorMessage(error) ?? i18n.t('auth.oauth.failed')
     sessionStorage.setItem(OAUTH_ERROR_KEY, message)
     clearOAuthUrl(OAUTH_FAILURE_PATH)
     return

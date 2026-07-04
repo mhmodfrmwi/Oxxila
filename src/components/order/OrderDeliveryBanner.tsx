@@ -1,5 +1,6 @@
 // src/components/order/OrderDeliveryBanner.tsx
 import { CalendarDays } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import type { ApiOrder } from '../../types/order'
 import { formatEstimatedDeliveryArrival } from '../../utils/orderDelivery'
@@ -11,6 +12,7 @@ interface OrderDeliveryBannerProps {
 }
 
 export function OrderDeliveryBanner({ order, className }: OrderDeliveryBannerProps) {
+  const { t } = useTranslation()
   const trackingNumber = getOrderTrackingNumber(order)
 
   return (
@@ -20,15 +22,19 @@ export function OrderDeliveryBanner({ order, className }: OrderDeliveryBannerPro
         <div className="track-order-delivery-banner-left">
           <CalendarDays size={20} strokeWidth={1.75} aria-hidden />
           <div>
-            <p className="track-order-delivery-banner-title">Your order is on its way!</p>
+            <p className="track-order-delivery-banner-title">{t('checkout.track.onItsWay')}</p>
             <p className="track-order-delivery-banner-subtitle">
-              Estimated delivery: {formatEstimatedDeliveryArrival(order)}
+              {t('checkout.track.estimatedDelivery', {
+                date: formatEstimatedDeliveryArrival(order),
+              })}
             </p>
           </div>
         </div>
         {trackingNumber && (
           <div className="track-order-delivery-banner-right">
-            <p className="track-order-delivery-banner-tracking-label">Tracking Number</p>
+            <p className="track-order-delivery-banner-tracking-label">
+              {t('checkout.track.trackingNumber')}
+            </p>
             <p className="track-order-delivery-banner-tracking-value">{trackingNumber}</p>
           </div>
         )}

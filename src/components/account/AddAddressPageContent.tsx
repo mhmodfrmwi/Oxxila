@@ -1,5 +1,6 @@
 // src/components/account/AddAddressPageContent.tsx
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router-dom'
 import {
   ADDRESSES_PATH,
@@ -31,6 +32,7 @@ function AddAddressSkeleton() {
 }
 
 export function AddAddressPageContent() {
+  const { t } = useTranslation()
   const {
     isAuthenticated,
     loginPath,
@@ -72,16 +74,16 @@ export function AddAddressPageContent() {
         <Breadcrumb
           className="mb-5 sm:mb-6"
           items={[
-            { label: 'Home', href: HOME_PATH },
-            { label: 'My Account', href: MY_ACCOUNT_PATH },
-            { label: 'Addresses', href: ADDRESSES_PATH },
-            { label: 'Add Address' },
+            { label: t('nav.home'), href: HOME_PATH },
+            { label: t('checkout.address.myAccount'), href: MY_ACCOUNT_PATH },
+            { label: t('checkout.address.addresses'), href: ADDRESSES_PATH },
+            { label: t('checkout.address.addAddress') },
           ]}
         />
 
         <header className="mb-6 sm:mb-8">
-          <Heading variant="page" className="text-center sm:text-left">
-            Add New Address
+          <Heading variant="page" className="text-center sm:text-start">
+            {t('checkout.address.pageTitle')}
           </Heading>
         </header>
 
@@ -91,15 +93,22 @@ export function AddAddressPageContent() {
           <div className="add-address-card relative mx-auto w-full max-w-2xl">
             <button
               type="button"
-              className={cn('add-address-close absolute right-4 top-4 sm:right-5 sm:top-5', focusRingClasses)}
+              className={cn(
+                'add-address-close absolute end-4 top-4 sm:end-5 sm:top-5',
+                focusRingClasses,
+              )}
               onClick={handleClose}
-              aria-label="Close add address"
+              aria-label={t('checkout.address.close')}
             >
               <X size={18} strokeWidth={1.5} aria-hidden />
             </button>
 
-            <Heading variant="card" as="h2" className="mb-6 pr-12 text-center font-serif text-2xl sm:text-[1.75rem]">
-              Add Address
+            <Heading
+              variant="card"
+              as="h2"
+              className="mb-6 pe-12 text-center font-serif text-2xl sm:text-[1.75rem]"
+            >
+              {t('checkout.address.cardTitle')}
             </Heading>
 
             {submitError && (
@@ -122,7 +131,7 @@ export function AddAddressPageContent() {
               noValidate
             >
               <SelectField
-                label="City"
+                label={t('checkout.address.city')}
                 name="city"
                 value={form.city}
                 onChange={(event) => updateField('city', event.target.value)}
@@ -130,7 +139,7 @@ export function AddAddressPageContent() {
                 required
               >
                 <option value="" disabled>
-                  Select city
+                  {t('checkout.address.selectCity')}
                 </option>
                 {cityOptions.map((city) => (
                   <option key={city} value={city}>
@@ -145,7 +154,7 @@ export function AddAddressPageContent() {
               </SelectField>
 
               <SelectField
-                label="Government"
+                label={t('checkout.address.government')}
                 name="government"
                 value={form.government}
                 onChange={(event) => updateField('government', event.target.value)}
@@ -153,7 +162,7 @@ export function AddAddressPageContent() {
                 required
               >
                 <option value="" disabled>
-                  Your Gov.
+                  {t('checkout.address.yourGov')}
                 </option>
                 {governorates.map((governorate) => (
                   <option key={governorate._id} value={governorate.name}>
@@ -163,11 +172,11 @@ export function AddAddressPageContent() {
               </SelectField>
 
               <TextAreaField
-                label="Address"
+                label={t('checkout.address.address')}
                 name="address"
                 value={form.address}
                 onChange={(event) => updateField('address', event.target.value)}
-                placeholder="Street address, building, floor, apartment"
+                placeholder={t('checkout.address.addressPlaceholder')}
                 error={errors.address}
                 required
               />
@@ -175,7 +184,7 @@ export function AddAddressPageContent() {
               {addresses.length > 0 && (
                 <>
                   <div className="add-address-divider" aria-hidden>
-                    <span>Or</span>
+                    <span>{t('checkout.address.or')}</span>
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -204,7 +213,11 @@ export function AddAddressPageContent() {
                 className="add-address-save-btn mt-2"
                 disabled={submitting}
               >
-                {submitting ? 'Saving...' : editingAddressId ? 'Update' : 'Save'}
+                {submitting
+                  ? t('checkout.address.saving')
+                  : editingAddressId
+                    ? t('checkout.address.update')
+                    : t('checkout.address.save')}
               </Button>
             </form>
           </div>

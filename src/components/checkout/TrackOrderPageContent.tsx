@@ -1,5 +1,6 @@
 // src/components/checkout/TrackOrderPageContent.tsx
 import { ArrowLeft } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Link, Navigate } from 'react-router-dom'
 import { HOME_PATH, MY_ACCOUNT_PATH, SHOP_PATH } from '../../config/routes'
 import { useTrackOrderPage } from '../../hooks/useTrackOrderPage'
@@ -16,9 +17,6 @@ import { Button } from '../ui/Button'
 import { focusRingClasses } from '../ui/interactionStyles'
 import { OrderStatusStepper } from './OrderStatusStepper'
 
-const TEMPERATURE_NOTE =
-  'This package contains temperature-sensitive ingredients. Please unbox and store at room temperature upon delivery.'
-
 function TrackOrderSkeleton() {
   return (
     <div className="order-confirmation-skeleton mx-auto max-w-5xl space-y-6" aria-hidden>
@@ -34,6 +32,7 @@ function TrackOrderSkeleton() {
 }
 
 export function TrackOrderPageContent() {
+  const { t } = useTranslation()
   const {
     isAuthenticated,
     loginPath,
@@ -65,9 +64,9 @@ export function TrackOrderPageContent() {
         <Breadcrumb
           className="mb-5 sm:mb-6"
           items={[
-            { label: 'Home', href: HOME_PATH },
-            { label: 'Orders', href: MY_ACCOUNT_PATH },
-            { label: 'Track Order' },
+            { label: t('nav.home'), href: HOME_PATH },
+            { label: t('checkout.track.orders'), href: MY_ACCOUNT_PATH },
+            { label: t('checkout.track.title') },
           ]}
         />
 
@@ -75,8 +74,8 @@ export function TrackOrderPageContent() {
           to={MY_ACCOUNT_PATH}
           className={cn('track-order-back-link', focusRingClasses, 'rounded-sm')}
         >
-          <ArrowLeft size={16} strokeWidth={1.5} aria-hidden />
-          Back
+          <ArrowLeft size={16} strokeWidth={1.5} aria-hidden className="rtl:-scale-x-100" />
+          {t('checkout.back')}
         </Link>
 
         {loading ? (
@@ -88,11 +87,7 @@ export function TrackOrderPageContent() {
             <OrderPageHeader order={order} trackingNumber={trackingNumber} />
 
             <div className="order-confirmation-card track-order-stepper-card">
-              <OrderStatusStepper
-                order={order}
-                variant="track"
-                showTitle={false}
-              />
+              <OrderStatusStepper order={order} variant="track" showTitle={false} />
             </div>
 
             <OrderDeliveryBanner order={order} />
@@ -107,7 +102,7 @@ export function TrackOrderPageContent() {
               <div>
                 <OrderShippingInfoCard
                   order={order}
-                  recipientName={customerName || 'Customer'}
+                  recipientName={customerName || t('checkout.confirmation.customer')}
                   phone={customerPhone}
                 />
 
@@ -120,7 +115,9 @@ export function TrackOrderPageContent() {
                     disabled={cancelling}
                     onClick={() => void handleCancelOrder()}
                   >
-                    {cancelling ? 'Cancelling...' : 'Cancel Order'}
+                    {cancelling
+                      ? t('checkout.track.cancelling')
+                      : t('checkout.track.cancelOrder')}
                   </Button>
                 )}
               </div>
@@ -128,8 +125,8 @@ export function TrackOrderPageContent() {
               <div className="track-order-summary-card">
                 <OrderSummarySection
                   order={order}
-                  totalLabel="Total Paid"
-                  footerNote={TEMPERATURE_NOTE}
+                  totalLabel={t('checkout.track.totalPaid')}
+                  footerNote={t('checkout.track.temperatureNote')}
                 />
               </div>
             </div>
@@ -141,7 +138,7 @@ export function TrackOrderPageContent() {
                 className="order-confirmation-action w-full sm:w-auto"
                 onClick={handleContinueShopping}
               >
-                Continue shopping
+                {t('actions.continueShopping')}
               </Button>
             </div>
           </div>

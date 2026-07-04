@@ -1,17 +1,18 @@
 // src/components/checkout/OrderConfirmationContent.tsx
 import { Check, Clock, Truck } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router-dom'
 import { SHOP_PATH } from '../../config/routes'
 import { useOrderConfirmationPage } from '../../hooks/useOrderConfirmationPage'
 import {
   formatEstimatedDeliveryRange,
   formatOrderDate,
-  formatOrderPaymentMethod,
   formatOrderReferenceId,
   formatOrderShippingAddress,
   getOrderTrackingNumber,
 } from '../../utils/orderFormat'
 import { formatCartPrice } from '../../utils/formatProductPrice'
+import type { ApiOrder } from '../../types/order'
 import { OrderSummarySection } from '../order/OrderSummarySection'
 import { FormMessage } from '../auth/FormMessage'
 import { Footer } from '../landing/footer/Footer'
@@ -29,7 +30,15 @@ function ConfirmationSkeleton() {
   )
 }
 
+function translatePaymentMethod(order: ApiOrder, t: (key: string) => string) {
+  if (order.paymentMethod === 'cod') return t('checkout.payment.cod')
+  if (order.paymentProvider === 'paymob') return 'Paymob'
+  if (order.paymentProvider === 'stripe') return 'Stripe'
+  return t('checkout.payment.card')
+}
+
 export function OrderConfirmationContent() {
+  const { t } = useTranslation()
   const {
     isAuthenticated,
     loginPath,
@@ -51,6 +60,7 @@ export function OrderConfirmationContent() {
   }
 
   const trackingNumber = order ? getOrderTrackingNumber(order) : null
+  const deliveryRange = order ? formatEstimatedDeliveryRange(order) : ''
 
   return (
     <>
@@ -63,41 +73,47 @@ export function OrderConfirmationContent() {
           <FormMessage message={error} />
         ) : order ? (
           <div className="mx-auto max-w-4xl">
-            <section className="order-confirmation-success" aria-label="Order confirmation">
+            <section
+              className="order-confirmation-success"
+              aria-label={t('checkout.confirmation.ariaLabel')}
+            >
               <div className="order-confirmation-icon" aria-hidden>
                 <Check size={36} strokeWidth={2} />
               </div>
 
-              <h1 className="order-confirmation-title">Thank You for Your Order</h1>
+              <h1 className="order-confirmation-title">{t('checkout.confirmation.thankYou')}</h1>
               <p className="order-confirmation-order-id">
-                Order #{trackingNumber ?? formatOrderReferenceId(order)}
+                {t('checkout.confirmation.orderHash', {
+                  id: trackingNumber ?? formatOrderReferenceId(order),
+                })}
               </p>
               <p className="order-confirmation-message">
-                A confirmation email with your invoice and tracking details has been sent to{' '}
-                {customerEmail || 'your email address'}
+                {t('checkout.confirmation.emailSent', {
+                  email: customerEmail || t('checkout.confirmation.yourEmail'),
+                })}
               </p>
 
               <dl className="order-confirmation-meta">
                 <div className="order-confirmation-meta-item">
-                  <strong>Order Number</strong>
+                  <strong>{t('checkout.confirmation.orderNumber')}</strong>
                   <span>#{formatOrderReferenceId(order)}</span>
                 </div>
                 {trackingNumber && (
                   <div className="order-confirmation-meta-item">
-                    <strong>Tracking Number</strong>
+                    <strong>{t('checkout.confirmation.trackingNumber')}</strong>
                     <span>{trackingNumber}</span>
                   </div>
                 )}
                 <div className="order-confirmation-meta-item">
-                  <strong>Estimated Delivery</strong>
-                  <span>{formatEstimatedDeliveryRange(order)}</span>
+                  <strong>{t('checkout.confirmation.estimatedDelivery')}</strong>
+                  <span>{deliveryRange}</span>
                 </div>
                 <div className="order-confirmation-meta-item">
-                  <strong>Payment Method</strong>
-                  <span>{formatOrderPaymentMethod(order)}</span>
+                  <strong>{t('checkout.confirmation.paymentMethod')}</strong>
+                  <span>{translatePaymentMethod(order, t)}</span>
                 </div>
                 <div className="order-confirmation-meta-item">
-                  <strong>Delivery Address</strong>
+                  <strong>{t('checkout.confirmation.deliveryAddress')}</strong>
                   <span>{formatOrderShippingAddress(order)}</span>
                 </div>
               </dl>
@@ -106,40 +122,47 @@ export function OrderConfirmationContent() {
             <div className="order-confirmation-card">
               <div className="order-confirmation-card-grid">
                 <div className="order-confirmation-details">
-                  <p className="order-confirmation-section-label">Shipping To</p>
-                  <p className="order-confirmation-recipient">{customerName || 'Customer'}</p>
+                  <p className="order-confirmation-section-label">
+                    {t('checkout.confirmation.shippingTo')}
+                  </p>
+                  <p className="order-confirmation-recipient">
+                    {customerName || t('checkout.confirmation.customer')}
+                  </p>
                   <p className="order-confirmation-address">
                     {formatOrderShippingAddress(order)}
                   </p>
 
                   <div className="order-confirmation-divider" />
 
-                  <p className="order-confirmation-section-label">Delivery Method</p>
+                  <p className="order-confirmation-section-label">
+                    {t('checkout.confirmation.deliveryMethod')}
+                  </p>
                   <div className="order-confirmation-delivery">
                     <span className="order-confirmation-delivery-icon" aria-hidden>
                       <Truck size={18} strokeWidth={1.75} />
                     </span>
                     <div>
                       <p className="order-confirmation-delivery-title">
-                        {order.shipping.methodName || 'Standard Shipping'}
+                        {order.shipping.methodName ||
+                          t('checkout.confirmation.standardShipping')}
                       </p>
                       <p className="order-confirmation-delivery-subtitle">
-                        Estimated arrival {formatEstimatedDeliveryRange(order)}
+                        {t('checkout.confirmation.estimatedArrival', { range: deliveryRange })}
                       </p>
                     </div>
                   </div>
 
                   <dl className="order-confirmation-details-list">
                     <div className="order-confirmation-details-row">
-                      <dt>Order Date</dt>
+                      <dt>{t('checkout.confirmation.orderDate')}</dt>
                       <dd>{formatOrderDate(order.createdAt)}</dd>
                     </div>
                     <div className="order-confirmation-details-row">
-                      <dt>Payment Method</dt>
-                      <dd>{formatOrderPaymentMethod(order)}</dd>
+                      <dt>{t('checkout.confirmation.paymentMethod')}</dt>
+                      <dd>{translatePaymentMethod(order, t)}</dd>
                     </div>
                     <div className="order-confirmation-details-row">
-                      <dt>Total Amount</dt>
+                      <dt>{t('checkout.confirmation.totalAmount')}</dt>
                       <dd>{formatCartPrice(order.totalPrice)}</dd>
                     </div>
                   </dl>
@@ -161,7 +184,7 @@ export function OrderConfirmationContent() {
                 onClick={handleTrackOrder}
               >
                 <Clock size={16} strokeWidth={1.75} aria-hidden />
-                Track your order
+                {t('checkout.confirmation.trackOrder')}
               </Button>
               <Button
                 type="button"
@@ -169,7 +192,7 @@ export function OrderConfirmationContent() {
                 className="order-confirmation-action w-full sm:w-auto"
                 onClick={handleContinueShopping}
               >
-                Continue shopping
+                {t('actions.continueShopping')}
               </Button>
             </div>
           </div>

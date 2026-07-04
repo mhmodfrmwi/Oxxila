@@ -1,4 +1,5 @@
 import { useId, useRef, type KeyboardEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface OtpInputProps {
   length?: number
@@ -7,6 +8,7 @@ interface OtpInputProps {
 }
 
 export function OtpInput({ length = 6, value, onChange }: OtpInputProps) {
+  const { t } = useTranslation()
   const baseId = useId()
   const inputsRef = useRef<Array<HTMLInputElement | null>>([])
 
@@ -29,7 +31,7 @@ export function OtpInput({ length = 6, value, onChange }: OtpInputProps) {
   }
 
   return (
-    <div className="flex justify-center gap-2 sm:gap-3" role="group" aria-label="One-time password">
+    <div className="flex justify-center gap-2 sm:gap-3" role="group" aria-label={t('auth.otp.ariaLabel')}>
       {digits.map((digit, index) => (
         <input
           key={`${baseId}-${index}`}
@@ -49,7 +51,7 @@ export function OtpInput({ length = 6, value, onChange }: OtpInputProps) {
             'text-primary-text focus:border-border-interactive focus:outline-none focus:ring-2 focus:ring-button-primary/30',
             'sm:h-14 sm:w-12',
           ].join(' ')}
-          aria-label={`Digit ${index + 1} of ${length}`}
+          aria-label={t('auth.otp.digit', { current: index + 1, total: length })}
         />
       ))}
     </div>

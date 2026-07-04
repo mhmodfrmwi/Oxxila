@@ -1,6 +1,7 @@
 // src/components/ui/InputField.tsx
 import { Eye, EyeOff } from 'lucide-react'
 import { useId, useState, type InputHTMLAttributes } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -18,6 +19,7 @@ export function InputField({
   error,
   ...props
 }: InputFieldProps) {
+  const { t } = useTranslation()
   const generatedId = useId()
   const errorId = useId()
   const id = externalId ?? generatedId
@@ -39,7 +41,7 @@ export function InputField({
             'w-full rounded-xl px-4 py-3.5 text-base',
             'bg-input text-primary-text placeholder:text-placeholder-text',
             'focus:outline-none focus:ring-2 focus:ring-button-primary/50',
-            showPasswordToggle && 'pr-11',
+            showPasswordToggle && 'pe-11',
             error && 'border border-support-error focus:ring-support-error/40',
             className,
           )}
@@ -51,8 +53,8 @@ export function InputField({
           <button
             type="button"
             onClick={() => setVisible((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary-text"
-            aria-label={visible ? 'Hide password' : 'Show password'}
+            className="absolute end-3 top-1/2 -translate-y-1/2 text-secondary-text"
+            aria-label={visible ? t('auth.fields.hidePassword') : t('auth.fields.showPassword')}
           >
             {visible ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>

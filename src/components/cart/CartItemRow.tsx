@@ -1,6 +1,7 @@
 // src/components/cart/CartItemRow.tsx
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import type { ApiCartItem } from '../../types/cart'
 import { formatCartPrice } from '../../utils/formatProductPrice'
@@ -29,6 +30,7 @@ export function CartItemRow({
   brand,
   variant,
 }: CartItemRowProps) {
+  const { t } = useTranslation()
   const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null)
   const imageSrc =
     failedImageUrl === item.product.images[0]
@@ -45,7 +47,7 @@ export function CartItemRow({
         className="cart-item-checkbox"
         checked={selected}
         onChange={(event) => onSelectedChange(event.target.checked)}
-        aria-label={`Select ${item.product.name}`}
+        aria-label={t('cart.selectItem', { name: item.product.name })}
       />
 
       <img
@@ -65,9 +67,10 @@ export function CartItemRow({
         <h3 className="cart-item-name">{item.product.name}</h3>
         {variant && <p className="cart-item-variant">{variant}</p>}
         <p className="cart-item-unit-price">{formatCartPrice(item.price)}</p>
-        <p className="cart-item-delivery">Free delivery on qualifying orders</p>
+        <p className="cart-item-delivery">{t('cart.freeDelivery')}</p>
         <p className="cart-item-line-total">
-          Total: <span className="font-medium text-primary-text">{formatCartPrice(lineTotal)}</span>
+          {t('cart.lineTotal')}{' '}
+          <span className="font-medium text-primary-text">{formatCartPrice(lineTotal)}</span>
         </p>
 
         <div className="mt-3 w-fit">
@@ -86,7 +89,7 @@ export function CartItemRow({
         className={cn('cart-item-remove', focusRingClasses)}
         onClick={onRemove}
         disabled={disabled}
-        aria-label={`Remove ${item.product.name} from cart`}
+        aria-label={t('cart.removeItem', { name: item.product.name })}
       >
         <Trash2 size={18} strokeWidth={1.5} aria-hidden />
       </button>

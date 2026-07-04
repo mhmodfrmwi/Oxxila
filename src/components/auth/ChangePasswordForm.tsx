@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { resetPassword } from '../../api/auth'
 import { useToast } from '../../context/ToastContext'
@@ -10,6 +11,7 @@ import { AuthSimpleCard } from './AuthSimpleCard'
 import { FormMessage } from './FormMessage'
 
 export function ChangePasswordForm() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const toast = useToast()
   const { token: routeToken } = useParams<{ token?: string }>()
@@ -25,9 +27,9 @@ export function ChangePasswordForm() {
     setSuccess('')
 
     if (!token) {
-      const message = 'Reset token is missing. Open the password reset link from your email.'
+      const message = t('auth.reset.tokenMissing')
       setError(message)
-      toast.error('Invalid form', message)
+      toast.error(t('auth.reset.invalidForm'), message)
       return
     }
 
@@ -36,8 +38,9 @@ export function ChangePasswordForm() {
     const confirmPassword = String(formData.get('confirmPassword') ?? '')
 
     if (newPassword !== confirmPassword) {
-      setError('Passwords do not match.')
-      toast.error('Invalid form', 'Passwords do not match.')
+      const message = t('auth.reset.passwordsMismatch')
+      setError(message)
+      toast.error(t('auth.reset.invalidForm'), message)
       return
     }
 
@@ -46,20 +49,20 @@ export function ChangePasswordForm() {
     try {
       const response = await resetPassword(token, { newPassword, confirmPassword })
       setSuccess(response.message)
-      toast.success('Password changed')
+      toast.success(t('auth.reset.successToast'))
       event.currentTarget.reset()
 
       setTimeout(() => {
         navigate('/login', {
           replace: true,
-          state: { message: 'Password updated successfully. Please log in.' },
+          state: { message: t('auth.reset.successMessage') },
         })
       }, 1500)
     } catch (err) {
       const message =
-        err instanceof ApiError ? err.message : 'Unable to update password. Please try again.'
+        err instanceof ApiError ? err.message : t('auth.reset.failedFallback')
       setError(message)
-      toast.error('Unable to update password', message)
+      toast.error(t('auth.reset.failedTitle'), message)
     } finally {
       setLoading(false)
     }
@@ -67,16 +70,16 @@ export function ChangePasswordForm() {
 
   return (
     <AuthSimpleCard>
-      <header className="mb-8 text-center sm:text-left">
-        <Heading variant="page">Change password</Heading>
+      <header className="mb-8 text-center sm:text-start">
+        <Heading variant="page">{t('auth.reset.title')}</Heading>
         <p className="mt-2 text-sm text-secondary-text sm:text-base">
-          Create a new password for your Oxxila account.
+          {t('auth.reset.subtitle')}
         </p>
       </header>
 
       {!token && (
         <div className="mb-4">
-          <FormMessage message="Reset token is missing. Use the link from your email to open this page." />
+          <FormMessage message={t('auth.reset.tokenMissingPage')} />
         </div>
       )}
 
@@ -85,29 +88,29 @@ export function ChangePasswordForm() {
 
       <form className="space-y-5" onSubmit={handleSubmit} noValidate>
         <InputField
-          label="New password"
+          label={t('auth.fields.newPassword')}
           type="password"
           name="newPassword"
           autoComplete="new-password"
-          placeholder="Min. 8 characters"
+          placeholder={t('auth.fields.passwordPlaceholder')}
           showPasswordToggle
           required
           minLength={8}
         />
 
         <InputField
-          label="Confirm password"
+          label={t('auth.fields.confirmPassword')}
           type="password"
           name="confirmPassword"
           autoComplete="new-password"
-          placeholder="Re-enter password"
+          placeholder={t('auth.fields.confirmPasswordPlaceholder')}
           showPasswordToggle
           required
           minLength={8}
         />
 
         <Button type="submit" fullWidth pill className="mt-2 h-14" disabled={loading || !token}>
-          {loading ? 'Updating...' : 'Update password'}
+          {loading ? t('auth.reset.submitting') : t('auth.reset.submit')}
         </Button>
       </form>
 
@@ -116,7 +119,7 @@ export function ChangePasswordForm() {
           to="/login"
           className="font-semibold text-link hover:text-link-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-link rounded"
         >
-          Back to login
+          {t('auth.reset.backToLogin')}
         </Link>
       </p>
     </AuthSimpleCard>

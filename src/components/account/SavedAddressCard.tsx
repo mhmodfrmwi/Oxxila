@@ -1,4 +1,5 @@
 // src/components/account/SavedAddressCard.tsx
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../ui/interactionStyles'
 import type { UserAddress } from '../../api/users'
@@ -24,16 +25,15 @@ export function SavedAddressCard({
   onEdit,
   onDelete,
 }: SavedAddressCardProps) {
+  const { t } = useTranslation()
+
   return (
     <article
-      className={cn(
-        'saved-address-card',
-        selected && 'saved-address-card--selected',
-      )}
+      className={cn('saved-address-card', selected && 'saved-address-card--selected')}
     >
       <button
         type="button"
-        className={cn('w-full text-left', focusRingClasses, 'rounded-xl')}
+        className={cn('w-full text-start', focusRingClasses, 'rounded-xl')}
         onClick={onSelect}
         aria-pressed={selected}
       >
@@ -41,7 +41,9 @@ export function SavedAddressCard({
         <div className="saved-address-card-lines">
           <p>{address.address}</p>
           <p>{address.city}</p>
-          {phone && <p className="mt-2">Phone number: {phone}</p>}
+          {phone && (
+            <p className="mt-2">{t('checkout.address.phoneNumber', { phone })}</p>
+          )}
         </div>
       </button>
 
@@ -51,7 +53,7 @@ export function SavedAddressCard({
           className={cn('saved-address-card-edit', focusRingClasses, 'rounded-sm')}
           onClick={onEdit}
         >
-          edit
+          {t('checkout.address.edit')}
         </button>
         <button
           type="button"
@@ -59,7 +61,7 @@ export function SavedAddressCard({
           onClick={onDelete}
           disabled={deleting}
         >
-          {deleting ? 'deleting...' : 'delete'}
+          {deleting ? t('checkout.address.deleting') : t('checkout.address.delete')}
         </button>
       </div>
     </article>

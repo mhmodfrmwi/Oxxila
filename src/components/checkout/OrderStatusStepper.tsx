@@ -1,5 +1,6 @@
 // src/components/checkout/OrderStatusStepper.tsx
 import { Check, Home, Package, Truck, type LucideIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import type { ApiOrder } from '../../types/order'
 import {
@@ -27,12 +28,14 @@ interface OrderStatusStepperProps {
 export function OrderStatusStepper({
   order,
   className,
-  title = 'Order Status',
+  title,
   variant = 'confirmation',
   showTitle = true,
 }: OrderStatusStepperProps) {
+  const { t } = useTranslation()
   const steps =
     variant === 'track' ? getTrackOrderStatusSteps(order) : getOrderStatusDisplaySteps(order)
+  const resolvedTitle = title ?? t('checkout.confirmation.orderStatus')
 
   return (
     <section
@@ -42,15 +45,19 @@ export function OrderStatusStepper({
         variant === 'track' && 'track-order-status',
         className,
       )}
-      aria-label={title}
+      aria-label={resolvedTitle}
     >
-      {showTitle && <h2 className="order-confirmation-status-title">{title}</h2>}
+      {showTitle && <h2 className="order-confirmation-status-title">{resolvedTitle}</h2>}
       <ol className="order-confirmation-status-track">
         {steps.map((step) => {
           const Icon = STEP_ICONS[step.iconKey]
           const isComplete = step.status === 'completed'
           const isActive = step.status === 'active'
-          const showCheck = isComplete && (step.iconKey === 'approved' || step.iconKey === 'confirmed')
+          const showCheck =
+            isComplete && (step.iconKey === 'approved' || step.iconKey === 'confirmed')
+          const labelKey = `checkout.status.${step.key}`
+          const label = t(labelKey)
+          const displayLabel = label === labelKey ? step.label : label
 
           return (
             <li
@@ -63,9 +70,13 @@ export function OrderStatusStepper({
               )}
             >
               <span className="order-confirmation-status-node" aria-hidden>
-                {showCheck ? <Check size={14} strokeWidth={2.5} /> : <Icon size={16} strokeWidth={1.75} />}
+                {showCheck ? (
+                  <Check size={14} strokeWidth={2.5} />
+                ) : (
+                  <Icon size={16} strokeWidth={1.75} />
+                )}
               </span>
-              <span className="order-confirmation-status-label">{step.label}</span>
+              <span className="order-confirmation-status-label">{displayLabel}</span>
             </li>
           )
         })}

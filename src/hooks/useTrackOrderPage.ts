@@ -1,5 +1,6 @@
 // src/hooks/useTrackOrderPage.ts
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getMe } from '../api/auth'
 import { cancelMyOrder, getMyOrder } from '../api/orders'
@@ -10,6 +11,7 @@ import type { ApiOrder } from '../types/order'
 import { canCancelOrder } from '../utils/orderTracking'
 
 export function useTrackOrderPage() {
+  const { t } = useTranslation()
   const { orderId = '' } = useParams<{ orderId: string }>()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
@@ -52,7 +54,7 @@ export function useTrackOrderPage() {
         setCustomerPhone(profile?.phone ?? '')
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : 'Unable to load order tracking.')
+          setError(err instanceof ApiError ? err.message : t('checkout.track.loadError'))
         }
       } finally {
         if (!cancelled) setLoading(false)
@@ -64,7 +66,7 @@ export function useTrackOrderPage() {
     return () => {
       cancelled = true
     }
-  }, [isAuthenticated, orderId])
+  }, [isAuthenticated, orderId, t])
 
   async function handleCancelOrder() {
     if (!order || !canCancelOrder(order)) return
@@ -76,7 +78,7 @@ export function useTrackOrderPage() {
       const response = await cancelMyOrder(order._id)
       if (response.data) setOrder(response.data)
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : 'Unable to cancel order.')
+      setActionError(err instanceof ApiError ? err.message : t('checkout.track.cancelError'))
     } finally {
       setCancelling(false)
     }

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { getOAuthStartUrl, type OAuthProvider } from '../../utils/oauth'
 
 interface SocialLoginButtonsProps {
@@ -30,12 +31,18 @@ const providers: Array<{ id: OAuthProvider; name: string; icon: typeof GoogleIco
 ]
 
 export function SocialLoginButtons({ className = '', disabled = false }: SocialLoginButtonsProps) {
+  const { t } = useTranslation()
+
   function handleOAuth(provider: OAuthProvider) {
     window.location.assign(getOAuthStartUrl(provider))
   }
 
   return (
-    <div className={['grid grid-cols-2 gap-3', className].join(' ')} role="group" aria-label="Social login">
+    <div
+      className={['grid grid-cols-2 gap-3', className].join(' ')}
+      role="group"
+      aria-label={t('auth.social.ariaLabel')}
+    >
       {providers.map(({ id, name, icon: Icon }) => (
         <button
           key={id}
@@ -43,7 +50,7 @@ export function SocialLoginButtons({ className = '', disabled = false }: SocialL
           disabled={disabled}
           onClick={() => handleOAuth(id)}
           className="flex h-12 items-center justify-center rounded-xl border border-border-subtle bg-input transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
-          aria-label={`Continue with ${name}`}
+          aria-label={t('auth.social.continueWith', { provider: name })}
         >
           <Icon />
         </button>

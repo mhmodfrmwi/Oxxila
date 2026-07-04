@@ -12,6 +12,7 @@ import {
   type ShippingGovernorate,
 } from '../api/shipping'
 import { CART_PATH, LOGIN_PATH, orderConfirmationPath } from '../config/routes'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useToast } from '../context/ToastContext'
@@ -55,13 +56,18 @@ function buildBillingFromAddress(
   }
 }
 
-function validateBillingForm(form: BillingFormState): BillingFormErrors {
+function validateBillingForm(
+  form: BillingFormState,
+  t: (key: string) => string,
+): BillingFormErrors {
   const errors: BillingFormErrors = {}
-  if (!form.governorateId.trim()) errors.governorateId = 'Government is required'
-  if (!form.districtId.trim()) errors.districtId = 'City is required'
-  if (!form.addressLine.trim()) errors.addressLine = 'Address is required'
+  if (!form.governorateId.trim()) {
+    errors.governorateId = t('checkout.payment.governmentRequired')
+  }
+  if (!form.districtId.trim()) errors.districtId = t('checkout.payment.cityRequired')
+  if (!form.addressLine.trim()) errors.addressLine = t('checkout.payment.addressRequired')
   else if (form.addressLine.trim().length < 6) {
-    errors.addressLine = 'Address must be at least 6 characters'
+    errors.addressLine = t('checkout.payment.addressMinLength')
   }
   return errors
 }
@@ -73,6 +79,7 @@ function resolveProvider(method: PaymentMethodId): 'stripe' | 'paymob' | 'cod' {
 }
 
 export function usePaymentPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const toast = useToast()
@@ -274,10 +281,10 @@ export function usePaymentPage() {
   async function handlePayNow() {
     setSubmitError(null)
 
-    const validation = validateBillingForm(effectiveBillingForm)
+    const validation = validateBillingForm(effectiveBillingForm, t)
     if (Object.keys(validation).length > 0) {
       setBillingErrors(validation)
-      toast.error('Invalid form', 'Please complete the billing address fields.')
+      toast.error(t('checkout.payment.invalidForm'), t('checkout.payment.completeBilling'))
       return
     }
 
@@ -297,7 +304,7 @@ export function usePaymentPage() {
         const response = await createCodOrder({ ...payload, paymentMethod: 'cod' })
         const created = response.data
         if (created?._id) {
-          toast.success('Order placed')
+          toast.success(t('checkout.payment.orderPlaced'))
           navigate(orderConfirmationPath(created._id))
         } else {
           navigate(CART_PATH)
@@ -311,13 +318,13 @@ export function usePaymentPage() {
         throw new ApiError('Payment provider did not return a checkout URL', 502)
       }
 
-      toast.info('Redirecting to payment')
+      toast.info(t('checkout.payment.redirecting'))
       window.location.assign(checkoutUrl)
     } catch (error) {
       const message =
-        error instanceof ApiError ? error.message : 'Unable to complete payment.'
+        error instanceof ApiError ? error.message : t('checkout.payment.paymentFailed')
       setSubmitError(message)
-      toast.error('Payment failed', message)
+      toast.error(t('checkout.payment.paymentFailed'), message)
     } finally {
       setSubmitting(false)
     }

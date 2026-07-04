@@ -1,6 +1,8 @@
+// src/utils/oauth.ts
 import { API_BASE_URL } from '../config/api'
 import { HOME_PATH, LOGIN_PATH } from '../config/routes'
 import type { AuthUser } from '../api/auth'
+import i18n from '../i18n'
 
 export type OAuthProvider = 'google' | 'facebook'
 
@@ -106,13 +108,12 @@ export function parseOAuthUserFromQuery(raw: string | null): AuthUser | null {
 export function getOAuthErrorMessage(errorCode: string | null): string | null {
   if (!errorCode) return null
 
-  const messages: Record<string, string> = {
-    google_failed: 'Google sign-in failed. Please try again.',
-    facebook_failed: 'Facebook sign-in failed. Please try again.',
-    access_denied: 'Sign-in was cancelled.',
+  const knownCodes = new Set(['google_failed', 'facebook_failed', 'access_denied'])
+  if (knownCodes.has(errorCode)) {
+    return i18n.t(`auth.oauth.${errorCode}`)
   }
 
-  return messages[errorCode] ?? 'Social sign-in failed. Please try again.'
+  return i18n.t('auth.oauth.failed')
 }
 
 export function extractOAuthCallback(searchParams: URLSearchParams) {

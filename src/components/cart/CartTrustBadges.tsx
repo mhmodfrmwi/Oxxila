@@ -1,18 +1,7 @@
 // src/components/cart/CartTrustBadges.tsx
 import { BadgeCheck, Lock, RotateCcw, Shield, ShieldCheck } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
-
-const cartBadges = [
-  { icon: Shield, label: 'Secure payment SSL' },
-  { icon: BadgeCheck, label: 'Authenticity guaranteed' },
-  { icon: RotateCcw, label: '30 day easy returns' },
-] as const
-
-const paymentBadges = [
-  { icon: Lock, label: 'SSL Encryption' },
-  { icon: ShieldCheck, label: 'Trusted Payments' },
-  { icon: BadgeCheck, label: 'Original Guarantee' },
-] as const
 
 interface CartTrustBadgesProps {
   className?: string
@@ -20,8 +9,21 @@ interface CartTrustBadgesProps {
 }
 
 export function CartTrustBadges({ className, variant = 'cart' }: CartTrustBadgesProps) {
-  const badges = variant === 'payment' ? paymentBadges : cartBadges
+  const { t } = useTranslation()
   const itemClass = variant === 'payment' ? 'payment-trust-badge' : 'cart-trust-badge'
+
+  const badges =
+    variant === 'payment'
+      ? [
+          { icon: Lock, label: t('cart.trust.sslEncryption') },
+          { icon: ShieldCheck, label: t('cart.trust.trustedPayments') },
+          { icon: BadgeCheck, label: t('cart.trust.originalGuarantee') },
+        ]
+      : [
+          { icon: Shield, label: t('cart.trust.securePayment') },
+          { icon: BadgeCheck, label: t('cart.trust.authenticity') },
+          { icon: RotateCcw, label: t('cart.trust.easyReturns') },
+        ]
 
   return (
     <ul className={cn('mt-5 grid grid-cols-3 gap-3', className)}>

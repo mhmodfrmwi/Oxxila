@@ -1,4 +1,5 @@
 // src/components/checkout/CheckoutStepper.tsx
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
   ADD_ADDRESS_PATH,
@@ -12,15 +13,15 @@ export type CheckoutStepId = 'cart' | 'address' | 'payment' | 'confirmation'
 
 interface CheckoutStep {
   id: CheckoutStepId
-  label: string
+  labelKey: string
   path?: string
 }
 
 const steps: CheckoutStep[] = [
-  { id: 'cart', label: 'Cart', path: CART_PATH },
-  { id: 'address', label: 'Address', path: ADD_ADDRESS_PATH },
-  { id: 'payment', label: 'Payment', path: PAYMENT_PATH },
-  { id: 'confirmation', label: 'Confirmation' },
+  { id: 'cart', labelKey: 'checkout.steps.cart', path: CART_PATH },
+  { id: 'address', labelKey: 'checkout.steps.address', path: ADD_ADDRESS_PATH },
+  { id: 'payment', labelKey: 'checkout.steps.payment', path: PAYMENT_PATH },
+  { id: 'confirmation', labelKey: 'checkout.steps.confirmation' },
 ]
 
 interface CheckoutStepperProps {
@@ -29,13 +30,15 @@ interface CheckoutStepperProps {
 }
 
 export function CheckoutStepper({ currentStep, className }: CheckoutStepperProps) {
+  const { t } = useTranslation()
   const currentIndex = steps.findIndex((step) => step.id === currentStep)
 
   return (
-    <nav className={cn('checkout-stepper', className)} aria-label="Checkout progress">
+    <nav className={cn('checkout-stepper', className)} aria-label={t('checkout.progress')}>
       {steps.map((step, index) => {
         const isActive = step.id === currentStep
         const isComplete = index < currentIndex
+        const label = t(step.labelKey)
 
         return (
           <div key={step.id} className="flex items-center gap-2">
@@ -52,7 +55,7 @@ export function CheckoutStepper({ currentStep, className }: CheckoutStepperProps
                 <span className="checkout-stepper-index" aria-hidden>
                   {index + 1}
                 </span>
-                <span>{step.label}</span>
+                <span>{label}</span>
               </Link>
             ) : (
               <div
@@ -66,7 +69,7 @@ export function CheckoutStepper({ currentStep, className }: CheckoutStepperProps
                 <span className="checkout-stepper-index" aria-hidden>
                   {index + 1}
                 </span>
-                <span>{step.label}</span>
+                <span>{label}</span>
               </div>
             )}
           </div>

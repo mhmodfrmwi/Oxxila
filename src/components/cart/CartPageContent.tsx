@@ -1,7 +1,7 @@
 // src/components/cart/CartPageContent.tsx
 import { useMemo, useState } from 'react'
-import { Navigate } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { HOME_PATH, LOGIN_PATH, PAYMENT_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
@@ -22,6 +22,7 @@ import { CartShippingBar } from './CartShippingBar'
 import { OrderSummaryCard } from './OrderSummaryCard'
 
 export function CartPageContent() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const {
@@ -52,10 +53,7 @@ export function CartPageContent() {
     return next
   }, [items, selectedOverrides])
 
-  const itemCountLabel = useMemo(() => {
-    if (itemCount === 1) return '1 item'
-    return `${itemCount} items`
-  }, [itemCount])
+  const itemCountLabel = t('cart.itemCount', { count: itemCount })
 
   if (!isAuthenticated) {
     return <Navigate to={LOGIN_PATH} replace />
@@ -66,7 +64,9 @@ export function CartPageContent() {
     try {
       await updateCartItem(itemId, quantity)
     } catch (error) {
-      setActionError(error instanceof ApiError ? error.message : 'Could not update quantity')
+      setActionError(
+        error instanceof ApiError ? error.message : t('cart.updateQuantityError'),
+      )
     }
   }
 
@@ -75,7 +75,7 @@ export function CartPageContent() {
     try {
       await removeCartItem(itemId)
     } catch (error) {
-      setActionError(error instanceof ApiError ? error.message : 'Could not remove item')
+      setActionError(error instanceof ApiError ? error.message : t('cart.removeItemError'))
     }
   }
 
@@ -85,8 +85,8 @@ export function CartPageContent() {
         <Breadcrumb
           className="mb-5 sm:mb-6"
           items={[
-            { label: 'Home', href: HOME_PATH },
-            { label: 'Cart' },
+            { label: t('nav.home'), href: HOME_PATH },
+            { label: t('nav.cart') },
           ]}
         />
 
@@ -96,7 +96,7 @@ export function CartPageContent() {
           <>
             <header className="mb-5 sm:mb-6">
               <Heading variant="page" className="mb-2">
-                Shopping Cart
+                {t('cart.title')}
               </Heading>
               {hasItems && (
                 <p className="text-sm text-secondary-text">{itemCountLabel}</p>
@@ -121,7 +121,7 @@ export function CartPageContent() {
               <CartEmptyState />
             ) : (
               <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-10">
-                <section aria-label="Cart items" className="min-w-0">
+                <section aria-label={t('cart.itemsAria')} className="min-w-0">
                   <div className="rounded-2xl border border-border-subtle bg-card px-4 sm:px-5">
                     {items.map((item) => (
                       <CartItemRow
@@ -129,9 +129,14 @@ export function CartPageContent() {
                         item={item}
                         selected={selectedIds[item._id] ?? true}
                         onSelectedChange={(selected) =>
-                          setSelectedOverrides((current) => ({ ...current, [item._id]: selected }))
+                          setSelectedOverrides((current) => ({
+                            ...current,
+                            [item._id]: selected,
+                          }))
                         }
-                        onQuantityChange={(quantity) => void handleQuantityChange(item._id, quantity)}
+                        onQuantityChange={(quantity) =>
+                          void handleQuantityChange(item._id, quantity)
+                        }
                         onRemove={() => void handleRemove(item._id)}
                         disabled={updatingItemId === item._id}
                       />
@@ -156,20 +161,27 @@ export function CartPageContent() {
       </div>
 
       <ContentSection padding="compact" aria-labelledby="cart-browsing-heading">
-        <SectionHeader id="cart-browsing-heading" title="Products recently viewed" size="compact" />
+        <SectionHeader
+          id="cart-browsing-heading"
+          title={t('cart.recentlyViewed')}
+          size="compact"
+        />
         {browsingLoading ? (
           <div className="h-[280px] animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
         ) : (
-          <ProductCarousel products={browsingProducts} ariaLabel="Products recently viewed" />
+          <ProductCarousel
+            products={browsingProducts}
+            ariaLabel={t('cart.recentlyViewedAria')}
+          />
         )}
       </ContentSection>
 
       <ContentSection padding="compact" aria-labelledby="cart-buy-again-heading">
-        <SectionHeader id="cart-buy-again-heading" title="Buy again" size="compact" />
+        <SectionHeader id="cart-buy-again-heading" title={t('cart.buyAgain')} size="compact" />
         {buyAgainLoading ? (
           <div className="h-[280px] animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
         ) : (
-          <ProductCarousel products={buyAgainProducts} ariaLabel="Buy again products" />
+          <ProductCarousel products={buyAgainProducts} ariaLabel={t('cart.buyAgainAria')} />
         )}
       </ContentSection>
 

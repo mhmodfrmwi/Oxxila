@@ -1,5 +1,6 @@
 // src/components/checkout/PaymentPageContent.tsx
 import { ArrowLeft } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router-dom'
 import {
   CART_PATH,
@@ -34,6 +35,7 @@ function PaymentPageSkeleton() {
 }
 
 export function PaymentPageContent() {
+  const { t } = useTranslation()
   const {
     isAuthenticated,
     loginPath,
@@ -81,9 +83,9 @@ export function PaymentPageContent() {
         <Breadcrumb
           className="mb-5 sm:mb-6"
           items={[
-            { label: 'Home', href: HOME_PATH },
-            { label: 'Checkout', href: CHECKOUT_PATH },
-            { label: 'Payment' },
+            { label: t('nav.home'), href: HOME_PATH },
+            { label: t('checkout.title'), href: CHECKOUT_PATH },
+            { label: t('checkout.payment.title') },
           ]}
         />
 
@@ -92,13 +94,13 @@ export function PaymentPageContent() {
           className={cn('payment-back-link', focusRingClasses, 'rounded-sm')}
           onClick={handleBack}
         >
-          <ArrowLeft size={16} strokeWidth={1.5} aria-hidden />
-          Back
+          <ArrowLeft size={16} strokeWidth={1.5} aria-hidden className="rtl:-scale-x-100" />
+          {t('checkout.back')}
         </button>
 
         <header className="mb-5 sm:mb-6">
           <Heading variant="page" className="font-serif">
-            Payment
+            {t('checkout.payment.title')}
           </Heading>
         </header>
 
@@ -143,7 +145,7 @@ export function PaymentPageContent() {
                   className="mt-4 lg:hidden"
                   onClick={handleBack}
                 >
-                  Back
+                  {t('checkout.back')}
                 </Button>
               </div>
 
@@ -156,12 +158,12 @@ export function PaymentPageContent() {
                 shippingAmount={shippingPrice}
                 shippingCompareAt={shippingCompareAt}
                 totalCompareAt={totalCompareAt}
-                ctaLabel="Pay Now"
+                ctaLabel={t('cart.summary.payNow')}
                 onCtaClick={() => void handlePayNow()}
                 ctaDisabled={submitting}
                 showPromo={false}
                 trustBadgeVariant="payment"
-                footerNote="Your clinical data and payment details are handled with medical-grade security."
+                footerNote={t('checkout.payment.securityNote')}
               />
             </div>
           </>

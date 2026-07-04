@@ -11,6 +11,7 @@ import {
 } from '../api/users'
 import { getMe } from '../api/auth'
 import { ADDRESSES_PATH, LOGIN_PATH } from '../config/routes'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
@@ -33,12 +34,15 @@ const emptyForm: AddressFormState = {
   address: '',
 }
 
-function validateForm(form: AddressFormState): AddressFormErrors {
+function validateForm(
+  form: AddressFormState,
+  t: (key: string) => string,
+): AddressFormErrors {
   const errors: AddressFormErrors = {}
-  if (!form.city.trim()) errors.city = 'City is required'
-  if (!form.government.trim()) errors.government = 'Government is required'
-  if (!form.address.trim()) errors.address = 'Address is required'
-  else if (form.address.trim().length > 500) errors.address = 'Address is too long'
+  if (!form.city.trim()) errors.city = t('checkout.address.cityRequired')
+  if (!form.government.trim()) errors.government = t('checkout.address.governmentRequired')
+  if (!form.address.trim()) errors.address = t('checkout.address.addressRequired')
+  else if (form.address.trim().length > 500) errors.address = t('checkout.address.addressTooLong')
   return errors
 }
 
@@ -50,6 +54,7 @@ function buildAddressPayload(form: AddressFormState) {
 }
 
 export function useAddAddressPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { isAuthenticated, user } = useAuth()
   const toast = useToast()
@@ -150,10 +155,10 @@ export function useAddAddressPage() {
     setSubmitError(null)
     setSubmitSuccess(null)
 
-    const validation = validateForm(form)
+    const validation = validateForm(form, t)
     if (Object.keys(validation).length > 0) {
       setErrors(validation)
-      toast.error('Invalid form', 'Please fill in all required fields.')
+      toast.error(t('checkout.address.invalidForm'), t('checkout.address.fillRequired'))
       return
     }
 
@@ -169,8 +174,8 @@ export function useAddAddressPage() {
             current.map((entry) => (entry._id === updated._id ? updated : entry)),
           )
         }
-        setSubmitSuccess('Address updated successfully.')
-        toast.success('Address updated')
+        setSubmitSuccess(t('checkout.address.updatedSuccess'))
+        toast.success(t('checkout.address.toastUpdated'))
       } else {
         const response = await createMyAddress(payload)
         const created = response.data?.address
@@ -178,16 +183,17 @@ export function useAddAddressPage() {
           setAddresses((current) => [...current, created])
           setSelectedAddressId(created._id)
         }
-        setSubmitSuccess('Address saved successfully.')
-        toast.success('Address added')
+        setSubmitSuccess(t('checkout.address.savedSuccess'))
+        toast.success(t('checkout.address.toastAdded'))
       }
 
       setForm(emptyForm)
       setEditingAddressId(null)
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Unable to save address.'
+      const message =
+        error instanceof ApiError ? error.message : t('checkout.address.unableToSave')
       setSubmitError(message)
-      toast.error('Unable to save address', message)
+      toast.error(t('checkout.address.unableToSave'), message)
     } finally {
       setSubmitting(false)
     }
@@ -200,11 +206,12 @@ export function useAddAddressPage() {
       await deleteMyAddress(addressId)
       setAddresses((current) => current.filter((entry) => entry._id !== addressId))
       if (selectedAddressId === addressId) setSelectedAddressId(null)
-      toast.success('Address deleted')
+      toast.success(t('checkout.address.toastDeleted'))
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Unable to delete address.'
+      const message =
+        error instanceof ApiError ? error.message : t('checkout.address.unableToDelete')
       setSubmitError(message)
-      toast.error('Unable to delete address', message)
+      toast.error(t('checkout.address.unableToDelete'), message)
     } finally {
       setDeletingId(null)
     }

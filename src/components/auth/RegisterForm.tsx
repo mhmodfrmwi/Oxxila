@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { register } from '../../api/auth'
 import { useToast } from '../../context/ToastContext'
@@ -12,6 +13,7 @@ import { PasswordStrength } from './PasswordStrength'
 import { SocialLoginButtons } from './SocialLoginButtons'
 
 export function RegisterForm() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const toast = useToast()
   const [password, setPassword] = useState('')
@@ -32,16 +34,17 @@ export function RegisterForm() {
 
     try {
       await register({ name, email, phone, password: nextPassword })
-      toast.success('Register successful', 'Account created successfully. Please log in.')
+      const successMessage = t('auth.register.successMessage')
+      toast.success(t('auth.register.successTitle'), successMessage)
       navigate('/login', {
         replace: true,
-        state: { message: 'Account created successfully. Please log in.' },
+        state: { message: successMessage },
       })
     } catch (err) {
       const message =
-        err instanceof ApiError ? err.message : 'Unable to create account. Please try again.'
+        err instanceof ApiError ? err.message : t('auth.register.failedFallback')
       setError(message)
-      toast.error('Register failed', message)
+      toast.error(t('auth.register.failedTitle'), message)
     } finally {
       setLoading(false)
     }
@@ -50,9 +53,9 @@ export function RegisterForm() {
   return (
     <AuthCard activeTab="signup" imagePosition="left">
       <header className="mb-8">
-        <Heading variant="page-lg">Create your account</Heading>
+        <Heading variant="page-lg">{t('auth.register.title')}</Heading>
         <p className="mt-2 font-serif text-xl text-secondary-text">
-          Welcome to Oxxila
+          {t('auth.register.subtitle')}
         </p>
       </header>
 
@@ -60,40 +63,40 @@ export function RegisterForm() {
 
       <form className="space-y-5" onSubmit={handleSubmit} noValidate>
         <InputField
-          label="Full Name"
+          label={t('auth.register.fullName')}
           type="text"
           name="name"
           autoComplete="name"
-          placeholder="Name:"
+          placeholder={t('auth.register.namePlaceholder')}
           required
         />
 
         <InputField
-          label="Email Address"
+          label={t('auth.fields.email')}
           type="email"
           name="email"
           autoComplete="email"
-          placeholder="Example@example.com"
+          placeholder={t('auth.fields.emailPlaceholder')}
           required
         />
 
         <InputField
-          label="Phone Number"
+          label={t('auth.register.phone')}
           type="tel"
           name="phone"
           autoComplete="tel"
-          placeholder="+1 (555) 000-0000"
+          placeholder={t('auth.register.phonePlaceholder')}
           inputMode="tel"
           required
         />
 
         <div className="space-y-2">
           <InputField
-            label="Create password"
+            label={t('auth.register.createPassword')}
             type="password"
             name="password"
             autoComplete="new-password"
-            placeholder="Min. 8 characters"
+            placeholder={t('auth.fields.passwordPlaceholder')}
             showPasswordToggle
             required
             minLength={8}
@@ -106,14 +109,14 @@ export function RegisterForm() {
         <SocialLoginButtons disabled={loading} />
 
         <Button type="submit" fullWidth pill className="h-14 sm:h-[65px]" disabled={loading}>
-          {loading ? 'Creating account...' : 'Create Account'}
+          {loading ? t('auth.register.submitting') : t('auth.register.submit')}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-secondary-text">
-        Already have an account?{' '}
+        {t('auth.register.hasAccount')}{' '}
         <Link to="/login" className="font-medium text-link hover:text-link-hover">
-          Login here
+          {t('auth.register.loginHere')}
         </Link>
       </p>
     </AuthCard>

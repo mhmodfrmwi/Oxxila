@@ -1,6 +1,7 @@
 // src/components/cart/OrderSummaryCard.tsx
 import { ChevronRight } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { ApiError } from '../../lib/api'
 import type { ApiCart, ApiCartItem } from '../../types/cart'
@@ -52,6 +53,7 @@ function SummaryRow({
 }
 
 function OrderReviewItem({ item }: { item: ApiCartItem }) {
+  const { t } = useTranslation()
   const imageSrc = resolveProductImageUrl(item.product.images[0]) ?? PRODUCT_IMAGE_PLACEHOLDER
   const lineTotal = item.price * item.quantity
 
@@ -68,7 +70,9 @@ function OrderReviewItem({ item }: { item: ApiCartItem }) {
       />
       <div className="min-w-0">
         <p className="payment-review-item-name">{item.product.name}</p>
-        <p className="payment-review-item-qty">Qty: {item.quantity}</p>
+        <p className="payment-review-item-qty">
+          {t('cart.summary.qty', { count: item.quantity })}
+        </p>
       </div>
       <span className="payment-review-item-price">{formatCartPrice(lineTotal)}</span>
     </li>
@@ -96,18 +100,23 @@ export function OrderSummaryCard({
   trustBadgeVariant = 'cart',
   footerNote,
   showCta,
-  totalLabel = 'Total',
+  totalLabel,
 }: OrderSummaryCardProps) {
+  const { t } = useTranslation()
   const [promoDraft, setPromoDraft] = useState('')
   const [promoError, setPromoError] = useState<string | null>(null)
   const promoCode = cart.couponCode ?? promoDraft
   const isReview = mode === 'review'
   const isConfirmation = mode === 'confirmation'
   const resolvedTitle =
-    title ?? (isConfirmation ? 'Order Summary' : isReview ? 'Order Review' : 'Order Summary')
+    title ??
+    (isReview && !isConfirmation
+      ? t('cart.summary.reviewTitle')
+      : t('cart.summary.title'))
+  const resolvedTotalLabel = totalLabel ?? t('cart.summary.total')
   const resolvedShowPromo = showPromo ?? (!isReview && !isConfirmation)
   const showLineItems = isReview || isConfirmation
-  const showCheckoutButton = showCta ?? (!isConfirmation)
+  const showCheckoutButton = showCta ?? !isConfirmation
   const resolvedShippingAmount = shippingAmount ?? 0
   const shippingIsFree = resolvedShippingAmount === 0
   const resolvedTotal = isConfirmation
@@ -124,7 +133,9 @@ export function OrderSummaryCard({
     try {
       await onApplyCoupon(code)
     } catch (error) {
-      setPromoError(error instanceof ApiError ? error.message : 'Could not apply coupon')
+      setPromoError(
+        error instanceof ApiError ? error.message : t('cart.summary.applyError'),
+      )
     }
   }
 
@@ -134,23 +145,29 @@ export function OrderSummaryCard({
       await onRemoveCoupon()
       setPromoDraft('')
     } catch (error) {
-      setPromoError(error instanceof ApiError ? error.message : 'Could not remove coupon')
+      setPromoError(
+        error instanceof ApiError ? error.message : t('cart.summary.removeError'),
+      )
     }
   }
 
-  const defaultCtaLabel = isReview ? 'Pay Now' : 'Proceed to checkout'
+  const defaultCtaLabel = isReview
+    ? t('cart.summary.payNow')
+    : t('cart.summary.proceedToCheckout')
   const buttonLabel = ctaLabel ?? defaultCtaLabel
-  const buttonDisabled =
-    ctaDisabled ?? checkoutDisabled ?? cart.items.length === 0
+  const buttonDisabled = ctaDisabled ?? checkoutDisabled ?? cart.items.length === 0
 
   return (
-    <aside className={cn('cart-summary-card lg:sticky lg:top-6', className)} aria-label={resolvedTitle}>
+    <aside
+      className={cn('cart-summary-card lg:sticky lg:top-6', className)}
+      aria-label={resolvedTitle}
+    >
       <Heading variant="card" as="h2" className="mb-5 font-serif">
         {resolvedTitle}
       </Heading>
 
       {showLineItems && cart.items.length > 0 && (
-        <ul className="mb-5" aria-label="Order items">
+        <ul className="mb-5" aria-label={t('cart.summary.orderItems')}>
           {cart.items.map((item) => (
             <OrderReviewItem key={item._id} item={item} />
           ))}
@@ -159,35 +176,45 @@ export function OrderSummaryCard({
 
       <div className="space-y-3">
         {(!isReview || isConfirmation) && (
-          <SummaryRow label="Subtotal" value={formatCartPrice(cart.subtotal)} />
+          <SummaryRow
+            label={t('cart.summary.subtotal')}
+            value={formatCartPrice(cart.subtotal)}
+          />
         )}
 
         {cart.discountAmount > 0 && (
           <SummaryRow
-            label="Discount"
+            label={t('cart.summary.discount')}
             value={`-${formatCartPrice(cart.discountAmount)}`}
             valueClassName="text-support-success"
           />
         )}
 
         <SummaryRow
-          label="Shipping"
+          label={t('cart.summary.shipping')}
           value={
             <span className="inline-flex items-center gap-2">
-              {shippingIsFree && <span className="text-support-success">Free</span>}
+              {shippingIsFree && (
+                <span className="text-support-success">{t('cart.summary.free')}</span>
+              )}
               {shippingCompareAt != null && shippingCompareAt > 0 && (
-                <span className="payment-summary-strike">{formatCartPrice(shippingCompareAt)}</span>
+                <span className="payment-summary-strike">
+                  {formatCartPrice(shippingCompareAt)}
+                </span>
               )}
               <span>{formatCartPrice(resolvedShippingAmount)}</span>
             </span>
           }
         />
 
-        <SummaryRow label="Estimated Tax" value={formatCartPrice(estimatedTax)} />
+        <SummaryRow
+          label={t('cart.summary.estimatedTax')}
+          value={formatCartPrice(estimatedTax)}
+        />
 
         {cart.storeCreditApplied > 0 && (
           <SummaryRow
-            label="Store credit"
+            label={t('cart.summary.storeCredit')}
             value={`-${formatCartPrice(cart.storeCreditApplied)}`}
             valueClassName="text-support-success"
           />
@@ -197,7 +224,7 @@ export function OrderSummaryCard({
       {resolvedShowPromo && (
         <div className="mt-5">
           <label htmlFor="cart-promo-code" className="sr-only">
-            Promo code
+            {t('cart.summary.promoCode')}
           </label>
           <div className="cart-promo-field">
             <input
@@ -205,7 +232,7 @@ export function OrderSummaryCard({
               type="text"
               value={promoCode}
               onChange={(event) => setPromoDraft(event.target.value)}
-              placeholder="Promo Code"
+              placeholder={t('cart.summary.promoPlaceholder')}
               className="cart-promo-input"
               disabled={couponLoading}
             />
@@ -216,7 +243,7 @@ export function OrderSummaryCard({
                 onClick={() => void handleRemoveCoupon()}
                 disabled={couponLoading}
               >
-                Remove
+                {t('cart.summary.remove')}
               </button>
             ) : (
               <button
@@ -225,7 +252,7 @@ export function OrderSummaryCard({
                 onClick={() => void handleApplyCoupon()}
                 disabled={couponLoading || !promoCode.trim()}
               >
-                Apply
+                {t('cart.summary.apply')}
               </button>
             )}
           </div>
@@ -240,10 +267,12 @@ export function OrderSummaryCard({
       <div className="cart-summary-divider" />
 
       <div className="cart-summary-total">
-        <span className="cart-summary-total-label">{totalLabel}</span>
+        <span className="cart-summary-total-label">{resolvedTotalLabel}</span>
         <span className="inline-flex items-baseline gap-2">
           {resolvedTotalCompareAt != null && resolvedTotalCompareAt > resolvedTotal && (
-            <span className="payment-summary-strike">{formatCartPrice(resolvedTotalCompareAt)}</span>
+            <span className="payment-summary-strike">
+              {formatCartPrice(resolvedTotalCompareAt)}
+            </span>
           )}
           <span className="cart-summary-total-value">{formatCartPrice(resolvedTotal)}</span>
         </span>
@@ -259,7 +288,7 @@ export function OrderSummaryCard({
           onClick={onCtaClick}
         >
           {buttonLabel}
-          {isReview && <ChevronRight size={18} strokeWidth={2} aria-hidden />}
+          {isReview && <ChevronRight size={18} strokeWidth={2} aria-hidden className="rtl:-scale-x-100" />}
         </Button>
       )}
 
