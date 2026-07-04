@@ -16,7 +16,6 @@ import {
   browsingHistoryTitle,
   findCategoryBySlug,
   relatedBrowsingTitle,
-  resolveDefaultCategorySlug,
   toCategoryMeta,
   type SortOption,
 } from './categoryData'
@@ -26,20 +25,19 @@ import { FilterSidebar } from './filters/FilterSidebar'
 export function CategoryPageContent() {
   const { slug = '' } = useParams<{ slug: string }>()
   const { categories, brands, loading: catalogLoading } = useLandingCatalogContext()
-  const defaultSlug = useMemo(() => resolveDefaultCategorySlug(categories), [categories])
   const category = useMemo(() => findCategoryBySlug(categories, slug), [categories, slug])
   const meta = category ? toCategoryMeta(category) : null
   const subcategories = category?.subcategories ?? []
-  const categoryBrands = useMemo(
-    () =>
-      brands.filter((brand) => {
-        if (!brand.category) return true
-        const categoryId =
-          typeof brand.category === 'string' ? brand.category : brand.category._id
-        return categoryId === category?._id
-      }),
-    [brands, category?._id],
-  )
+  const categoryBrands = useMemo(() => {
+    const activeBrands = brands.filter((brand) => brand.isActive !== false)
+    const filtered = activeBrands.filter((brand) => {
+      if (!brand.category) return true
+      const categoryId =
+        typeof brand.category === 'string' ? brand.category : brand.category._id
+      return categoryId === category?._id
+    })
+    return filtered.length > 0 ? filtered : activeBrands
+  }, [brands, category?._id])
 
   const [filtersBySlug, setFiltersBySlug] = useState<Partial<Record<string, FilterState>>>({})
   const [sortBySlug, setSortBySlug] = useState<Partial<Record<string, SortOption>>>({})
@@ -107,10 +105,6 @@ export function CategoryPageContent() {
     }
   }
 
-  if (!catalogLoading && categories.length > 0 && !category && defaultSlug) {
-    return <Navigate to={`${CATEGORIES_PATH}/${defaultSlug}`} replace />
-  }
-
   if (!catalogLoading && categories.length === 0) {
     return (
       <div className="container-content py-12">
@@ -119,6 +113,10 @@ export function CategoryPageContent() {
         </p>
       </div>
     )
+  }
+
+  if (!catalogLoading && !category) {
+    return <Navigate to={CATEGORIES_PATH} replace />
   }
 
   if (!meta) {
@@ -140,7 +138,7 @@ export function CategoryPageContent() {
           className="mb-5 sm:mb-6"
           items={[
             { label: 'Home', href: HOME_PATH },
-            { label: 'Categories', href: `${CATEGORIES_PATH}/${defaultSlug ?? meta.slug}` },
+            { label: 'Categories', href: CATEGORIES_PATH },
             { label: meta.name },
           ]}
         />
@@ -151,6 +149,8 @@ export function CategoryPageContent() {
             filters={filters}
             onFiltersChange={handleFiltersChange}
             onFiltersReset={handleFiltersReset}
+            categories={categories}
+            activeCategorySlug={meta.slug}
             subcategories={subcategories}
             brands={categoryBrands}
           />

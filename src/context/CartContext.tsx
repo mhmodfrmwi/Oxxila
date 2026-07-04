@@ -9,6 +9,7 @@ import {
   updateCartItem as updateCartItemRequest,
 } from '../api/cart'
 import { useAuth } from './AuthContext'
+import { useToast } from './ToastContext'
 import { ApiError } from '../lib/api'
 import type { ApiCart } from '../types/cart'
 
@@ -30,6 +31,7 @@ const CartContext = createContext<CartContextValue | null>(null)
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth()
+  const toast = useToast()
   const [cart, setCart] = useState<ApiCart | null>(null)
   const [loading, setLoading] = useState(false)
   const [updatingItemId, setUpdatingItemId] = useState<string | null>(null)
@@ -84,52 +86,89 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated])
 
   const addToCart = useCallback(async (productId: string, quantity = 1) => {
-    const response = await addToCartRequest(productId, quantity)
-    if (!response.data) {
-      throw new ApiError('Cart was not updated. Please try again.')
+    try {
+      const response = await addToCartRequest(productId, quantity)
+      if (!response.data) {
+        throw new ApiError('Cart was not updated. Please try again.')
+      }
+      setCart(response.data)
+      toast.success('Added to cart')
+    } catch (error) {
+      toast.error(
+        'Unable to add to cart',
+        error instanceof ApiError ? error.message : 'Please try again.',
+      )
+      throw error
     }
-    setCart(response.data)
-  }, [])
+  }, [toast])
 
   const updateCartItem = useCallback(async (itemId: string, quantity: number) => {
     setUpdatingItemId(itemId)
     try {
       const response = await updateCartItemRequest(itemId, quantity)
       setCart(response.data ?? null)
+      toast.success('Quantity updated')
+    } catch (error) {
+      toast.error(
+        'Unable to update quantity',
+        error instanceof ApiError ? error.message : 'Please try again.',
+      )
+      throw error
     } finally {
       setUpdatingItemId(null)
     }
-  }, [])
+  }, [toast])
 
   const removeCartItem = useCallback(async (itemId: string) => {
     setUpdatingItemId(itemId)
     try {
       const response = await removeCartItemRequest(itemId)
       setCart(response.data ?? null)
+      toast.success('Removed from cart')
+    } catch (error) {
+      toast.error(
+        'Unable to remove item',
+        error instanceof ApiError ? error.message : 'Please try again.',
+      )
+      throw error
     } finally {
       setUpdatingItemId(null)
     }
-  }, [])
+  }, [toast])
 
   const applyCoupon = useCallback(async (code: string) => {
     setCouponLoading(true)
     try {
       const response = await applyCouponRequest(code)
       setCart(response.data ?? null)
+      toast.success('Coupon applied')
+    } catch (error) {
+      toast.error(
+        'Unable to apply coupon',
+        error instanceof ApiError ? error.message : 'Please try again.',
+      )
+      throw error
     } finally {
       setCouponLoading(false)
     }
-  }, [])
+  }, [toast])
 
   const removeCoupon = useCallback(async () => {
     setCouponLoading(true)
     try {
       const response = await removeCouponRequest()
       setCart(response.data ?? null)
+      toast.success('Coupon removed')
+    } catch (error) {
+      toast.error(
+        'Unable to remove coupon',
+        error instanceof ApiError ? error.message : 'Please try again.',
+      )
+      throw error
     } finally {
       setCouponLoading(false)
     }
-  }, [])
+  }, [toast])
 
   const resolvedCart = isAuthenticated ? cart : null
   const resolvedLoading = isAuthenticated ? loading : false

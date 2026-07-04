@@ -1,43 +1,38 @@
+// src/components/category/filters/CategoryFilter.tsx
+import { useNavigate } from 'react-router-dom'
+import { CATEGORIES_PATH } from '../../../config/routes'
 import { cn } from '../../../lib/cn'
+import type { ApiCategory } from '../../../types/catalog'
 import { focusRingClasses } from '../../ui/interactionStyles'
-import type { ApiSubCategory } from '../../../types/catalog'
 import { FilterSection } from './FilterSection'
 
 interface CategoryFilterProps {
-  selectedIds: string[]
-  onChange: (ids: string[]) => void
-  subcategories: ApiSubCategory[]
+  categories: ApiCategory[]
+  activeSlug?: string
 }
 
-export function CategoryFilter({ selectedIds, onChange, subcategories }: CategoryFilterProps) {
-  function toggleCategory(id: string) {
-    if (selectedIds.includes(id)) {
-      onChange(selectedIds.filter((item) => item !== id))
-    } else {
-      onChange([...selectedIds, id])
-    }
-  }
+export function CategoryFilter({ categories, activeSlug }: CategoryFilterProps) {
+  const navigate = useNavigate()
+  const activeCategories = categories.filter((category) => category.isActive !== false)
 
-  if (subcategories.length === 0) {
-    return null
-  }
+  if (activeCategories.length === 0) return null
 
   return (
-    <FilterSection title="Subcategory">
+    <FilterSection title="Categories">
       <div className="flex flex-wrap gap-2">
-        {subcategories.map((subcategory) => {
-          const isSelected = selectedIds.includes(subcategory._id)
+        {activeCategories.map((category) => {
+          const isSelected = category.slug === activeSlug
 
           return (
             <button
-              key={subcategory._id}
+              key={category._id}
               type="button"
-              onClick={() => toggleCategory(subcategory._id)}
+              onClick={() => navigate(`${CATEGORIES_PATH}/${category.slug}`)}
               data-selected={isSelected}
               className={cn('filter-chip px-2.5 py-1.5', focusRingClasses)}
               aria-pressed={isSelected}
             >
-              {subcategory.name}
+              {category.name}
             </button>
           )
         })}

@@ -14,11 +14,12 @@ import {
 import { CART_PATH, LOGIN_PATH, orderConfirmationPath } from '../config/routes'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
+import { useToast } from '../context/ToastContext'
 import { useCartAddresses } from './useCartAddresses'
 import { ApiError } from '../lib/api'
 import type { UserAddress } from '../api/users'
 
-export type PaymentMethodId = 'billing' | 'stripe' | 'paymob' | 'cod'
+export type PaymentMethodId = 'stripe' | 'paymob' | 'cod'
 
 export interface BillingFormState {
   governorateId: string
@@ -74,6 +75,7 @@ function resolveProvider(method: PaymentMethodId): 'stripe' | 'paymob' | 'cod' {
 export function usePaymentPage() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
+  const toast = useToast()
   const { cart, loading: cartLoading, couponLoading, applyCoupon, removeCoupon } = useCart()
   const { primaryAddress, loading: addressLoading } = useCartAddresses()
 
@@ -275,7 +277,7 @@ export function usePaymentPage() {
     const validation = validateBillingForm(effectiveBillingForm)
     if (Object.keys(validation).length > 0) {
       setBillingErrors(validation)
-      setPaymentMethod('billing')
+      toast.error('Invalid form', 'Please complete the billing address fields.')
       return
     }
 
@@ -295,6 +297,7 @@ export function usePaymentPage() {
         const response = await createCodOrder({ ...payload, paymentMethod: 'cod' })
         const created = response.data
         if (created?._id) {
+          toast.success('Order placed')
           navigate(orderConfirmationPath(created._id))
         } else {
           navigate(CART_PATH)
@@ -308,9 +311,13 @@ export function usePaymentPage() {
         throw new ApiError('Payment provider did not return a checkout URL', 502)
       }
 
+      toast.info('Redirecting to payment')
       window.location.assign(checkoutUrl)
     } catch (error) {
-      setSubmitError(error instanceof ApiError ? error.message : 'Unable to complete payment.')
+      const message =
+        error instanceof ApiError ? error.message : 'Unable to complete payment.'
+      setSubmitError(message)
+      toast.error('Payment failed', message)
     } finally {
       setSubmitting(false)
     }

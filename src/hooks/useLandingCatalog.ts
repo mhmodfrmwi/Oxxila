@@ -59,7 +59,7 @@ export function useLandingCatalog(): LandingCatalogState {
           categories: categoriesResponse.data ?? [],
           brands: brandsResponse.data ?? [],
           bestSellers: buildBestSellers(bestSellerProducts.length > 0 ? bestSellerProducts : products),
-          skinConcerns: buildSkinConcerns(products),
+          skinConcerns: buildSkinConcerns(),
           featuredImages: buildFeaturedImages(products),
         })
       } catch (error) {
@@ -72,7 +72,7 @@ export function useLandingCatalog(): LandingCatalogState {
           categories: [],
           brands: [],
           bestSellers: buildBestSellers([]),
-          skinConcerns: buildSkinConcerns([]),
+          skinConcerns: buildSkinConcerns(),
           featuredImages: buildFeaturedImages([]),
         })
       }

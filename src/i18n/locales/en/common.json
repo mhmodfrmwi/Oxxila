@@ -1,0 +1,72 @@
+{
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "categories": "Categories",
+    "docs": "Docs",
+    "cart": "Cart",
+    "profile": "Profile",
+    "account": "Account",
+    "signInRegister": "Sign in / Register",
+    "logOut": "Log out",
+    "loggingOut": "Logging out...",
+    "mainNavigation": "Main navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "closeMenuOverlay": "Close menu overlay",
+    "shoppingBag": "Shopping bag",
+    "shoppingBagWithCount": "Shopping bag, {{count}} items"
+  },
+  "actions": {
+    "addToCart": "Add to Cart",
+    "search": "Search",
+    "login": "Login",
+    "register": "Register",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "continueShopping": "Continue shopping"
+  },
+  "search": {
+    "label": "Search",
+    "placeholder": "Search for..."
+  },
+  "language": {
+    "label": "Language",
+    "english": "English",
+    "arabic": "العربية",
+    "switcher": "Language switcher"
+  },
+  "theme": {
+    "changeTheme": "Change Theme"
+  },
+  "footer": {
+    "description": "Discover clinically proven skincare products designed to help you achieve healthy, glowing skin.",
+    "policies": "Policies",
+    "shopping": "Shopping",
+    "copyright": "© 2026 Oxxila. All Rights Reserved.",
+    "newsletterEmail": "Email address",
+    "newsletterPlaceholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "subscribing": "Subscribing...",
+    "subscribed": "Subscribed",
+    "policyLinks": {
+      "about": "About Oxxila",
+      "quality": "Our Quality Promise",
+      "authenticity": "Authenticity Guarantee",
+      "standards": "Dermatology Standards",
+      "terms": "Terms & Conditions",
+      "privacy": "Privacy Policy",
+      "contact": "Contact Us"
+    },
+    "shoppingLinks": {
+      "shopAll": "Shop All Products",
+      "skinConcerns": "Skin Concerns",
+      "brands": "Brands",
+      "newArrivals": "New Arrivals",
+      "bestSellers": "Best Sellers",
+      "shipping": "Shipping & Delivery",
+      "returns": "Returns & Refunds",
+      "trackOrder": "Track Your Order"
+    }
+  }
+}

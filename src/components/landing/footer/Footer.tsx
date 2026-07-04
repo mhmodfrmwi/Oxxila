@@ -1,12 +1,43 @@
+// src/components/landing/footer/Footer.tsx
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { FadeUp } from '../../ui/FadeUp'
 import { Logo } from '../../ui/Logo'
-import { footerPolicyLinks, footerShoppingLinks } from '../landingData'
 import { FooterLinks } from './FooterLinks'
 import { InstagramGrid } from './InstagramGrid'
 import { NewsletterForm } from './NewsletterForm'
 import { SocialLinks } from './SocialLinks'
 
 export function Footer() {
+  const { t } = useTranslation()
+
+  const policyLinks = useMemo(
+    () => [
+      { label: t('footer.policyLinks.about'), to: '/about' },
+      { label: t('footer.policyLinks.quality'), to: '/quality' },
+      { label: t('footer.policyLinks.authenticity'), to: '/authenticity' },
+      { label: t('footer.policyLinks.standards'), to: '/standards' },
+      { label: t('footer.policyLinks.terms'), to: '/terms' },
+      { label: t('footer.policyLinks.privacy'), to: '/privacy' },
+      { label: t('footer.policyLinks.contact'), to: '/contact' },
+    ],
+    [t],
+  )
+
+  const shoppingLinks = useMemo(
+    () => [
+      { label: t('footer.shoppingLinks.shopAll'), to: '/shop' },
+      { label: t('footer.shoppingLinks.skinConcerns'), to: '/concerns' },
+      { label: t('footer.shoppingLinks.brands'), to: '/brands' },
+      { label: t('footer.shoppingLinks.newArrivals'), to: '/shop?filter=new' },
+      { label: t('footer.shoppingLinks.bestSellers'), to: '/shop?filter=best' },
+      { label: t('footer.shoppingLinks.shipping'), to: '/shipping' },
+      { label: t('footer.shoppingLinks.returns'), to: '/returns' },
+      { label: t('footer.shoppingLinks.trackOrder'), to: '/track' },
+    ],
+    [t],
+  )
+
   return (
     <footer className="relative bg-background text-primary-text">
       <div
@@ -23,14 +54,13 @@ export function Footer() {
                 className="dark:[&_img:nth-child(2)]:brightness-0 dark:[&_img:nth-child(2)]:invert"
               />
               <p className="mt-4 max-w-sm font-serif text-sm leading-relaxed text-secondary-text sm:text-base">
-                Discover clinically proven skincare products designed to help you achieve healthy,
-                glowing skin.
+                {t('footer.description')}
               </p>
               <NewsletterForm />
             </div>
 
-            <FooterLinks title="Policies" links={footerPolicyLinks} variant="slide" />
-            <FooterLinks title="Shopping" links={footerShoppingLinks} variant="underline" />
+            <FooterLinks title={t('footer.policies')} links={policyLinks} variant="slide" />
+            <FooterLinks title={t('footer.shopping')} links={shoppingLinks} variant="underline" />
 
             <div className="min-[769px]:col-span-2 min-[1025px]:col-span-1 min-[1025px]:max-w-[280px] min-[1025px]:justify-self-end">
               <InstagramGrid />
@@ -40,9 +70,7 @@ export function Footer() {
 
         <div className="mt-12 border-t border-border-subtle pt-8 lg:mt-14">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-secondary-text">
-              © 2026 Oxxila. All Rights Reserved.
-            </p>
+            <p className="text-sm text-secondary-text">{t('footer.copyright')}</p>
             <SocialLinks />
           </div>
         </div>

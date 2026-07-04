@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { register } from '../../api/auth'
+import { useToast } from '../../context/ToastContext'
 import { ApiError } from '../../lib/api'
 import { Button } from '../ui/Button'
 import { Heading } from '../ui/Heading'
@@ -12,6 +13,7 @@ import { SocialLoginButtons } from './SocialLoginButtons'
 
 export function RegisterForm() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -30,12 +32,16 @@ export function RegisterForm() {
 
     try {
       await register({ name, email, phone, password: nextPassword })
+      toast.success('Register successful', 'Account created successfully. Please log in.')
       navigate('/login', {
         replace: true,
         state: { message: 'Account created successfully. Please log in.' },
       })
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Unable to create account. Please try again.')
+      const message =
+        err instanceof ApiError ? err.message : 'Unable to create account. Please try again.'
+      setError(message)
+      toast.error('Register failed', message)
     } finally {
       setLoading(false)
     }

@@ -1,18 +1,20 @@
+// src/components/layout/Navbar.tsx
 import { ChevronDown, LogOut, ShoppingBag, User, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { HOME_PATH, SHOP_PATH, CATEGORIES_PATH, CART_PATH } from '../../config/routes'
+import {
+  CART_PATH,
+  CATEGORIES_PATH,
+  HOME_PATH,
+  LOGIN_PATH,
+  SHOP_PATH,
+} from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
+import { useToast } from '../../context/ToastContext'
 import { Logo } from '../ui/Logo'
 import { typeSmallClasses } from '../ui/typography'
-
-const navLinks = [
-  { label: 'Home', to: HOME_PATH },
-  { label: 'Shop', to: SHOP_PATH },
-  { label: 'Categories', to: CATEGORIES_PATH, hasChevron: true },
-  { label: 'Docs', to: '/docs' },
-]
 
 function BurgerIcon() {
   return (
@@ -25,11 +27,23 @@ function BurgerIcon() {
 }
 
 export function Navbar() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { isAuthenticated, logout } = useAuth()
   const { itemCount } = useCart()
+  const toast = useToast()
   const [menuOpen, setMenuOpen] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
+
+  const navLinks = useMemo(
+    () => [
+      { labelKey: 'nav.home', to: HOME_PATH },
+      { labelKey: 'nav.shop', to: SHOP_PATH },
+      { labelKey: 'nav.categories', to: CATEGORIES_PATH, hasChevron: true },
+      { labelKey: 'nav.docs', to: '/docs' },
+    ],
+    [],
+  )
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
@@ -45,8 +59,11 @@ export function Navbar() {
 
     try {
       await logout()
+      toast.success(t('nav.logOut'))
       setMenuOpen(false)
       navigate(HOME_PATH, { replace: true })
+    } catch {
+      toast.error(t('nav.logOut'))
     } finally {
       setAuthLoading(false)
     }
@@ -64,9 +81,7 @@ export function Navbar() {
       'relative inline-flex items-center justify-center gap-1 pb-2 transition-colors',
       typeSmallClasses,
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded',
-      isActive
-        ? 'text-primary-text'
-        : 'text-secondary-text hover:text-primary-text',
+      isActive ? 'text-primary-text' : 'text-secondary-text hover:text-primary-text',
     ].join(' ')
 
   function NavLinkContent({
@@ -96,17 +111,15 @@ export function Navbar() {
     [
       'block rounded-xl px-4 py-3 transition-colors',
       typeSmallClasses,
-      'text-left',
-      isActive
-        ? 'bg-accent/10 text-accent'
-        : 'text-primary-text hover:bg-input',
+      'text-start',
+      isActive ? 'bg-accent/10 text-accent' : 'text-primary-text hover:bg-input',
     ].join(' ')
 
   return (
     <header className="relative z-40 border-b border-border-subtle bg-card">
       <nav
         className="mx-auto flex max-w-[1440px] items-center justify-between gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3 lg:px-6 lg:py-4"
-        aria-label="Main navigation"
+        aria-label={t('nav.mainNavigation')}
       >
         <button
           type="button"
@@ -115,7 +128,7 @@ export function Navbar() {
             'text-primary-text hover:bg-input',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
           ].join(' ')}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-label={menuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((open) => !open)}
         >
@@ -128,7 +141,7 @@ export function Navbar() {
               <NavLink to={link.to} className={linkClass}>
                 {({ isActive }) => (
                   <NavLinkContent
-                    label={link.label}
+                    label={t(link.labelKey)}
                     hasChevron={link.hasChevron}
                     isActive={isActive}
                   />
@@ -150,11 +163,15 @@ export function Navbar() {
               'text-primary-text hover:bg-input',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
             ].join(' ')}
-            aria-label={itemCount > 0 ? `Shopping bag, ${itemCount} items` : 'Shopping bag'}
+            aria-label={
+              itemCount > 0
+                ? t('nav.shoppingBagWithCount', { count: itemCount })
+                : t('nav.shoppingBag')
+            }
           >
             <ShoppingBag size={20} aria-hidden />
             {itemCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-button-primary px-1 text-[10px] font-semibold text-on-emphasis">
+              <span className="absolute -end-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-button-primary px-1 text-[10px] font-semibold text-on-emphasis">
                 {itemCount > 99 ? '99+' : itemCount}
               </span>
             )}
@@ -169,15 +186,21 @@ export function Navbar() {
             >
               <LogOut size={18} aria-hidden />
               <span className="hidden leading-tight sm:inline">
-                {authLoading ? 'Logging out...' : 'Log out'}
+                {authLoading ? t('nav.loggingOut') : t('nav.logOut')}
               </span>
             </button>
           ) : (
-            <NavLink to="/login" className={authActionClass}>
+            <NavLink to={LOGIN_PATH} className={authActionClass}>
               <User size={18} aria-hidden />
-              <span className={['hidden flex-col items-start leading-tight sm:inline-flex', typeSmallClasses, 'text-left'].join(' ')}>
-                <span>Sign in / Register</span>
-                <span className="text-secondary-text">Account</span>
+              <span
+                className={[
+                  'hidden flex-col items-start leading-tight sm:inline-flex',
+                  typeSmallClasses,
+                  'text-start',
+                ].join(' ')}
+              >
+                <span>{t('nav.signInRegister')}</span>
+                <span className="text-secondary-text">{t('nav.account')}</span>
               </span>
             </NavLink>
           )}
@@ -189,16 +212,16 @@ export function Navbar() {
           <button
             type="button"
             className="fixed inset-0 z-40 bg-black/40 md:hidden"
-            aria-label="Close menu overlay"
+            aria-label={t('nav.closeMenuOverlay')}
             onClick={() => setMenuOpen(false)}
           />
-          <div className="fixed inset-y-0 left-0 z-50 w-[min(320px,85vw)] border-r border-border-subtle bg-card p-5 shadow-xl md:hidden">
+          <div className="fixed inset-y-0 start-0 z-50 w-[min(320px,85vw)] border-e border-border-subtle bg-card p-5 shadow-xl md:hidden">
             <div className="mb-6 flex items-center justify-between">
               <Logo />
               <button
                 type="button"
                 className="rounded-lg p-2"
-                aria-label="Close menu"
+                aria-label={t('nav.closeMenu')}
                 onClick={() => setMenuOpen(false)}
               >
                 <X size={22} />
@@ -213,7 +236,7 @@ export function Navbar() {
                     onClick={() => setMenuOpen(false)}
                   >
                     <span className="inline-flex items-center gap-1">
-                      {link.label}
+                      {t(link.labelKey)}
                       {link.hasChevron && <ChevronDown size={14} aria-hidden />}
                     </span>
                   </NavLink>
@@ -226,7 +249,7 @@ export function Navbar() {
                     className={[
                       'flex w-full items-center gap-2 rounded-xl px-4 py-3 transition-colors',
                       typeSmallClasses,
-                      'justify-start text-left',
+                      'justify-start text-start',
                       'text-primary-text hover:bg-input',
                       authLoading ? 'pointer-events-none opacity-60' : '',
                     ].join(' ')}
@@ -235,17 +258,17 @@ export function Navbar() {
                     aria-busy={authLoading}
                   >
                     <LogOut size={18} aria-hidden />
-                    {authLoading ? 'Logging out...' : 'Log out'}
+                    {authLoading ? t('nav.loggingOut') : t('nav.logOut')}
                   </button>
                 ) : (
                   <NavLink
-                    to="/login"
+                    to={LOGIN_PATH}
                     className={mobileLinkClass}
                     onClick={() => setMenuOpen(false)}
                   >
                     <span className="inline-flex items-center gap-2">
                       <User size={18} aria-hidden />
-                      Sign in / Register
+                      {t('nav.signInRegister')}
                     </span>
                   </NavLink>
                 )}

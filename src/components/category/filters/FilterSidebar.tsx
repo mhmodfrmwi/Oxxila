@@ -2,7 +2,7 @@ import { ChevronDown, SlidersHorizontal } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
-import type { ApiBrand, ApiSubCategory } from '../../../types/catalog'
+import type { ApiBrand, ApiCategory, ApiSubCategory } from '../../../types/catalog'
 import { AvailabilityFilter } from './AvailabilityFilter'
 import { BrandFilter } from './BrandFilter'
 import { CategoryFilter } from './CategoryFilter'
@@ -13,12 +13,15 @@ import { OffersFilter } from './OffersFilter'
 import { PriceFilter } from './PriceFilter'
 import { RatingFilter } from './RatingFilter'
 import { SensitivityFilter } from './SensitivityFilter'
+import { TypeOfCategoryFilter } from './TypeOfCategoryFilter'
 
 interface FilterSidebarProps {
   className?: string
   filters: FilterState
   onFiltersChange: (patch: Partial<FilterState>) => void
   onFiltersReset: () => void
+  categories: ApiCategory[]
+  activeCategorySlug?: string
   subcategories: ApiSubCategory[]
   brands: ApiBrand[]
 }
@@ -28,6 +31,8 @@ export function FilterSidebar({
   filters,
   onFiltersChange,
   onFiltersReset,
+  categories,
+  activeCategorySlug,
   subcategories,
   brands,
 }: FilterSidebarProps) {
@@ -40,35 +45,36 @@ export function FilterSidebar({
 
   const filterGroups = (
     <>
+      <CategoryFilter categories={categories} activeSlug={activeCategorySlug} />
+      <BrandFilter
+        selectedIds={filters.brandIds}
+        onChange={(brandIds) => onFiltersChange({ brandIds })}
+        brands={brands}
+      />
       <SensitivityFilter
         selectedIds={filters.sensitivityIds}
         onChange={(sensitivityIds) => onFiltersChange({ sensitivityIds })}
       />
-      <CategoryFilter
-        selectedIds={filters.categoryIds}
-        onChange={(categoryIds) => onFiltersChange({ categoryIds })}
+      <TypeOfCategoryFilter
+        selectedIds={filters.typeOfCategoryIds}
+        onChange={(typeOfCategoryIds) => onFiltersChange({ typeOfCategoryIds })}
         subcategories={subcategories}
       />
       <ConcernsFilter
         selectedIds={filters.concernIds}
         onChange={(concernIds) => onFiltersChange({ concernIds })}
       />
+      <OffersFilter
+        selectedIds={filters.offerIds}
+        onChange={(offerIds) => onFiltersChange({ offerIds })}
+      />
       <PriceFilter
         value={filters.priceSort}
         onChange={(priceSort) => onFiltersChange({ priceSort })}
       />
-      <BrandFilter
-        selectedIds={filters.brandIds}
-        onChange={(brandIds) => onFiltersChange({ brandIds })}
-        brands={brands}
-      />
       <RatingFilter
         selectedRating={filters.rating}
         onChange={(rating) => onFiltersChange({ rating })}
-      />
-      <OffersFilter
-        selectedIds={filters.offerIds}
-        onChange={(offerIds) => onFiltersChange({ offerIds })}
       />
       <AvailabilityFilter
         inStockOnly={filters.inStockOnly}

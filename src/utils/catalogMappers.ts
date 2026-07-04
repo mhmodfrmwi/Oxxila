@@ -1,8 +1,5 @@
 import type { BestSellerProduct } from '../components/landing/best-seller/ProductCard'
-import {
-  bestSellerProducts as fallbackBestSellers,
-  skinConcerns as fallbackSkinConcerns,
-} from '../components/landing/landingData'
+import { bestSellerProducts as fallbackBestSellers } from '../components/landing/landingData'
 import type {
   ApiProduct,
   FeaturedImage,
@@ -10,6 +7,7 @@ import type {
 } from '../types/catalog'
 import { resolveProductImageUrl } from './productImage'
 import { resolveProductPricing } from './productPricing'
+import { SKIN_CONCERN_IMAGES } from './skinConcernImages'
 
 export const SKIN_CONCERN_ORDER = [
   'acne',
@@ -28,10 +26,6 @@ const SKIN_CONCERN_LABELS: Record<string, string> = {
   wrinkles: 'Wrinkles',
   'wide-pores': 'Wide pores',
 }
-
-const FALLBACK_CONCERN_IMAGES = Object.fromEntries(
-  fallbackSkinConcerns.map((concern) => [concern.id, concern.image]),
-) as Record<string, string>
 
 export function mapProductToBestSeller(product: ApiProduct): BestSellerProduct {
   const { price } = resolveProductPricing(product)
@@ -66,31 +60,13 @@ export function buildBestSellers(products: ApiProduct[]): BestSellerProduct[] {
   return fallbackBestSellers.map((product) => ({ ...product }))
 }
 
-export function buildSkinConcerns(products: ApiProduct[]): SkinConcernDisplay[] {
-  const mapped = SKIN_CONCERN_ORDER.map((slug) => {
-    const product = products.find((item) => item.concerns?.includes(slug))
-    const image =
-      product?.images?.[0] ??
-      FALLBACK_CONCERN_IMAGES[slug === 'sensitive-skin' ? 'sensitive' : slug] ??
-      FALLBACK_CONCERN_IMAGES.acne
-
-    return {
-      id: slug,
-      slug,
-      name: SKIN_CONCERN_LABELS[slug] ?? slug,
-      image,
-      href: `/search?concerns=${slug}`,
-    }
-  })
-
-  if (mapped.some((concern) => concern.image)) return mapped
-
-  return fallbackSkinConcerns.map((concern) => ({
-    id: concern.id,
-    slug: concern.id,
-    name: concern.name,
-    image: concern.image,
-    href: `/search?concerns=${concern.id}`,
+export function buildSkinConcerns(): SkinConcernDisplay[] {
+  return SKIN_CONCERN_ORDER.map((slug) => ({
+    id: slug,
+    slug,
+    name: SKIN_CONCERN_LABELS[slug] ?? slug,
+    image: SKIN_CONCERN_IMAGES[slug],
+    href: `/search?concerns=${slug}`,
   }))
 }
 

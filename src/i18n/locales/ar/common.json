@@ -1,0 +1,72 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "shop": "المتجر",
+    "categories": "الفئات",
+    "docs": "المستندات",
+    "cart": "السلة",
+    "profile": "الملف الشخصي",
+    "account": "الحساب",
+    "signInRegister": "تسجيل الدخول / إنشاء حساب",
+    "logOut": "تسجيل الخروج",
+    "loggingOut": "جاري تسجيل الخروج...",
+    "mainNavigation": "التنقل الرئيسي",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "closeMenuOverlay": "إغلاق طبقة القائمة",
+    "shoppingBag": "حقيبة التسوق",
+    "shoppingBagWithCount": "حقيبة التسوق، {{count}} عناصر"
+  },
+  "actions": {
+    "addToCart": "أضف إلى السلة",
+    "search": "بحث",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "continue": "متابعة",
+    "cancel": "إلغاء",
+    "continueShopping": "متابعة التسوق"
+  },
+  "search": {
+    "label": "بحث",
+    "placeholder": "ابحث عن..."
+  },
+  "language": {
+    "label": "اللغة",
+    "english": "English",
+    "arabic": "العربية",
+    "switcher": "مبدّل اللغة"
+  },
+  "theme": {
+    "changeTheme": "تغيير المظهر"
+  },
+  "footer": {
+    "description": "اكتشف منتجات العناية بالبشرة المثبتة سريريًا والمصممة لمساعدتك على الحصول على بشرة صحية ومشرقة.",
+    "policies": "السياسات",
+    "shopping": "التسوق",
+    "copyright": "© 2026 أوكسيلا. جميع الحقوق محفوظة.",
+    "newsletterEmail": "البريد الإلكتروني",
+    "newsletterPlaceholder": "أدخل بريدك الإلكتروني",
+    "subscribe": "اشترك",
+    "subscribing": "جاري الاشتراك...",
+    "subscribed": "تم الاشتراك",
+    "policyLinks": {
+      "about": "عن أوكسيلا",
+      "quality": "وعد الجودة",
+      "authenticity": "ضمان الأصالة",
+      "standards": "معايير الأمراض الجلدية",
+      "terms": "الشروط والأحكام",
+      "privacy": "سياسة الخصوصية",
+      "contact": "اتصل بنا"
+    },
+    "shoppingLinks": {
+      "shopAll": "تسوق كل المنتجات",
+      "skinConcerns": "مشاكل البشرة",
+      "brands": "العلامات التجارية",
+      "newArrivals": "وصل حديثًا",
+      "bestSellers": "الأكثر مبيعًا",
+      "shipping": "الشحن والتوصيل",
+      "returns": "الإرجاع والاسترداد",
+      "trackOrder": "تتبع طلبك"
+    }
+  }
+}

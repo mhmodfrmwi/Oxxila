@@ -4,6 +4,5 @@ export type { CountdownPromoSlide, PromoCarouselSlide } from './CountdownPromoCa
 export { PromoCarouselCard } from './PromoCarouselCard'
 export type { PromoCarouselBackgroundVariant, PromoCarouselCardProps } from './PromoCarouselCard'
 export { PromoCarouselSection } from './PromoCarouselSection'
-export { promoCarouselSlides } from './promoCarouselData'
 export { formatCountdown, getCountdownValues, useCountdown } from './useCountdown'
 export type { CountdownValues } from './useCountdown'

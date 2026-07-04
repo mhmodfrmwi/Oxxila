@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import { HOME_PATH } from '../../config/routes'
 import { ApiError } from '../../lib/api'
 import { getOAuthErrorMessage, getOAuthSearchParams } from '../../utils/oauth'
@@ -27,6 +28,7 @@ export function LoginForm() {
   const location = useLocation()
   const navigate = useNavigate()
   const { login, isAuthenticated } = useAuth()
+  const toast = useToast()
   const [oauthError] = useState(() => readOAuthError(location.state))
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(
@@ -59,12 +61,12 @@ export function LoginForm() {
 
     try {
       const nextUser = await login({ email, password })
-      navigate(HOME_PATH, {
-        replace: true,
-        state: { message: `Welcome back, ${nextUser.name}!` },
-      })
+      toast.success('Login successful', `Welcome back, ${nextUser.name}!`)
+      navigate(HOME_PATH, { replace: true })
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Unable to log in. Please try again.')
+      const message = err instanceof ApiError ? err.message : 'Unable to log in. Please try again.'
+      setError(message)
+      toast.error('Login failed', message)
     } finally {
       setLoading(false)
     }

@@ -269,20 +269,39 @@ export function ProductPromoCard({
           </h2>
 
           <div className="flex shrink-0 justify-center min-[769px]:justify-start">
-            <Link
-              to={slide.ctaHref}
-              onClick={(e) => e.stopPropagation()}
-              className={cn(
-                'promo-banner__cta inline-flex items-center justify-center rounded-full italic transition-all hover:brightness-110',
-                'min-h-8 min-w-[96px] px-4 text-[length:calc(var(--font-size-small)*0.9)]',
-                'min-[480px]:min-h-9 min-[480px]:min-w-[112px] min-[480px]:px-5',
-                'min-[640px]:min-h-10 min-[640px]:min-w-[140px] min-[640px]:px-6',
-                'min-[769px]:min-h-11 min-[769px]:min-w-[172px] min-[769px]:px-8',
-                typeSmallClasses,
-              )}
-            >
-              {slide.ctaLabel}
-            </Link>
+            {/^https?:\/\//i.test(slide.ctaHref) ? (
+              <a
+                href={slide.ctaHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className={cn(
+                  'promo-banner__cta inline-flex items-center justify-center rounded-full italic transition-all hover:brightness-110',
+                  'min-h-8 min-w-[96px] px-4 text-[length:calc(var(--font-size-small)*0.9)]',
+                  'min-[480px]:min-h-9 min-[480px]:min-w-[112px] min-[480px]:px-5',
+                  'min-[640px]:min-h-10 min-[640px]:min-w-[140px] min-[640px]:px-6',
+                  'min-[769px]:min-h-11 min-[769px]:min-w-[172px] min-[769px]:px-8',
+                  typeSmallClasses,
+                )}
+              >
+                {slide.ctaLabel}
+              </a>
+            ) : (
+              <Link
+                to={slide.ctaHref}
+                onClick={(e) => e.stopPropagation()}
+                className={cn(
+                  'promo-banner__cta inline-flex items-center justify-center rounded-full italic transition-all hover:brightness-110',
+                  'min-h-8 min-w-[96px] px-4 text-[length:calc(var(--font-size-small)*0.9)]',
+                  'min-[480px]:min-h-9 min-[480px]:min-w-[112px] min-[480px]:px-5',
+                  'min-[640px]:min-h-10 min-[640px]:min-w-[140px] min-[640px]:px-6',
+                  'min-[769px]:min-h-11 min-[769px]:min-w-[172px] min-[769px]:px-8',
+                  typeSmallClasses,
+                )}
+              >
+                {slide.ctaLabel}
+              </Link>
+            )}
           </div>
         </div>
 

@@ -12,6 +12,7 @@ import {
 import { getMe } from '../api/auth'
 import { ADDRESSES_PATH, LOGIN_PATH } from '../config/routes'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
 
 export interface AddressFormState {
@@ -51,6 +52,7 @@ function buildAddressPayload(form: AddressFormState) {
 export function useAddAddressPage() {
   const navigate = useNavigate()
   const { isAuthenticated, user } = useAuth()
+  const toast = useToast()
   const [form, setForm] = useState<AddressFormState>(emptyForm)
   const [errors, setErrors] = useState<AddressFormErrors>({})
   const [addresses, setAddresses] = useState<UserAddress[]>([])
@@ -151,6 +153,7 @@ export function useAddAddressPage() {
     const validation = validateForm(form)
     if (Object.keys(validation).length > 0) {
       setErrors(validation)
+      toast.error('Invalid form', 'Please fill in all required fields.')
       return
     }
 
@@ -167,6 +170,7 @@ export function useAddAddressPage() {
           )
         }
         setSubmitSuccess('Address updated successfully.')
+        toast.success('Address updated')
       } else {
         const response = await createMyAddress(payload)
         const created = response.data?.address
@@ -175,12 +179,15 @@ export function useAddAddressPage() {
           setSelectedAddressId(created._id)
         }
         setSubmitSuccess('Address saved successfully.')
+        toast.success('Address added')
       }
 
       setForm(emptyForm)
       setEditingAddressId(null)
     } catch (error) {
-      setSubmitError(error instanceof ApiError ? error.message : 'Unable to save address.')
+      const message = error instanceof ApiError ? error.message : 'Unable to save address.'
+      setSubmitError(message)
+      toast.error('Unable to save address', message)
     } finally {
       setSubmitting(false)
     }
@@ -193,8 +200,11 @@ export function useAddAddressPage() {
       await deleteMyAddress(addressId)
       setAddresses((current) => current.filter((entry) => entry._id !== addressId))
       if (selectedAddressId === addressId) setSelectedAddressId(null)
+      toast.success('Address deleted')
     } catch (error) {
-      setSubmitError(error instanceof ApiError ? error.message : 'Unable to delete address.')
+      const message = error instanceof ApiError ? error.message : 'Unable to delete address.'
+      setSubmitError(message)
+      toast.error('Unable to delete address', message)
     } finally {
       setDeletingId(null)
     }

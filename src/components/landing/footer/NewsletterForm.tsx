@@ -1,6 +1,8 @@
+// src/components/landing/footer/NewsletterForm.tsx
 import { motion } from 'framer-motion'
 import { Check, Loader2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { gradientCtaClasses, successCtaClasses } from '../../ui/buttonStyles'
 import { typeSmallClasses } from '../../ui/typography'
 import { cn } from '../../../lib/cn'
@@ -8,6 +10,7 @@ import { cn } from '../../../lib/cn'
 type FormStatus = 'idle' | 'loading' | 'success'
 
 export function NewsletterForm() {
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [status, setStatus] = useState<FormStatus>('idle')
@@ -35,13 +38,13 @@ export function NewsletterForm() {
     <form onSubmit={handleSubmit} className="mt-6 space-y-3 sm:mt-8" noValidate>
       <div>
         <label htmlFor="footer-newsletter-email" className="sr-only">
-          Email address
+          {t('footer.newsletterEmail')}
         </label>
         <input
           id="footer-newsletter-email"
           type="email"
           value={email}
-          placeholder="Enter your email"
+          placeholder={t('footer.newsletterPlaceholder')}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? 'footer-newsletter-error' : undefined}
           disabled={status === 'loading'}
@@ -82,16 +85,16 @@ export function NewsletterForm() {
         {status === 'loading' && (
           <>
             <Loader2 size={18} className="animate-spin" aria-hidden />
-            Subscribing…
+            {t('footer.subscribing')}
           </>
         )}
         {status === 'success' && (
           <>
             <Check size={18} aria-hidden />
-            Subscribed!
+            {t('footer.subscribed')}
           </>
         )}
-        {status === 'idle' && 'Subscribe'}
+        {status === 'idle' && t('footer.subscribe')}
       </motion.button>
     </form>
   )

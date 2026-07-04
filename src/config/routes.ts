@@ -44,3 +44,9 @@ export const TRACK_ORDER_PATH = '/track/order'
 export function trackOrderPath(orderId: string) {
   return `${TRACK_ORDER_PATH}/${orderId}`
 }
+
+export const COLLECTIONS_PATH = '/collections'
+
+export function collectionPath(slug: string) {
+  return `${COLLECTIONS_PATH}/${slug}`
+}

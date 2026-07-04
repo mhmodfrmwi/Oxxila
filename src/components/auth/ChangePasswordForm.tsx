@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { resetPassword } from '../../api/auth'
+import { useToast } from '../../context/ToastContext'
 import { ApiError } from '../../lib/api'
 import { Button } from '../ui/Button'
 import { Heading } from '../ui/Heading'
@@ -10,6 +11,7 @@ import { FormMessage } from './FormMessage'
 
 export function ChangePasswordForm() {
   const navigate = useNavigate()
+  const toast = useToast()
   const { token: routeToken } = useParams<{ token?: string }>()
   const [searchParams] = useSearchParams()
   const token = routeToken ?? searchParams.get('token') ?? ''
@@ -23,7 +25,9 @@ export function ChangePasswordForm() {
     setSuccess('')
 
     if (!token) {
-      setError('Reset token is missing. Open the password reset link from your email.')
+      const message = 'Reset token is missing. Open the password reset link from your email.'
+      setError(message)
+      toast.error('Invalid form', message)
       return
     }
 
@@ -33,6 +37,7 @@ export function ChangePasswordForm() {
 
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match.')
+      toast.error('Invalid form', 'Passwords do not match.')
       return
     }
 
@@ -41,6 +46,7 @@ export function ChangePasswordForm() {
     try {
       const response = await resetPassword(token, { newPassword, confirmPassword })
       setSuccess(response.message)
+      toast.success('Password changed')
       event.currentTarget.reset()
 
       setTimeout(() => {
@@ -50,7 +56,10 @@ export function ChangePasswordForm() {
         })
       }, 1500)
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Unable to update password. Please try again.')
+      const message =
+        err instanceof ApiError ? err.message : 'Unable to update password. Please try again.'
+      setError(message)
+      toast.error('Unable to update password', message)
     } finally {
       setLoading(false)
     }

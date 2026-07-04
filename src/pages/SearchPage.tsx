@@ -1,3 +1,4 @@
+// src/pages/SearchPage.tsx
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Layout } from '../components/layout/Layout'
@@ -12,15 +13,18 @@ import type { RecommendedProduct } from '../components/shop/recommended/recommen
 import { mapApiProductToRecommendedProduct } from '../utils/productDetailMappers'
 import { sortOptionToApiSort } from '../utils/productQueryParams'
 import { ApiError } from '../lib/api'
+import { useLandingCatalogContext } from '../hooks/useLandingCatalogContext'
 
 export function SearchPage() {
   const [searchParams] = useSearchParams()
+  const { brands } = useLandingCatalogContext()
   const keyword = searchParams.get('keyword') ?? searchParams.get('q') ?? ''
   const concerns = searchParams.get('concerns') ?? searchParams.get('concern') ?? ''
+  const brandId = searchParams.get('brand') ?? ''
   const [sort, setSort] = useState<SortOption>('featured')
   const searchQueryKey = useMemo(
-    () => `${keyword}\0${concerns}\0${sort}`,
-    [keyword, concerns, sort],
+    () => `${keyword}\0${concerns}\0${brandId}\0${sort}`,
+    [keyword, concerns, brandId, sort],
   )
   const [paginationState, setPaginationState] = useState({ searchQueryKey, page: 1 })
 
@@ -33,68 +37,85 @@ export function SearchPage() {
     setPaginationState({ searchQueryKey, page: nextPage })
   }
 
-  const [concernProducts, setConcernProducts] = useState<RecommendedProduct[]>([])
-  const [concernLoading, setConcernLoading] = useState(false)
-  const [concernPagination, setConcernPagination] = useState<{
+  const [filterProducts, setFilterProducts] = useState<RecommendedProduct[]>([])
+  const [filterLoading, setFilterLoading] = useState(false)
+  const [filterError, setFilterError] = useState<string | null>(null)
+  const [filterPagination, setFilterPagination] = useState<{
     totalDocuments: number
     numberOfPages: number
   } | null>(null)
 
-  const { products, loading, error, pagination } = useSearchProducts(keyword, sort, page, PRODUCTS_PER_PAGE)
+  const { products, loading, error, pagination } = useSearchProducts(
+    keyword,
+    sort,
+    page,
+    PRODUCTS_PER_PAGE,
+  )
 
-  const isConcernBrowse = !keyword.trim() && Boolean(concerns.trim())
+  const isFilterBrowse = !keyword.trim() && (Boolean(concerns.trim()) || Boolean(brandId.trim()))
 
   useEffect(() => {
-    if (!isConcernBrowse) return
+    if (!isFilterBrowse) return
 
     let cancelled = false
 
-    async function loadByConcern() {
+    async function loadByFilter() {
       await Promise.resolve()
       if (cancelled) return
 
-      setConcernLoading(true)
+      setFilterLoading(true)
+      setFilterError(null)
       try {
         const response = await getProducts({
-          concerns,
+          ...(concerns.trim() ? { concerns } : {}),
+          ...(brandId.trim() ? { brand: brandId.trim() } : {}),
           page,
           limit: PRODUCTS_PER_PAGE,
           sort: sortOptionToApiSort(sort),
         })
         if (cancelled) return
-        setConcernProducts((response.data ?? []).map(mapApiProductToRecommendedProduct))
-        setConcernPagination({
+        setFilterProducts((response.data ?? []).map(mapApiProductToRecommendedProduct))
+        setFilterPagination({
           totalDocuments: response.pagination?.totalDocuments ?? 0,
           numberOfPages: response.pagination?.numberOfPages ?? 1,
         })
       } catch (loadError) {
         if (cancelled) return
-        if (!(loadError instanceof ApiError)) {
-          setConcernProducts([])
-        }
+        setFilterProducts([])
+        setFilterError(
+          loadError instanceof ApiError ? loadError.message : 'Unable to load products.',
+        )
       } finally {
-        if (!cancelled) setConcernLoading(false)
+        if (!cancelled) setFilterLoading(false)
       }
     }
 
-    void loadByConcern()
+    void loadByFilter()
 
     return () => {
       cancelled = true
     }
-  }, [isConcernBrowse, concerns, page, sort])
+  }, [isFilterBrowse, concerns, brandId, page, sort])
 
-  const displayProducts = isConcernBrowse ? concernProducts : products
-  const displayLoading = isConcernBrowse ? concernLoading : loading
-  const displayPagination = isConcernBrowse ? concernPagination : pagination
+  const displayProducts = isFilterBrowse ? filterProducts : products
+  const displayLoading = isFilterBrowse ? filterLoading : loading
+  const displayError = isFilterBrowse ? filterError : error
+  const displayPagination = isFilterBrowse ? filterPagination : pagination
   const totalPages = displayPagination?.numberOfPages ?? 1
   const totalResults = displayPagination?.totalDocuments ?? displayProducts.length
+  const hasQuery = Boolean(keyword.trim() || concerns.trim() || brandId.trim())
+
+  const brandName = useMemo(() => {
+    if (!brandId.trim()) return ''
+    return brands.find((brand) => brand._id === brandId.trim())?.name ?? 'Brand'
+  }, [brandId, brands])
 
   const title = useMemo(() => {
     if (keyword.trim()) return `Search results for "${keyword.trim()}"`
+    if (brandId.trim()) return brandName
     if (concerns.trim()) return `Products for ${concerns.replace(/-/g, ' ')}`
     return 'Search products'
-  }, [keyword, concerns])
+  }, [keyword, concerns, brandId, brandName])
 
   return (
     <Layout>
@@ -108,31 +129,35 @@ export function SearchPage() {
           className="pt-6"
         />
 
-        {!keyword.trim() && !concerns.trim() && (
+        {!hasQuery && (
           <p className="py-12 text-center text-sm text-secondary-text">
             Enter a search term in the header or browse by skin concern from the shop page.
           </p>
         )}
 
-        {error && (
+        {displayError && (
           <p className="mb-4 text-sm text-support-error" role="alert">
-            {error}
+            {displayError}
           </p>
         )}
 
         {displayLoading ? (
           <div className="grid grid-cols-2 gap-4 min-[769px]:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: PRODUCTS_PER_PAGE }).map((_, index) => (
-              <div key={index} className="aspect-square animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
+              <div
+                key={index}
+                className="aspect-square animate-pulse rounded-[20px] bg-surface-muted"
+                aria-hidden
+              />
             ))}
           </div>
         ) : displayProducts.length > 0 ? (
           <ProductGrid products={displayProducts} />
-        ) : (keyword.trim() || concerns.trim()) ? (
+        ) : hasQuery ? (
           <p className="py-12 text-center text-sm text-secondary-text">No products found.</p>
         ) : null}
 
-        {(keyword.trim() || concerns.trim()) && (
+        {hasQuery && (
           <Pagination
             currentPage={page}
             totalPages={totalPages}

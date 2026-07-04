@@ -1,8 +1,10 @@
-import promoBestSellers from '../../assets/landing/sections/cta-image0_110_5881.png'
-import promoNewArrivals from '../../assets/landing/sections/cta-image1_110_5881.png'
-import promoTopRated from '../../assets/landing/sections/cta-image2_110_5881.jpg'
-import promoOffers from '../../assets/landing/sections/cta-image3_110_5881.jpg'
-import promoDermatologist from '../../assets/landing/sections/cta-image4_110_5881.png'
+// src/components/shop/moreReasonsData.ts
+import promoNewArrivals from '../../assets/Rectangle 4347.png'
+import promoTrending from '../../assets/Rectangle 4347(1).png'
+import promoBestSellers from '../../assets/Rectangle 4347(2).png'
+import promoOffers from '../../assets/Rectangle 4347(3).png'
+import promoDermatologist from '../../assets/Rectangle 4347(4).png'
+import { getCollectionHref } from '../../config/collections'
 
 export type PromotionLayout = 'compact' | 'tall' | 'wide'
 
@@ -26,7 +28,7 @@ export const shopPromotions: ShopPromotion[] = [
     subtitle: 'Fresh takes you almost need',
     image: promoNewArrivals,
     imageAlt: 'New skincare arrivals',
-    href: '/shop?filter=new-arrivals',
+    href: getCollectionHref('new-arrivals'),
     layout: 'compact',
     gridClassName: 'lg:col-start-1 lg:row-start-1',
   },
@@ -36,7 +38,7 @@ export const shopPromotions: ShopPromotion[] = [
     subtitle: 'Fill your cart',
     image: promoBestSellers,
     imageAlt: 'Best selling skincare products',
-    href: '/shop?filter=best-sellers',
+    href: getCollectionHref('best-sellers'),
     layout: 'compact',
     gridClassName: 'lg:col-start-1 lg:row-start-2',
   },
@@ -44,9 +46,9 @@ export const shopPromotions: ShopPromotion[] = [
     id: 'top-rated',
     title: 'Top Rated',
     subtitle: 'stay in trend',
-    image: promoTopRated,
+    image: promoTrending,
     imageAlt: 'Top rated skincare collection',
-    href: '/shop?filter=top-rated',
+    href: getCollectionHref('trending'),
     layout: 'tall',
     gridClassName: 'lg:col-start-2 lg:row-start-1 lg:row-span-2',
   },
@@ -56,7 +58,7 @@ export const shopPromotions: ShopPromotion[] = [
     subtitle: 'discover Oxxila deals',
     image: promoOffers,
     imageAlt: 'Special offers and discounts',
-    href: '/shop?filter=offers',
+    href: getCollectionHref('offers'),
     layout: 'wide',
     gridClassName: 'lg:col-start-3 lg:row-start-1',
   },
@@ -66,7 +68,7 @@ export const shopPromotions: ShopPromotion[] = [
     subtitle: 'Doctor Recommended Skincare',
     image: promoDermatologist,
     imageAlt: 'Dermatologist recommended skincare',
-    href: '/shop?filter=dermatologist',
+    href: getCollectionHref('featured'),
     layout: 'wide',
     gridClassName: 'lg:col-start-3 lg:row-start-2',
   },

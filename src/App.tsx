@@ -17,12 +17,12 @@ import {
   PRODUCTS_PATH,
   REGISTER_PATH,
   RESET_PASSWORD_PATH,
+  COLLECTIONS_PATH,
   SEARCH_PATH,
   SHOP_PATH,
   TRACK_ORDER_PATH,
   VERIFY_OTP_PATH,
 } from './config/routes'
-import { CategoryIndexRedirect } from './components/category/CategoryIndexRedirect'
 import { RouteFallback } from './components/ui/RouteFallback'
 
 const LandingPage = lazy(() =>
@@ -60,8 +60,14 @@ const AddAddressPage = lazy(() =>
 const SearchPage = lazy(() =>
   import('./pages/SearchPage').then((module) => ({ default: module.SearchPage })),
 )
+const CategoriesPage = lazy(() =>
+  import('./pages/CategoriesPage').then((module) => ({ default: module.CategoriesPage })),
+)
 const CategoryPage = lazy(() =>
   import('./pages/CategoryPage').then((module) => ({ default: module.CategoryPage })),
+)
+const CollectionPage = lazy(() =>
+  import('./pages/CollectionPage').then((module) => ({ default: module.CollectionPage })),
 )
 const ProductPage = lazy(() =>
   import('./pages/ProductPage').then((module) => ({ default: module.ProductPage })),
@@ -97,8 +103,9 @@ export default function App() {
         <Route path={`${TRACK_ORDER_PATH}/:orderId`} element={<TrackOrderPage />} />
         <Route path={ADD_ADDRESS_PATH} element={<AddAddressPage />} />
         <Route path={SEARCH_PATH} element={<SearchPage />} />
-        <Route path={CATEGORIES_PATH} element={<CategoryIndexRedirect />} />
+        <Route path={CATEGORIES_PATH} element={<CategoriesPage />} />
         <Route path={`${CATEGORIES_PATH}/:slug`} element={<CategoryPage />} />
+        <Route path={`${COLLECTIONS_PATH}/:slug`} element={<CollectionPage />} />
         <Route path={`${PRODUCTS_PATH}/:slug`} element={<ProductPage />} />
         <Route path="/" element={<Navigate to={HOME_PATH} replace />} />
         <Route path={LOGIN_PATH} element={<LoginPage />} />
