@@ -1,4 +1,6 @@
+// src/components/shop/recommended/RecommendedProductsSection.tsx
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getRecommendations } from '../../../api/users'
 import { useAuth } from '../../../context/AuthContext'
 import { useLandingCatalogContext } from '../../../hooks/useLandingCatalogContext'
@@ -8,9 +10,12 @@ import { ContentSection } from '../../layout/ContentSection'
 import { SectionHeader } from '../../landing/SectionHeader'
 
 export function RecommendedProductsSection() {
+  const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const { products: catalogProducts, loading: catalogLoading } = useLandingCatalogContext()
-  const [recommendedFromApi, setRecommendedFromApi] = useState<ReturnType<typeof mapApiProductToRecommendedProduct>[]>([])
+  const [recommendedFromApi, setRecommendedFromApi] = useState<
+    ReturnType<typeof mapApiProductToRecommendedProduct>[]
+  >([])
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
 
   useEffect(() => {
@@ -50,11 +55,18 @@ export function RecommendedProductsSection() {
 
   return (
     <ContentSection aria-labelledby="recommended-products-heading">
-      <SectionHeader id="recommended-products-heading" title="Recommended for you" size="compact" />
+      <SectionHeader
+        id="recommended-products-heading"
+        title={t('shop.recommended.title')}
+        size="compact"
+      />
       {loading ? (
         <div className="h-[280px] animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
       ) : (
-        <ProductCarousel products={recommendedProducts} />
+        <ProductCarousel
+          products={recommendedProducts}
+          ariaLabel={t('shop.recommended.ariaLabel')}
+        />
       )}
     </ContentSection>
   )

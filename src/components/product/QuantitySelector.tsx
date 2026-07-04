@@ -1,4 +1,6 @@
+// src/components/product/QuantitySelector.tsx
 import { Minus, Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../ui/interactionStyles'
 
@@ -17,6 +19,8 @@ export function QuantitySelector({
   max = 99,
   className,
 }: QuantitySelectorProps) {
+  const { t } = useTranslation()
+
   function decrement() {
     onChange(Math.max(min, value - 1))
   }
@@ -40,7 +44,7 @@ export function QuantitySelector({
     >
       <button
         type="button"
-        aria-label="Decrease quantity"
+        aria-label={t('productDetail.decreaseQuantity')}
         disabled={value <= min}
         onClick={decrement}
         className={controlClass}
@@ -50,13 +54,13 @@ export function QuantitySelector({
       <span
         className="product-detail-qty-value"
         aria-live="polite"
-        aria-label={`Quantity: ${value}`}
+        aria-label={t('productDetail.quantityValue', { value })}
       >
         {value}
       </span>
       <button
         type="button"
-        aria-label="Increase quantity"
+        aria-label={t('productDetail.increaseQuantity')}
         disabled={value >= max}
         onClick={increment}
         className={controlClass}

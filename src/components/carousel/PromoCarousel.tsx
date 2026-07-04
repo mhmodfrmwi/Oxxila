@@ -1,7 +1,9 @@
+// src/components/carousel/PromoCarousel.tsx
 import { motion } from 'framer-motion'
 import { useCallback, useState, type ReactNode } from 'react'
 import { cn } from '../../lib/cn'
 import { useCarouselAutoplay } from '../../hooks/useCarouselAutoplay'
+import { CarouselFrame } from './CarouselFrame'
 import { PromoCarouselControls } from './PromoCarouselControls'
 import { carouselTransition, getLayeredCardMotion } from './carouselMotion'
 import { getWrappedOffset } from './getWrappedOffset'
@@ -35,7 +37,8 @@ export function PromoCarousel<T>({
   autoplayMs = 5000,
   className,
   trackClassName,
-  trackHeightClassName = 'h-[min(360px,78vw)] min-[640px]:h-[min(400px,68vw)] min-[769px]:h-[430px]',
+  trackHeightClassName =
+    'h-[min(360px,78vw)] min-[640px]:h-[min(400px,68vw)] min-[769px]:h-[396px] min-[1536px]:h-[430px]',
   ariaLabel = 'Promotional carousel',
 }: PromoCarouselProps<T>) {
   const [activeIndex, setActiveIndex] = useState(0)
@@ -64,9 +67,10 @@ export function PromoCarousel<T>({
   if (total === 0) return null
 
   return (
-    <section
+    <CarouselFrame
+      as="section"
       aria-label={ariaLabel}
-      className={cn('relative', className)}
+      className={className}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
@@ -142,6 +146,6 @@ export function PromoCarousel<T>({
           onNext={goNext}
         />
       </div>
-    </section>
+    </CarouselFrame>
   )
 }

@@ -1,3 +1,5 @@
+// src/components/product/reviews/ReviewsSection.tsx
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/cn'
 import { Button } from '../../ui/Button'
 import { RatingSummaryCard } from './RatingSummaryCard'
@@ -44,12 +46,16 @@ export function ReviewsSection({
   onWriteReview,
   onViewAll,
 }: ReviewsSectionProps) {
+  const { t } = useTranslation()
   const visibleReviews = reviews.slice(0, initialVisibleCount)
   const totalDocuments = reviewsTotalDocuments ?? totalReviews
   const showViewAll = totalDocuments > initialVisibleCount
 
   return (
-    <section className={cn('reviews-section', className)} aria-label="Customer reviews">
+    <section
+      className={cn('reviews-section', className)}
+      aria-label={t('productDetail.reviews.ariaLabel')}
+    >
       {loading ? (
         <ReviewsSectionSkeleton />
       ) : (
@@ -70,7 +76,7 @@ export function ReviewsSection({
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-secondary-text">No reviews yet.</p>
+                <p className="text-sm text-secondary-text">{t('productDetail.reviews.empty')}</p>
               )}
             </div>
 
@@ -83,7 +89,7 @@ export function ReviewsSection({
                   className="reviews-view-all-btn !border"
                   onClick={onViewAll}
                 >
-                  View all comments
+                  {t('productDetail.reviews.viewAll')}
                 </Button>
               </div>
             )}

@@ -1,3 +1,4 @@
+export { CarouselFrame } from './CarouselFrame'
 export { PromoCarousel } from './PromoCarousel'
 export { PromoCarousel as Carousel } from './PromoCarousel'
 export type { PromoCarouselSlideProps } from './PromoCarousel'

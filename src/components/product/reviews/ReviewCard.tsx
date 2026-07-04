@@ -1,4 +1,6 @@
+// src/components/product/reviews/ReviewCard.tsx
 import { Languages, ThumbsUp } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { StarDisplay } from './StarDisplay'
 import type { Review } from './types'
 
@@ -7,6 +9,7 @@ interface ReviewCardProps {
 }
 
 export function ReviewCard({ review }: ReviewCardProps) {
+  const { t } = useTranslation()
   const titleId = review.title ? `review-title-${review.id}` : undefined
 
   return (
@@ -40,11 +43,11 @@ export function ReviewCard({ review }: ReviewCardProps) {
       <div className="review-card-footer">
         <button type="button" className="review-card-action">
           <ThumbsUp size={16} strokeWidth={1.5} aria-hidden />
-          <span>Helpful ({review.helpful})</span>
+          <span>{t('productDetail.reviews.helpful', { count: review.helpful })}</span>
         </button>
         <button type="button" className="review-card-action">
           <Languages size={16} strokeWidth={1.5} aria-hidden />
-          <span>Translate</span>
+          <span>{t('productDetail.reviews.translate')}</span>
         </button>
       </div>
     </article>

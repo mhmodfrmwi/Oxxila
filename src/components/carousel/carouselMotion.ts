@@ -34,10 +34,12 @@ export function getLayeredCardMotion(offset: number, viewport: CarouselViewport)
     return { x: offset * 280, scale: 0.9, opacity: 0, zIndex: 0 }
   }
 
+  // Offsets scaled for ~828px banner cards (laptop/small desktop).
+  // Large monitors use 900px cards; overlap stays proportional.
   const distance = Math.abs(offset)
 
   if (distance > 2) {
-    return { x: offset * 300, scale: 0.86, opacity: 0, zIndex: 0 }
+    return { x: offset * 276, scale: 0.86, opacity: 0, zIndex: 0 }
   }
 
   if (distance === 0) {
@@ -45,8 +47,8 @@ export function getLayeredCardMotion(offset: number, viewport: CarouselViewport)
   }
 
   if (distance === 1) {
-    return { x: offset * 278, scale: 0.92, opacity: 0.58, zIndex: 20 }
+    return { x: offset * 256, scale: 0.92, opacity: 0.58, zIndex: 20 }
   }
 
-  return { x: offset * 340, scale: 0.88, opacity: 0.28, zIndex: 10 }
+  return { x: offset * 313, scale: 0.88, opacity: 0.28, zIndex: 10 }
 }

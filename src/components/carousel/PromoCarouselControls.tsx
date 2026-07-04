@@ -1,4 +1,6 @@
+// src/components/carousel/PromoCarouselControls.tsx
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 
 interface PromoCarouselControlsProps {
@@ -16,6 +18,8 @@ export function PromoCarouselControls({
   onPrev,
   onNext,
 }: PromoCarouselControlsProps) {
+  const { t } = useTranslation()
+
   const arrowClass = cn(
     'flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
     'text-secondary-text transition-colors hover:bg-input hover:text-primary-text',
@@ -24,14 +28,19 @@ export function PromoCarouselControls({
 
   return (
     <div className="flex items-center justify-center gap-2">
-      <button type="button" className={arrowClass} onClick={onPrev} aria-label="Previous slide">
+      <button
+        type="button"
+        className={arrowClass}
+        onClick={onPrev}
+        aria-label={t('shop.carousel.previousSlide')}
+      >
         <ChevronLeft className="h-4 w-4" strokeWidth={1.75} aria-hidden />
       </button>
 
       <div
         className="flex items-center justify-center gap-1.5"
         role="tablist"
-        aria-label="Carousel pagination"
+        aria-label={t('shop.carousel.pagination')}
       >
         {Array.from({ length: count }).map((_, index) => {
           const isActive = index === activeIndex
@@ -41,7 +50,7 @@ export function PromoCarouselControls({
               type="button"
               role="tab"
               aria-selected={isActive}
-              aria-label={`Go to slide ${index + 1}`}
+              aria-label={t('shop.carousel.goToSlide', { number: index + 1 })}
               onClick={() => onSelect(index)}
               className="flex h-8 w-6 items-center justify-center"
             >
@@ -58,7 +67,12 @@ export function PromoCarouselControls({
         })}
       </div>
 
-      <button type="button" className={arrowClass} onClick={onNext} aria-label="Next slide">
+      <button
+        type="button"
+        className={arrowClass}
+        onClick={onNext}
+        aria-label={t('shop.carousel.nextSlide')}
+      >
         <ChevronRight className="h-4 w-4" strokeWidth={1.75} aria-hidden />
       </button>
     </div>

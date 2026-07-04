@@ -1,3 +1,5 @@
+// src/components/product/ProductPageContent.tsx
+import { useTranslation } from 'react-i18next'
 import { Navigate, useParams } from 'react-router-dom'
 import { Breadcrumb } from '../ui/Breadcrumb'
 import { HOME_PATH, SHOP_PATH } from '../../config/routes'
@@ -19,6 +21,7 @@ function ProductDetailSkeleton() {
 }
 
 export function ProductPageContent() {
+  const { t } = useTranslation()
   const { slug } = useParams<{ slug: string }>()
   const {
     loading,
@@ -50,9 +53,7 @@ export function ProductPageContent() {
     return (
       <div className="container-content pb-10 sm:pb-12 lg:pb-20">
         <p className="text-sm text-support-error" role="alert">
-          {errorKind === 'not_found'
-            ? 'Product not found.'
-            : error ?? 'Unable to load product details.'}
+          {errorKind === 'not_found' ? t('productDetail.notFound') : t('productDetail.loadError')}
         </p>
       </div>
     )
@@ -66,7 +67,7 @@ export function ProductPageContent() {
         <Breadcrumb
           className="mb-6 sm:mb-8 lg:mb-10"
           items={[
-            { label: 'Home', href: HOME_PATH },
+            { label: t('nav.home'), href: HOME_PATH },
             { label: product.categoryName, href: product.categoryHref },
             { label: productName },
           ]}

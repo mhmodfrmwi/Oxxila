@@ -17,6 +17,9 @@ export interface ProductDetail {
   image: string
   imageAlt: string
   badge?: string
+  /** ISO date string — format with i18n on the product page */
+  offerEndsAt?: string
+  /** @deprecated Prefer formatting offerEndsAt in the UI */
   offerEndsLabel?: string
   soldCount?: number
   subCategoryName?: string

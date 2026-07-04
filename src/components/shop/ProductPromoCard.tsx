@@ -104,7 +104,7 @@ function BrandMark({
       )}
     >
       {isLrp ? (
-        <div className="relative text-left">
+        <div className="relative text-start">
           <span
             className="absolute top-0 right-[28%] h-2 w-2 bg-[#0043ce] sm:h-2.5 sm:w-2.5"
             aria-hidden
@@ -221,7 +221,9 @@ export function ProductPromoCard({
         'promo-banner',
         'h-[min(360px,78vw)] w-[min(900px,96vw)] overflow-hidden rounded-card',
         'min-[640px]:h-[min(400px,68vw)] min-[640px]:w-[min(900px,96vw)]',
-        'min-[769px]:h-[430px] min-[769px]:w-[900px]',
+        /* ~8% smaller on laptop/small desktop; full size from 1536px */
+        'min-[769px]:h-[396px] min-[769px]:w-[828px]',
+        'min-[1536px]:h-[430px] min-[1536px]:w-[900px]',
         'border border-[color:var(--promo-border)] bg-[color:var(--promo-bg)]',
         'text-[color:var(--promo-text)] shadow-xl transition-shadow duration-500',
         '[box-shadow:0_20px_40px_var(--promo-shadow)]',
@@ -253,7 +255,11 @@ export function ProductPromoCard({
           )}
         >
           <div className="flex shrink-0 justify-center min-[769px]:justify-start">
-            <BrandMark brand={slide.brand} subline={slide.brandSubline} variant={slide.variant} />
+            <BrandMark
+              brand={slide.brand}
+              subline={slide.brandSubline}
+              variant={slide.variant}
+            />
           </div>
 
           <h2
@@ -262,7 +268,7 @@ export function ProductPromoCard({
               'text-[length:calc(var(--font-size-base)*0.88)]',
               'min-[480px]:text-[length:calc(var(--font-size-base)*1.05)]',
               'min-[640px]:text-[length:calc(var(--font-size-base)*1.35)]',
-              'min-[769px]:text-left min-[769px]:text-[length:calc(var(--font-size-base)*2.05)]',
+              'min-[769px]:text-start min-[769px]:text-[length:calc(var(--font-size-base)*2.05)]',
             )}
           >
             {slide.headline}

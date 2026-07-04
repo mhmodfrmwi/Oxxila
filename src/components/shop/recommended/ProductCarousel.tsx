@@ -1,6 +1,9 @@
+// src/components/shop/recommended/ProductCarousel.tsx
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useCallback, useLayoutEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { CarouselFrame } from '../../carousel/CarouselFrame'
 import { carouselTransition } from '../../carousel/carouselMotion'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
@@ -22,14 +25,15 @@ function CarouselArrow({
   onClick,
   disabled,
   className,
+  label,
 }: {
   direction: 'prev' | 'next'
   onClick: () => void
   disabled: boolean
   className?: string
+  label: string
 }) {
   const Icon = direction === 'prev' ? ChevronLeft : ChevronRight
-  const label = direction === 'prev' ? 'Previous products' : 'Next products'
 
   return (
     <button
@@ -54,16 +58,14 @@ function CarouselArrow({
   )
 }
 
-export function ProductCarousel({
-  products,
-  ariaLabel = 'Recommended products',
-  className,
-}: ProductCarouselProps) {
+export function ProductCarousel({ products, ariaLabel, className }: ProductCarouselProps) {
+  const { t } = useTranslation()
   const [activeIndex, setActiveIndex] = useState(0)
   const [stepPx, setStepPx] = useState(0)
   const [maxIndex, setMaxIndex] = useState(0)
   const viewportRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
+  const resolvedAriaLabel = ariaLabel ?? t('shop.recommended.ariaLabel')
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current
@@ -103,14 +105,16 @@ export function ProductCarousel({
   if (products.length === 0) return null
 
   const canScroll = maxIndex > 0
+  const prevLabel = t('shop.carousel.previous')
+  const nextLabel = t('shop.carousel.next')
 
   return (
-    <div className={cn('relative', className)}>
+    <CarouselFrame className={className}>
       <div
         ref={viewportRef}
         className="overflow-hidden pr-2 sm:pr-4 lg:pr-14"
         aria-roledescription="carousel"
-        aria-label={ariaLabel}
+        aria-label={resolvedAriaLabel}
       >
         <motion.div
           ref={trackRef}
@@ -142,12 +146,14 @@ export function ProductCarousel({
             direction="prev"
             onClick={goPrev}
             disabled={activeIndex === 0}
+            label={prevLabel}
             className="absolute top-[calc(50%-2.5rem)] left-0 z-10 hidden -translate-y-1/2 lg:flex"
           />
           <CarouselArrow
             direction="next"
             onClick={goNext}
             disabled={activeIndex >= maxIndex}
+            label={nextLabel}
             className="absolute top-[calc(50%-2.5rem)] right-0 z-10 -translate-y-1/2"
           />
         </>
@@ -155,10 +161,20 @@ export function ProductCarousel({
 
       {canScroll && (
         <div className="mt-5 flex items-center justify-center gap-3 lg:hidden">
-          <CarouselArrow direction="prev" onClick={goPrev} disabled={activeIndex === 0} />
-          <CarouselArrow direction="next" onClick={goNext} disabled={activeIndex >= maxIndex} />
+          <CarouselArrow
+            direction="prev"
+            onClick={goPrev}
+            disabled={activeIndex === 0}
+            label={prevLabel}
+          />
+          <CarouselArrow
+            direction="next"
+            onClick={goNext}
+            disabled={activeIndex >= maxIndex}
+            label={nextLabel}
+          />
         </div>
       )}
-    </div>
+    </CarouselFrame>
   )
 }

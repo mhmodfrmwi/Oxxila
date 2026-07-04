@@ -1,3 +1,5 @@
+// src/components/product/MoreFromMACCosmetics.tsx
+import { useTranslation } from 'react-i18next'
 import { ContentSection } from '../layout/ContentSection'
 import { SectionHeader } from '../landing/SectionHeader'
 import { ProductCarousel } from '../shop/recommended/ProductCarousel'
@@ -11,17 +13,17 @@ export interface MoreFromMACCosmeticsProps {
 }
 
 export function MoreFromMACCosmetics({ brandName, products }: MoreFromMACCosmeticsProps) {
+  const { t } = useTranslation()
+
   if (products.length === 0) return null
 
-  const sectionTitle = brandName ? `More from ${brandName}` : 'More from this brand'
+  const sectionTitle = brandName
+    ? t('productDetail.moreFromBrand', { brand: brandName })
+    : t('productDetail.moreFromBrandFallback')
 
   return (
     <ContentSection padding="compact" aria-labelledby="more-from-brand-heading">
-      <SectionHeader
-        id="more-from-brand-heading"
-        title={sectionTitle}
-        size="compact"
-      />
+      <SectionHeader id="more-from-brand-heading" title={sectionTitle} size="compact" />
       <ProductCarousel products={products} ariaLabel={sectionTitle} />
     </ContentSection>
   )

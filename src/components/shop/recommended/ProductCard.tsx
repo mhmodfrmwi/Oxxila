@@ -1,5 +1,7 @@
+// src/components/shop/recommended/ProductCard.tsx
 import { Heart, ShoppingBag } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
@@ -23,6 +25,7 @@ const carouselImageHeightClasses =
   'h-[168px] sm:h-[184px] md:h-[196px] lg:h-[212px]'
 
 export function ProductCard({ product, layout = 'carousel', className }: ProductCardProps) {
+  const { t } = useTranslation()
   const { brand, title, price, originalPrice, rating, reviewCount, image, imageAlt, badge, href } =
     product
   const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null)
@@ -53,7 +56,7 @@ export function ProductCard({ product, layout = 'carousel', className }: Product
           )}
         >
           {badge && (
-            <span className="absolute top-3 left-3 z-10">
+            <span className="absolute start-3 top-3 z-10">
               <ProductBadge>{badge}</ProductBadge>
             </span>
           )}
@@ -80,22 +83,22 @@ export function ProductCard({ product, layout = 'carousel', className }: Product
 
           <IconActionButton
             icon={Heart}
-            label="Add to wishlist"
+            label={t('shop.product.addToWishlist')}
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
             }}
-            className="absolute bottom-3 left-3 z-10"
+            className="absolute bottom-3 start-3 z-10"
           />
 
           <IconActionButton
             icon={ShoppingBag}
-            label="Add to cart"
+            label={t('actions.addToCart')}
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
             }}
-            className="absolute right-3 bottom-3 z-10"
+            className="absolute end-3 bottom-3 z-10"
           />
         </div>
 

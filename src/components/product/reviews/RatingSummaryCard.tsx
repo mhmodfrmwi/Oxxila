@@ -1,3 +1,5 @@
+// src/components/product/reviews/RatingSummaryCard.tsx
+import { useTranslation } from 'react-i18next'
 import { Button } from '../../ui/Button'
 import { RatingBar } from './RatingBar'
 import { StarDisplay } from './StarDisplay'
@@ -16,20 +18,29 @@ export function RatingSummaryCard({
   distribution,
   onWriteReview,
 }: RatingSummaryCardProps) {
+  const { t } = useTranslation()
   const formattedRating = averageRating.toFixed(1)
 
   return (
     <article className="reviews-summary-card">
       <div className="reviews-summary-header">
-        <span className="reviews-summary-score" aria-label={`${formattedRating} out of 5 stars`}>
+        <span
+          className="reviews-summary-score"
+          aria-label={t('productDetail.reviews.outOfFive', { rating: formattedRating })}
+        >
           {formattedRating}
         </span>
         <StarDisplay rating={averageRating} size={16} className="reviews-summary-stars" />
       </div>
 
-      <p className="reviews-summary-count">Based on {totalReviews} reviews</p>
+      <p className="reviews-summary-count">
+        {t('productDetail.reviews.basedOn', { count: totalReviews })}
+      </p>
 
-      <div className="reviews-summary-distribution" aria-label="Rating distribution">
+      <div
+        className="reviews-summary-distribution"
+        aria-label={t('productDetail.reviews.distribution')}
+      >
         {distribution.map((item) => (
           <RatingBar key={item.stars} item={item} />
         ))}
@@ -43,7 +54,7 @@ export function RatingSummaryCard({
         className="reviews-summary-cta"
         onClick={onWriteReview}
       >
-        Write a review
+        {t('productDetail.reviews.writeReview')}
       </Button>
     </article>
   )

@@ -1,5 +1,7 @@
+// src/components/product/ProductImageGallery.tsx
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState, type SyntheticEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../ui/interactionStyles'
 import { PRODUCT_IMAGE_PLACEHOLDER } from '../../utils/productImage'
@@ -18,6 +20,7 @@ export function ProductImageGallery({
   onActiveIndexChange,
   className,
 }: ProductImageGalleryProps) {
+  const { t } = useTranslation()
   const [internalIndex, setInternalIndex] = useState(0)
   const activeIndex = controlledIndex ?? internalIndex
 
@@ -59,11 +62,15 @@ export function ProductImageGallery({
           onError={handleImageError}
         />
 
-        <div className="product-detail-gallery-nav" aria-label="Gallery navigation">
+        <div
+          className="product-detail-gallery-nav"
+          dir="ltr"
+          aria-label={t('productDetail.gallery.navigation')}
+        >
           <button
             type="button"
             onClick={goPrev}
-            aria-label="Previous image"
+            aria-label={t('productDetail.gallery.previous')}
             className={cn(
               'product-detail-gallery-arrow flex items-center justify-center p-1',
               focusRingClasses,
@@ -72,13 +79,16 @@ export function ProductImageGallery({
             <ChevronLeft size={12} strokeWidth={1.5} aria-hidden />
           </button>
 
-          <ul className={cn('product-detail-gallery-dots flex items-center')} aria-label="Image pagination">
+          <ul
+            className={cn('product-detail-gallery-dots flex items-center')}
+            aria-label={t('productDetail.gallery.pagination')}
+          >
             {images.map((image, index) => (
               <li key={`${image.src}-dot-${index}`} className="product-detail-gallery-dot-slot">
                 <button
                   type="button"
                   onClick={() => setActiveIndex(index)}
-                  aria-label={`Go to image ${index + 1}`}
+                  aria-label={t('productDetail.gallery.goToImage', { number: index + 1 })}
                   aria-current={index === activeIndex ? 'true' : undefined}
                   className={cn('product-detail-gallery-dot', focusRingClasses)}
                   data-active={index === activeIndex ? 'true' : 'false'}
@@ -90,7 +100,7 @@ export function ProductImageGallery({
           <button
             type="button"
             onClick={goNext}
-            aria-label="Next image"
+            aria-label={t('productDetail.gallery.next')}
             className={cn(
               'product-detail-gallery-arrow flex items-center justify-center p-1',
               focusRingClasses,
@@ -117,20 +127,19 @@ export function ProductMediaThumbnails({
   onSelect,
   className,
 }: ProductMediaThumbnailsProps) {
+  const { t } = useTranslation()
+
   return (
     <ul
-      className={cn(
-        'product-detail-media-thumbs flex flex-wrap items-end',
-        className,
-      )}
-      aria-label="Product media"
+      className={cn('product-detail-media-thumbs flex flex-wrap items-end', className)}
+      aria-label={t('productDetail.gallery.productMedia')}
     >
       {images.map((image, index) => (
         <li key={`${image.src}-media-${index}`}>
           <button
             type="button"
             onClick={() => onSelect(index)}
-            aria-label={`View media ${index + 1}`}
+            aria-label={t('productDetail.gallery.viewMedia', { number: index + 1 })}
             aria-current={index === activeIndex ? 'true' : undefined}
             className={cn(
               'product-card-frame product-detail-thumb block overflow-hidden',

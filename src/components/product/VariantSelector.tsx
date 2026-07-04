@@ -1,3 +1,5 @@
+// src/components/product/VariantSelector.tsx
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../ui/interactionStyles'
 
@@ -16,13 +18,15 @@ export function VariantSelector({
   onChange,
   className,
 }: VariantSelectorProps) {
+  const { t } = useTranslation()
+
   return (
     <div className={cn('product-detail-selector-section', className)}>
       <p className="product-detail-selector-label">{label}</p>
       <div
         className="product-detail-variant-options flex flex-wrap"
         role="group"
-        aria-label={`${label} options`}
+        aria-label={t('productDetail.optionsAria', { label })}
       >
         {options.map((option) => {
           const isSelected = option === value

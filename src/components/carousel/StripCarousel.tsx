@@ -1,6 +1,7 @@
+// src/components/carousel/StripCarousel.tsx
 import { motion } from 'framer-motion'
 import { useCallback, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { cn } from '../../lib/cn'
+import { CarouselFrame } from './CarouselFrame'
 import { carouselTransition } from './carouselMotion'
 import { StripCarouselControls } from './StripCarouselControls'
 
@@ -71,7 +72,7 @@ export function StripCarousel<T>({
   const pageCount = maxIndex + 1
 
   return (
-    <section aria-label={ariaLabel} className={cn('relative', className)}>
+    <CarouselFrame as="section" aria-label={ariaLabel} className={className}>
       <div ref={viewportRef} className="overflow-hidden">
         <motion.div
           ref={trackRef}
@@ -109,6 +110,6 @@ export function StripCarousel<T>({
           />
         </div>
       )}
-    </section>
+    </CarouselFrame>
   )
 }

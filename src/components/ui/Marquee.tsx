@@ -1,5 +1,6 @@
 // src/components/ui/Marquee.tsx
 import { type ReactNode } from 'react'
+import { CarouselFrame } from '../carousel/CarouselFrame'
 
 export interface MarqueeProps {
   children: ReactNode
@@ -12,9 +13,8 @@ export interface MarqueeProps {
 
 /**
  * Infinite logo/content marquee.
- * Layout is always LTR so the duplicated track stays seamless.
- * Animation direction follows `document.documentElement.dir`
- * (LTR: right → left, RTL: left → right).
+ * Layout stays LTR (via CarouselFrame) so the duplicated track is seamless.
+ * Animation direction follows `html[dir]` — reverse only the keyframes in RTL.
  */
 export function Marquee({
   children,
@@ -24,10 +24,7 @@ export function Marquee({
   trackClassName = '',
 }: MarqueeProps) {
   return (
-    <div
-      dir="ltr"
-      className={['group/marquee relative w-full overflow-hidden', className].join(' ')}
-    >
+    <CarouselFrame className={['group/marquee w-full overflow-hidden', className].join(' ')}>
       <div
         className={[
           'marquee-track flex w-max motion-reduce:animate-none',
@@ -42,6 +39,6 @@ export function Marquee({
           {children}
         </div>
       </div>
-    </div>
+    </CarouselFrame>
   )
 }

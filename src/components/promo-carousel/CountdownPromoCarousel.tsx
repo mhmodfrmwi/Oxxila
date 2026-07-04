@@ -1,5 +1,7 @@
+// src/components/promo-carousel/CountdownPromoCarousel.tsx
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCallback, useState, type ReactNode } from 'react'
+import { CarouselFrame } from '../carousel/CarouselFrame'
 import { carouselTransition } from '../carousel/carouselMotion'
 import { useCarouselAutoplay } from '../../hooks/useCarouselAutoplay'
 import { cn } from '../../lib/cn'
@@ -58,10 +60,11 @@ export function CountdownPromoCarousel({
   const currentSlide = slides[activeSlide]
 
   return (
-    <section
+    <CarouselFrame
+      as="section"
       aria-label={ariaLabel}
       aria-roledescription="carousel"
-      className={cn('relative', className)}
+      className={cn(className)}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
@@ -90,6 +93,6 @@ export function CountdownPromoCarousel({
           </motion.div>
         </AnimatePresence>
       </div>
-    </section>
+    </CarouselFrame>
   )
 }

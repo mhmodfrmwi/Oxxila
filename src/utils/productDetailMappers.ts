@@ -59,6 +59,13 @@ function resolveProductBadge(product: ApiProduct): string | undefined {
   return undefined
 }
 
+function resolveOfferEndsAt(value: string | null | undefined): string | undefined {
+  if (!value) return undefined
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime()) || date.getTime() < Date.now()) return undefined
+  return value
+}
+
 function formatOfferEndsLabel(value: string | null | undefined): string | undefined {
   if (!value) return undefined
   const date = new Date(value)
@@ -131,6 +138,7 @@ export function mapApiProductToProductDetail(product: ApiProduct): ProductDetail
     image: resolveProductImageUrl(product.images?.[0]),
     imageAlt: product.name,
     badge: resolveProductBadge(product),
+    offerEndsAt: resolveOfferEndsAt(product.offerEndsAt),
     offerEndsLabel: formatOfferEndsLabel(product.offerEndsAt),
     soldCount: product.soldCount != null && product.soldCount > 0 ? product.soldCount : undefined,
     subCategoryName: product.subCategory?.[0]?.name,

@@ -1,5 +1,6 @@
 // src/components/shop/brand-stores/BrandStores.tsx
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLandingCatalogContext } from '../../../hooks/useLandingCatalogContext'
 import { mapBrandsToStores } from '../../../utils/brandMappers'
 import { ContentSection } from '../../layout/ContentSection'
@@ -19,21 +20,26 @@ function BrandGridSkeleton() {
 }
 
 export function BrandStores() {
+  const { t } = useTranslation()
   const { brands, loading, error } = useLandingCatalogContext()
   const brandStores = useMemo(() => mapBrandsToStores(brands), [brands])
 
   return (
     <ContentSection aria-labelledby="brand-stores-heading">
-      <SectionHeader id="brand-stores-heading" title="Official brand stores" size="compact" />
+      <SectionHeader
+        id="brand-stores-heading"
+        title={t('shop.brands.title')}
+        size="compact"
+      />
       {loading ? (
         <BrandGridSkeleton />
       ) : error ? (
         <p className="py-6 text-center text-sm text-support-error" role="alert">
-          {error}
+          {t('shop.brands.loadError')}
         </p>
       ) : brandStores.length === 0 ? (
         <p className="py-6 text-center text-sm text-secondary-text" role="status">
-          No brands available right now.
+          {t('shop.brands.empty')}
         </p>
       ) : (
         <BrandGrid brands={brandStores} />

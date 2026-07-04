@@ -1,6 +1,8 @@
+// src/components/product/QuestionsSafetySection.tsx
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import { useId, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { Button } from '../ui/Button'
 import '../../styles/questions-safety.css'
@@ -22,15 +24,20 @@ export interface QuestionsSafetySectionProps {
 const DEFAULT_FAQS: FAQItem[] = []
 
 export function QuestionsSafetySection({
-  title = 'Questions & Safety',
-  subtitle = 'Concerns regarding clinical usage and ingredient interactions.',
-  buttonText = 'Ask a specialist',
+  title,
+  subtitle,
+  buttonText,
   faqs = DEFAULT_FAQS,
   className,
   onAskSpecialist,
 }: QuestionsSafetySectionProps) {
+  const { t } = useTranslation()
   const baseId = useId()
   const [openIndex, setOpenIndex] = useState(0)
+
+  const resolvedTitle = title ?? t('productDetail.questions.title')
+  const resolvedSubtitle = subtitle ?? t('productDetail.questions.subtitle')
+  const resolvedButtonText = buttonText ?? t('productDetail.questions.askSpecialist')
 
   return (
     <section
@@ -40,9 +47,9 @@ export function QuestionsSafetySection({
       <div className="questions-safety-grid">
         <div className="questions-safety-intro">
           <h2 id={`${baseId}-title`} className="questions-safety-title">
-            {title}
+            {resolvedTitle}
           </h2>
-          <p className="questions-safety-subtitle">{subtitle}</p>
+          <p className="questions-safety-subtitle">{resolvedSubtitle}</p>
           <Button
             type="button"
             variant="outline"
@@ -50,11 +57,15 @@ export function QuestionsSafetySection({
             className="questions-safety-cta"
             onClick={onAskSpecialist}
           >
-            {buttonText}
+            {resolvedButtonText}
           </Button>
         </div>
 
-        <div className="questions-safety-faq" role="region" aria-label="Product safety questions">
+        <div
+          className="questions-safety-faq"
+          role="region"
+          aria-label={t('productDetail.questions.faqAria')}
+        >
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index
             const triggerId = `${baseId}-trigger-${index}`
@@ -77,7 +88,11 @@ export function QuestionsSafetySection({
                   >
                     <span className="questions-safety-question">{faq.question}</span>
                     <span className="questions-safety-chevron" aria-hidden>
-                      <ChevronDown size={18} strokeWidth={1.75} className="questions-safety-chevron-icon" />
+                      <ChevronDown
+                        size={18}
+                        strokeWidth={1.75}
+                        className="questions-safety-chevron-icon"
+                      />
                     </span>
                   </button>
                 </h3>

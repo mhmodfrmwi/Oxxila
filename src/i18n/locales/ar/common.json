@@ -149,5 +149,186 @@
       "emailLabel": "البريد",
       "location": "الموقع"
     }
+  },
+  "shop": {
+    "promo": {
+      "title": "إرجاع خلال 20 يومًا",
+      "subtitle": "من تاريخ الشراء"
+    },
+    "banner": {
+      "ariaLabel": "عروض المتجر",
+      "empty": "لا توجد عروض متاحة حاليًا.",
+      "loadError": "تعذر تحميل اللافتات.",
+      "specialOffer": "عرض خاص",
+      "shopNow": "تسوق الآن",
+      "featured": "مميز",
+      "brand": "أوكسيلا"
+    },
+    "categories": {
+      "ariaLabel": "فئات المتجر",
+      "items": {
+        "skin-care": "العناية بالبشرة",
+        "hair-care": "العناية بالشعر",
+        "body-care": "العناية بالجسم",
+        "face-treatments": "علاجات الوجه",
+        "sun-protection": "الحماية من الشمس",
+        "anti-aging": "مكافحة الشيخوخة",
+        "acne": "حلول حب الشباب",
+        "pigmentation": "التصبغات والتفتيح",
+        "sensitive": "بشرة حساسة",
+        "mens": "عناية الرجال",
+        "womens": "عناية النساء"
+      }
+    },
+    "reasons": {
+      "title": "المزيد من أسباب التسوق",
+      "items": {
+        "new-arrivals": {
+          "title": "وصل حديثًا",
+          "subtitle": "منتجات جديدة تحتاجها تقريبًا",
+          "imageAlt": "منتجات عناية بالبشرة جديدة"
+        },
+        "best-sellers": {
+          "title": "الأكثر مبيعًا",
+          "subtitle": "املأ سلتك",
+          "imageAlt": "منتجات العناية بالبشرة الأكثر مبيعًا"
+        },
+        "top-rated": {
+          "title": "الأعلى تقييمًا",
+          "subtitle": "ابقَ على الموضة",
+          "imageAlt": "مجموعة العناية بالبشرة الأعلى تقييمًا"
+        },
+        "offers-discounts": {
+          "title": "العروض والخصومات",
+          "subtitle": "اكتشف عروض أوكسيلا",
+          "imageAlt": "عروض وخصومات خاصة"
+        },
+        "dermatologist": {
+          "title": "موصى به من أطباء الجلدية",
+          "subtitle": "عناية بالبشرة موصى بها طبيًا",
+          "imageAlt": "عناية بالبشرة موصى بها من أطباء الجلدية"
+        }
+      }
+    },
+    "recommended": {
+      "title": "موصى به لك",
+      "ariaLabel": "منتجات موصى بها"
+    },
+    "previouslyBrowsed": {
+      "title": "منتجات تصفحتها سابقًا",
+      "ariaLabel": "منتجات تصفحتها سابقًا"
+    },
+    "offers": {
+      "ariaLabel": "عروض التخفيضات",
+      "empty": "لا توجد عروض نشطة حاليًا.",
+      "loadError": "تعذر تحميل العروض.",
+      "specialOffer": "عرض خاص",
+      "percentOff": "خصم {{percent}}%",
+      "percentOffWithName": "خصم {{percent}}% — {{name}}",
+      "openIn": "يفتح خلال",
+      "carouselAria": "عروض ترويجية"
+    },
+    "brands": {
+      "title": "المتاجر الرسمية للعلامات",
+      "empty": "لا توجد علامات تجارية متاحة حاليًا.",
+      "loadError": "تعذر تحميل العلامات التجارية."
+    },
+    "carousel": {
+      "previous": "المنتجات السابقة",
+      "next": "المنتجات التالية",
+      "previousSlide": "الشريحة السابقة",
+      "nextSlide": "الشريحة التالية",
+      "pagination": "ترقيم العرض",
+      "goToSlide": "الانتقال إلى الشريحة {{number}}",
+      "promotional": "عرض ترويجي"
+    },
+    "product": {
+      "addToWishlist": "أضف إلى المفضلة"
+    }
+  },
+  "productDetail": {
+    "promo": {
+      "title": "إرجاع خلال 30 يومًا",
+      "subtitle": "من تاريخ الشراء"
+    },
+    "ariaLabel": "تفاصيل المنتج",
+    "notFound": "المنتج غير موجود.",
+    "loadError": "تعذر تحميل تفاصيل المنتج.",
+    "perPiece": "/ قطعة",
+    "percentOff": "خصم {{percent}}%",
+    "offerEnds": "ينتهي العرض {{date}}",
+    "sold": "تم بيع {{count}}",
+    "inStockReady": "{{count}} متوفر وجاهز",
+    "inStockReadyWithDelivery": "{{count}} متوفر وجاهز — {{delivery}}",
+    "media": "الوسائط",
+    "mediaAria": "وسائط المنتج",
+    "beforeAfter": "قبل / بعد",
+    "beforeAfterAria": "نتائج قبل وبعد",
+    "shade": "اللون",
+    "size": "الحجم",
+    "optionsAria": "خيارات {{label}}",
+    "quantity": "الكمية",
+    "quantityValue": "الكمية: {{value}}",
+    "decreaseQuantity": "تقليل الكمية",
+    "increaseQuantity": "زيادة الكمية",
+    "adding": "جاري الإضافة...",
+    "oneClickCheckout": "شراء بنقرة واحدة",
+    "share": "مشاركة المنتج",
+    "sku": "رمز المنتج",
+    "category": "الفئة",
+    "subcategory": "الفئة الفرعية",
+    "brand": "العلامة التجارية",
+    "availability": "التوفر",
+    "inStock": "متوفر",
+    "outOfStock": "غير متوفر",
+    "availabilityUnknown": "التوفر غير معروف",
+    "tags": "الوسوم",
+    "badge": {
+      "bestSeller": "الأكثر مبيعًا",
+      "certified": "معتمد",
+      "bundle": "باقة"
+    },
+    "cart": {
+      "missingId": "تعذر إضافة هذا المنتج. معرّف المنتج مفقود.",
+      "outOfStock": "هذا المنتج غير متوفر.",
+      "added": "تمت الإضافة إلى السلة.",
+      "failed": "تعذر إضافة المنتج إلى السلة."
+    },
+    "tabs": {
+      "ariaLabel": "معلومات المنتج",
+      "description": "الوصف",
+      "advantages": "المزايا",
+      "composition": "المكونات"
+    },
+    "gallery": {
+      "navigation": "التنقل في المعرض",
+      "previous": "الصورة السابقة",
+      "next": "الصورة التالية",
+      "pagination": "ترقيم الصور",
+      "goToImage": "الانتقال إلى الصورة {{number}}",
+      "viewMedia": "عرض الوسائط {{number}}",
+      "productMedia": "وسائط المنتج"
+    },
+    "questions": {
+      "title": "الأسئلة والسلامة",
+      "subtitle": "استفسارات حول الاستخدام السريري وتفاعلات المكونات.",
+      "askSpecialist": "اسأل متخصصًا",
+      "faqAria": "أسئلة سلامة المنتج"
+    },
+    "reviews": {
+      "ariaLabel": "آراء العملاء",
+      "basedOn": "بناءً على {{count}} تقييمات",
+      "outOfFive": "{{rating}} من 5 نجوم",
+      "distribution": "توزيع التقييمات",
+      "writeReview": "اكتب تقييمًا",
+      "viewAll": "عرض كل التعليقات",
+      "empty": "لا توجد تقييمات بعد.",
+      "helpful": "مفيد ({{count}})",
+      "translate": "ترجمة"
+    },
+    "moreFromBrand": "المزيد من {{brand}}",
+    "moreFromBrandFallback": "المزيد من هذه العلامة",
+    "previouslyBrowsedRelated": "منتجات ذات صلة تصفحتها سابقًا",
+    "previouslyBrowsedRelatedAria": "منتجات ذات صلة تصفحتها سابقًا"
   }
 }

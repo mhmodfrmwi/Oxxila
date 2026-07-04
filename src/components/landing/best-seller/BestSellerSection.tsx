@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { CarouselFrame } from '../../carousel/CarouselFrame'
 import { getWrappedOffset } from '../../carousel/getWrappedOffset'
 import { useCarouselAutoplay } from '../../../hooks/useCarouselAutoplay'
 import { gradientCtaClasses } from '../../ui/buttonStyles'
@@ -71,33 +72,34 @@ export function BestSellerSection() {
               {t('home.bestSellers.empty')}
             </p>
           ) : (
-            <motion.div
-              dir="ltr"
-              className="relative mx-auto h-[400px] max-w-4xl [perspective:1200px] sm:h-[430px] min-[769px]:h-[460px]"
-              drag={isMobile ? 'x' : false}
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.12}
-              onDragEnd={(_, info) => {
-                if (info.offset.x < -SWIPE_THRESHOLD) goNext()
-                else if (info.offset.x > SWIPE_THRESHOLD) goPrev()
-              }}
-            >
-              <div className="absolute inset-0 backdrop-blur-[2px]" aria-hidden />
+            <CarouselFrame className="mx-auto h-[400px] max-w-4xl sm:h-[430px] min-[769px]:h-[460px]">
+              <motion.div
+                className="relative h-full w-full [perspective:1200px]"
+                drag={isMobile ? 'x' : false}
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.12}
+                onDragEnd={(_, info) => {
+                  if (info.offset.x < -SWIPE_THRESHOLD) goNext()
+                  else if (info.offset.x > SWIPE_THRESHOLD) goPrev()
+                }}
+              >
+                <div className="absolute inset-0 backdrop-blur-[2px]" aria-hidden />
 
-              {bestSellers.map((product, index) => {
-                const offset = getWrappedOffset(index, activeSlide, total)
-                return (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    offset={offset}
-                    isActive={index === activeSlide}
-                    isMobile={isMobile}
-                    onSelect={() => goTo(index)}
-                  />
-                )
-              })}
-            </motion.div>
+                {bestSellers.map((product, index) => {
+                  const offset = getWrappedOffset(index, activeSlide, total)
+                  return (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      offset={offset}
+                      isActive={index === activeSlide}
+                      isMobile={isMobile}
+                      onSelect={() => goTo(index)}
+                    />
+                  )
+                })}
+              </motion.div>
+            </CarouselFrame>
           )}
 
           {!loading && total > 0 && (

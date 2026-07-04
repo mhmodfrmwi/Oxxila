@@ -149,5 +149,186 @@
       "emailLabel": "Email",
       "location": "Location"
     }
+  },
+  "shop": {
+    "promo": {
+      "title": "Return within 20 days",
+      "subtitle": "from purchase date"
+    },
+    "banner": {
+      "ariaLabel": "Shop promotions",
+      "empty": "No promotions available right now.",
+      "loadError": "Unable to load banners.",
+      "specialOffer": "Special Offer",
+      "shopNow": "SHOP NOW",
+      "featured": "FEATURED",
+      "brand": "OXXILA"
+    },
+    "categories": {
+      "ariaLabel": "Shop categories",
+      "items": {
+        "skin-care": "Skin Care",
+        "hair-care": "Hair Care",
+        "body-care": "Body Care",
+        "face-treatments": "Face Treatments",
+        "sun-protection": "Sun Protection",
+        "anti-aging": "Anti-Aging",
+        "acne": "Acne Solutions",
+        "pigmentation": "Pigmentation & Brightening",
+        "sensitive": "Sensitive Skin",
+        "mens": "Men's Care",
+        "womens": "Women's Care"
+      }
+    },
+    "reasons": {
+      "title": "More reasons to shop",
+      "items": {
+        "new-arrivals": {
+          "title": "New Arrivals",
+          "subtitle": "Fresh takes you almost need",
+          "imageAlt": "New skincare arrivals"
+        },
+        "best-sellers": {
+          "title": "Best Sellers",
+          "subtitle": "Fill your cart",
+          "imageAlt": "Best selling skincare products"
+        },
+        "top-rated": {
+          "title": "Top Rated",
+          "subtitle": "stay in trend",
+          "imageAlt": "Top rated skincare collection"
+        },
+        "offers-discounts": {
+          "title": "Offers & Discounts",
+          "subtitle": "discover Oxxila deals",
+          "imageAlt": "Special offers and discounts"
+        },
+        "dermatologist": {
+          "title": "Dermatologist recommended",
+          "subtitle": "Doctor Recommended Skincare",
+          "imageAlt": "Dermatologist recommended skincare"
+        }
+      }
+    },
+    "recommended": {
+      "title": "Recommended for you",
+      "ariaLabel": "Recommended products"
+    },
+    "previouslyBrowsed": {
+      "title": "Previously browsed products",
+      "ariaLabel": "Previously browsed products"
+    },
+    "offers": {
+      "ariaLabel": "Sale promotions",
+      "empty": "No active offers right now.",
+      "loadError": "Unable to load offers.",
+      "specialOffer": "Special Offer",
+      "percentOff": "{{percent}}% Off",
+      "percentOffWithName": "{{percent}}% Off — {{name}}",
+      "openIn": "open in",
+      "carouselAria": "Promotional offers"
+    },
+    "brands": {
+      "title": "Official brand stores",
+      "empty": "No brands available right now.",
+      "loadError": "Unable to load brands."
+    },
+    "carousel": {
+      "previous": "Previous products",
+      "next": "Next products",
+      "previousSlide": "Previous slide",
+      "nextSlide": "Next slide",
+      "pagination": "Carousel pagination",
+      "goToSlide": "Go to slide {{number}}",
+      "promotional": "Promotional carousel"
+    },
+    "product": {
+      "addToWishlist": "Add to wishlist"
+    }
+  },
+  "productDetail": {
+    "promo": {
+      "title": "Return within 30 days",
+      "subtitle": "from purchase date"
+    },
+    "ariaLabel": "Product details",
+    "notFound": "Product not found.",
+    "loadError": "Unable to load product details.",
+    "perPiece": "/ pcs",
+    "percentOff": "{{percent}}% off",
+    "offerEnds": "Offer ends {{date}}",
+    "sold": "{{count}} Sold",
+    "inStockReady": "{{count}} in stock ready",
+    "inStockReadyWithDelivery": "{{count}} in stock ready — {{delivery}}",
+    "media": "Media",
+    "mediaAria": "Product media",
+    "beforeAfter": "Before / After",
+    "beforeAfterAria": "Before and after results",
+    "shade": "Shade",
+    "size": "Size",
+    "optionsAria": "{{label}} options",
+    "quantity": "Quantity",
+    "quantityValue": "Quantity: {{value}}",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
+    "adding": "Adding...",
+    "oneClickCheckout": "One Click Checkout",
+    "share": "Share product",
+    "sku": "SKU",
+    "category": "Category",
+    "subcategory": "Subcategory",
+    "brand": "Brand",
+    "availability": "Availability",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "availabilityUnknown": "Availability unknown",
+    "tags": "Tags",
+    "badge": {
+      "bestSeller": "Best seller",
+      "certified": "Certified",
+      "bundle": "Bundle"
+    },
+    "cart": {
+      "missingId": "Unable to add this product. Product ID is missing.",
+      "outOfStock": "This product is out of stock.",
+      "added": "Added to cart.",
+      "failed": "Unable to add item to cart."
+    },
+    "tabs": {
+      "ariaLabel": "Product information",
+      "description": "Description",
+      "advantages": "Advantages",
+      "composition": "Composition"
+    },
+    "gallery": {
+      "navigation": "Gallery navigation",
+      "previous": "Previous image",
+      "next": "Next image",
+      "pagination": "Image pagination",
+      "goToImage": "Go to image {{number}}",
+      "viewMedia": "View media {{number}}",
+      "productMedia": "Product media"
+    },
+    "questions": {
+      "title": "Questions & Safety",
+      "subtitle": "Concerns regarding clinical usage and ingredient interactions.",
+      "askSpecialist": "Ask a specialist",
+      "faqAria": "Product safety questions"
+    },
+    "reviews": {
+      "ariaLabel": "Customer reviews",
+      "basedOn": "Based on {{count}} reviews",
+      "outOfFive": "{{rating}} out of 5 stars",
+      "distribution": "Rating distribution",
+      "writeReview": "Write a review",
+      "viewAll": "View all comments",
+      "empty": "No reviews yet.",
+      "helpful": "Helpful ({{count}})",
+      "translate": "Translate"
+    },
+    "moreFromBrand": "More from {{brand}}",
+    "moreFromBrandFallback": "More from this brand",
+    "previouslyBrowsedRelated": "Previously browsed related",
+    "previouslyBrowsedRelatedAria": "Previously browsed related products"
   }
 }
