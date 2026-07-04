@@ -24,26 +24,22 @@ export function FilterSection({
     <div className={cn('filter-section-card', className)}>
       <button
         type="button"
-        className={cn(
-          'flex w-full items-center justify-between gap-3 text-left',
-          focusRingClasses,
-          'rounded-sm',
-        )}
+        className={cn('filter-section-header', focusRingClasses)}
         aria-expanded={isOpen}
         aria-controls={panelId}
         onClick={() => setIsOpen((open) => !open)}
       >
         <span className={filterSectionTitleClasses}>{title}</span>
         <ChevronDown
-          size={14}
-          strokeWidth={1.5}
+          size={16}
+          strokeWidth={1.75}
           className={cn(filterSectionChevronClasses, isOpen && 'rotate-180')}
           aria-hidden
         />
       </button>
 
       {isOpen && (
-        <div id={panelId} className="mt-4">
+        <div id={panelId} className="filter-section-panel">
           {children}
         </div>
       )}

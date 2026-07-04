@@ -5,10 +5,12 @@ import { CATEGORIES_PATH, HOME_PATH } from '../../config/routes'
 import { useBrowsingHistory } from '../../hooks/useBrowsingHistory'
 import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import { useLandingCatalogContext } from '../../hooks/useLandingCatalogContext'
+import { useSubCategories } from '../../hooks/useSubCategories'
 import {
   getCollectionTitle,
   parseCategoryBrowseParams,
 } from '../../utils/categoryBrowseParams'
+import { collectSubcategoriesFromCategories } from '../../utils/catalogSubcategories'
 import { Breadcrumb } from '../ui/Breadcrumb'
 import { Pagination } from '../ui/Pagination'
 import { ContentSection } from '../layout/ContentSection'
@@ -93,7 +95,22 @@ export function CategoryPageContent() {
     return filtered.length > 0 ? filtered : activeBrands
   }, [brands, selectedCategory])
 
-  const subcategories = selectedCategory?.subcategories ?? []
+  const catalogSubcategories = useMemo(
+    () => collectSubcategoriesFromCategories(categories),
+    [categories],
+  )
+
+  const { subcategories: fetchedSubcategories, loading: subcategoriesLoading } = useSubCategories(
+    selectedCategory?._id,
+    !catalogLoading,
+  )
+
+  const subcategories = useMemo(() => {
+    if (fetchedSubcategories.length > 0) return fetchedSubcategories
+    if (selectedCategory?.subcategories?.length) return selectedCategory.subcategories
+    if (!selectedCategory) return catalogSubcategories
+    return []
+  }, [fetchedSubcategories, selectedCategory, catalogSubcategories])
 
   const pageTitle =
     selectedCategory?.name ??
@@ -180,6 +197,7 @@ export function CategoryPageContent() {
             categories={categories}
             activeCategorySlug={selectedCategory?.slug}
             subcategories={subcategories}
+            subcategoriesLoading={subcategoriesLoading}
             brands={categoryBrands}
           />
 

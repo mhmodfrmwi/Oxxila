@@ -25,17 +25,17 @@ export function BrandFilter({ selectedIds, onChange, brands }: BrandFilterProps)
 
   return (
     <FilterSection title="Brand">
-      <ul className="grid grid-cols-2 gap-2">
+      <ul className="flex flex-wrap gap-2">
         {brands.map((brand) => {
           const isSelected = selectedIds.includes(brand._id)
 
           return (
-            <li key={brand._id} className="min-w-0">
+            <li key={brand._id} className="min-w-0 max-w-full">
               <button
                 type="button"
                 onClick={() => toggleBrand(brand._id)}
                 data-selected={isSelected}
-                className={cn('filter-brand-chip w-full', focusRingClasses)}
+                className={cn('filter-brand-chip', focusRingClasses)}
                 aria-pressed={isSelected}
               >
                 <span className="filter-brand-logo">

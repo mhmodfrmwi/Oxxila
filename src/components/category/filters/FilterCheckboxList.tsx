@@ -32,8 +32,8 @@ export function FilterCheckboxList({
   }
 
   return (
-    <div className={cn('space-y-3', className)}>
-      <ul className="space-y-3">
+    <div className={cn('filter-checkbox-list', className)}>
+      <ul className="filter-checkbox-list-items">
         {visibleOptions.map((option) => (
           <li key={option.id}>
             <label className="filter-option-row">

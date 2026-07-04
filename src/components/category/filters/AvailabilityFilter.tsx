@@ -1,4 +1,4 @@
-import { FilterStandaloneSection } from './FilterStandaloneSection'
+import { FilterSection } from './FilterSection'
 
 interface AvailabilityFilterProps {
   inStockOnly: boolean
@@ -7,7 +7,7 @@ interface AvailabilityFilterProps {
 
 export function AvailabilityFilter({ inStockOnly, onChange }: AvailabilityFilterProps) {
   return (
-    <FilterStandaloneSection title="Availability">
+    <FilterSection title="Availability">
       <label className="filter-option-row">
         <input
           type="checkbox"
@@ -17,6 +17,6 @@ export function AvailabilityFilter({ inStockOnly, onChange }: AvailabilityFilter
         />
         <span>Available only</span>
       </label>
-    </FilterStandaloneSection>
+    </FilterSection>
   )
 }

@@ -1,6 +1,6 @@
 /** Serif accordion title inside a filter section card */
 export const filterSectionTitleClasses =
-  'font-serif text-[length:calc(var(--font-size-small)*1.05)] font-medium leading-tight text-primary-text'
+  'font-serif text-[length:calc(var(--font-size-small)*1.0625)] font-medium leading-snug text-primary-text'
 
 /** Chevron in filter section headers */
 export const filterSectionChevronClasses =
@@ -8,8 +8,8 @@ export const filterSectionChevronClasses =
 
 /** Clear-all link in sidebar header */
 export const filterClearAllClasses =
-  'text-[length:calc(var(--font-size-small)*0.875)] lowercase text-[var(--filter-sidebar-clear)] transition-colors hover:text-primary-text'
+  'text-[length:calc(var(--font-size-small)*0.8125)] font-normal text-[var(--filter-sidebar-clear)] transition-colors hover:text-primary-text'
 
 /** Sidebar main heading */
 export const filterSidebarHeadingClasses =
-  'font-serif text-[length:calc(var(--font-size-small)*1.35)] font-medium leading-tight text-primary-text'
+  'font-serif text-[length:calc(var(--font-size-small)*1.375)] font-medium leading-none text-primary-text'

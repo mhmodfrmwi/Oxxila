@@ -1,6 +1,6 @@
 import { FilterCheckboxList } from './FilterCheckboxList'
 import { sensitivityOptions } from './filterOptionsData'
-import { FilterStandaloneSection } from './FilterStandaloneSection'
+import { FilterSection } from './FilterSection'
 
 interface SensitivityFilterProps {
   selectedIds: string[]
@@ -9,12 +9,12 @@ interface SensitivityFilterProps {
 
 export function SensitivityFilter({ selectedIds, onChange }: SensitivityFilterProps) {
   return (
-    <FilterStandaloneSection title="Sensitivity">
+    <FilterSection title="Sensitivity">
       <FilterCheckboxList
         options={sensitivityOptions}
         selectedIds={selectedIds}
         onChange={onChange}
       />
-    </FilterStandaloneSection>
+    </FilterSection>
   )
 }

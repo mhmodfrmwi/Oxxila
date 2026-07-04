@@ -1,8 +1,10 @@
 // src/components/landing/HeroSection.tsx
+import { ArrowUpRight, Shield } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../context/ThemeContext'
 import { SHOP_PATH } from '../../config/routes'
+import { cn } from '../../lib/cn'
 import {
   HERO_BLOB_PATH,
   HERO_LEFT_BLOB_PATH,
@@ -13,13 +15,21 @@ import {
   heroLeftProduct,
   heroRightProduct,
 } from './landingData'
+import { focusRingClasses } from '../ui/interactionStyles'
 import { typeSmallClasses } from '../ui/typography'
 
 const HERO_WIDTH = 1440
 const HERO_HEIGHT = 796
 
-const HERO_RIGHT_PIN_PATH =
-  'M1325 416.816C1320.99 416.816 1318.39 419.508 1315.31 420.489C1314.06 420.888 1313.44 421.088 1313.18 421.369C1312.93 421.65 1312.86 422.061 1312.71 422.883C1311.12 431.677 1314.59 439.808 1322.85 442.973C1323.74 443.313 1324.19 443.483 1325 443.483C1325.82 443.483 1326.26 443.313 1327.15 442.973C1335.42 439.808 1338.88 431.677 1337.29 422.883C1337.14 422.061 1337.07 421.65 1336.82 421.369C1336.56 421.087 1335.94 420.888 1334.69 420.489C1331.61 419.508 1329.01 416.816 1325 416.816Z'
+const heroFabClass = cn(
+  'hero-fab absolute z-30 flex aspect-square items-center justify-center rounded-full',
+  'bg-button-primary text-on-emphasis',
+  'shadow-lg shadow-button-primary/35',
+  'transition-[background-color,color,box-shadow,transform] duration-200 ease-out',
+  'hover:bg-accent-soft hover:shadow-xl hover:shadow-button-primary/45',
+  'active:translate-y-px active:bg-button-primary-active active:text-primary-text',
+  focusRingClasses,
+)
 
 function pctX(value: number) {
   return `${(value / HERO_WIDTH) * 100}%`
@@ -186,30 +196,6 @@ export function HeroSection() {
                 preserveAspectRatio="xMidYMid slice"
               />
             </g>
-
-            <circle cx="1325" cy="430.149" r="35" fill="var(--button-primary)" />
-            <g
-              fill="none"
-              stroke="var(--text-on-color)"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d={HERO_RIGHT_PIN_PATH} />
-              <path d="M1325 423.483L1325 426.149" />
-            </g>
-
-            <circle cx="115" cy="650.149" r="35" fill="var(--button-primary)" />
-            <g
-              fill="none"
-              stroke="var(--text-on-color)"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M122.667 643.483L108 658.149" />
-              <path d="M114.667 642.325C114.667 642.325 122.178 641.691 123.318 642.831C124.458 643.971 123.825 651.483 123.825 651.483" />
-            </g>
           </svg>
 
           <div className="pointer-events-none absolute inset-0 z-20">
@@ -229,17 +215,27 @@ export function HeroSection() {
 
           <button
             type="button"
-            className="absolute z-30 min-h-11 min-w-11 rounded-full"
-            style={centerStyle(115, 650.149)}
+            className={heroFabClass}
+            style={{
+              ...centerStyle(115, 650.149),
+              width: pctX(70),
+            }}
             aria-label={t('home.hero.previousSlide')}
-          />
+          >
+            <ArrowUpRight size={20} strokeWidth={2.25} aria-hidden className="shrink-0" />
+          </button>
 
           <button
             type="button"
-            className="absolute z-30 min-h-11 min-w-11 rounded-full"
-            style={centerStyle(1325, 430.149)}
+            className={heroFabClass}
+            style={{
+              ...centerStyle(1325, 430.149),
+              width: pctX(70),
+            }}
             aria-label={t('home.hero.nextSlide')}
-          />
+          >
+            <Shield size={20} strokeWidth={2.25} aria-hidden className="shrink-0" />
+          </button>
 
           <Link
             to={SHOP_PATH}

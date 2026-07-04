@@ -23,6 +23,7 @@ interface FilterSidebarProps {
   categories: ApiCategory[]
   activeCategorySlug?: string
   subcategories: ApiSubCategory[]
+  subcategoriesLoading?: boolean
   brands: ApiBrand[]
 }
 
@@ -34,6 +35,7 @@ export function FilterSidebar({
   categories,
   activeCategorySlug,
   subcategories,
+  subcategoriesLoading,
   brands,
 }: FilterSidebarProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -45,20 +47,16 @@ export function FilterSidebar({
 
   const filterGroups = (
     <>
-      <CategoryFilter categories={categories} activeSlug={activeCategorySlug} />
-      <BrandFilter
-        selectedIds={filters.brandIds}
-        onChange={(brandIds) => onFiltersChange({ brandIds })}
-        brands={brands}
-      />
       <SensitivityFilter
         selectedIds={filters.sensitivityIds}
         onChange={(sensitivityIds) => onFiltersChange({ sensitivityIds })}
       />
+      <CategoryFilter categories={categories} activeSlug={activeCategorySlug} />
       <TypeOfCategoryFilter
         selectedIds={filters.typeOfCategoryIds}
         onChange={(typeOfCategoryIds) => onFiltersChange({ typeOfCategoryIds })}
         subcategories={subcategories}
+        loading={subcategoriesLoading}
       />
       <ConcernsFilter
         selectedIds={filters.concernIds}
@@ -67,6 +65,11 @@ export function FilterSidebar({
       <OffersFilter
         selectedIds={filters.offerIds}
         onChange={(offerIds) => onFiltersChange({ offerIds })}
+      />
+      <BrandFilter
+        selectedIds={filters.brandIds}
+        onChange={(brandIds) => onFiltersChange({ brandIds })}
+        brands={brands}
       />
       <PriceFilter
         value={filters.priceSort}
@@ -108,7 +111,7 @@ export function FilterSidebar({
       >
         <span className="flex min-w-0 items-center gap-2.5">
           <SlidersHorizontal size={18} className="shrink-0 text-secondary-text" aria-hidden />
-          <span>Filters</span>
+          <span>Filter</span>
           {activeCount > 0 && (
             <span
               className={cn(
@@ -135,18 +138,18 @@ export function FilterSidebar({
         id="filter-sidebar-panel"
         className={cn(!isOpen && 'hidden', 'lg:block')}
       >
-        <div className="mb-5 flex items-center justify-between gap-3 lg:mb-6">
-          <h2 className={filterSidebarHeadingClasses}>Filters</h2>
+        <div className="mb-4 flex items-baseline justify-between gap-3 lg:mb-5">
+          <h2 className={filterSidebarHeadingClasses}>Filter</h2>
           <button
             type="button"
             onClick={clearAll}
             className={cn(filterClearAllClasses, focusRingClasses, 'rounded-sm')}
           >
-            clear all
+            Clear All
           </button>
         </div>
 
-        <div className="space-y-5">{filterGroups}</div>
+        <div className="filter-sidebar-groups">{filterGroups}</div>
       </div>
     </aside>
   )

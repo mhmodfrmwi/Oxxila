@@ -12,7 +12,7 @@ const ratings = [1, 2, 3, 4, 5] as const
 export function RatingFilter({ selectedRating, onChange }: RatingFilterProps) {
   return (
     <FilterSection title="Product Rating">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {ratings.map((rating) => {
           const isSelected = selectedRating === rating
 

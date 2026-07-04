@@ -1,6 +1,6 @@
 import { FilterCheckboxList } from './FilterCheckboxList'
 import { concernOptions, concernsCollapsedCount } from './filterOptionsData'
-import { FilterStandaloneSection } from './FilterStandaloneSection'
+import { FilterSection } from './FilterSection'
 
 interface ConcernsFilterProps {
   selectedIds: string[]
@@ -9,13 +9,13 @@ interface ConcernsFilterProps {
 
 export function ConcernsFilter({ selectedIds, onChange }: ConcernsFilterProps) {
   return (
-    <FilterStandaloneSection title="Concerns">
+    <FilterSection title="Concerns">
       <FilterCheckboxList
         options={concernOptions}
         selectedIds={selectedIds}
         onChange={onChange}
         initialVisibleCount={concernsCollapsedCount}
       />
-    </FilterStandaloneSection>
+    </FilterSection>
   )
 }

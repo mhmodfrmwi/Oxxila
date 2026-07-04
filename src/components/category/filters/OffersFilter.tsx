@@ -1,6 +1,6 @@
 import { FilterCheckboxList } from './FilterCheckboxList'
 import { offerOptions } from './filterOptionsData'
-import { FilterStandaloneSection } from './FilterStandaloneSection'
+import { FilterSection } from './FilterSection'
 
 interface OffersFilterProps {
   selectedIds: string[]
@@ -9,8 +9,8 @@ interface OffersFilterProps {
 
 export function OffersFilter({ selectedIds, onChange }: OffersFilterProps) {
   return (
-    <FilterStandaloneSection title="Offers">
+    <FilterSection title="Offers">
       <FilterCheckboxList options={offerOptions} selectedIds={selectedIds} onChange={onChange} />
-    </FilterStandaloneSection>
+    </FilterSection>
   )
 }

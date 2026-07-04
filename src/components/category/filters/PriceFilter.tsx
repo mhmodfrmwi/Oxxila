@@ -15,7 +15,7 @@ interface PriceFilterProps {
 export function PriceFilter({ value, onChange }: PriceFilterProps) {
   return (
     <FilterSection title="Price">
-      <ul className="space-y-3">
+      <ul className="filter-checkbox-list-items">
         {priceOptions.map((option) => (
           <li key={option.value}>
             <label className="filter-option-row">
