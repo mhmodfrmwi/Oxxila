@@ -162,25 +162,30 @@ export function OrderSummaryCard({
       className={cn('cart-summary-card lg:sticky lg:top-6', className)}
       aria-label={resolvedTitle}
     >
-      <Heading variant="card" as="h2" className="mb-5 font-serif">
+      <Heading
+        variant="card"
+        as="h2"
+        className={cn('font-serif', isReview ? 'payment-order-summary-title' : 'mb-5')}
+      >
         {resolvedTitle}
       </Heading>
 
       {showLineItems && cart.items.length > 0 && (
-        <ul className="mb-5" aria-label={t('cart.summary.orderItems')}>
+        <ul
+          className={cn(isReview ? 'payment-order-items' : 'mb-5')}
+          aria-label={t('cart.summary.orderItems')}
+        >
           {cart.items.map((item) => (
             <OrderReviewItem key={item._id} item={item} />
           ))}
         </ul>
       )}
 
-      <div className="space-y-3">
-        {(!isReview || isConfirmation) && (
-          <SummaryRow
-            label={t('cart.summary.subtotal')}
-            value={formatCartPrice(cart.subtotal)}
-          />
-        )}
+      <div className={cn(isReview ? 'payment-order-summary-rows' : 'space-y-3')}>
+        <SummaryRow
+          label={t('cart.summary.subtotal')}
+          value={formatCartPrice(cart.subtotal)}
+        />
 
         {cart.discountAmount > 0 && (
           <SummaryRow
@@ -202,7 +207,9 @@ export function OrderSummaryCard({
                   {formatCartPrice(shippingCompareAt)}
                 </span>
               )}
-              <span>{formatCartPrice(resolvedShippingAmount)}</span>
+              {!shippingIsFree && (
+                <span>{formatCartPrice(resolvedShippingAmount)}</span>
+              )}
             </span>
           }
         />
@@ -266,15 +273,15 @@ export function OrderSummaryCard({
 
       <div className="cart-summary-divider" />
 
-      <div className="cart-summary-total">
+      <div className={cn('cart-summary-total', isReview && 'payment-order-summary-total')}>
         <span className="cart-summary-total-label">{resolvedTotalLabel}</span>
-        <span className="inline-flex items-baseline gap-2">
+        <span className="inline-flex items-baseline gap-1.5">
+          <span className="cart-summary-total-value">{formatCartPrice(resolvedTotal)}</span>
           {resolvedTotalCompareAt != null && resolvedTotalCompareAt > resolvedTotal && (
             <span className="payment-summary-strike">
               {formatCartPrice(resolvedTotalCompareAt)}
             </span>
           )}
-          <span className="cart-summary-total-value">{formatCartPrice(resolvedTotal)}</span>
         </span>
       </div>
 
@@ -283,6 +290,7 @@ export function OrderSummaryCard({
           type="button"
           variant="primary"
           fullWidth
+          pill={isReview}
           className={cn(isReview ? 'payment-pay-btn' : 'cart-checkout-btn', 'mt-5')}
           disabled={buttonDisabled}
           onClick={onCtaClick}
@@ -292,7 +300,12 @@ export function OrderSummaryCard({
         </Button>
       )}
 
-      {showTrustBadges && <CartTrustBadges variant={trustBadgeVariant} />}
+      {showTrustBadges && (
+        <CartTrustBadges
+          variant={trustBadgeVariant}
+          className={isReview ? 'payment-order-trust-badges' : undefined}
+        />
+      )}
 
       {footerNote && <p className="payment-security-note">{footerNote}</p>}
     </aside>

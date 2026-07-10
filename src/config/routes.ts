@@ -1,6 +1,8 @@
 /** Landing page — matches backend OAUTH_SUCCESS_REDIRECT (…/home). */
 export const HOME_PATH = '/home'
 
+export const DOCS_PATH = '/docs'
+
 export const SHOP_PATH = '/shop'
 
 export const CATEGORIES_PATH = '/categories'

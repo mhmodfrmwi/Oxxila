@@ -6,6 +6,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import {
   CART_PATH,
   CATEGORIES_PATH,
+  DOCS_PATH,
   HOME_PATH,
   LOGIN_PATH,
   MY_ACCOUNT_PATH,
@@ -42,7 +43,7 @@ export function Navbar() {
       { labelKey: 'nav.home', to: HOME_PATH },
       { labelKey: 'nav.shop', to: SHOP_PATH },
       { labelKey: 'nav.categories', to: CATEGORIES_PATH, hasChevron: true },
-      { labelKey: 'nav.docs', to: '/docs' },
+      { labelKey: 'nav.docs', to: DOCS_PATH },
     ],
     [],
   )

@@ -69,6 +69,87 @@
       "trackOrder": "Track Your Order"
     }
   },
+  "about": {
+    "hero": {
+      "title": "Oxxila Pharma: Science Driven Skincare",
+      "subtitle": "Pharmaceutical authority meets premium skincare excellence in Egypt. Bridging advanced science and aesthetic beauty."
+    },
+    "intro": {
+      "eyebrow": "A New Inception",
+      "title": "About Oxxila",
+      "paragraph1": "Oxxila Pharma is an Egyptian pharmaceutical skincare company built on rigorous science, regulatory compliance, and clinical integrity. We manufacture and distribute dermatologist-trusted solutions for consumers who expect medical-grade standards.",
+      "paragraph2": "From proprietary formulations to curated international imports, every product in our portfolio is selected and validated against pharmaceutical quality benchmarks — so your skincare routine is informed, safe, and effective.",
+      "cards": {
+        "formulations": {
+          "title": "Proprietary Formulations",
+          "description": "In-house R&D and manufacturing aligned with EDA requirements and GMP protocols."
+        },
+        "imports": {
+          "title": "Curated Imports",
+          "description": "Premium global brands vetted for authenticity, stability, and clinical relevance."
+        }
+      }
+    },
+    "quality": {
+      "title": "Quality & Compliance",
+      "subtitle": "Every product in our portfolio meets pharmaceutical-grade standards enforced through regulatory oversight and certified manufacturing.",
+      "items": {
+        "eda": {
+          "title": "EDA-Registered",
+          "description": "All marketed products are registered with the Egyptian Drug Authority for safety and traceability."
+        },
+        "gmp": {
+          "title": "GMP Standards",
+          "description": "Manufacturing partners operate under Good Manufacturing Practice for consistent product quality."
+        },
+        "iso": {
+          "title": "ISO-Certified",
+          "description": "Quality management systems certified to international ISO standards across our supply chain."
+        }
+      }
+    },
+    "medical": {
+      "title": "Medically Aligned Solutions",
+      "subtitle": "We collaborate with dermatology experts and clinical advisors to ensure every recommendation reflects evidence-based skincare science.",
+      "imageAlt": "Scientific cell illustration representing medically aligned skincare research",
+      "items": {
+        "rd": {
+          "title": "R&D Focused",
+          "description": "Continuous research into active ingredients, stability, and skin compatibility."
+        },
+        "protocols": {
+          "title": "Medical Grade Protocols",
+          "description": "Formulation and handling processes aligned with pharmaceutical best practices."
+        },
+        "content": {
+          "title": "Regulated Content",
+          "description": "Product information reviewed for clinical accuracy and regulatory compliance."
+        }
+      }
+    },
+    "infrastructure": {
+      "title": "Infrastructure & Supply Chain",
+      "items": {
+        "facility": {
+          "title": "Licensed Infrastructure",
+          "description": "EDA-licensed facilities for storage, handling, and distribution."
+        },
+        "warehouse": {
+          "title": "Certified Warehouse",
+          "description": "Climate-controlled warehousing with batch traceability."
+        },
+        "supply": {
+          "title": "Monitored Supply Chain",
+          "description": "End-to-end logistics monitoring from manufacturer to your door."
+        }
+      }
+    },
+    "cta": {
+      "title": "Authenticity Seal",
+      "description": "Our entire portfolio is EDA-registered. Every product you receive is verified for authenticity, safety, and regulatory compliance.",
+      "button": "View Certificate"
+    }
+  },
   "home": {
     "hero": {
       "title": "Oxxila is the store which combines trust and convenience",

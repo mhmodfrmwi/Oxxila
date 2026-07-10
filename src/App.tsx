@@ -10,6 +10,7 @@ import {
   CATEGORIES_PATH,
   CHANGE_PASSWORD_PATH,
   CHECKOUT_PATH,
+  DOCS_PATH,
   FORGOT_PASSWORD_PATH,
   HOME_PATH,
   LOGIN_PATH,
@@ -31,6 +32,9 @@ import { RouteFallback } from './components/ui/RouteFallback'
 
 const LandingPage = lazy(() =>
   import('./pages/LandingPage').then((module) => ({ default: module.LandingPage })),
+)
+const DocsPage = lazy(() =>
+  import('./pages/DocsPage').then((module) => ({ default: module.DocsPage })),
 )
 const ShopPage = lazy(() =>
   import('./pages/ShopPage').then((module) => ({ default: module.ShopPage })),
@@ -117,6 +121,7 @@ export default function App() {
     <Suspense fallback={<RouteFallback />}>
       <Routes>
         <Route path={HOME_PATH} element={<LandingPage />} />
+        <Route path={DOCS_PATH} element={<DocsPage />} />
         <Route path={SHOP_PATH} element={<ShopPage />} />
         <Route path={CART_PATH} element={<CartPage />} />
         <Route path={MY_ACCOUNT_PATH} element={<AccountPage />} />

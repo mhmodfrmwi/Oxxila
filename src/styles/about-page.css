@@ -1,0 +1,417 @@
+/* About / Pharma page — Figma-aligned section styles */
+
+.about-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.75rem;
+  min-height: clamp(17.5rem, 42vw, 22.5rem);
+}
+
+.about-hero__media {
+  position: absolute;
+  inset: 0;
+}
+
+.about-hero__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(67 36 140 / 0.55) 0%,
+    rgb(45 24 96 / 0.72) 100%
+  );
+}
+
+.about-hero__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: inherit;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.about-hero__title {
+  max-width: 46rem;
+  font-family: var(--font-family-base);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.15;
+  color: #ffffff;
+}
+
+.about-hero__subtitle {
+  margin-top: 0.875rem;
+  max-width: 38rem;
+  font-size: clamp(0.9375rem, 2vw, 1.125rem);
+  line-height: 1.55;
+  color: rgb(255 255 255 / 0.92);
+}
+
+.about-eyebrow {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--accent);
+}
+
+.about-intro-grid {
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .about-intro-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 2.5rem 3rem;
+  }
+}
+
+.about-intro-copy p + p {
+  margin-top: 1rem;
+}
+
+.about-intro-copy p {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--secondary-text);
+}
+
+@media (min-width: 768px) {
+  .about-intro-copy p {
+    font-size: 1rem;
+  }
+}
+
+.about-intro-cards {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .about-intro-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+.about-feature-card {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 0.875rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--card-background);
+  padding: 1.5rem 1.25rem;
+  box-shadow: 0 10px 28px rgb(15 23 42 / 0.06);
+}
+
+[data-theme='dark'] .about-feature-card {
+  box-shadow: none;
+}
+
+.about-feature-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  background: rgb(123 101 251 / 0.12);
+  color: var(--primary-button);
+}
+
+.about-feature-card__title {
+  font-family: var(--font-family-base);
+  font-size: 1.0625rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-text);
+}
+
+.about-feature-card__description {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--secondary-text);
+}
+
+/* Quality — theme-independent lavender panel (Figma) */
+.about-quality-panel {
+  border-radius: 1.75rem;
+  background: #ebe6f8;
+  padding: 2.5rem 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .about-quality-panel {
+    padding: 3rem 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .about-quality-panel {
+    padding: 3.5rem 2.5rem;
+  }
+}
+
+.about-quality-panel__header {
+  margin-inline: auto;
+  max-width: 42rem;
+  text-align: center;
+}
+
+.about-quality-panel__title {
+  font-family: var(--font-family-base);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: var(--font-weight-medium);
+  color: #4a4570;
+}
+
+.about-quality-panel__subtitle {
+  margin-top: 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #6b668f;
+}
+
+.about-quality-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 768px) {
+  .about-quality-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+  }
+}
+
+.about-quality-card {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.875rem;
+  border-radius: 1.25rem;
+  background: #ddd5f2;
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+}
+
+.about-quality-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  color: var(--primary-button);
+}
+
+.about-quality-card__title {
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  color: #4a4570;
+}
+
+.about-quality-card__description {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: #6b668f;
+}
+
+.about-medical-grid {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .about-medical-grid {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 3rem;
+  }
+}
+
+.about-medical-visual {
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background: #eef2f8;
+}
+
+.about-medical-visual__image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.about-medical-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-medical-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.about-medical-item__icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  background: var(--primary-button);
+  color: var(--text-on-color);
+}
+
+.about-medical-item__title {
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-text);
+}
+
+.about-medical-item__description {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--secondary-text);
+}
+
+.about-infrastructure-header {
+  margin-inline: auto;
+  max-width: 40rem;
+  text-align: center;
+}
+
+.about-infrastructure-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 768px) {
+  .about-infrastructure-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+  }
+}
+
+.about-infrastructure-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  height: 100%;
+  border-radius: 1.25rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--card-background);
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 0.05);
+}
+
+[data-theme='dark'] .about-infrastructure-card {
+  box-shadow: none;
+}
+
+.about-infrastructure-card__icon-wrap {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.625rem;
+  background: var(--card-background);
+  border: 1px solid var(--border-subtle);
+  color: var(--primary-button);
+}
+
+[data-theme='dark'] .about-infrastructure-card__icon-wrap {
+  background: var(--surface-subtle);
+}
+
+.about-infrastructure-card__title {
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-text);
+}
+
+.about-infrastructure-card__description {
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--secondary-text);
+}
+
+/* CTA — theme-independent marketing panel (Figma) */
+.about-cta-panel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.75rem;
+  background: linear-gradient(90deg, #d8ccf8 0%, #f4f0ff 48%, #ffffff 100%);
+  padding: 2.75rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .about-cta-panel {
+    padding: 3.25rem 2rem;
+  }
+}
+
+.about-cta-panel__watermark {
+  position: absolute;
+  top: 50%;
+  right: -2%;
+  width: min(42vw, 18rem);
+  transform: translateY(-50%);
+  opacity: 0.14;
+  pointer-events: none;
+  user-select: none;
+}
+
+.about-cta-panel__content {
+  position: relative;
+  z-index: 1;
+  margin-inline: auto;
+  max-width: 36rem;
+  text-align: center;
+}
+
+.about-cta-panel__title {
+  font-family: var(--font-family-base);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: var(--font-weight-medium);
+  color: #4a4570;
+}
+
+.about-cta-panel__description {
+  margin-top: 0.875rem;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: #6b668f;
+}
+
+.about-cta-panel__button {
+  margin-top: 1.5rem;
+}

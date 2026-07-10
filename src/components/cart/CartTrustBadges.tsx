@@ -1,5 +1,5 @@
 // src/components/cart/CartTrustBadges.tsx
-import { BadgeCheck, Lock, RotateCcw, Shield, ShieldCheck } from 'lucide-react'
+import { BadgeCheck, RotateCcw, Shield, ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 
@@ -15,7 +15,7 @@ export function CartTrustBadges({ className, variant = 'cart' }: CartTrustBadges
   const badges =
     variant === 'payment'
       ? [
-          { icon: Lock, label: t('cart.trust.sslEncryption') },
+          { icon: Shield, label: t('cart.trust.sslEncryption') },
           { icon: ShieldCheck, label: t('cart.trust.trustedPayments') },
           { icon: BadgeCheck, label: t('cart.trust.originalGuarantee') },
         ]

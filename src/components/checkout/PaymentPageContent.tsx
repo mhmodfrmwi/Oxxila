@@ -4,8 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router-dom'
 import {
   CART_PATH,
-  CHECKOUT_PATH,
-  HOME_PATH,
 } from '../../config/routes'
 import { usePaymentPage } from '../../hooks/usePaymentPage'
 import { cn } from '../../lib/cn'
@@ -13,11 +11,9 @@ import { CartShippingBar } from '../cart/CartShippingBar'
 import { OrderSummaryCard } from '../cart/OrderSummaryCard'
 import { FormMessage } from '../auth/FormMessage'
 import { Footer } from '../landing/footer/Footer'
-import { Breadcrumb } from '../ui/Breadcrumb'
 import { Button } from '../ui/Button'
 import { Heading } from '../ui/Heading'
 import { focusRingClasses } from '../ui/interactionStyles'
-import { CheckoutStepper } from './CheckoutStepper'
 import { PaymentMethodSection } from './PaymentMethodSection'
 
 function PaymentPageSkeleton() {
@@ -80,15 +76,6 @@ export function PaymentPageContent() {
   return (
     <>
       <div className="container-content pb-8 sm:pb-10">
-        <Breadcrumb
-          className="mb-5 sm:mb-6"
-          items={[
-            { label: t('nav.home'), href: HOME_PATH },
-            { label: t('checkout.title'), href: CHECKOUT_PATH },
-            { label: t('checkout.payment.title') },
-          ]}
-        />
-
         <button
           type="button"
           className={cn('payment-back-link', focusRingClasses, 'rounded-sm')}
@@ -98,13 +85,11 @@ export function PaymentPageContent() {
           {t('checkout.back')}
         </button>
 
-        <header className="mb-5 sm:mb-6">
+        <header className="payment-page-header">
           <Heading variant="page" className="font-serif">
             {t('checkout.payment.title')}
           </Heading>
         </header>
-
-        <CheckoutStepper currentStep="payment" className="sm:mb-6" />
 
         {loading || !cart ? (
           <PaymentPageSkeleton />
@@ -113,7 +98,7 @@ export function PaymentPageContent() {
             <CartShippingBar
               address={primaryAddress}
               loading={addressLoading}
-              className="mb-6 sm:mb-8"
+              className="payment-page-shipping mb-8 sm:mb-10"
             />
 
             {submitError && (
@@ -152,6 +137,7 @@ export function PaymentPageContent() {
               <OrderSummaryCard
                 cart={cart}
                 mode="review"
+                className="payment-order-summary"
                 couponLoading={couponLoading}
                 onApplyCoupon={applyCoupon}
                 onRemoveCoupon={removeCoupon}

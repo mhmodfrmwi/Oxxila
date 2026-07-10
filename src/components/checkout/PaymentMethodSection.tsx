@@ -48,20 +48,39 @@ export function PaymentMethodSection({
       aria-label={t('checkout.payment.methodsAria')}
       className={cn('payment-method-section', className)}
     >
-      <div className="payment-billing-panel">
-        <p className="payment-phone-line">
-          <span className="payment-phone-line-text">
-            {t('checkout.payment.phoneNumber', { phone: phoneDisplay })}
-          </span>{' '}
-          <Link
-            to={ADD_ADDRESS_PATH}
-            className={cn('payment-inline-link', focusRingClasses, 'rounded-sm')}
-          >
-            {t('checkout.payment.changeAddress')}
-          </Link>
-        </p>
+      <p className="payment-phone-line">
+        <span className="payment-phone-line-text">
+          {t('checkout.payment.phoneNumber', { phone: phoneDisplay })}
+        </span>{' '}
+        <Link
+          to={ADD_ADDRESS_PATH}
+          className={cn('payment-inline-link', focusRingClasses, 'rounded-sm')}
+        >
+          {t('checkout.payment.changeAddress')}
+        </Link>
+      </p>
 
+      <div className="payment-billing-panel">
         <div className="payment-billing-fields">
+          <SelectField
+            label={t('checkout.payment.government')}
+            name="government"
+            value={billingForm.governorateId}
+            onChange={(event) => updateBillingField('governorateId', event.target.value)}
+            error={billingErrors.governorateId}
+            required
+            className="payment-field-input"
+          >
+            <option value="" disabled>
+              {t('checkout.payment.govPlaceholder')}
+            </option>
+            {governorates.map((governorate) => (
+              <option key={governorate._id} value={governorate._id}>
+                {governorate.name}
+              </option>
+            ))}
+          </SelectField>
+
           <SelectField
             label={t('checkout.payment.city')}
             name="city"
@@ -94,25 +113,6 @@ export function PaymentMethodSection({
             )}
           </SelectField>
 
-          <SelectField
-            label={t('checkout.payment.government')}
-            name="government"
-            value={billingForm.governorateId}
-            onChange={(event) => updateBillingField('governorateId', event.target.value)}
-            error={billingErrors.governorateId}
-            required
-            className="payment-field-input"
-          >
-            <option value="" disabled>
-              {t('checkout.payment.govPlaceholder')}
-            </option>
-            {governorates.map((governorate) => (
-              <option key={governorate._id} value={governorate._id}>
-                {governorate.name}
-              </option>
-            ))}
-          </SelectField>
-
           <TextAreaField
             label={t('checkout.payment.address')}
             name="address"
@@ -126,7 +126,7 @@ export function PaymentMethodSection({
         </div>
       </div>
 
-      <div className="payment-method-options">
+      <div className="payment-method-options" role="radiogroup" aria-label={t('checkout.payment.methodsAria')}>
         <PaymentMethodCard
           selected={paymentMethod === 'stripe'}
           onSelect={() => setPaymentMethod('stripe')}
