@@ -16,6 +16,8 @@ import {
   MY_ACCOUNT_PATH,
   ORDER_CONFIRMATION_PATH,
   PAYMENT_PATH,
+  PAYMENT_CALLBACK_PATH,
+  PAYMENT_CALLBACK_PREVIEW_PATH,
   PRODUCTS_PATH,
   REGISTER_PATH,
   RESET_PASSWORD_PATH,
@@ -57,6 +59,16 @@ const CheckoutPage = lazy(() =>
 )
 const PaymentPage = lazy(() =>
   import('./pages/PaymentPage').then((module) => ({ default: module.PaymentPage })),
+)
+const PaymentCallbackPage = lazy(() =>
+  import('./pages/PaymentCallbackPage').then((module) => ({
+    default: module.PaymentCallbackPage,
+  })),
+)
+const PaymentCallbackPreviewPage = lazy(() =>
+  import('./pages/PaymentCallbackPreviewPage').then((module) => ({
+    default: module.PaymentCallbackPreviewPage,
+  })),
 )
 const OrderConfirmationPage = lazy(() =>
   import('./pages/OrderConfirmationPage').then((module) => ({
@@ -116,6 +128,8 @@ export default function App() {
         />
         <Route path={CHECKOUT_PATH} element={<CheckoutPage />} />
         <Route path={PAYMENT_PATH} element={<PaymentPage />} />
+        <Route path={PAYMENT_CALLBACK_PREVIEW_PATH} element={<PaymentCallbackPreviewPage />} />
+        <Route path={PAYMENT_CALLBACK_PATH} element={<PaymentCallbackPage />} />
         <Route path={`${ORDER_CONFIRMATION_PATH}/:orderId`} element={<OrderConfirmationPage />} />
         <Route path={`${TRACK_ORDER_PATH}/:orderId`} element={<TrackOrderPage />} />
         <Route path={ADD_ADDRESS_PATH} element={<AddAddressPage />} />

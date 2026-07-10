@@ -37,6 +37,16 @@ export const CHECKOUT_PATH = '/checkout'
 
 export const PAYMENT_PATH = '/checkout/payment'
 
+export const PAYMENT_CALLBACK_PATH = '/payment-callback'
+
+/** Static preview of the payment callback UI (no auth, no API). */
+export const PAYMENT_CALLBACK_PREVIEW_PATH = '/payment-callback/preview'
+
+/** Stripe / Paymob success redirect — backend sets this as the provider success URL. */
+export function paymentCallbackPath(sessionId: string) {
+  return `${PAYMENT_CALLBACK_PATH}?session=${encodeURIComponent(sessionId)}`
+}
+
 export const ORDER_CONFIRMATION_PATH = '/checkout/confirmation'
 
 export function orderConfirmationPath(orderId: string) {

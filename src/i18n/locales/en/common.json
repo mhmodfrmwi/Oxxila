@@ -455,7 +455,28 @@
       "completeBilling": "Please complete the billing address fields.",
       "orderPlaced": "Order placed",
       "redirecting": "Redirecting to payment",
-      "paymentFailed": "Payment failed"
+      "paymentFailed": "Payment failed",
+      "loadingShipping": "Please wait while shipping zones load, then try again."
+    },
+    "callback": {
+      "ariaLabel": "Payment verification",
+      "verifyingTitle": "Verifying your payment",
+      "verifyingMessage": "Please wait while we confirm your payment…",
+      "session": "Session: {{sessionId}}",
+      "successTitle": "Payment successful!",
+      "successMessage": "Redirecting you to track your order…",
+      "orderNumber": "Order number",
+      "total": "Total",
+      "failedTitle": "Payment verification failed",
+      "failedMessage": "We couldn't verify your payment. Please try again or return home.",
+      "retry": "Try again",
+      "goHome": "Back to home",
+      "previewBanner": "Preview mode — showing {{state}} state (no API calls)",
+      "previewState": {
+        "loading": "verifying",
+        "success": "success",
+        "failed": "failed"
+      }
     },
     "confirmation": {
       "ariaLabel": "Order confirmation",

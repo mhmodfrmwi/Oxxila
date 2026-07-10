@@ -1,0 +1,142 @@
+/* Payment callback — polling state after Stripe / Paymob redirect */
+.payment-callback-preview-banner {
+  margin-bottom: 1rem;
+  border-radius: 0.75rem;
+  border: 1px dashed var(--primary-button);
+  background: rgb(59 130 246 / 0.08);
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  text-align: center;
+  color: var(--primary-text);
+}
+
+.payment-callback-card {
+  margin-inline: auto;
+  max-width: 28rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--card);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 0.06);
+}
+
+[data-theme='dark'] .payment-callback-card {
+  box-shadow: none;
+}
+
+.payment-callback-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.payment-callback-spinner {
+  color: var(--primary-button);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.payment-callback-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 9999px;
+}
+
+.payment-callback-icon--success {
+  background: rgb(34 197 94 / 0.12);
+  color: var(--support-success, #16a34a);
+}
+
+.payment-callback-icon--failed {
+  background: rgb(239 68 68 / 0.12);
+  color: var(--support-error);
+}
+
+.payment-callback-title {
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-text);
+}
+
+.payment-callback-message {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--secondary-text);
+}
+
+.payment-callback-session {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--secondary-text);
+  word-break: break-all;
+}
+
+.payment-callback-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.payment-callback-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--border-subtle);
+}
+
+.payment-callback-dot--active {
+  background: var(--primary-button);
+}
+
+.payment-callback-summary {
+  margin-top: 0.75rem;
+  width: 100%;
+  border-radius: 0.875rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-muted);
+  padding: 1rem 1.125rem;
+  text-align: start;
+}
+
+.payment-callback-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.payment-callback-summary-row + .payment-callback-summary-row {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.payment-callback-summary-row dt {
+  color: var(--secondary-text);
+}
+
+.payment-callback-summary-row dd {
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-text);
+}
+
+.payment-callback-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.75rem;
+}

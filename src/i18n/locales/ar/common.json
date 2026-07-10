@@ -455,7 +455,28 @@
       "completeBilling": "يرجى إكمال حقول عنوان الفوترة.",
       "orderPlaced": "تم تقديم الطلب",
       "redirecting": "جاري التحويل إلى الدفع",
-      "paymentFailed": "فشل الدفع"
+      "paymentFailed": "فشل الدفع",
+      "loadingShipping": "يرجى الانتظار حتى يتم تحميل مناطق الشحن، ثم حاول مرة أخرى."
+    },
+    "callback": {
+      "ariaLabel": "التحقق من الدفع",
+      "verifyingTitle": "جاري التحقق من الدفع",
+      "verifyingMessage": "برجاء الانتظار بينما نؤكد عملية الدفع…",
+      "session": "الجلسة: {{sessionId}}",
+      "successTitle": "تم الدفع بنجاح!",
+      "successMessage": "جاري تحويلك لتتبع طلبك…",
+      "orderNumber": "رقم الطلب",
+      "total": "الإجمالي",
+      "failedTitle": "حدث خطأ في الدفع",
+      "failedMessage": "لم نتمكن من التحقق من الدفع. يرجى المحاولة مرة أخرى أو العودة للرئيسية.",
+      "retry": "حاول مرة أخرى",
+      "goHome": "العودة للرئيسية",
+      "previewBanner": "وضع المعاينة — عرض حالة {{state}} (بدون استدعاء API)",
+      "previewState": {
+        "loading": "التحقق",
+        "success": "النجاح",
+        "failed": "الفشل"
+      }
     },
     "confirmation": {
       "ariaLabel": "تأكيد الطلب",

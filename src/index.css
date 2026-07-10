@@ -7,6 +7,7 @@
 @import './styles/cart.css';
 @import './styles/add-address.css';
 @import './styles/payment.css';
+@import './styles/payment-callback.css';
 @import './styles/order-confirmation.css';
 @import './styles/track-order.css';
 @import './styles/promo-carousel.css';

@@ -40,6 +40,30 @@ const emptyBillingForm: BillingFormState = {
   addressLine: '',
 }
 
+const OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i
+
+function resolveDistrictIdFromCity(
+  cityName: string,
+  districts: ShippingDistrict[],
+  hasDistricts: boolean,
+): string {
+  if (!hasDistricts) return 'other'
+
+  const normalizedCity = cityName.trim().toLowerCase()
+  if (!normalizedCity) return ''
+
+  const matchedDistrict = districts.find(
+    (district) => district.name.trim().toLowerCase() === normalizedCity,
+  )
+  return matchedDistrict?._id ?? 'other'
+}
+
+function isValidBillingDistrictId(districtId: string, hasDistricts: boolean): boolean {
+  if (!districtId.trim()) return false
+  if (districtId === 'other') return true
+  return hasDistricts ? OBJECT_ID_PATTERN.test(districtId) : true
+}
+
 function buildBillingFromAddress(
   address: UserAddress,
   governorates: ShippingGovernorate[],
@@ -51,20 +75,25 @@ function buildBillingFromAddress(
 
   return {
     governorateId: matchedGovernorate?._id ?? '',
-    districtId: address.city,
+    districtId: '',
     addressLine: rest.join(', ') || address.address,
   }
 }
 
 function validateBillingForm(
   form: BillingFormState,
+  hasDistricts: boolean,
   t: (key: string) => string,
 ): BillingFormErrors {
   const errors: BillingFormErrors = {}
   if (!form.governorateId.trim()) {
     errors.governorateId = t('checkout.payment.governmentRequired')
   }
-  if (!form.districtId.trim()) errors.districtId = t('checkout.payment.cityRequired')
+  if (!form.districtId.trim()) {
+    errors.districtId = t('checkout.payment.cityRequired')
+  } else if (!isValidBillingDistrictId(form.districtId, hasDistricts)) {
+    errors.districtId = t('checkout.payment.cityRequired')
+  }
   if (!form.addressLine.trim()) errors.addressLine = t('checkout.payment.addressRequired')
   else if (form.addressLine.trim().length < 6) {
     errors.addressLine = t('checkout.payment.addressMinLength')
@@ -90,6 +119,7 @@ export function usePaymentPage() {
   const [governorates, setGovernorates] = useState<ShippingGovernorate[]>([])
   const [districts, setDistricts] = useState<ShippingDistrict[]>([])
   const [hasDistricts, setHasDistricts] = useState(true)
+  const [zonesLoading, setZonesLoading] = useState(false)
   const [billingForm, setBillingForm] = useState<BillingFormState>(emptyBillingForm)
   const [billingErrors, setBillingErrors] = useState<BillingFormErrors>({})
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId>('stripe')
@@ -102,8 +132,14 @@ export function usePaymentPage() {
 
   const derivedBillingFromShipping = useMemo(() => {
     if (!billingSameAsShipping || !primaryAddress || governorates.length === 0) return null
-    return buildBillingFromAddress(primaryAddress, governorates)
-  }, [billingSameAsShipping, primaryAddress, governorates])
+    const base = buildBillingFromAddress(primaryAddress, governorates)
+    if (!base.governorateId) return base
+
+    return {
+      ...base,
+      districtId: resolveDistrictIdFromCity(primaryAddress.city, districts, hasDistricts),
+    }
+  }, [billingSameAsShipping, primaryAddress, governorates, districts, hasDistricts])
 
   const effectiveBillingForm = derivedBillingFromShipping ?? billingForm
   const activeGovernorateId = effectiveBillingForm.governorateId
@@ -173,6 +209,8 @@ export function usePaymentPage() {
       await Promise.resolve()
       if (cancelled) return
 
+      setZonesLoading(true)
+
       try {
         const response = await getShippingZones(activeGovernorateId)
         if (cancelled) return
@@ -191,6 +229,8 @@ export function usePaymentPage() {
         }
       } catch {
         if (!cancelled) setDistricts([])
+      } finally {
+        if (!cancelled) setZonesLoading(false)
       }
     }
 
@@ -281,10 +321,15 @@ export function usePaymentPage() {
   async function handlePayNow() {
     setSubmitError(null)
 
-    const validation = validateBillingForm(effectiveBillingForm, t)
+    const validation = validateBillingForm(effectiveBillingForm, hasDistricts, t)
     if (Object.keys(validation).length > 0) {
       setBillingErrors(validation)
       toast.error(t('checkout.payment.invalidForm'), t('checkout.payment.completeBilling'))
+      return
+    }
+
+    if (zonesLoading) {
+      toast.error(t('checkout.payment.paymentFailed'), t('checkout.payment.loadingShipping'))
       return
     }
 
