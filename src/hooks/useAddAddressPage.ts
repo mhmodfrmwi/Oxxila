@@ -6,10 +6,10 @@ import {
   createMyAddress,
   deleteMyAddress,
   getMyAddresses,
+  getUserProfile,
   updateMyAddress,
   type UserAddress,
 } from '../api/users'
-import { getMe } from '../api/auth'
 import { ADDRESSES_PATH, LOGIN_PATH } from '../config/routes'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
@@ -95,14 +95,13 @@ export function useAddAddressPage() {
       try {
         const [addressesResponse, profileResponse, countriesResponse] = await Promise.all([
           getMyAddresses(),
-          getMe(),
+          getUserProfile(),
           getShippingCountries(),
         ])
         if (cancelled) return
 
         setAddresses(addressesResponse.data?.addresses ?? [])
-        const profile = profileResponse.data as { phone?: string } | undefined
-        setPhone(profile?.phone ?? '')
+        setPhone(profileResponse.data?.phone ?? '')
 
         const countries = countriesResponse.data ?? []
         const defaultCountry = countries[0]

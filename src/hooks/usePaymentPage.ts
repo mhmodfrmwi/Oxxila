@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createCodOrder, createPaymentSession } from '../api/orders'
-import { getMe } from '../api/auth'
+import { getUserProfile } from '../api/users'
 import {
   getShippingCountries,
   getShippingGovernorates,
@@ -168,13 +168,12 @@ export function usePaymentPage() {
       setPageLoading(true)
       try {
         const [profileResponse, countriesResponse] = await Promise.all([
-          getMe(),
+          getUserProfile(),
           getShippingCountries(),
         ])
         if (cancelled) return
 
-        const profile = profileResponse.data as { phone?: string } | undefined
-        setPhone(profile?.phone ?? '')
+        setPhone(profileResponse.data?.phone ?? '')
 
         const countries = countriesResponse.data ?? []
         const defaultCountry = countries[0]
