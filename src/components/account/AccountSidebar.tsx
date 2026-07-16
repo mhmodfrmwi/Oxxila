@@ -9,6 +9,7 @@ import {
   ADDRESSES_PATH,
   HOME_PATH,
   MY_ACCOUNT_PATH,
+  RETURNS_HISTORY_PATH,
 } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
@@ -26,6 +27,7 @@ export interface AccountNavItem {
 const defaultNavItems: AccountNavItem[] = [
   { id: 'profile', labelKey: 'profile.nav.myProfile', to: MY_ACCOUNT_PATH, end: true },
   { id: 'orders', labelKey: 'profile.nav.myOrders', to: ACCOUNT_ORDERS_PATH },
+  { id: 'returns', labelKey: 'profile.nav.myReturns', to: RETURNS_HISTORY_PATH },
   { id: 'addresses', labelKey: 'profile.nav.myAddresses', to: ADDRESSES_PATH },
   {
     id: 'password',
@@ -38,6 +40,7 @@ interface AccountSidebarProps {
   name: string
   email: string
   avatar?: string
+  avatarLoading?: boolean
   navItems?: AccountNavItem[]
   className?: string
 }
@@ -46,6 +49,7 @@ export function AccountSidebar({
   name,
   email,
   avatar,
+  avatarLoading = false,
   navItems = defaultNavItems,
   className,
 }: AccountSidebarProps) {
@@ -88,7 +92,13 @@ export function AccountSidebar({
       aria-label={t('profile.sidebarAria')}
     >
       <div className="mb-6 flex flex-col items-center text-center">
-        <UserAvatar name={name} src={avatar} size="lg" alt={name} />
+        <UserAvatar
+          name={name}
+          src={avatar}
+          size="lg"
+          alt={name}
+          loading={avatarLoading}
+        />
         <p className="mt-4 font-serif text-lg font-medium text-primary-text">{name}</p>
         {email && (
           <p className="mt-1 break-all text-sm text-secondary-text">{email}</p>

@@ -68,6 +68,7 @@ export function parseOAuthUserFromToken(token: string): AuthUser | null {
     const email = String(payload.email ?? '')
     const name = String(payload.name ?? payload.username ?? 'User')
     const role = String(payload.role ?? 'user')
+    const picture = String(payload.picture ?? payload.avatar ?? '').trim()
 
     if (!id && !email) return null
 
@@ -76,6 +77,9 @@ export function parseOAuthUserFromToken(token: string): AuthUser | null {
       name,
       email,
       role,
+      // Never treat JWT picture as the uploaded avatar — keep it provisional
+      // until /users/getMe hydrates the canonical profile photo.
+      provisionalAvatar: picture || undefined,
     }
   } catch {
     return null

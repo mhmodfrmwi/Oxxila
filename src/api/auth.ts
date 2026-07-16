@@ -6,7 +6,14 @@ export interface AuthUser {
   email: string
   role: string
   phone?: string
+  /** Canonical profile photo from API (uploaded image, else OAuth photo). */
   avatar?: string
+  /**
+   * Temporary OAuth picture (e.g. JWT `picture`) used only until profile hydrate.
+   * Cleared once `getUserProfile` / login response provides the real avatar.
+   */
+  provisionalAvatar?: string
+  storeCreditBalance?: number
 }
 
 export interface LoginPayload {

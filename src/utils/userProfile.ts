@@ -1,15 +1,25 @@
 // src/utils/userProfile.ts
 import type { AuthUser } from '../api/auth'
 import type { UserProfile } from '../api/users'
+import { normalizeAvatarUrl } from './userAvatar'
 
-export function profileToAuthUser(profile: UserProfile): AuthUser {
+export function profileToAuthUser(
+  profile: UserProfile,
+  previous?: AuthUser | null,
+): AuthUser {
+  const avatar = normalizeAvatarUrl(profile.avatar)
+
   return {
-    id: String(profile._id ?? profile.id ?? ''),
+    id: String(profile._id ?? profile.id ?? previous?.id ?? ''),
     name: profile.name,
     email: profile.email,
-    role: profile.role ?? 'user',
-    phone: profile.phone ?? '',
-    avatar: profile.avatar ?? '',
+    role: profile.role ?? previous?.role ?? 'user',
+    phone: profile.phone ?? previous?.phone ?? '',
+    avatar,
+    // Profile response is canonical — drop any provisional Google picture.
+    provisionalAvatar: undefined,
+    storeCreditBalance:
+      profile.storeCreditBalance ?? previous?.storeCreditBalance ?? 0,
   }
 }
 

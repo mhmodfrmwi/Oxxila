@@ -27,6 +27,8 @@ import {
   SHOP_PATH,
   TRACK_ORDER_PATH,
   VERIFY_OTP_PATH,
+  RETURNS_PATH,
+  RETURNS_HISTORY_PATH,
 } from './config/routes'
 import { RouteFallback } from './components/ui/RouteFallback'
 
@@ -115,6 +117,14 @@ const VerifyOtpPage = lazy(() =>
 const ChangePasswordPage = lazy(() =>
   import('./pages/ChangePasswordPage').then((module) => ({ default: module.ChangePasswordPage })),
 )
+const ReturnsPage = lazy(() =>
+  import('./pages/ReturnsPage').then((module) => ({ default: module.ReturnsPage })),
+)
+const ReturnsHistoryPage = lazy(() =>
+  import('./pages/ReturnsHistoryPage').then((module) => ({
+    default: module.ReturnsHistoryPage,
+  })),
+)
 
 export default function App() {
   return (
@@ -150,6 +160,8 @@ export default function App() {
         <Route path={VERIFY_OTP_PATH} element={<VerifyOtpPage />} />
         <Route path={`${RESET_PASSWORD_PATH}/:token`} element={<ChangePasswordPage />} />
         <Route path={CHANGE_PASSWORD_PATH} element={<ChangePasswordPage />} />
+        <Route path={RETURNS_PATH} element={<ReturnsPage />} />
+        <Route path={RETURNS_HISTORY_PATH} element={<ReturnsHistoryPage />} />
       </Routes>
     </Suspense>
   )

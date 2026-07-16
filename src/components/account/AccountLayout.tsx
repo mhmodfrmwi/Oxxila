@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router-dom'
 import { HOME_PATH, LOGIN_PATH, MY_ACCOUNT_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
+import { useUserAvatar } from '../../hooks/useUserAvatar'
 import { Footer } from '../landing/footer/Footer'
 import { Layout } from '../layout/Layout'
 import { PageBleed } from '../layout/PageBleed'
@@ -23,14 +24,13 @@ export function AccountLayout({
 }: AccountLayoutProps) {
   const { t } = useTranslation()
   const { isAuthenticated, user } = useAuth()
+  const { name, src, loading: avatarLoading } = useUserAvatar()
 
   if (!isAuthenticated) {
     return <Navigate to={LOGIN_PATH} replace />
   }
 
-  const name = user?.name ?? ''
   const email = user?.email ?? ''
-  const avatar = user?.avatar
 
   return (
     <Layout>
@@ -52,7 +52,8 @@ export function AccountLayout({
             <AccountSidebar
               name={name}
               email={email}
-              avatar={avatar}
+              avatar={src}
+              avatarLoading={avatarLoading}
               navItems={navItems}
               className="lg:sticky lg:top-6"
             />

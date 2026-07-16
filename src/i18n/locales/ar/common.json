@@ -15,7 +15,16 @@
     "closeMenu": "إغلاق القائمة",
     "closeMenuOverlay": "إغلاق طبقة القائمة",
     "shoppingBag": "حقيبة التسوق",
-    "shoppingBagWithCount": "حقيبة التسوق، {{count}} عناصر"
+    "shoppingBagWithCount": "حقيبة التسوق، {{count}} عناصر",
+    "accountMenu": "قائمة الحساب",
+    "openAccountMenu": "فتح قائمة الحساب",
+    "dropdown": {
+      "account": "الحساب",
+      "myOrders": "طلباتي",
+      "returns": "المرتجعات",
+      "wishlist": "المفضلة",
+      "giftCards": "بطاقات الهدايا"
+    }
   },
   "actions": {
     "addToCart": "أضف إلى السلة",
@@ -745,6 +754,7 @@
     "nav": {
       "myProfile": "ملفي الشخصي",
       "myOrders": "طلباتي",
+      "myReturns": "مرتجعاتي",
       "myAddresses": "عناويني",
       "changePassword": "تغيير كلمة المرور",
       "logout": "تسجيل الخروج"
@@ -807,5 +817,110 @@
       "updateSuccess": "تم تحديث كلمة المرور بنجاح",
       "updateFailed": "تعذر تحديث كلمة المرور"
     }
+  },
+  "returns": {
+    "progress": "تقدم الإرجاع",
+    "steps": {
+      "request": "تم إرسال الطلب",
+      "approval": "الموافقة",
+      "pickup": "الاستلام",
+      "refund": "الاسترداد"
+    },
+    "selectItems": "اختر المنتجات",
+    "selectItemsSubtitle": "اختر منتجات من طلباتك المؤهلة الأخيرة.",
+    "selectItemsSubtitleOrder": "اختر منتجات من طلبك الأخير / {{order}}",
+    "selectProduct": "اختر {{name}} للإرجاع",
+    "decreaseQty": "تقليل الكمية",
+    "increaseQty": "زيادة الكمية",
+    "needAssistance": "هل تحتاج مساعدة؟",
+    "help": {
+      "eligibility": "التحقق من أهلية الإرجاع",
+      "international": "رسوم الإرجاع الدولي",
+      "medical": "سياسة التفاعل الطبي"
+    },
+    "reasonTitle": "سبب الإرجاع",
+    "reasonSubtitle": "ساعدنا على تحسين تركيباتنا السريرية.",
+    "selectReason": "اختر السبب",
+    "reasonPlaceholder": "اختر سببًا...",
+    "reasons": {
+      "damaged_item": "منتج تالف",
+      "wrong_product": "منتج خاطئ",
+      "allergic_reaction": "تفاعل تحسسي / جلدي",
+      "expired_product": "منتج منتهي الصلاحية",
+      "changed_mind": "تغيير الرأي",
+      "other": "أخرى"
+    },
+    "medicalNote": "ملاحظة طبية (اختياري)",
+    "medicalNotePlaceholder": "صف أي تفاعلات جلدية أو مخاوف سريرية...",
+    "clinicalProof": "إثبات سريري - صور",
+    "uploadTitle": "رفع صور المنتج",
+    "uploadHint": "(JPEG أو PNG بحد أقصى 20 ميجابايت)",
+    "removeImage": "إزالة الصورة",
+    "invalidImageType": "يُسمح فقط بصور JPEG أو PNG أو WebP",
+    "imageTooLarge": "يجب ألا يتجاوز حجم كل صورة 5 ميجابايت",
+    "pickupTitle": "الاسترداد والاستلام",
+    "pickupSubtitle": "اللوجستيات والحل المالي.",
+    "pickupAddress": "عنوان الاستلام",
+    "city": "المدينة",
+    "cityPlaceholder": "اختر المدينة",
+    "community": "المجتمع",
+    "communityPlaceholder": "اختر المجتمع",
+    "address": "العنوان",
+    "addressPlaceholder": "الشارع، المبنى، الطابق، الشقة",
+    "otherDistrict": "أخرى",
+    "shipToSaved": "الشحن إلى \"{{address}}\"",
+    "submit": "إرسال طلب الإرجاع",
+    "submitting": "جاري الإرسال...",
+    "loadFailed": "تعذر تحميل المرتجعات المؤهلة. يرجى المحاولة مرة أخرى.",
+    "emptyTitle": "لا توجد مرتجعات مؤهلة",
+    "emptyMessage": "ستظهر هنا الطلبات المُسلَّمة ضمن فترة الإرجاع.",
+    "browseShop": "متابعة التسوق",
+    "invalidForm": "طلب إرجاع غير صالح",
+    "fillRequired": "يرجى إكمال الحقول المطلوبة.",
+    "submitSuccess": "تم إرسال طلب الإرجاع",
+    "submitSuccessDetail": "تم إرسال طلب الإرجاع بنجاح. سنراجعه قريبًا.",
+    "viewHistory": "عرض تتبع المرتجعات",
+    "submitFailed": "تعذر إرسال طلب الإرجاع",
+    "validation": {
+      "itemsRequired": "اختر منتجًا واحدًا مؤهلًا على الأقل",
+      "reasonRequired": "اختر سبب الإرجاع",
+      "governorateRequired": "المدينة مطلوبة",
+      "cityRequired": "المجتمع مطلوب",
+      "addressRequired": "عنوان الاستلام مطلوب",
+      "proofRequired": "صور الإثبات مطلوبة لهذا السبب"
+    }
+  },
+  "returnsHistory": {
+    "back": "رجوع",
+    "title": "المرتجعات",
+    "trackingStatus": "حالة التتبع",
+    "timelineAria": "تقدم الإرجاع",
+    "timeline": {
+      "submitted": "تم الإرسال",
+      "approved": "تمت الموافقة",
+      "picked_up": "تم الاستلام",
+      "received": "تم الاستلام بالمستودع",
+      "refunded": "تم الاسترداد"
+    },
+    "status": {
+      "pending": "قيد المراجعة",
+      "approved": "تمت الموافقة",
+      "picked_up": "تم الاستلام",
+      "received": "تم الاستلام",
+      "refunded": "تم الاسترداد",
+      "rejected": "مرفوض"
+    },
+    "reason": "السبب",
+    "logistics": "اللوجستيات",
+    "refund": "الاسترداد",
+    "orderRef": "طلب {{order}}",
+    "logisticsPending": "قيد المراجعة",
+    "trackingLabel": "تتبع {{carrier}}: {{number}}",
+    "pickupRequested": "تم طلب الاستلام",
+    "emptyTitle": "لا توجد طلبات إرجاع بعد",
+    "emptyMessage": "عند إرسال طلب إرجاع، يمكنك متابعة تقدمه هنا.",
+    "startReturn": "طلب إرجاع",
+    "requestAnother": "طلب إرجاع آخر",
+    "loadFailed": "تعذر تحميل المرتجعات. يرجى المحاولة مرة أخرى."
   }
 }

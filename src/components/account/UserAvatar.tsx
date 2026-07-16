@@ -1,13 +1,17 @@
 // src/components/account/UserAvatar.tsx
 import { User } from 'lucide-react'
+import { useState } from 'react'
 import { cn } from '../../lib/cn'
+import { initialsFromName, normalizeAvatarUrl } from '../../utils/userAvatar'
 
 interface UserAvatarProps {
   name: string
-  src?: string
+  src?: string | null
   size?: 'sm' | 'md' | 'lg'
   className?: string
   alt?: string
+  /** Show pulse skeleton while the canonical profile is still loading. */
+  loading?: boolean
 }
 
 const sizeClasses = {
@@ -22,21 +26,31 @@ const iconSizes = {
   lg: 40,
 } as const
 
-function initialsFromName(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean)
-  if (parts.length === 0) return ''
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase()
-}
-
 export function UserAvatar({
   name,
   src,
   size = 'md',
   className,
   alt,
+  loading = false,
 }: UserAvatarProps) {
+  const resolvedSrc = normalizeAvatarUrl(src)
+  const [failedSrc, setFailedSrc] = useState<string | null>(null)
   const initials = initialsFromName(name)
+  const showImage = Boolean(resolvedSrc) && failedSrc !== resolvedSrc
+
+  if (loading && !showImage) {
+    return (
+      <div
+        className={cn(
+          'shrink-0 animate-pulse rounded-full bg-surface-muted',
+          sizeClasses[size],
+          className,
+        )}
+        aria-hidden
+      />
+    )
+  }
 
   return (
     <div
@@ -47,8 +61,15 @@ export function UserAvatar({
       )}
       aria-hidden={!alt}
     >
-      {src ? (
-        <img src={src} alt={alt ?? ''} className="h-full w-full object-cover" />
+      {showImage ? (
+        <img
+          src={resolvedSrc}
+          alt={alt ?? ''}
+          className="h-full w-full object-cover"
+          onError={() => {
+            if (resolvedSrc) setFailedSrc(resolvedSrc)
+          }}
+        />
       ) : initials ? (
         <span className="font-semibold">{initials}</span>
       ) : (

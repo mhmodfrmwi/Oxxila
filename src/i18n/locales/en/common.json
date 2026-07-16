@@ -15,7 +15,16 @@
     "closeMenu": "Close menu",
     "closeMenuOverlay": "Close menu overlay",
     "shoppingBag": "Shopping bag",
-    "shoppingBagWithCount": "Shopping bag, {{count}} items"
+    "shoppingBagWithCount": "Shopping bag, {{count}} items",
+    "accountMenu": "Account menu",
+    "openAccountMenu": "Open account menu",
+    "dropdown": {
+      "account": "Account",
+      "myOrders": "My Orders",
+      "returns": "Returns",
+      "wishlist": "Wishlist",
+      "giftCards": "Gift Cards"
+    }
   },
   "actions": {
     "addToCart": "Add to Cart",
@@ -745,6 +754,7 @@
     "nav": {
       "myProfile": "My Profile",
       "myOrders": "My Orders",
+      "myReturns": "My Returns",
       "myAddresses": "My Addresses",
       "changePassword": "Change Password",
       "logout": "Logout"
@@ -807,5 +817,110 @@
       "updateSuccess": "Password updated successfully",
       "updateFailed": "Unable to update password"
     }
+  },
+  "returns": {
+    "progress": "Return progress",
+    "steps": {
+      "request": "Request Sent",
+      "approval": "Approval",
+      "pickup": "Pickup",
+      "refund": "Refund"
+    },
+    "selectItems": "Select Items",
+    "selectItemsSubtitle": "Choose products from your recent eligible orders.",
+    "selectItemsSubtitleOrder": "Choose products from your recent order / {{order}}",
+    "selectProduct": "Select {{name}} for return",
+    "decreaseQty": "Decrease quantity",
+    "increaseQty": "Increase quantity",
+    "needAssistance": "Need Assistance?",
+    "help": {
+      "eligibility": "Return eligibility check",
+      "international": "International return fees",
+      "medical": "Medical reaction policy"
+    },
+    "reasonTitle": "Reason for Return",
+    "reasonSubtitle": "Help us improve our clinical formulations.",
+    "selectReason": "Select Reason",
+    "reasonPlaceholder": "Select a reason...",
+    "reasons": {
+      "damaged_item": "Damaged item",
+      "wrong_product": "Wrong product",
+      "allergic_reaction": "Allergic / skin reaction",
+      "expired_product": "Expired product",
+      "changed_mind": "Changed mind",
+      "other": "Other"
+    },
+    "medicalNote": "Medical Note (Optional)",
+    "medicalNotePlaceholder": "Describe any skin reactions or clinical concerns...",
+    "clinicalProof": "Clinical Proof - Photos",
+    "uploadTitle": "Upload product photos",
+    "uploadHint": "(JPEG or PNG Max 20MB)",
+    "removeImage": "Remove image",
+    "invalidImageType": "Only JPEG, PNG, or WebP images are allowed",
+    "imageTooLarge": "Each image must be 5MB or smaller",
+    "pickupTitle": "Refund & Pickup",
+    "pickupSubtitle": "Logistics and financial resolution.",
+    "pickupAddress": "Pickup Address",
+    "city": "City",
+    "cityPlaceholder": "Select city",
+    "community": "Community",
+    "communityPlaceholder": "Select community",
+    "address": "Address",
+    "addressPlaceholder": "Street address, building, floor, apartment",
+    "otherDistrict": "Other",
+    "shipToSaved": "Ship to \"{{address}}\"",
+    "submit": "Submit Return Request",
+    "submitting": "Submitting...",
+    "loadFailed": "Unable to load eligible returns. Please try again.",
+    "emptyTitle": "No eligible returns",
+    "emptyMessage": "Delivered orders within the return window will appear here.",
+    "browseShop": "Continue shopping",
+    "invalidForm": "Invalid return request",
+    "fillRequired": "Please complete the required fields.",
+    "submitSuccess": "Return request submitted",
+    "submitSuccessDetail": "Your return request was submitted successfully. We will review it shortly.",
+    "viewHistory": "View return tracking",
+    "submitFailed": "Unable to submit return request",
+    "validation": {
+      "itemsRequired": "Select at least one eligible item",
+      "reasonRequired": "Select a return reason",
+      "governorateRequired": "City is required",
+      "cityRequired": "Community is required",
+      "addressRequired": "Pickup address is required",
+      "proofRequired": "Proof photos are required for this reason"
+    }
+  },
+  "returnsHistory": {
+    "back": "Back",
+    "title": "Returns",
+    "trackingStatus": "Tracking Status",
+    "timelineAria": "Return progress",
+    "timeline": {
+      "submitted": "Submitted",
+      "approved": "Approved",
+      "picked_up": "Picked Up",
+      "received": "Received",
+      "refunded": "Refunded"
+    },
+    "status": {
+      "pending": "Pending review",
+      "approved": "Approved",
+      "picked_up": "Picked up",
+      "received": "Received",
+      "refunded": "Refunded",
+      "rejected": "Rejected"
+    },
+    "reason": "Reason",
+    "logistics": "Logistics",
+    "refund": "Refund",
+    "orderRef": "Order {{order}}",
+    "logisticsPending": "Pending review",
+    "trackingLabel": "{{carrier}} tracking: {{number}}",
+    "pickupRequested": "Pickup requested",
+    "emptyTitle": "No return requests yet",
+    "emptyMessage": "When you submit a return, you can track its progress here.",
+    "startReturn": "Request a return",
+    "requestAnother": "Request another return",
+    "loadFailed": "Unable to load your returns. Please try again."
   }
 }

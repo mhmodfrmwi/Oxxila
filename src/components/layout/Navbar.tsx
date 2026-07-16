@@ -1,6 +1,6 @@
 // src/components/layout/Navbar.tsx
 import { ChevronDown, LogOut, ShoppingBag, User, X } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import {
@@ -10,14 +10,17 @@ import {
   HOME_PATH,
   LOGIN_PATH,
   MY_ACCOUNT_PATH,
+  RETURNS_HISTORY_PATH,
   SHOP_PATH,
 } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { useToast } from '../../context/ToastContext'
+import { useUserAvatar } from '../../hooks/useUserAvatar'
 import { UserAvatar } from '../account/UserAvatar'
 import { Logo } from '../ui/Logo'
 import { typeSmallClasses } from '../ui/typography'
+import { AccountDropdown } from './AccountDropdown'
 
 function BurgerIcon() {
   return (
@@ -32,11 +35,14 @@ function BurgerIcon() {
 export function Navbar() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { isAuthenticated, user, logout } = useAuth()
+  const { isAuthenticated, logout } = useAuth()
+  const { name, src, loading: avatarLoading, storeCreditBalance } = useUserAvatar()
   const { itemCount } = useCart()
   const toast = useToast()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
+  const accountMenuRef = useRef<HTMLDivElement>(null)
 
   const navLinks = useMemo(
     () => [
@@ -59,6 +65,7 @@ export function Navbar() {
     if (authLoading) return
 
     setAuthLoading(true)
+    setAccountOpen(false)
 
     try {
       await logout()
@@ -181,26 +188,38 @@ export function Navbar() {
           </Link>
           {isAuthenticated ? (
             <>
-              <NavLink
-                to={MY_ACCOUNT_PATH}
-                className={authActionClass}
-                aria-label={t('nav.account')}
-              >
-                <UserAvatar
-                  name={user?.name ?? ''}
-                  src={user?.avatar}
-                  size="sm"
-                  alt={user?.name}
-                />
-                <span
-                  className={[
-                    'hidden max-w-[8rem] truncate leading-tight sm:inline',
-                    typeSmallClasses,
-                  ].join(' ')}
+              <div ref={accountMenuRef} className="relative">
+                <button
+                  type="button"
+                  className={authActionClass}
+                  aria-label={t('nav.openAccountMenu')}
+                  aria-haspopup="menu"
+                  aria-expanded={accountOpen}
+                  onClick={() => setAccountOpen((open) => !open)}
                 >
-                  {user?.name}
-                </span>
-              </NavLink>
+                  <UserAvatar
+                    name={name}
+                    src={src}
+                    size="sm"
+                    alt={name}
+                    loading={avatarLoading}
+                  />
+                  <span
+                    className={[
+                      'hidden max-w-[8rem] truncate leading-tight sm:inline',
+                      typeSmallClasses,
+                    ].join(' ')}
+                  >
+                    {name}
+                  </span>
+                </button>
+                <AccountDropdown
+                  open={accountOpen}
+                  onClose={() => setAccountOpen(false)}
+                  rootRef={accountMenuRef}
+                  storeCreditBalance={storeCreditBalance}
+                />
+              </div>
               <button
                 type="button"
                 className={authActionClass}
@@ -278,13 +297,21 @@ export function Navbar() {
                     >
                       <span className="inline-flex items-center gap-2">
                         <UserAvatar
-                          name={user?.name ?? ''}
-                          src={user?.avatar}
+                          name={name}
+                          src={src}
                           size="sm"
-                          alt={user?.name}
+                          alt={name}
+                          loading={avatarLoading}
                         />
-                        {user?.name || t('nav.account')}
+                        {name || t('nav.account')}
                       </span>
+                    </NavLink>
+                    <NavLink
+                      to={RETURNS_HISTORY_PATH}
+                      className={mobileLinkClass}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {t('nav.dropdown.returns')}
                     </NavLink>
                     <button
                       type="button"

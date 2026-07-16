@@ -33,7 +33,7 @@ export function Footer() {
       { label: t('footer.shoppingLinks.newArrivals'), to: getCollectionHref('new-arrivals') },
       { label: t('footer.shoppingLinks.bestSellers'), to: getCollectionHref('best-sellers') },
       { label: t('footer.shoppingLinks.shipping'), to: '/shipping' },
-      { label: t('footer.shoppingLinks.returns'), to: '/returns' },
+      { label: t('footer.shoppingLinks.returns'), to: '/returns/history' },
       { label: t('footer.shoppingLinks.trackOrder'), to: '/track' },
     ],
     [t],

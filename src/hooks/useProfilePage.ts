@@ -1,5 +1,5 @@
 // src/hooks/useProfilePage.ts
-import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   getUserProfile,
@@ -68,12 +68,17 @@ function validateProfileForm(
 
 export function useProfilePage() {
   const { t } = useTranslation()
-  const { setUser } = useAuth()
+  const { setUser, user } = useAuth()
   const toast = useToast()
+  const userRef = useRef(user)
+
+  useEffect(() => {
+    userRef.current = user
+  }, [user])
 
   const [form, setForm] = useState<ProfileFormState>(emptyForm)
   const [errors, setErrors] = useState<ProfileFormErrors>({})
-  const [avatar, setAvatar] = useState('')
+  const [avatar, setAvatar] = useState(() => user?.avatar ?? '')
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
@@ -88,6 +93,7 @@ export function useProfilePage() {
       _id?: string
       id?: string
       role?: string
+      storeCreditBalance?: number
     }) => {
       const { firstName, lastName } = splitFullName(profile.name)
       setForm({
@@ -97,7 +103,7 @@ export function useProfilePage() {
         phone: profile.phone ?? '',
       })
       setAvatar(profile.avatar ?? '')
-      setUser(profileToAuthUser(profile))
+      setUser(profileToAuthUser(profile, userRef.current))
     },
     [setUser],
   )

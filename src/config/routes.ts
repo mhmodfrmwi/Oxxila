@@ -66,3 +66,7 @@ export const COLLECTIONS_PATH = '/collections'
 export function collectionPath(slug: string) {
   return `${COLLECTIONS_PATH}/${slug}`
 }
+
+export const RETURNS_PATH = '/returns'
+
+export const RETURNS_HISTORY_PATH = '/returns/history'

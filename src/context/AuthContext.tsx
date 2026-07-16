@@ -1,22 +1,37 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+// src/context/AuthContext.tsx
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import {
   login as loginRequest,
   logout as logoutRequest,
   type AuthUser,
   type LoginPayload,
 } from '../api/auth'
+import { getUserProfile } from '../api/users'
 import { AUTH_TOKEN_KEY } from '../config/api'
 import { STORAGE_KEYS } from '../config/storage'
 import { ApiError, getAccessToken } from '../lib/api'
 import { parseOAuthUserFromToken, createFallbackOAuthUser } from '../utils/oauth'
+import { profileToAuthUser } from '../utils/userProfile'
 
 interface AuthContextValue {
   user: AuthUser | null
   isAuthenticated: boolean
+  /** True until the first profile hydrate attempt finishes for the current session. */
+  profileLoading: boolean
   login: (payload: LoginPayload) => Promise<AuthUser>
   logout: () => Promise<void>
   setUser: (user: AuthUser | null) => void
   setSession: (accessToken: string, user?: AuthUser | null) => void
+  refreshProfile: () => Promise<AuthUser | null>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -39,6 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return readStoredUser() ?? parseOAuthUserFromToken(token)
   })
+  const [profileLoading, setProfileLoading] = useState(() => Boolean(getAccessToken()))
+  const userRef = useRef(user)
+
+  useEffect(() => {
+    userRef.current = user
+  }, [user])
 
   const setUser = useCallback((nextUser: AuthUser | null) => {
     setUserState(nextUser)
@@ -49,14 +70,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const refreshProfile = useCallback(async () => {
+    if (!getAccessToken()) {
+      setProfileLoading(false)
+      return null
+    }
+
+    try {
+      const response = await getUserProfile()
+      if (!response.data) {
+        setProfileLoading(false)
+        return userRef.current
+      }
+
+      const nextUser = profileToAuthUser(response.data, userRef.current)
+      setUser(nextUser)
+      setProfileLoading(false)
+      return nextUser
+    } catch {
+      setProfileLoading(false)
+      return userRef.current
+    }
+  }, [setUser])
+
+  useEffect(() => {
+    if (!getAccessToken()) return
+
+    let cancelled = false
+
+    async function hydrate() {
+      setProfileLoading(true)
+      try {
+        const response = await getUserProfile()
+        if (cancelled || !response.data) return
+        setUser(profileToAuthUser(response.data, userRef.current))
+      } catch {
+        /* keep stored / provisional user */
+      } finally {
+        if (!cancelled) setProfileLoading(false)
+      }
+    }
+
+    void hydrate()
+
+    return () => {
+      cancelled = true
+    }
+  }, [setUser])
+
   const setSession = useCallback(
     (accessToken: string, nextUser?: AuthUser | null) => {
       localStorage.setItem(AUTH_TOKEN_KEY, accessToken)
       const resolvedUser =
         nextUser ?? parseOAuthUserFromToken(accessToken) ?? createFallbackOAuthUser()
       setUser(resolvedUser)
+      setProfileLoading(true)
+      void refreshProfile()
     },
-    [setUser],
+    [setUser, refreshProfile],
   )
 
   const login = useCallback(
@@ -66,9 +137,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       localStorage.setItem(AUTH_TOKEN_KEY, accessToken)
       setUser(nextUser)
-      return nextUser
+      setProfileLoading(true)
+      const hydrated = await refreshProfile()
+      return hydrated ?? nextUser
     },
-    [setUser],
+    [setUser, refreshProfile],
   )
 
   const logout = useCallback(async () => {
@@ -81,6 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       localStorage.removeItem(AUTH_TOKEN_KEY)
       setUser(null)
+      setProfileLoading(false)
     }
   }, [setUser])
 
@@ -88,12 +162,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       isAuthenticated: Boolean(getAccessToken() && user),
+      profileLoading,
       login,
       logout,
       setUser,
       setSession,
+      refreshProfile,
     }),
-    [user, login, logout, setUser, setSession],
+    [user, profileLoading, login, logout, setUser, setSession, refreshProfile],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
