@@ -1,6 +1,7 @@
 // src/hooks/useReturnsPage.ts
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 import {
   createReturnRequest,
   getEligibleReturnOrders,
@@ -23,6 +24,7 @@ import { useToast } from '../context/ToastContext'
 import { useCartAddresses } from './useCartAddresses'
 import { ApiError } from '../lib/api'
 import {
+  isReturnsPreviewEnabled,
   PREVIEW_DISTRICTS_BY_GOVERNORATE,
   PREVIEW_GOVERNORATES,
   resolveEligibleOrdersOrPreview,
@@ -68,6 +70,8 @@ export function useReturnsPage() {
   const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const toast = useToast()
+  const [searchParams] = useSearchParams()
+  const previewEnabled = isReturnsPreviewEnabled(searchParams)
   const { primaryAddress, loading: addressesLoading } = useCartAddresses()
 
   const [orders, setOrders] = useState<EligibleReturnOrder[]>([])
@@ -108,13 +112,26 @@ export function useReturnsPage() {
       try {
         const ordersResponse = await getEligibleReturnOrders({ limit: 50 })
         if (cancelled) return
-        const resolved = resolveEligibleOrdersOrPreview(ordersResponse.data)
+        const resolved = resolveEligibleOrdersOrPreview(
+          ordersResponse.data,
+          previewEnabled,
+        )
         nextOrders = resolved.orders
         usingPreview = resolved.usingPreview
-      } catch {
-        const resolved = resolveEligibleOrdersOrPreview(null)
-        nextOrders = resolved.orders
-        usingPreview = resolved.usingPreview
+      } catch (error) {
+        if (previewEnabled) {
+          const resolved = resolveEligibleOrdersOrPreview(null, true)
+          nextOrders = resolved.orders
+          usingPreview = resolved.usingPreview
+        } else {
+          nextOrders = []
+          usingPreview = false
+          if (!cancelled) {
+            setLoadError(
+              error instanceof ApiError ? error.message : t('returns.loadFailed'),
+            )
+          }
+        }
       }
 
       if (cancelled) return
@@ -136,7 +153,7 @@ export function useReturnsPage() {
         const profileResponse = await getUserProfile()
         if (!cancelled) setPhone(profileResponse.data?.phone ?? '')
       } catch {
-        /* optional for UI preview */
+        /* phone is optional for the form */
       }
 
       try {
@@ -148,13 +165,21 @@ export function useReturnsPage() {
           const govResponse = await getShippingGovernorates(defaultCountry._id)
           if (!cancelled) {
             const govs = govResponse.data ?? []
-            setGovernorates(govs.length > 0 ? govs : PREVIEW_GOVERNORATES)
+            setGovernorates(
+              govs.length > 0
+                ? govs
+                : usingPreview
+                  ? PREVIEW_GOVERNORATES
+                  : [],
+            )
           }
         } else if (!cancelled) {
-          setGovernorates(PREVIEW_GOVERNORATES)
+          setGovernorates(usingPreview ? PREVIEW_GOVERNORATES : [])
         }
       } catch {
-        if (!cancelled) setGovernorates(PREVIEW_GOVERNORATES)
+        if (!cancelled) {
+          setGovernorates(usingPreview ? PREVIEW_GOVERNORATES : [])
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -165,7 +190,7 @@ export function useReturnsPage() {
     return () => {
       cancelled = true
     }
-  }, [isAuthenticated, t])
+  }, [isAuthenticated, previewEnabled, t])
 
   useEffect(() => {
     if (!pickup.governorateId) return
@@ -176,7 +201,10 @@ export function useReturnsPage() {
       await Promise.resolve()
       if (cancelled) return
 
-      const previewDistricts = PREVIEW_DISTRICTS_BY_GOVERNORATE[pickup.governorateId]
+      const previewDistricts =
+        usingPreviewData
+          ? PREVIEW_DISTRICTS_BY_GOVERNORATE[pickup.governorateId]
+          : undefined
       if (previewDistricts) {
         setHasDistricts(true)
         setDistricts(previewDistricts)
@@ -206,7 +234,7 @@ export function useReturnsPage() {
     return () => {
       cancelled = true
     }
-  }, [pickup.governorateId])
+  }, [pickup.governorateId, usingPreviewData])
 
   const ordersByDate = useMemo(() => {
     const groups = new Map<string, EligibleReturnOrder[]>()
@@ -418,7 +446,7 @@ export function useReturnsPage() {
       setUseSavedAddress(false)
 
       const refreshed = await getEligibleReturnOrders({ limit: 50 })
-      const resolved = resolveEligibleOrdersOrPreview(refreshed.data)
+      const resolved = resolveEligibleOrdersOrPreview(refreshed.data, previewEnabled)
       setOrders(resolved.orders)
       setUsingPreviewData(resolved.usingPreview)
     } catch (error) {

@@ -1,9 +1,12 @@
 // src/components/layout/Navbar.tsx
-import { ChevronDown, LogOut, ShoppingBag, User, X } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { ChevronDown, Heart, KeyRound, LogOut, MapPin, ShoppingBag, ShoppingCart, Truck, User, X } from 'lucide-react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import {
+  ACCOUNT_CHANGE_PASSWORD_PATH,
+  ACCOUNT_ORDERS_PATH,
+  ADDRESSES_PATH,
   CART_PATH,
   CATEGORIES_PATH,
   DOCS_PATH,
@@ -12,6 +15,7 @@ import {
   MY_ACCOUNT_PATH,
   RETURNS_HISTORY_PATH,
   SHOP_PATH,
+  WISHLIST_PATH,
 } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
@@ -43,6 +47,7 @@ export function Navbar() {
   const [accountOpen, setAccountOpen] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
   const accountMenuRef = useRef<HTMLDivElement>(null)
+  const accountMenuId = useId()
 
   const navLinks = useMemo(
     () => [
@@ -60,6 +65,10 @@ export function Navbar() {
       document.body.style.overflow = ''
     }
   }, [menuOpen])
+
+  function closeAccountMenu() {
+    setAccountOpen(false)
+  }
 
   async function handleLogout() {
     if (authLoading) return
@@ -140,7 +149,10 @@ export function Navbar() {
           ].join(' ')}
           aria-label={menuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
           aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
+          onClick={() => {
+            setAccountOpen(false)
+            setMenuOpen((open) => !open)
+          }}
         >
           {menuOpen ? <X size={22} /> : <BurgerIcon />}
         </button>
@@ -195,7 +207,11 @@ export function Navbar() {
                   aria-label={t('nav.openAccountMenu')}
                   aria-haspopup="menu"
                   aria-expanded={accountOpen}
-                  onClick={() => setAccountOpen((open) => !open)}
+                  aria-controls={accountMenuId}
+                  onClick={() => {
+                    setMenuOpen(false)
+                    setAccountOpen((open) => !open)
+                  }}
                 >
                   <UserAvatar
                     name={name}
@@ -214,8 +230,9 @@ export function Navbar() {
                   </span>
                 </button>
                 <AccountDropdown
+                  id={accountMenuId}
                   open={accountOpen}
-                  onClose={() => setAccountOpen(false)}
+                  onClose={closeAccountMenu}
                   rootRef={accountMenuRef}
                   storeCreditBalance={storeCreditBalance}
                 />
@@ -307,11 +324,54 @@ export function Navbar() {
                       </span>
                     </NavLink>
                     <NavLink
+                      to={ACCOUNT_ORDERS_PATH}
+                      className={mobileLinkClass}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <ShoppingCart size={18} strokeWidth={1.5} aria-hidden />
+                        {t('nav.dropdown.myOrders')}
+                      </span>
+                    </NavLink>
+                    <NavLink
+                      to={WISHLIST_PATH}
+                      className={mobileLinkClass}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <Heart size={18} strokeWidth={1.5} aria-hidden />
+                        {t('nav.dropdown.wishlist')}
+                      </span>
+                    </NavLink>
+                    <NavLink
                       to={RETURNS_HISTORY_PATH}
                       className={mobileLinkClass}
                       onClick={() => setMenuOpen(false)}
                     >
-                      {t('nav.dropdown.returns')}
+                      <span className="inline-flex items-center gap-2">
+                        <Truck size={18} strokeWidth={1.5} aria-hidden />
+                        {t('nav.dropdown.returns')}
+                      </span>
+                    </NavLink>
+                    <NavLink
+                      to={ADDRESSES_PATH}
+                      className={mobileLinkClass}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <MapPin size={18} strokeWidth={1.5} aria-hidden />
+                        {t('profile.nav.myAddresses')}
+                      </span>
+                    </NavLink>
+                    <NavLink
+                      to={ACCOUNT_CHANGE_PASSWORD_PATH}
+                      className={mobileLinkClass}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <KeyRound size={18} strokeWidth={1.5} aria-hidden />
+                        {t('profile.nav.changePassword')}
+                      </span>
                     </NavLink>
                     <button
                       type="button"

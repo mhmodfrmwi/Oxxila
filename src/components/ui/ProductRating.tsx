@@ -7,7 +7,7 @@ interface ProductRatingProps {
   reviewCount: number
   className?: string
   starSize?: number
-  variant?: 'card' | 'detail'
+  variant?: 'card' | 'detail' | 'wishlist'
 }
 
 function StarRow({
@@ -59,6 +59,25 @@ export function ProductRating({
         <StarRow rating={rating} size={starSize} gapClassName="gap-[3px]" />
         <span className="product-detail-rating-reviews">
           {formatReviewCount(reviewCount)} reviews
+        </span>
+      </div>
+    )
+  }
+
+  if (variant === 'wishlist') {
+    return (
+      <div
+        className={cn('flex shrink-0 items-center gap-1 text-xs', className)}
+        aria-label={`${rating} out of 5 stars, ${formatReviewCount(reviewCount)} reviews`}
+      >
+        <Star
+          size={starSize}
+          className="fill-support-warning text-support-warning"
+          aria-hidden
+        />
+        <span className="text-primary-text tabular-nums">{rating}</span>
+        <span className="text-secondary-text tabular-nums">
+          ({formatReviewCount(reviewCount)})
         </span>
       </div>
     )

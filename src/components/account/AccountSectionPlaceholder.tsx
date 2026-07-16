@@ -1,8 +1,7 @@
 // src/components/account/AccountSectionPlaceholder.tsx
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { cn } from '../../lib/cn'
-import { focusRingClasses } from '../ui/interactionStyles'
+import { Button } from '../ui/Button'
 import { Heading } from '../ui/Heading'
 
 interface AccountSectionPlaceholderProps {
@@ -27,15 +26,10 @@ export function AccountSectionPlaceholder({
         {t(descriptionKey)}
       </p>
       {actionLabelKey && actionTo && (
-        <Link
-          to={actionTo}
-          className={cn(
-            'mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-button-primary px-6 py-3',
-            'text-sm font-medium text-on-emphasis hover:bg-button-primary-hover',
-            focusRingClasses,
-          )}
-        >
-          {t(actionLabelKey)}
+        <Link to={actionTo} className="mt-6">
+          <Button variant="primary" pill>
+            {t(actionLabelKey)}
+          </Button>
         </Link>
       )}
     </div>

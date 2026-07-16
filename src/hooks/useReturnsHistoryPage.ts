@@ -1,10 +1,16 @@
 // src/hooks/useReturnsHistoryPage.ts
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 import { getMyOrder } from '../api/orders'
 import { getMyReturns, type ReturnRequest } from '../api/returns'
 import { LOGIN_PATH } from '../config/routes'
 import { useAuth } from '../context/AuthContext'
-import { resolveReturnHistoryOrPreview } from '../mocks/returns'
+import { ApiError } from '../lib/api'
+import {
+  isReturnsPreviewEnabled,
+  resolveReturnHistoryOrPreview,
+} from '../mocks/returns'
 import { getReturnOrderId } from '../utils/returnTracking'
 
 function enrichReturnItems(
@@ -31,7 +37,10 @@ function enrichReturnItems(
 }
 
 export function useReturnsHistoryPage() {
+  const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
+  const [searchParams] = useSearchParams()
+  const previewEnabled = isReturnsPreviewEnabled(searchParams)
   const [returns, setReturns] = useState<ReturnRequest[]>([])
   const [usingPreviewData, setUsingPreviewData] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -53,10 +62,10 @@ export function useReturnsHistoryPage() {
         const response = await getMyReturns({ limit: 50 })
         if (cancelled) return
 
-        const resolved = resolveReturnHistoryOrPreview(response.data)
+        const resolved = resolveReturnHistoryOrPreview(response.data, previewEnabled)
         let list = resolved.returns
 
-        if (!resolved.usingPreview) {
+        if (!resolved.usingPreview && list.length > 0) {
           const orderIds = [
             ...new Set(list.map((entry) => getReturnOrderId(entry)).filter(Boolean)),
           ]
@@ -85,12 +94,21 @@ export function useReturnsHistoryPage() {
         if (cancelled) return
         setReturns(list)
         setUsingPreviewData(resolved.usingPreview)
-      } catch {
+      } catch (err) {
         if (cancelled) return
-        const resolved = resolveReturnHistoryOrPreview(null)
-        setReturns(resolved.returns)
-        setUsingPreviewData(resolved.usingPreview)
-        setError('')
+
+        if (previewEnabled) {
+          const resolved = resolveReturnHistoryOrPreview(null, true)
+          setReturns(resolved.returns)
+          setUsingPreviewData(resolved.usingPreview)
+          setError('')
+        } else {
+          setReturns([])
+          setUsingPreviewData(false)
+          setError(
+            err instanceof ApiError ? err.message : t('returnsHistory.loadFailed'),
+          )
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -101,7 +119,7 @@ export function useReturnsHistoryPage() {
     return () => {
       cancelled = true
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, previewEnabled, t])
 
   return {
     isAuthenticated,

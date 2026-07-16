@@ -36,6 +36,9 @@ export function UserAvatar({
 }: UserAvatarProps) {
   const resolvedSrc = normalizeAvatarUrl(src)
   const [failedSrc, setFailedSrc] = useState<string | null>(null)
+  if (failedSrc && failedSrc !== resolvedSrc) {
+    setFailedSrc(null)
+  }
   const initials = initialsFromName(name)
   const showImage = Boolean(resolvedSrc) && failedSrc !== resolvedSrc
 

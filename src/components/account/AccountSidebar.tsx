@@ -3,14 +3,8 @@ import { LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useNavigate } from 'react-router-dom'
-import {
-  ACCOUNT_CHANGE_PASSWORD_PATH,
-  ACCOUNT_ORDERS_PATH,
-  ADDRESSES_PATH,
-  HOME_PATH,
-  MY_ACCOUNT_PATH,
-  RETURNS_HISTORY_PATH,
-} from '../../config/routes'
+import { ACCOUNT_SIDEBAR_NAV } from '../../config/accountNav'
+import { HOME_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { cn } from '../../lib/cn'
@@ -24,17 +18,12 @@ export interface AccountNavItem {
   end?: boolean
 }
 
-const defaultNavItems: AccountNavItem[] = [
-  { id: 'profile', labelKey: 'profile.nav.myProfile', to: MY_ACCOUNT_PATH, end: true },
-  { id: 'orders', labelKey: 'profile.nav.myOrders', to: ACCOUNT_ORDERS_PATH },
-  { id: 'returns', labelKey: 'profile.nav.myReturns', to: RETURNS_HISTORY_PATH },
-  { id: 'addresses', labelKey: 'profile.nav.myAddresses', to: ADDRESSES_PATH },
-  {
-    id: 'password',
-    labelKey: 'profile.nav.changePassword',
-    to: ACCOUNT_CHANGE_PASSWORD_PATH,
-  },
-]
+const defaultNavItems: AccountNavItem[] = ACCOUNT_SIDEBAR_NAV.map((item) => ({
+  id: item.id,
+  labelKey: item.labelKey,
+  to: item.to,
+  ...('end' in item && item.end ? { end: true as const } : {}),
+}))
 
 interface AccountSidebarProps {
   name: string

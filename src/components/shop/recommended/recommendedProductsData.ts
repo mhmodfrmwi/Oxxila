@@ -10,4 +10,6 @@ export interface RecommendedProduct {
   imageAlt: string
   badge?: string
   href: string
+  /** Present when stock is known from the API. */
+  stock?: number
 }

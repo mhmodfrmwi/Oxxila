@@ -1,7 +1,13 @@
 // src/mocks/returns.ts
 /**
  * Temporary development preview data for Returns pages.
- * Remove this file (and hook fallbacks) once the backend reliably returns live data.
+ * Remove this file (and hook preview branches) once UI review is done.
+ *
+ * Preview is NEVER automatic. Enable only via:
+ * - `?preview=true` on the returns URL (dev builds only), or
+ * - `VITE_ENABLE_RETURNS_PREVIEW=true` in a local `.env` (dev builds only)
+ *
+ * Production builds always ignore preview data.
  */
 import type { EligibleReturnOrder, ReturnRequest } from '../api/returns'
 import type { ShippingDistrict, ShippingGovernorate } from '../api/shipping'
@@ -353,22 +359,50 @@ export const PREVIEW_RETURN_HISTORY: ReturnRequest[] = [
   },
 ]
 
+export function isReturnsPreviewEnabled(searchParams?: URLSearchParams | null): boolean {
+  // Production / preview builds must never render shared mock returns.
+  if (!import.meta.env.DEV) return false
+
+  if (import.meta.env.VITE_ENABLE_RETURNS_PREVIEW === 'true') return true
+
+  if (searchParams?.get('preview') === 'true') return true
+
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('preview') === 'true') return true
+  }
+
+  return false
+}
+
 export function resolveEligibleOrdersOrPreview(
   apiData: EligibleReturnOrder[] | null | undefined,
+  previewEnabled = false,
 ): { orders: EligibleReturnOrder[]; usingPreview: boolean } {
   if (apiData && apiData.length > 0) {
     return { orders: apiData, usingPreview: false }
   }
-  return { orders: PREVIEW_ELIGIBLE_RETURN_ORDERS, usingPreview: true }
+
+  if (previewEnabled) {
+    return { orders: PREVIEW_ELIGIBLE_RETURN_ORDERS, usingPreview: true }
+  }
+
+  return { orders: [], usingPreview: false }
 }
 
 export function resolveReturnHistoryOrPreview(
   apiData: ReturnRequest[] | null | undefined,
+  previewEnabled = false,
 ): { returns: ReturnRequest[]; usingPreview: boolean } {
   if (apiData && apiData.length > 0) {
     return { returns: apiData, usingPreview: false }
   }
-  return { returns: PREVIEW_RETURN_HISTORY, usingPreview: true }
+
+  if (previewEnabled) {
+    return { returns: PREVIEW_RETURN_HISTORY, usingPreview: true }
+  }
+
+  return { returns: [], usingPreview: false }
 }
 
 /** Soft shipping options so the request form remains usable in preview. */

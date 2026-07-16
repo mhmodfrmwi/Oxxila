@@ -29,6 +29,7 @@ import {
   VERIFY_OTP_PATH,
   RETURNS_PATH,
   RETURNS_HISTORY_PATH,
+  WISHLIST_PATH,
 } from './config/routes'
 import { RouteFallback } from './components/ui/RouteFallback'
 
@@ -125,6 +126,11 @@ const ReturnsHistoryPage = lazy(() =>
     default: module.ReturnsHistoryPage,
   })),
 )
+const WishlistPage = lazy(() =>
+  import('./pages/WishlistPage').then((module) => ({
+    default: module.WishlistPage,
+  })),
+)
 
 export default function App() {
   return (
@@ -162,6 +168,7 @@ export default function App() {
         <Route path={CHANGE_PASSWORD_PATH} element={<ChangePasswordPage />} />
         <Route path={RETURNS_PATH} element={<ReturnsPage />} />
         <Route path={RETURNS_HISTORY_PATH} element={<ReturnsHistoryPage />} />
+        <Route path={WISHLIST_PATH} element={<WishlistPage />} />
       </Routes>
     </Suspense>
   )

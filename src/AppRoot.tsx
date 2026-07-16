@@ -5,6 +5,7 @@ import { CartProvider } from './context/CartContext'
 import { LandingCatalogProvider } from './context/LandingCatalogContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { ToastProvider } from './context/ToastContext'
+import { WishlistProvider } from './context/WishlistContext'
 import App from './App.tsx'
 import './index.css'
 
@@ -15,10 +16,12 @@ export function AppRoot() {
         <ToastProvider>
           <AuthProvider>
             <CartProvider>
-              <LandingCatalogProvider>
-                <OAuthCallbackHandler />
-                <App />
-              </LandingCatalogProvider>
+              <WishlistProvider>
+                <LandingCatalogProvider>
+                  <OAuthCallbackHandler />
+                  <App />
+                </LandingCatalogProvider>
+              </WishlistProvider>
             </CartProvider>
           </AuthProvider>
         </ToastProvider>

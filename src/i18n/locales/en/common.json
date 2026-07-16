@@ -23,7 +23,8 @@
       "myOrders": "My Orders",
       "returns": "Returns",
       "wishlist": "Wishlist",
-      "giftCards": "Gift Cards"
+      "giftCards": "Gift Cards",
+      "storeCredit": "Store credit {{balance}}"
     }
   },
   "actions": {
@@ -754,6 +755,7 @@
     "nav": {
       "myProfile": "My Profile",
       "myOrders": "My Orders",
+      "wishlist": "Wishlist",
       "myReturns": "My Returns",
       "myAddresses": "My Addresses",
       "changePassword": "Change Password",
@@ -779,6 +781,7 @@
     "avatarUpdated": "Profile photo updated",
     "avatarUpdateFailed": "Unable to update profile photo",
     "loadFailed": "Unable to load your profile. Please try again.",
+    "retry": "Try again",
     "invalidForm": "Invalid form",
     "fillRequired": "Please fill in all required fields.",
     "validation": {
@@ -889,6 +892,20 @@
       "addressRequired": "Pickup address is required",
       "proofRequired": "Proof photos are required for this reason"
     }
+  },
+  "wishlist": {
+    "back": "Back",
+    "title": "Wishlist",
+    "itemCount_one": "{{count}} item",
+    "itemCount_other": "{{count}} items",
+    "emptyTitle": "Your wishlist is empty",
+    "emptyMessage": "Save products you love and find them here anytime.",
+    "shopCta": "Continue shopping",
+    "removeFromWishlist": "Remove from wishlist",
+    "outOfStock": "Out of stock",
+    "signInRequired": "Sign in required",
+    "signInRequiredDetail": "Please sign in to manage your wishlist.",
+    "loadFailed": "Unable to load your wishlist. Please try again."
   },
   "returnsHistory": {
     "back": "Back",

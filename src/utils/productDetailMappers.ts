@@ -111,6 +111,7 @@ export function mapApiProductToRecommendedProduct(product: ApiProduct): Recommen
     imageAlt: product.name,
     badge: resolveProductBadge(product),
     href: `${PRODUCTS_PATH}/${product.slug}`,
+    stock: product.stock,
   }
 }
 

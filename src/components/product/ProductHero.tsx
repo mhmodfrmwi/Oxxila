@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { LOGIN_PATH } from '../../config/routes'
 import { ApiError, getAccessToken } from '../../lib/api'
+import { useProductCardActions } from '../../hooks/useProductCardActions'
 import { Button } from '../ui/Button'
 import { ProductBadge } from '../ui/ProductBadge'
 import { ProductRating } from '../ui/ProductRating'
@@ -43,13 +44,29 @@ function BrandMark({ brand, brandLogo }: { brand: string; brandLogo?: string }) 
 function SocialIconButton({
   icon: Icon,
   label,
+  onClick,
+  filled = false,
+  disabled = false,
 }: {
   icon: typeof Heart
   label: string
+  onClick?: () => void
+  filled?: boolean
+  disabled?: boolean
 }) {
   return (
-    <button type="button" aria-label={label} className="product-detail-icon-action">
-      <Icon size={20} strokeWidth={1.5} aria-hidden />
+    <button
+      type="button"
+      aria-label={label}
+      aria-pressed={filled || undefined}
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(
+        'product-detail-icon-action',
+        filled && 'product-detail-icon-action-active',
+      )}
+    >
+      <Icon size={20} strokeWidth={1.5} aria-hidden fill={filled ? 'currentColor' : 'none'} />
     </button>
   )
 }
@@ -83,6 +100,11 @@ export function ProductHero({ product, className }: ProductHeroProps) {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const { addToCart } = useCart()
+  const {
+    wishlisted,
+    wishlistPending,
+    handleWishlistToggle,
+  } = useProductCardActions(product.id)
   const [cartLoading, setCartLoading] = useState(false)
   const [cartMessage, setCartMessage] = useState<string | null>(null)
   const [cartMessageIsError, setCartMessageIsError] = useState(false)
@@ -342,7 +364,19 @@ export function ProductHero({ product, className }: ProductHeroProps) {
             )}
 
             <div className="product-detail-social-actions">
-              <SocialIconButton icon={Heart} label={t('shop.product.addToWishlist')} />
+              <SocialIconButton
+                icon={Heart}
+                label={
+                  wishlisted
+                    ? t('wishlist.removeFromWishlist')
+                    : t('shop.product.addToWishlist')
+                }
+                filled={wishlisted}
+                disabled={wishlistPending}
+                onClick={() => {
+                  void handleWishlistToggle()
+                }}
+              />
               <SocialIconButton icon={Share2} label={t('productDetail.share')} />
             </div>
 

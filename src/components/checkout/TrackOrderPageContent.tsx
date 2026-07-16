@@ -2,7 +2,7 @@
 import { ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate } from 'react-router-dom'
-import { HOME_PATH, MY_ACCOUNT_PATH, SHOP_PATH } from '../../config/routes'
+import { HOME_PATH, ACCOUNT_ORDERS_PATH, SHOP_PATH } from '../../config/routes'
 import { useTrackOrderPage } from '../../hooks/useTrackOrderPage'
 import { cn } from '../../lib/cn'
 import { getOrderTrackingNumber } from '../../utils/orderFormat'
@@ -65,13 +65,13 @@ export function TrackOrderPageContent() {
           className="mb-5 sm:mb-6"
           items={[
             { label: t('nav.home'), href: HOME_PATH },
-            { label: t('checkout.track.orders'), href: MY_ACCOUNT_PATH },
+            { label: t('checkout.track.orders'), href: ACCOUNT_ORDERS_PATH },
             { label: t('checkout.track.title') },
           ]}
         />
 
         <Link
-          to={MY_ACCOUNT_PATH}
+          to={ACCOUNT_ORDERS_PATH}
           className={cn('track-order-back-link', focusRingClasses, 'rounded-sm')}
         >
           <ArrowLeft size={16} strokeWidth={1.5} aria-hidden className="rtl:-scale-x-100" />

@@ -1,3 +1,4 @@
+// src/components/ui/IconActionButton.tsx
 import type { LucideIcon } from 'lucide-react'
 import type { MouseEventHandler } from 'react'
 import { cn } from '../../lib/cn'
@@ -10,6 +11,8 @@ interface IconActionButtonProps {
   className?: string
   size?: 'sm' | 'md' | 'lg'
   disabled?: boolean
+  /** Fills the icon (e.g. active wishlist heart). */
+  filled?: boolean
 }
 
 const sizeClasses = {
@@ -31,11 +34,13 @@ export function IconActionButton({
   className,
   size = 'md',
   disabled = false,
+  filled = false,
 }: IconActionButtonProps) {
   return (
     <button
       type="button"
       aria-label={label}
+      aria-pressed={filled ? true : undefined}
       onClick={onClick}
       disabled={disabled}
       className={cn(
@@ -48,7 +53,11 @@ export function IconActionButton({
         className,
       )}
     >
-      <Icon size={iconSizes[size]} aria-hidden />
+      <Icon
+        size={iconSizes[size]}
+        aria-hidden
+        {...(filled ? { fill: 'currentColor' as const } : {})}
+      />
     </button>
   )
 }

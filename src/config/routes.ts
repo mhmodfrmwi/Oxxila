@@ -70,3 +70,5 @@ export function collectionPath(slug: string) {
 export const RETURNS_PATH = '/returns'
 
 export const RETURNS_HISTORY_PATH = '/returns/history'
+
+export const WISHLIST_PATH = '/wishlist'

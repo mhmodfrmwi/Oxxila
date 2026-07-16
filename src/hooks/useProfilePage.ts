@@ -144,6 +144,24 @@ export function useProfilePage() {
     }
   }, [applyProfile, t])
 
+  const reloadProfile = useCallback(async () => {
+    setLoading(true)
+    setLoadError('')
+
+    try {
+      const response = await getUserProfile()
+      if (!response.data) {
+        setLoadError(t('profile.loadFailed'))
+        return
+      }
+      applyProfile(response.data)
+    } catch (err) {
+      setLoadError(err instanceof ApiError ? err.message : t('profile.loadFailed'))
+    } finally {
+      setLoading(false)
+    }
+  }, [applyProfile, t])
+
   function updateField<K extends keyof ProfileFormState>(
     field: K,
     value: ProfileFormState[K],
@@ -228,5 +246,6 @@ export function useProfilePage() {
     updateField,
     handleAvatarChange,
     handleSubmit,
+    reloadProfile,
   }
 }

@@ -23,7 +23,8 @@
       "myOrders": "طلباتي",
       "returns": "المرتجعات",
       "wishlist": "المفضلة",
-      "giftCards": "بطاقات الهدايا"
+      "giftCards": "بطاقات الهدايا",
+      "storeCredit": "رصيد المتجر {{balance}}"
     }
   },
   "actions": {
@@ -754,6 +755,7 @@
     "nav": {
       "myProfile": "ملفي الشخصي",
       "myOrders": "طلباتي",
+      "wishlist": "المفضلة",
       "myReturns": "مرتجعاتي",
       "myAddresses": "عناويني",
       "changePassword": "تغيير كلمة المرور",
@@ -779,6 +781,7 @@
     "avatarUpdated": "تم تحديث صورة الملف الشخصي",
     "avatarUpdateFailed": "تعذر تحديث صورة الملف الشخصي",
     "loadFailed": "تعذر تحميل ملفك الشخصي. يرجى المحاولة مرة أخرى.",
+    "retry": "إعادة المحاولة",
     "invalidForm": "نموذج غير صالح",
     "fillRequired": "يرجى تعبئة جميع الحقول المطلوبة.",
     "validation": {
@@ -889,6 +892,20 @@
       "addressRequired": "عنوان الاستلام مطلوب",
       "proofRequired": "صور الإثبات مطلوبة لهذا السبب"
     }
+  },
+  "wishlist": {
+    "back": "رجوع",
+    "title": "قائمة الأمنيات",
+    "itemCount_one": "منتج واحد",
+    "itemCount_other": "{{count}} منتجات",
+    "emptyTitle": "قائمة الأمنيات فارغة",
+    "emptyMessage": "احفظ المنتجات التي تحبها وابحث عنها هنا في أي وقت.",
+    "shopCta": "متابعة التسوق",
+    "removeFromWishlist": "إزالة من قائمة الأمنيات",
+    "outOfStock": "غير متوفر",
+    "signInRequired": "يلزم تسجيل الدخول",
+    "signInRequiredDetail": "يرجى تسجيل الدخول لإدارة قائمة الأمنيات.",
+    "loadFailed": "تعذر تحميل قائمة الأمنيات. يرجى المحاولة مرة أخرى."
   },
   "returnsHistory": {
     "back": "رجوع",

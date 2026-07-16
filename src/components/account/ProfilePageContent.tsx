@@ -41,6 +41,7 @@ export function ProfilePageContent() {
     updateField,
     handleAvatarChange,
     handleSubmit,
+    reloadProfile,
   } = useProfilePage()
 
   return (
@@ -52,14 +53,15 @@ export function ProfilePageContent() {
         </p>
       </header>
 
-      {loadError && (
-        <div className="mb-6">
-          <FormMessage message={loadError} />
-        </div>
-      )}
-
       {loading ? (
         <ProfileSkeleton />
+      ) : loadError ? (
+        <div className="space-y-4" role="alert">
+          <FormMessage message={loadError} />
+          <Button type="button" variant="outline" onClick={() => void reloadProfile()}>
+            {t('profile.retry')}
+          </Button>
+        </div>
       ) : (
         <form className="space-y-6" onSubmit={handleSubmit} noValidate>
           <div className="flex flex-col items-center gap-3">
