@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   login as loginRequest,
   logout as logoutRequest,
@@ -17,8 +18,14 @@ import {
 } from '../api/auth'
 import { getUserProfile } from '../api/users'
 import { AUTH_TOKEN_KEY } from '../config/api'
+import { LOGIN_PATH } from '../config/routes'
 import { STORAGE_KEYS } from '../config/storage'
 import { ApiError, getAccessToken } from '../lib/api'
+import {
+  clearLocalAuthStorage,
+  isAuthEntryPath,
+  onSessionExpired,
+} from '../lib/sessionExpiry'
 import { parseOAuthUserFromToken, createFallbackOAuthUser } from '../utils/oauth'
 import { profileToAuthUser } from '../utils/userProfile'
 
@@ -48,6 +55,7 @@ function readStoredUser(): AuthUser | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const navigate = useNavigate()
   const [user, setUserState] = useState<AuthUser | null>(() => {
     const token = localStorage.getItem(AUTH_TOKEN_KEY)
     if (!token) return null
@@ -70,6 +78,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  useEffect(() => {
+    return onSessionExpired(() => {
+      setUserState(null)
+      setProfileLoading(false)
+
+      if (!isAuthEntryPath(window.location.pathname)) {
+        navigate(LOGIN_PATH, {
+          replace: true,
+          state: { sessionExpired: true },
+        })
+      }
+    })
+  }, [navigate])
+
   const refreshProfile = useCallback(async () => {
     if (!getAccessToken()) {
       setProfileLoading(false)
@@ -87,8 +109,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(nextUser)
       setProfileLoading(false)
       return nextUser
-    } catch {
+    } catch (error) {
       setProfileLoading(false)
+      // 401 clears session centrally — do not restore a stale user.
+      if (error instanceof ApiError && error.statusCode === 401) {
+        return null
+      }
       return userRef.current
     }
   }, [setUser])
@@ -104,8 +130,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const response = await getUserProfile()
         if (cancelled || !response.data) return
         setUser(profileToAuthUser(response.data, userRef.current))
-      } catch {
-        /* keep stored / provisional user */
+      } catch (error) {
+        if (error instanceof ApiError && error.statusCode === 401) {
+          /* session cleared by api layer */
+          return
+        }
+        /* keep stored / provisional user on transient failures */
       } finally {
         if (!cancelled) setProfileLoading(false)
       }
@@ -152,7 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error
       }
     } finally {
-      localStorage.removeItem(AUTH_TOKEN_KEY)
+      clearLocalAuthStorage()
       setUser(null)
       setProfileLoading(false)
     }

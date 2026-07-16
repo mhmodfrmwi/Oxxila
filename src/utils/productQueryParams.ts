@@ -2,6 +2,7 @@
 import type { GetProductsParams } from '../api/catalog'
 import type { SortOption } from '../components/category/categoryData'
 import type { FilterState } from '../components/category/filters/filterState'
+import { requiresClientProductFilter } from './categoryBrowseParams'
 import { mapConcernIdsToApi, mapOfferIdsToApi, mapSensitivityIdsToApi } from './filterMappings'
 
 export function sortOptionToApiSort(sort: SortOption): string {
@@ -61,6 +62,7 @@ export function buildProductQueryParams(
     params.subCategory = subCategoryIds.join(',')
   }
 
+  // Backend accepts a single brand id; multi-brand is handled client-side after fetch.
   if (filters.brandIds.length === 1) {
     params.brand = filters.brandIds[0]
   }
@@ -104,3 +106,5 @@ export function applyClientOnlyFilters<T extends { brand?: { _id: string }; rati
 
   return result
 }
+
+export { requiresClientProductFilter }

@@ -104,6 +104,7 @@ export function useAddAddressPage() {
   const [phone, setPhone] = useState('')
   const [loading, setLoading] = useState(true)
   const [zonesLoading, setZonesLoading] = useState(false)
+  const [zonesError, setZonesError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -178,6 +179,7 @@ export function useAddAddressPage() {
     if (key === 'governorateId') {
       setDistricts([])
       setHasDistricts(true)
+      setZonesError(null)
     }
     setErrors((current) => ({ ...current, [key]: undefined }))
     setSubmitError(null)
@@ -196,6 +198,7 @@ export function useAddAddressPage() {
       if (cancelled) return
 
       setZonesLoading(true)
+      setZonesError(null)
       try {
         const response = await getShippingZones(form.governorateId)
         if (cancelled) return
@@ -203,15 +206,25 @@ export function useAddAddressPage() {
         const data = response.data
         setHasDistricts(data?.hasDistricts ?? true)
         setDistricts(data?.districts ?? [])
+        setZonesError(null)
 
         if (data && !data.hasDistricts) {
           setForm((current) =>
             current.districtId === 'other' ? current : { ...current, districtId: 'other' },
           )
         }
-      } catch {
+      } catch (error) {
         if (!cancelled) {
           setDistricts([])
+          setHasDistricts(true)
+          setForm((current) =>
+            current.districtId ? { ...current, districtId: '' } : current,
+          )
+          setZonesError(
+            error instanceof ApiError
+              ? error.message
+              : t('checkout.address.zonesLoadFailed'),
+          )
         }
       } finally {
         if (!cancelled) setZonesLoading(false)
@@ -223,7 +236,7 @@ export function useAddAddressPage() {
     return () => {
       cancelled = true
     }
-  }, [form.governorateId])
+  }, [form.governorateId, t])
 
   function startEdit(address: UserAddress) {
     setForm(formFromAddress(address))
@@ -232,11 +245,18 @@ export function useAddAddressPage() {
     setErrors({})
     setSubmitError(null)
     setSubmitSuccess(null)
+    setZonesError(null)
   }
 
   async function handleSave() {
     setSubmitError(null)
     setSubmitSuccess(null)
+
+    if (zonesError) {
+      setSubmitError(zonesError)
+      toast.error(t('checkout.address.unableToSave'), zonesError)
+      return
+    }
 
     const validation = validateForm(form, hasDistricts, t)
     if (Object.keys(validation).length > 0) {
@@ -293,7 +313,21 @@ export function useAddAddressPage() {
     setDeletingId(addressId)
     try {
       await deleteMyAddress(addressId)
-      setAddresses((current) => current.filter((entry) => entry._id !== addressId))
+
+      try {
+        const response = await getMyAddresses()
+        setAddresses(response.data?.addresses ?? [])
+      } catch {
+        setAddresses((current) => {
+          const next = current.filter((entry) => entry._id !== addressId)
+          if (next.length === 0 || next.some((entry) => entry.isDefault)) return next
+          return next.map((entry, index) => ({
+            ...entry,
+            isDefault: index === 0,
+          }))
+        })
+      }
+
       if (selectedAddressId === addressId) setSelectedAddressId(null)
       if (editingAddressId === addressId) {
         setEditingAddressId(null)
@@ -334,6 +368,7 @@ export function useAddAddressPage() {
     districts,
     hasDistricts,
     zonesLoading,
+    zonesError,
     selectedAddressId,
     loading,
     submitting,

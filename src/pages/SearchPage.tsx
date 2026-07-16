@@ -1,5 +1,5 @@
 // src/pages/SearchPage.tsx
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Layout } from '../components/layout/Layout'
 import { Footer } from '../components/landing/footer/Footer'
@@ -8,101 +8,49 @@ import { ProductGrid } from '../components/category/ProductGrid'
 import { PRODUCTS_PER_PAGE, type SortOption } from '../components/category/categoryData'
 import { useSearchProducts } from '../hooks/useSearchProducts'
 import { Pagination } from '../components/ui/Pagination'
-import { getProducts } from '../api/catalog'
-import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
-import { mapApiProductToRecommendedProduct } from '../utils/productDetailMappers'
-import { sortOptionToApiSort } from '../utils/productQueryParams'
-import { ApiError } from '../lib/api'
 import { useLandingCatalogContext } from '../hooks/useLandingCatalogContext'
 
+const SORT_OPTIONS = new Set<SortOption>([
+  'featured',
+  'price-asc',
+  'price-desc',
+  'rating',
+  'newest',
+])
+
+function parseSort(value: string | null): SortOption {
+  return value != null && SORT_OPTIONS.has(value as SortOption)
+    ? (value as SortOption)
+    : 'featured'
+}
+
+function parsePage(value: string | null): number {
+  const page = Number(value)
+  return Number.isFinite(page) && page >= 1 ? Math.floor(page) : 1
+}
+
 export function SearchPage() {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { brands } = useLandingCatalogContext()
+
   const keyword = searchParams.get('keyword') ?? searchParams.get('q') ?? ''
   const concerns = searchParams.get('concerns') ?? searchParams.get('concern') ?? ''
   const brandId = searchParams.get('brand') ?? ''
-  const [sort, setSort] = useState<SortOption>('featured')
-  const searchQueryKey = useMemo(
-    () => `${keyword}\0${concerns}\0${brandId}\0${sort}`,
-    [keyword, concerns, brandId, sort],
-  )
-  const [paginationState, setPaginationState] = useState({ searchQueryKey, page: 1 })
+  const sort = parseSort(searchParams.get('sort'))
+  const page = parsePage(searchParams.get('page'))
 
-  if (paginationState.searchQueryKey !== searchQueryKey) {
-    setPaginationState({ searchQueryKey, page: 1 })
-  }
-
-  const page = paginationState.page
-  const setPage = (nextPage: number) => {
-    setPaginationState({ searchQueryKey, page: nextPage })
-  }
-
-  const [filterProducts, setFilterProducts] = useState<RecommendedProduct[]>([])
-  const [filterLoading, setFilterLoading] = useState(false)
-  const [filterError, setFilterError] = useState<string | null>(null)
-  const [filterPagination, setFilterPagination] = useState<{
-    totalDocuments: number
-    numberOfPages: number
-  } | null>(null)
-
-  const { products, loading, error, pagination } = useSearchProducts(
+  const { products, loading, error, pagination } = useSearchProducts({
     keyword,
+    brandId,
+    concerns,
     sort,
     page,
-    PRODUCTS_PER_PAGE,
-  )
+    limit: PRODUCTS_PER_PAGE,
+  })
 
-  const isFilterBrowse = !keyword.trim() && (Boolean(concerns.trim()) || Boolean(brandId.trim()))
-
-  useEffect(() => {
-    if (!isFilterBrowse) return
-
-    let cancelled = false
-
-    async function loadByFilter() {
-      await Promise.resolve()
-      if (cancelled) return
-
-      setFilterLoading(true)
-      setFilterError(null)
-      try {
-        const response = await getProducts({
-          ...(concerns.trim() ? { concerns } : {}),
-          ...(brandId.trim() ? { brand: brandId.trim() } : {}),
-          page,
-          limit: PRODUCTS_PER_PAGE,
-          sort: sortOptionToApiSort(sort),
-        })
-        if (cancelled) return
-        setFilterProducts((response.data ?? []).map(mapApiProductToRecommendedProduct))
-        setFilterPagination({
-          totalDocuments: response.pagination?.totalDocuments ?? 0,
-          numberOfPages: response.pagination?.numberOfPages ?? 1,
-        })
-      } catch (loadError) {
-        if (cancelled) return
-        setFilterProducts([])
-        setFilterError(
-          loadError instanceof ApiError ? loadError.message : 'Unable to load products.',
-        )
-      } finally {
-        if (!cancelled) setFilterLoading(false)
-      }
-    }
-
-    void loadByFilter()
-
-    return () => {
-      cancelled = true
-    }
-  }, [isFilterBrowse, concerns, brandId, page, sort])
-
-  const displayProducts = isFilterBrowse ? filterProducts : products
-  const displayLoading = isFilterBrowse ? filterLoading : loading
-  const displayError = isFilterBrowse ? filterError : error
-  const displayPagination = isFilterBrowse ? filterPagination : pagination
-  const totalPages = displayPagination?.numberOfPages ?? 1
-  const totalResults = displayPagination?.totalDocuments ?? displayProducts.length
+  const totalPages = pagination?.numberOfPages ?? 1
+  const totalResults = pagination?.totalDocuments ?? products.length
+  const safePage = Math.min(page, Math.max(1, totalPages))
   const hasQuery = Boolean(keyword.trim() || concerns.trim() || brandId.trim())
 
   const brandName = useMemo(() => {
@@ -111,21 +59,37 @@ export function SearchPage() {
   }, [brandId, brands])
 
   const title = useMemo(() => {
-    if (keyword.trim()) return `Search results for "${keyword.trim()}"`
-    if (brandId.trim()) return brandName
-    if (concerns.trim()) return `Products for ${concerns.replace(/-/g, ' ')}`
-    return 'Search products'
+    const parts: string[] = []
+    if (keyword.trim()) parts.push(`“${keyword.trim()}”`)
+    if (brandId.trim()) parts.push(brandName)
+    if (concerns.trim()) parts.push(concerns.replace(/-/g, ' '))
+    if (parts.length === 0) return 'Search products'
+    if (keyword.trim() && parts.length === 1) return `Search results for ${parts[0]}`
+    return `Results for ${parts.join(' · ')}`
   }, [keyword, concerns, brandId, brandName])
+
+  function updateParams(patch: { sort?: SortOption; page?: number }) {
+    const next = new URLSearchParams(searchParams)
+    if (patch.sort != null) {
+      if (patch.sort === 'featured') next.delete('sort')
+      else next.set('sort', patch.sort)
+    }
+    if (patch.page != null) {
+      if (patch.page <= 1) next.delete('page')
+      else next.set('page', String(patch.page))
+    }
+    setSearchParams(next, { replace: false })
+  }
 
   return (
     <Layout>
       <div className="container-content pb-10 sm:pb-12">
         <CategoryToolbar
           categoryName={title}
-          productCount={displayProducts.length}
+          productCount={products.length}
           totalResults={totalResults}
           sort={sort}
-          onSortChange={setSort}
+          onSortChange={(nextSort) => updateParams({ sort: nextSort, page: 1 })}
           className="pt-6"
         />
 
@@ -135,13 +99,13 @@ export function SearchPage() {
           </p>
         )}
 
-        {displayError && (
+        {error && (
           <p className="mb-4 text-sm text-support-error" role="alert">
-            {displayError}
+            {error}
           </p>
         )}
 
-        {displayLoading ? (
+        {loading ? (
           <div className="grid grid-cols-2 gap-4 min-[769px]:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: PRODUCTS_PER_PAGE }).map((_, index) => (
               <div
@@ -151,17 +115,17 @@ export function SearchPage() {
               />
             ))}
           </div>
-        ) : displayProducts.length > 0 ? (
-          <ProductGrid products={displayProducts} />
+        ) : products.length > 0 ? (
+          <ProductGrid products={products} />
         ) : hasQuery ? (
           <p className="py-12 text-center text-sm text-secondary-text">No products found.</p>
         ) : null}
 
         {hasQuery && (
           <Pagination
-            currentPage={page}
+            currentPage={safePage}
             totalPages={totalPages}
-            onPageChange={setPage}
+            onPageChange={(nextPage) => updateParams({ page: nextPage })}
             className="pt-6"
           />
         )}

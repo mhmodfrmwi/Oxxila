@@ -31,6 +31,7 @@ export function OrderSummarySection({
         mode="confirmation"
         title={t('cart.summary.title')}
         totalLabel={resolvedTotalLabel}
+        shippingPrice={order.shippingPrice}
         onApplyCoupon={noopCoupon}
         onRemoveCoupon={noopCoupon}
         showPromo={false}

@@ -1,5 +1,5 @@
+// src/utils/catalogMappers.ts
 import type { BestSellerProduct } from '../components/landing/best-seller/ProductCard'
-import { bestSellerProducts as fallbackBestSellers } from '../components/landing/landingData'
 import type {
   ApiProduct,
   FeaturedImage,
@@ -28,13 +28,13 @@ const SKIN_CONCERN_LABELS: Record<string, string> = {
 }
 
 export function mapProductToBestSeller(product: ApiProduct): BestSellerProduct {
-  const { price } = resolveProductPricing(product)
+  const { price, originalPrice } = resolveProductPricing(product)
 
   return {
     id: product._id,
     title: product.name,
     price,
-    originalPrice: product.price,
+    originalPrice,
     rating: product.ratingsAverage ?? 0,
     reviewCount: product.ratingsQuantity ?? 0,
     image: resolveProductImageUrl(product.images?.[0]),
@@ -42,6 +42,7 @@ export function mapProductToBestSeller(product: ApiProduct): BestSellerProduct {
   }
 }
 
+/** Maps API products to best sellers. Returns [] when nothing usable — never mock commerce data. */
 export function buildBestSellers(products: ApiProduct[]): BestSellerProduct[] {
   const flagged = products.filter((product) => product.isBestSeller)
   const pool =
@@ -54,10 +55,7 @@ export function buildBestSellers(products: ApiProduct[]): BestSellerProduct[] {
             .sort((a, b) => (b.soldCount ?? 0) - (a.soldCount ?? 0)),
         ]
 
-  const mapped = pool.slice(0, 5).map(mapProductToBestSeller).filter((product) => product.image)
-
-  if (mapped.length > 0) return mapped
-  return fallbackBestSellers.map((product) => ({ ...product }))
+  return pool.slice(0, 5).map(mapProductToBestSeller).filter((product) => product.image)
 }
 
 export function buildSkinConcerns(): SkinConcernDisplay[] {
@@ -71,7 +69,7 @@ export function buildSkinConcerns(): SkinConcernDisplay[] {
 }
 
 export function buildFeaturedImages(products: ApiProduct[]): FeaturedImage[] {
-  const fromApi = products
+  return products
     .filter((product) => product.images?.[0])
     .slice(0, 4)
     .map((product) => ({
@@ -79,12 +77,4 @@ export function buildFeaturedImages(products: ApiProduct[]): FeaturedImage[] {
       src: resolveProductImageUrl(product.images[0]),
       alt: product.name,
     }))
-
-  if (fromApi.length > 0) return fromApi
-
-  return fallbackBestSellers.slice(0, 4).map((product) => ({
-    id: product.id,
-    src: product.image,
-    alt: product.title,
-  }))
 }

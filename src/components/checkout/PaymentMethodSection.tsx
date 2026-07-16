@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { MY_ACCOUNT_PATH } from '../../config/routes'
 import type { usePaymentPage } from '../../hooks/usePaymentPage'
 import { cn } from '../../lib/cn'
+import { FormMessage } from '../auth/FormMessage'
 import { SavedAddressCard } from '../account/SavedAddressCard'
 import { Button } from '../ui/Button'
 import { InputField } from '../ui/InputField'
@@ -19,6 +20,8 @@ interface PaymentMethodSectionProps {
   addresses: PaymentPageState['addresses']
   selectedAddressId: PaymentPageState['selectedAddressId']
   addressLoading: PaymentPageState['addressLoading']
+  addressLoadError: PaymentPageState['addressLoadError']
+  retryAddresses: PaymentPageState['retryAddresses']
   selectAddress: PaymentPageState['selectAddress']
   showNewAddressForm: PaymentPageState['showNewAddressForm']
   openNewAddressForm: PaymentPageState['openNewAddressForm']
@@ -40,6 +43,8 @@ export function PaymentMethodSection({
   addresses,
   selectedAddressId,
   addressLoading,
+  addressLoadError,
+  retryAddresses,
   selectAddress,
   showNewAddressForm,
   openNewAddressForm,
@@ -82,6 +87,13 @@ export function PaymentMethodSection({
           <div className="grid gap-3 sm:grid-cols-2" aria-hidden>
             <div className="h-36 animate-pulse rounded-2xl bg-surface-muted" />
             <div className="h-36 animate-pulse rounded-2xl bg-surface-muted" />
+          </div>
+        ) : addressLoadError ? (
+          <div className="space-y-3" role="alert">
+            <FormMessage message={addressLoadError || t('profile.addresses.loadFailed')} />
+            <Button type="button" variant="outline" onClick={() => void retryAddresses()}>
+              {t('cart.retry')}
+            </Button>
           </div>
         ) : (
           <>

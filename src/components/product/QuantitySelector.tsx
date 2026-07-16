@@ -9,6 +9,7 @@ interface QuantitySelectorProps {
   onChange: (value: number) => void
   min?: number
   max?: number
+  disabled?: boolean
   className?: string
 }
 
@@ -17,15 +18,18 @@ export function QuantitySelector({
   onChange,
   min = 1,
   max = 99,
+  disabled = false,
   className,
 }: QuantitySelectorProps) {
   const { t } = useTranslation()
 
   function decrement() {
+    if (disabled) return
     onChange(Math.max(min, value - 1))
   }
 
   function increment() {
+    if (disabled) return
     onChange(Math.min(max, value + 1))
   }
 
@@ -50,7 +54,7 @@ export function QuantitySelector({
       <button
         type="button"
         aria-label={t('productDetail.decreaseQuantity')}
-        disabled={value <= min}
+        disabled={disabled || value <= min}
         onClick={decrement}
         className={controlClass}
       >
@@ -66,7 +70,7 @@ export function QuantitySelector({
       <button
         type="button"
         aria-label={t('productDetail.increaseQuantity')}
-        disabled={value >= max}
+        disabled={disabled || value >= max}
         onClick={increment}
         className={controlClass}
       >

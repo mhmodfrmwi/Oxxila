@@ -34,6 +34,8 @@ export function PaymentPageContent() {
     loginPath,
     cart,
     cartLoading,
+    cartLoadError,
+    refreshCart,
     couponLoading,
     applyCoupon,
     removeCoupon,
@@ -41,6 +43,8 @@ export function PaymentPageContent() {
     addresses,
     selectedAddressId,
     addressLoading,
+    addressLoadError,
+    retryAddresses,
     selectAddress,
     showNewAddressForm,
     openNewAddressForm,
@@ -57,6 +61,8 @@ export function PaymentPageContent() {
     pageLoading,
     submitting,
     submitError,
+    zonesError,
+    shippingPrice,
     handlePayNow,
     handleBack,
   } = usePaymentPage()
@@ -65,11 +71,15 @@ export function PaymentPageContent() {
     return <Navigate to={loginPath} replace />
   }
 
-  if (!cartLoading && cart && cart.items.length === 0) {
+  if (!cartLoading && !cartLoadError && cart && cart.items.length === 0) {
     return <Navigate to={CART_PATH} replace />
   }
 
   const loading = cartLoading || pageLoading
+  const payableTotal =
+    cart && typeof shippingPrice === 'number'
+      ? cart.totalPrice + shippingPrice
+      : undefined
 
   return (
     <>
@@ -89,13 +99,27 @@ export function PaymentPageContent() {
           </Heading>
         </header>
 
-        {loading || !cart ? (
+        {loading && !cartLoadError ? (
+          <PaymentPageSkeleton />
+        ) : cartLoadError && !cart ? (
+          <div className="space-y-4" role="alert">
+            <FormMessage message={cartLoadError || t('cart.loadError')} />
+            <Button type="button" variant="outline" onClick={() => void refreshCart()}>
+              {t('cart.retry')}
+            </Button>
+          </div>
+        ) : !cart ? (
           <PaymentPageSkeleton />
         ) : (
           <>
             {submitError && (
               <div className="mb-4">
                 <FormMessage message={submitError} />
+              </div>
+            )}
+            {!submitError && zonesError && showNewAddressForm && (
+              <div className="mb-4">
+                <FormMessage message={zonesError} />
               </div>
             )}
 
@@ -106,6 +130,8 @@ export function PaymentPageContent() {
                   addresses={addresses}
                   selectedAddressId={selectedAddressId}
                   addressLoading={addressLoading}
+                  addressLoadError={addressLoadError}
+                  retryAddresses={retryAddresses}
                   selectAddress={selectAddress}
                   showNewAddressForm={showNewAddressForm}
                   openNewAddressForm={openNewAddressForm}
@@ -136,6 +162,8 @@ export function PaymentPageContent() {
                 cart={cart}
                 mode="review"
                 className="payment-order-summary"
+                shippingPrice={shippingPrice}
+                totalPrice={payableTotal}
                 couponLoading={couponLoading}
                 onApplyCoupon={applyCoupon}
                 onRemoveCoupon={removeCoupon}

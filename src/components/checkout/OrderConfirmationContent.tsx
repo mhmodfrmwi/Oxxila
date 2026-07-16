@@ -105,7 +105,7 @@ export function OrderConfirmationContent() {
                   </div>
                 )}
                 <div className="order-confirmation-meta-item">
-                  <strong>{t('checkout.confirmation.estimatedDelivery')}</strong>
+                  <strong>{t('checkout.delivery.estimatedDelivery')}</strong>
                   <span>{deliveryRange}</span>
                 </div>
                 <div className="order-confirmation-meta-item">

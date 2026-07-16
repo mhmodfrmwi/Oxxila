@@ -33,6 +33,7 @@ export function ProfilePageContent() {
     form,
     errors,
     avatar,
+    avatarError,
     loading,
     submitting,
     uploadingAvatar,
@@ -43,6 +44,8 @@ export function ProfilePageContent() {
     handleSubmit,
     reloadProfile,
   } = useProfilePage()
+
+  const avatarBusy = submitting || uploadingAvatar
 
   return (
     <div>
@@ -79,7 +82,7 @@ export function ProfilePageContent() {
                   'rounded-full border border-border-subtle bg-card text-button-primary shadow-sm',
                   'hover:bg-accent/10',
                   focusRingClasses,
-                  uploadingAvatar && 'pointer-events-none opacity-60',
+                  avatarBusy && 'pointer-events-none opacity-60',
                 )}
               >
                 <Camera size={16} aria-hidden />
@@ -91,11 +94,16 @@ export function ProfilePageContent() {
                 accept="image/jpeg,image/jpg,image/png,image/webp"
                 className="sr-only"
                 onChange={handleAvatarChange}
-                disabled={uploadingAvatar}
+                disabled={avatarBusy}
               />
             </div>
             {uploadingAvatar && (
               <p className="text-xs text-secondary-text">{t('profile.uploadingPhoto')}</p>
+            )}
+            {avatarError && (
+              <div className="w-full max-w-md">
+                <FormMessage message={avatarError} />
+              </div>
             )}
           </div>
 

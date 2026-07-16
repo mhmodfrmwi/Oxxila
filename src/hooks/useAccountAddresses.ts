@@ -81,7 +81,22 @@ export function useAccountAddresses() {
 
     try {
       await deleteMyAddress(addressId)
-      setAddresses((prev) => prev.filter((item) => item._id !== addressId))
+
+      try {
+        const response = await getMyAddresses()
+        setAddresses(response.data?.addresses ?? [])
+      } catch {
+        // Delete succeeded — keep UI consistent if refresh fails.
+        setAddresses((prev) => {
+          const next = prev.filter((item) => item._id !== addressId)
+          if (next.length === 0 || next.some((item) => item.isDefault)) return next
+          return next.map((item, index) => ({
+            ...item,
+            isDefault: index === 0,
+          }))
+        })
+      }
+
       toast.success(t('checkout.address.toastDeleted'))
     } catch (err) {
       const message =

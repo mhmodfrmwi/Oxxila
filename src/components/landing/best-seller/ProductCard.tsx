@@ -12,7 +12,8 @@ export interface BestSellerProduct {
   id: string
   title: string
   price: number
-  originalPrice: number
+  /** Compare-at price when a genuine discount exists. */
+  originalPrice?: number
   rating: number
   reviewCount: number
   image: string
@@ -154,9 +155,11 @@ export function ProductCard({
             <span className="text-base font-bold text-primary-text">
               ${product.price}
             </span>
-            <span className="text-sm text-secondary-text line-through">
-              ${product.originalPrice}
-            </span>
+            {product.originalPrice != null && product.originalPrice > product.price && (
+              <span className="text-sm text-secondary-text line-through">
+                ${product.originalPrice}
+              </span>
+            )}
           </div>
 
           <div className="flex shrink-0 items-center gap-1 text-xs text-secondary-text">

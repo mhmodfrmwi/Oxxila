@@ -1,6 +1,6 @@
 // src/components/product/ProductHero.tsx
 import { Heart, Package, Share2, ShoppingBag } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { cn } from '../../lib/cn'
@@ -142,6 +142,16 @@ export function ProductHero({ product, className }: ProductHeroProps) {
   const [selectedSize, setSelectedSize] = useState(sizes[0] ?? '')
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
+  const maxQuantity = Math.max(1, stockCount)
+  const isOutOfStock = stockCount <= 0
+
+  useEffect(() => {
+    setQuantity((current) => {
+      if (isOutOfStock) return 1
+      return Math.min(Math.max(1, current), maxQuantity)
+    })
+  }, [isOutOfStock, maxQuantity, product.id])
+
   const discountLabel =
     discountPercent != null && discountPercent > 0
       ? t('productDetail.percentOff', { percent: discountPercent })
@@ -152,7 +162,16 @@ export function ProductHero({ product, className }: ProductHeroProps) {
     : undefined
 
   const availabilityLabel =
-    stockCount > 0 ? t('productDetail.inStock') : t('productDetail.outOfStock')
+    isOutOfStock ? t('productDetail.outOfStock') : t('productDetail.inStock')
+
+  const stockBadgeLabel = isOutOfStock
+    ? t('productDetail.outOfStock')
+    : deliveryEstimate
+      ? t('productDetail.inStockReadyWithDelivery', {
+          count: stockCount,
+          delivery: deliveryEstimate,
+        })
+      : t('productDetail.inStockReady', { count: stockCount })
 
   const badgeLabel = translateBadge(badge, t)
 
@@ -168,18 +187,20 @@ export function ProductHero({ product, className }: ProductHeroProps) {
       return
     }
 
-    if (stockCount <= 0) {
+    if (isOutOfStock) {
       setCartMessage(t('productDetail.cart.outOfStock'))
       setCartMessageIsError(true)
       return
     }
+
+    const safeQuantity = Math.min(Math.max(1, quantity), maxQuantity)
 
     setCartLoading(true)
     setCartMessage(null)
     setCartMessageIsError(false)
 
     try {
-      await addToCart(product.id, quantity)
+      await addToCart(product.id, safeQuantity)
       setCartMessage(t('productDetail.cart.added'))
       setCartMessageIsError(false)
     } catch (error) {
@@ -256,16 +277,14 @@ export function ProductHero({ product, className }: ProductHeroProps) {
               </p>
             )}
 
-            <p className="product-detail-stock-badge">
+            <p
+              className={cn(
+                'product-detail-stock-badge',
+                isOutOfStock && 'product-detail-stock-badge--out-of-stock',
+              )}
+            >
               <Package size={16} strokeWidth={1.5} aria-hidden />
-              <span>
-                {deliveryEstimate
-                  ? t('productDetail.inStockReadyWithDelivery', {
-                      count: stockCount,
-                      delivery: deliveryEstimate,
-                    })
-                  : t('productDetail.inStockReady', { count: stockCount })}
-              </span>
+              <span>{stockBadgeLabel}</span>
             </p>
 
             <p className="product-detail-info-description">{description}</p>
@@ -326,7 +345,12 @@ export function ProductHero({ product, className }: ProductHeroProps) {
 
             <div className="product-detail-quantity-section">
               <p>{t('productDetail.quantity')}</p>
-              <QuantitySelector value={quantity} onChange={setQuantity} />
+              <QuantitySelector
+                value={quantity}
+                onChange={setQuantity}
+                min={1}
+                max={maxQuantity}
+              />
             </div>
 
             <div className="product-detail-actions">
@@ -336,7 +360,7 @@ export function ProductHero({ product, className }: ProductHeroProps) {
                 fullWidth
                 className="product-detail-cta"
                 onClick={() => void handleAddToCart()}
-                disabled={cartLoading || stockCount <= 0}
+                disabled={cartLoading || isOutOfStock}
               >
                 <ShoppingBag size={18} strokeWidth={1.5} aria-hidden />
                 {cartLoading ? t('productDetail.adding') : t('actions.addToCart')}

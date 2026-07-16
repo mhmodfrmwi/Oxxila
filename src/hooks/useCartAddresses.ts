@@ -1,51 +1,92 @@
 // src/hooks/useCartAddresses.ts
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getMyAddresses, type UserAddress } from '../api/users'
 import { useAuth } from '../context/AuthContext'
 import { ApiError } from '../lib/api'
 import { findDefaultAddress } from '../utils/userAddress'
 
 export function useCartAddresses() {
+  const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const [addresses, setAddresses] = useState<UserAddress[]>([])
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   const refreshAddresses = useCallback(async () => {
     if (!isAuthenticated) {
       setAddresses([])
       setSelectedAddressId(null)
+      setLoadError(null)
       return [] as UserAddress[]
     }
 
-    const response = await getMyAddresses()
-    const next = response.data?.addresses ?? []
-    setAddresses(next)
+    setLoading(true)
+    setLoadError(null)
+    try {
+      const response = await getMyAddresses()
+      const next = response.data?.addresses ?? []
+      setAddresses(next)
+      setLoadError(null)
 
-    setSelectedAddressId((current) => {
-      if (current && next.some((entry) => entry._id === current)) return current
-      return findDefaultAddress(next)?._id ?? null
-    })
+      setSelectedAddressId((current) => {
+        if (current && next.some((entry) => entry._id === current)) return current
+        return findDefaultAddress(next)?._id ?? null
+      })
 
-    return next
-  }, [isAuthenticated])
+      return next
+    } catch (error) {
+      if (!(error instanceof ApiError && error.statusCode === 401)) {
+        setAddresses([])
+        setSelectedAddressId(null)
+        setLoadError(
+          error instanceof ApiError
+            ? error.message
+            : t('profile.addresses.loadFailed'),
+        )
+      }
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }, [isAuthenticated, t])
 
   useEffect(() => {
-    if (!isAuthenticated) return
+    if (!isAuthenticated) {
+      setAddresses([])
+      setSelectedAddressId(null)
+      setLoadError(null)
+      setLoading(false)
+      return
+    }
 
     let cancelled = false
 
     async function load() {
-      await Promise.resolve()
-      if (cancelled) return
-
       setLoading(true)
+      setLoadError(null)
       try {
-        await refreshAddresses()
+        const response = await getMyAddresses()
+        if (cancelled) return
+
+        const next = response.data?.addresses ?? []
+        setAddresses(next)
+        setLoadError(null)
+        setSelectedAddressId((current) => {
+          if (current && next.some((entry) => entry._id === current)) return current
+          return findDefaultAddress(next)?._id ?? null
+        })
       } catch (error) {
-        if (!cancelled && !(error instanceof ApiError && error.statusCode === 401)) {
+        if (cancelled) return
+        if (!(error instanceof ApiError && error.statusCode === 401)) {
           setAddresses([])
           setSelectedAddressId(null)
+          setLoadError(
+            error instanceof ApiError
+              ? error.message
+              : t('profile.addresses.loadFailed'),
+          )
         }
       } finally {
         if (!cancelled) setLoading(false)
@@ -57,7 +98,7 @@ export function useCartAddresses() {
     return () => {
       cancelled = true
     }
-  }, [isAuthenticated, refreshAddresses])
+  }, [isAuthenticated, t])
 
   const resolvedAddresses = useMemo(
     () => (isAuthenticated ? addresses : []),
@@ -77,6 +118,7 @@ export function useCartAddresses() {
   return {
     addresses: resolvedAddresses,
     loading: isAuthenticated ? loading : false,
+    loadError: isAuthenticated ? loadError : null,
     selectedAddressId,
     setSelectedAddressId,
     selectedAddress,

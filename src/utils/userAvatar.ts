@@ -65,3 +65,20 @@ export function initialsFromName(name: string): string {
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
   return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase()
 }
+
+/** Matches backend avatar uploader limits. */
+export const AVATAR_MAX_BYTES = 2 * 1024 * 1024
+
+const AVATAR_ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp'])
+
+/** Returns an i18n key when invalid; null when the file may be uploaded. */
+export function getAvatarFileValidationKey(file: File): string | null {
+  const mime = file.type.toLowerCase()
+  if (!AVATAR_ALLOWED_MIME.has(mime)) {
+    return 'profile.avatarInvalidType'
+  }
+  if (file.size > AVATAR_MAX_BYTES) {
+    return 'profile.avatarTooLarge'
+  }
+  return null
+}

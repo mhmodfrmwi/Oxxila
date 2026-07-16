@@ -48,7 +48,7 @@ export function OrderShippingInfoCard({
 
       <dl className="order-confirmation-details-list">
         <div className="order-confirmation-details-row">
-          <dt>{t('checkout.confirmation.estimatedDelivery')}</dt>
+          <dt>{t('checkout.delivery.estimatedDelivery')}</dt>
           <dd>{formatEstimatedDeliveryArrival(order)}</dd>
         </div>
         <div className="order-confirmation-details-row">

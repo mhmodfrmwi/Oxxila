@@ -6,7 +6,12 @@ import { getFiltersQueryKey, type FilterState } from '../components/category/fil
 import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
 import { ApiError } from '../lib/api'
 import type { ApiPagination } from '../lib/api'
-import { applyClientOnlyFilters, buildProductQueryParams } from '../utils/productQueryParams'
+import type { ApiProduct } from '../types/catalog'
+import { requiresClientProductFilter } from '../utils/categoryBrowseParams'
+import {
+  applyClientOnlyFilters,
+  buildProductQueryParams,
+} from '../utils/productQueryParams'
 import { mapApiProductToRecommendedProduct } from '../utils/productDetailMappers'
 
 export interface CategoryProductsState {
@@ -21,6 +26,51 @@ const emptyState: CategoryProductsState = {
   error: null,
   products: [],
   pagination: null,
+}
+
+const CLIENT_FILTER_PAGE_SIZE = 100
+const CLIENT_FILTER_MAX_PAGES = 20
+
+async function fetchAllMatchingProducts(
+  baseParams: ReturnType<typeof buildProductQueryParams>,
+): Promise<ApiProduct[]> {
+  const collected: ApiProduct[] = []
+  let page = 1
+  let totalPages = 1
+
+  do {
+    const response = await getProducts({
+      ...baseParams,
+      page,
+      limit: CLIENT_FILTER_PAGE_SIZE,
+    })
+    collected.push(...(response.data ?? []))
+    totalPages = Math.min(
+      response.pagination?.numberOfPages ?? 1,
+      CLIENT_FILTER_MAX_PAGES,
+    )
+    page += 1
+  } while (page <= totalPages)
+
+  return collected
+}
+
+function buildClientPagination(
+  totalDocuments: number,
+  page: number,
+  limit: number,
+): ApiPagination {
+  const numberOfPages = Math.max(1, Math.ceil(totalDocuments / limit) || 1)
+  const safePage = Math.min(Math.max(1, page), numberOfPages)
+  return {
+    currentPage: safePage,
+    limit,
+    numberOfPages,
+    totalDocuments,
+    nextPage: safePage < numberOfPages ? safePage + 1 : null,
+    prevPage: safePage > 1 ? safePage - 1 : null,
+    results: Math.min(limit, Math.max(0, totalDocuments - (safePage - 1) * limit)),
+  }
 }
 
 export function useCategoryProducts(
@@ -39,6 +89,7 @@ export function useCategoryProducts(
   const filtersKey = getFiltersQueryKey(filters)
   const enabled = options?.enabled !== false
   const isCertified = options?.isCertified === true
+  const clientFilter = requiresClientProductFilter(filters)
 
   useEffect(() => {
     if (!enabled) return
@@ -46,8 +97,8 @@ export function useCategoryProducts(
     let cancelled = false
     const queryParams = buildProductQueryParams(filters, sort, {
       categoryId,
-      page,
-      limit,
+      page: clientFilter ? 1 : page,
+      limit: clientFilter ? CLIENT_FILTER_PAGE_SIZE : limit,
       isCertified: isCertified || undefined,
     })
 
@@ -58,15 +109,31 @@ export function useCategoryProducts(
       setState((previous) => ({ ...previous, loading: true, error: null }))
 
       try {
-        const response = await getProducts(queryParams)
+        if (clientFilter) {
+          const allProducts = await fetchAllMatchingProducts(queryParams)
+          if (cancelled) return
 
+          const filtered = applyClientOnlyFilters(allProducts, filters)
+          const pagination = buildClientPagination(filtered.length, page, limit)
+          const start = (pagination.currentPage - 1) * limit
+          const pageSlice = filtered.slice(start, start + limit)
+
+          setState({
+            loading: false,
+            error: null,
+            products: pageSlice.map(mapApiProductToRecommendedProduct),
+            pagination,
+          })
+          return
+        }
+
+        const response = await getProducts(queryParams)
         if (cancelled) return
 
-        const apiProducts = applyClientOnlyFilters(response.data ?? [], filters)
         setState({
           loading: false,
           error: null,
-          products: apiProducts.map(mapApiProductToRecommendedProduct),
+          products: (response.data ?? []).map(mapApiProductToRecommendedProduct),
           pagination: response.pagination ?? null,
         })
       } catch (error) {
@@ -85,11 +152,7 @@ export function useCategoryProducts(
     return () => {
       cancelled = true
     }
-  }, [categoryId, enabled, filters, filtersKey, isCertified, limit, page, sort])
-
-  if (!enabled) {
-    return { ...emptyState, loading: true }
-  }
+  }, [categoryId, filtersKey, sort, page, limit, enabled, isCertified, clientFilter, filters])
 
   return state
 }

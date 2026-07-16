@@ -1,14 +1,12 @@
 // src/components/landing/contact/ContactForm.tsx
 import { motion } from 'framer-motion'
-import { Check, Loader2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { gradientCtaClasses, successCtaClasses } from '../../ui/buttonStyles'
+import { gradientCtaClasses } from '../../ui/buttonStyles'
 import { typeSmallClasses } from '../../ui/typography'
 import { cn } from '../../../lib/cn'
 
 type FieldName = 'name' | 'email' | 'message'
-type FormStatus = 'idle' | 'loading' | 'success'
 
 interface FormValues {
   name: string
@@ -26,6 +24,7 @@ const inputBase = [
   'peer min-h-11 h-14 w-full rounded-2xl border px-4 pt-5 pb-1.5 text-sm outline-none transition-all duration-300 sm:text-base',
   'bg-input text-primary-text placeholder-transparent',
   'border-transparent focus:border-accent-soft/50 focus:ring-2 focus:ring-accent-soft/25',
+  'disabled:cursor-not-allowed disabled:opacity-60',
 ].join(' ')
 
 const labelBase = [
@@ -38,10 +37,10 @@ const labelBase = [
 interface FloatingFieldProps {
   id: FieldName
   label: string
-  type?: 'text' | 'email'
-  multiline?: boolean
+  type?: string
   value: string
   error?: string
+  disabled?: boolean
   onChange: (value: string) => void
   onBlur: () => void
 }
@@ -50,48 +49,50 @@ function FloatingField({
   id,
   label,
   type = 'text',
-  multiline = false,
   value,
   error,
+  disabled,
   onChange,
   onBlur,
 }: FloatingFieldProps) {
-  const errorRing = error ? 'border-support-error ring-2 ring-support-error/20' : ''
+  const isTextarea = id === 'message'
 
   return (
     <div className="relative">
-      {multiline ? (
+      {isTextarea ? (
         <textarea
-          id={id}
+          id={`contact-${id}`}
           name={id}
-          rows={5}
+          rows={4}
           value={value}
-          placeholder=" "
+          placeholder={label}
+          disabled={disabled}
           aria-invalid={Boolean(error)}
-          aria-describedby={error ? `${id}-error` : undefined}
+          aria-describedby={error ? `contact-${id}-error` : undefined}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
-          className={[inputBase, 'h-auto min-h-[140px] resize-none py-4', errorRing].join(' ')}
+          className={cn(inputBase, 'h-auto min-h-[7.5rem] resize-y py-4')}
         />
       ) : (
         <input
-          id={id}
+          id={`contact-${id}`}
           name={id}
           type={type}
           value={value}
-          placeholder=" "
+          placeholder={label}
+          disabled={disabled}
           aria-invalid={Boolean(error)}
-          aria-describedby={error ? `${id}-error` : undefined}
+          aria-describedby={error ? `contact-${id}-error` : undefined}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
-          className={[inputBase, errorRing].join(' ')}
+          className={inputBase}
         />
       )}
-      <label htmlFor={id} className={labelBase}>
+      <label htmlFor={`contact-${id}`} className={labelBase}>
         {label}
       </label>
       {error && (
-        <p id={`${id}-error`} className="mt-1.5 text-xs text-support-error" role="alert">
+        <p id={`contact-${id}-error`} className="mt-1.5 text-xs text-support-error" role="alert">
           {error}
         </p>
       )}
@@ -99,6 +100,7 @@ function FloatingField({
   )
 }
 
+/** No contact API endpoint — keep the form visible but non-submitting. */
 export function ContactForm() {
   const { t } = useTranslation()
   const [values, setValues] = useState<FormValues>({ name: '', email: '', message: '' })
@@ -108,7 +110,6 @@ export function ContactForm() {
     email: false,
     message: false,
   })
-  const [status, setStatus] = useState<FormStatus>('idle')
 
   function validate(formValues: FormValues): FormErrors {
     const nextErrors: FormErrors = {}
@@ -138,19 +139,8 @@ export function ContactForm() {
     setErrors((prev) => ({ ...prev, [field]: nextErrors[field] }))
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const nextErrors = validate(values)
-    setErrors(nextErrors)
-    setTouched({ name: true, email: true, message: true })
-    if (Object.keys(nextErrors).length > 0) return
-
-    setStatus('loading')
-    await new Promise((resolve) => window.setTimeout(resolve, 1200))
-    setStatus('success')
-    setValues({ name: '', email: '', message: '' })
-    setTouched({ name: false, email: false, message: false })
-    window.setTimeout(() => setStatus('idle'), 3000)
   }
 
   return (
@@ -163,11 +153,16 @@ export function ContactForm() {
       transition={{ duration: 0.5, delay: 0.1 }}
       noValidate
     >
+      <p className="rounded-xl bg-surface-muted/60 px-4 py-3 text-sm text-secondary-text" role="status">
+        {t('home.contact.unavailable')}
+      </p>
+
       <FloatingField
         id="name"
         label={t('home.contact.name')}
         value={values.name}
         error={touched.name ? errors.name : undefined}
+        disabled
         onChange={(v) => updateField('name', v)}
         onBlur={() => blurField('name')}
       />
@@ -177,45 +172,31 @@ export function ContactForm() {
         type="email"
         value={values.email}
         error={touched.email ? errors.email : undefined}
+        disabled
         onChange={(v) => updateField('email', v)}
         onBlur={() => blurField('email')}
       />
       <FloatingField
         id="message"
         label={t('home.contact.message')}
-        multiline
         value={values.message}
         error={touched.message ? errors.message : undefined}
+        disabled
         onChange={(v) => updateField('message', v)}
         onBlur={() => blurField('message')}
       />
 
       <motion.button
         type="submit"
-        disabled={status === 'loading' || status === 'success'}
-        whileHover={status === 'idle' ? { y: -2 } : undefined}
-        whileTap={status === 'idle' ? { scale: 0.99 } : undefined}
+        disabled
         className={cn(
-          'flex h-14 w-full items-center justify-center gap-2 rounded-full text-on-emphasis',
+          'flex h-14 w-full min-h-11 items-center justify-center gap-2 rounded-full px-8 text-on-emphasis',
           typeSmallClasses,
-          'transition-all duration-300',
-          status === 'success' ? successCtaClasses : gradientCtaClasses,
-          status === 'loading' && 'cursor-wait opacity-90',
+          gradientCtaClasses,
+          'cursor-not-allowed opacity-60',
         )}
       >
-        {status === 'loading' && (
-          <>
-            <Loader2 size={20} className="animate-spin" aria-hidden />
-            {t('home.contact.sending')}
-          </>
-        )}
-        {status === 'success' && (
-          <>
-            <Check size={20} aria-hidden />
-            {t('home.contact.sent')}
-          </>
-        )}
-        {status === 'idle' && t('home.contact.send')}
+        {t('home.contact.send')}
       </motion.button>
     </motion.form>
   )

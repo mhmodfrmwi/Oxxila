@@ -1,3 +1,4 @@
+// src/components/auth/LoginForm.tsx
 import { useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -7,6 +8,11 @@ import { HOME_PATH } from '../../config/routes'
 import { ApiError } from '../../lib/api'
 import { getOAuthErrorMessage, getOAuthSearchParams } from '../../utils/oauth'
 import { consumeOAuthError } from '../../utils/oauthBootstrap'
+import {
+  hasFieldErrors,
+  validateLoginFields,
+  type LoginFieldErrors,
+} from '../../utils/authValidation'
 import { Button } from '../ui/Button'
 import { Heading } from '../ui/Heading'
 import { InputField } from '../ui/InputField'
@@ -32,9 +38,16 @@ export function LoginForm() {
   const { login, isAuthenticated } = useAuth()
   const toast = useToast()
   const [oauthError] = useState(() => readOAuthError(location.state))
-  const [error, setError] = useState('')
+  const [error, setError] = useState(() =>
+    (location.state as { sessionExpired?: boolean } | null)?.sessionExpired
+      ? t('auth.session.expired')
+      : '',
+  )
+  const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({})
   const [success, setSuccess] = useState(
-    (location.state as { message?: string } | null)?.message ?? '',
+    (location.state as { message?: string; sessionExpired?: boolean } | null)?.sessionExpired
+      ? ''
+      : ((location.state as { message?: string } | null)?.message ?? ''),
   )
   const [loading, setLoading] = useState(false)
 
@@ -45,7 +58,12 @@ export function LoginForm() {
   }, [isAuthenticated, navigate])
 
   useEffect(() => {
-    if ((location.state as { message?: string; oauthError?: string } | null)?.message) {
+    const state = location.state as {
+      message?: string
+      oauthError?: string
+      sessionExpired?: boolean
+    } | null
+    if (state?.message || state?.sessionExpired) {
       window.history.replaceState({}, document.title)
     }
   }, [location.state])
@@ -58,6 +76,10 @@ export function LoginForm() {
     const formData = new FormData(event.currentTarget)
     const email = String(formData.get('email') ?? '').trim()
     const password = String(formData.get('password') ?? '')
+
+    const nextFieldErrors = validateLoginFields(email, password, t)
+    setFieldErrors(nextFieldErrors)
+    if (hasFieldErrors(nextFieldErrors)) return
 
     setLoading(true)
 
@@ -97,6 +119,8 @@ export function LoginForm() {
             autoComplete="email"
             placeholder={t('auth.fields.emailPlaceholder')}
             required
+            error={fieldErrors.email}
+            onChange={() => setFieldErrors((prev) => ({ ...prev, email: undefined }))}
           />
 
           <div>
@@ -109,6 +133,8 @@ export function LoginForm() {
               showPasswordToggle
               required
               minLength={8}
+              error={fieldErrors.password}
+              onChange={() => setFieldErrors((prev) => ({ ...prev, password: undefined }))}
             />
             <div className="mt-2 text-end">
               <Link

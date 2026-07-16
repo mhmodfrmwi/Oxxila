@@ -15,20 +15,15 @@ import {
   heroLeftProduct,
   heroRightProduct,
 } from './landingData'
-import { focusRingClasses } from '../ui/interactionStyles'
 import { typeSmallClasses } from '../ui/typography'
 
 const HERO_WIDTH = 1440
 const HERO_HEIGHT = 796
 
 const heroFabClass = cn(
-  'hero-fab absolute z-30 flex aspect-square items-center justify-center rounded-full',
+  'hero-fab pointer-events-none absolute z-30 flex aspect-square items-center justify-center rounded-full',
   'bg-button-primary text-on-emphasis',
   'shadow-lg shadow-button-primary/35',
-  'transition-[background-color,color,box-shadow,transform] duration-200 ease-out',
-  'hover:bg-accent-soft hover:shadow-xl hover:shadow-button-primary/45',
-  'active:translate-y-px active:bg-button-primary-active active:text-primary-text',
-  focusRingClasses,
 )
 
 function pctX(value: number) {
@@ -213,29 +208,27 @@ export function HeroSection() {
             </p>
           </div>
 
-          <button
-            type="button"
+          <div
             className={heroFabClass}
             style={{
               ...centerStyle(115, 650.149),
               width: pctX(70),
             }}
-            aria-label={t('home.hero.previousSlide')}
+            aria-hidden
           >
             <ArrowUpRight size={20} strokeWidth={2.25} aria-hidden className="shrink-0" />
-          </button>
+          </div>
 
-          <button
-            type="button"
+          <div
             className={heroFabClass}
             style={{
               ...centerStyle(1325, 430.149),
               width: pctX(70),
             }}
-            aria-label={t('home.hero.nextSlide')}
+            aria-hidden
           >
             <Shield size={20} strokeWidth={2.25} aria-hidden className="shrink-0" />
-          </button>
+          </div>
 
           <Link
             to={SHOP_PATH}

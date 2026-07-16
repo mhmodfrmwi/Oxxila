@@ -3,6 +3,7 @@ import type { SortOption } from '../components/category/categoryData'
 import {
   createDefaultFilterState,
   type FilterState,
+  type PriceSort,
 } from '../components/category/filters/filterState'
 import { CATEGORIES_PATH } from '../config/routes'
 
@@ -13,6 +14,8 @@ const SORT_OPTIONS = new Set<SortOption>([
   'rating',
   'newest',
 ])
+
+const PRICE_SORT_OPTIONS = new Set<PriceSort>(['all', 'low-to-high', 'high-to-low'])
 
 export type CollectionBrowseSlug =
   | 'new-arrivals'
@@ -27,6 +30,7 @@ export interface CategoryBrowseState {
   categorySlug: string | null
   certifiedOnly: boolean
   collection: CollectionBrowseSlug | null
+  page: number
 }
 
 const COLLECTION_TITLES: Record<CollectionBrowseSlug, string> = {
@@ -41,6 +45,10 @@ function isSortOption(value: string | null): value is SortOption {
   return value != null && SORT_OPTIONS.has(value as SortOption)
 }
 
+function isPriceSort(value: string | null): value is PriceSort {
+  return value != null && PRICE_SORT_OPTIONS.has(value as PriceSort)
+}
+
 function isCollectionSlug(value: string | null): value is CollectionBrowseSlug {
   return (
     value === 'new-arrivals' ||
@@ -49,6 +57,19 @@ function isCollectionSlug(value: string | null): value is CollectionBrowseSlug {
     value === 'offers' ||
     value === 'featured'
   )
+}
+
+function splitCsv(value: string | null): string[] {
+  if (!value?.trim()) return []
+  return value
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean)
+}
+
+function parsePage(value: string | null): number {
+  const page = Number(value)
+  return Number.isFinite(page) && page >= 1 ? Math.floor(page) : 1
 }
 
 export function getCollectionTitle(slug: CollectionBrowseSlug | null): string | null {
@@ -65,6 +86,7 @@ export function applyCollectionPreset(slug: CollectionBrowseSlug): CategoryBrows
         categorySlug: null,
         certifiedOnly: false,
         collection: slug,
+        page: 1,
       }
     case 'best-sellers':
       return {
@@ -73,6 +95,7 @@ export function applyCollectionPreset(slug: CollectionBrowseSlug): CategoryBrows
         categorySlug: null,
         certifiedOnly: false,
         collection: slug,
+        page: 1,
       }
     case 'trending':
       return {
@@ -81,6 +104,7 @@ export function applyCollectionPreset(slug: CollectionBrowseSlug): CategoryBrows
         categorySlug: null,
         certifiedOnly: false,
         collection: slug,
+        page: 1,
       }
     case 'offers':
       return {
@@ -89,6 +113,7 @@ export function applyCollectionPreset(slug: CollectionBrowseSlug): CategoryBrows
         categorySlug: null,
         certifiedOnly: false,
         collection: slug,
+        page: 1,
       }
     case 'featured':
       return {
@@ -97,44 +122,116 @@ export function applyCollectionPreset(slug: CollectionBrowseSlug): CategoryBrows
         categorySlug: null,
         certifiedOnly: true,
         collection: slug,
+        page: 1,
       }
   }
 }
 
 export function parseCategoryBrowseParams(searchParams: URLSearchParams): CategoryBrowseState {
+  const page = parsePage(searchParams.get('page'))
   const collectionParam = searchParams.get('collection')
-  if (isCollectionSlug(collectionParam)) {
-    return applyCollectionPreset(collectionParam)
+
+  // Pure collection deep link (no customized filter overrides in the URL).
+  if (isCollectionSlug(collectionParam) && !hasCustomFilterParams(searchParams)) {
+    return { ...applyCollectionPreset(collectionParam), page }
   }
 
-  const offersParam = searchParams.get('offers')
-  const offerIds = offersParam
-    ? offersParam.split(',').map((id) => id.trim()).filter(Boolean)
-    : []
   const sortParam = searchParams.get('sort')
-  const categorySlug = searchParams.get('category')?.trim() || null
+  const priceSortParam = searchParams.get('priceSort')
+  const ratingParam = searchParams.get('rating')
+  const rating = ratingParam != null && ratingParam !== '' ? Number(ratingParam) : null
 
   return {
     filters: {
       ...createDefaultFilterState(),
-      offerIds,
+      sensitivityIds: splitCsv(searchParams.get('sensitivity')),
+      categoryIds: splitCsv(searchParams.get('subCategory')),
+      typeOfCategoryIds: splitCsv(searchParams.get('type')),
+      concernIds: splitCsv(searchParams.get('concerns')),
+      priceSort: isPriceSort(priceSortParam) ? priceSortParam : 'all',
+      brandIds: splitCsv(searchParams.get('brand')),
+      rating: rating != null && Number.isFinite(rating) ? rating : null,
+      offerIds: splitCsv(searchParams.get('offers')),
+      inStockOnly: searchParams.get('inStock') === '1',
     },
     sort: isSortOption(sortParam) ? sortParam : 'featured',
-    categorySlug,
+    categorySlug: searchParams.get('category')?.trim() || null,
     certifiedOnly: searchParams.get('certified') === '1',
     collection: null,
+    page,
   }
+}
+
+function hasCustomFilterParams(searchParams: URLSearchParams): boolean {
+  return (
+    searchParams.has('brand') ||
+    searchParams.has('concerns') ||
+    searchParams.has('offers') ||
+    searchParams.has('sensitivity') ||
+    searchParams.has('subCategory') ||
+    searchParams.has('type') ||
+    searchParams.has('priceSort') ||
+    searchParams.has('rating') ||
+    searchParams.has('inStock') ||
+    searchParams.has('category') ||
+    searchParams.has('certified') ||
+    (searchParams.has('sort') && searchParams.get('sort') !== 'featured')
+  )
+}
+
+/** Serialize browse state into URL search params (single source of truth). */
+export function buildCategoryBrowseSearchParams(state: CategoryBrowseState): URLSearchParams {
+  const params = new URLSearchParams()
+
+  if (state.collection) {
+    params.set('collection', state.collection)
+    if (state.page > 1) params.set('page', String(state.page))
+    return params
+  }
+
+  if (state.categorySlug) params.set('category', state.categorySlug)
+  if (state.sort !== 'featured') params.set('sort', state.sort)
+  if (state.page > 1) params.set('page', String(state.page))
+  if (state.certifiedOnly) params.set('certified', '1')
+
+  const { filters } = state
+  if (filters.sensitivityIds.length) params.set('sensitivity', filters.sensitivityIds.join(','))
+  if (filters.categoryIds.length) params.set('subCategory', filters.categoryIds.join(','))
+  if (filters.typeOfCategoryIds.length) params.set('type', filters.typeOfCategoryIds.join(','))
+  if (filters.concernIds.length) params.set('concerns', filters.concernIds.join(','))
+  if (filters.priceSort !== 'all') params.set('priceSort', filters.priceSort)
+  if (filters.brandIds.length) params.set('brand', filters.brandIds.join(','))
+  if (filters.rating != null) params.set('rating', String(filters.rating))
+  if (filters.offerIds.length) params.set('offers', filters.offerIds.join(','))
+  if (filters.inStockOnly) params.set('inStock', '1')
+
+  return params
+}
+
+export function categoryBrowseHref(state: CategoryBrowseState): string {
+  const query = buildCategoryBrowseSearchParams(state).toString()
+  return query ? `${CATEGORIES_PATH}?${query}` : CATEGORIES_PATH
 }
 
 /** Categories listing with a single category filter applied. */
 export function categoryBrowsePath(categorySlug: string): string {
-  const params = new URLSearchParams({ category: categorySlug })
-  return `${CATEGORIES_PATH}?${params.toString()}`
+  return categoryBrowseHref({
+    filters: createDefaultFilterState(),
+    sort: 'featured',
+    categorySlug,
+    certifiedOnly: false,
+    collection: null,
+    page: 1,
+  })
 }
 
 /** Categories listing with a collection preset applied. */
 export function collectionBrowsePath(slug: CollectionBrowseSlug | string): string {
   if (!isCollectionSlug(slug)) return CATEGORIES_PATH
-  const params = new URLSearchParams({ collection: slug })
-  return `${CATEGORIES_PATH}?${params.toString()}`
+  return categoryBrowseHref(applyCollectionPreset(slug))
+}
+
+/** True when multi-brand / rating / in-stock require post-fetch filtering. */
+export function requiresClientProductFilter(filters: FilterState): boolean {
+  return filters.brandIds.length > 1 || filters.rating != null || filters.inStockOnly
 }

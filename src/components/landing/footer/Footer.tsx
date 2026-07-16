@@ -2,6 +2,12 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getCollectionHref } from '../../../config/collections'
+import {
+  DOCS_PATH,
+  HOME_PATH,
+  RETURNS_HISTORY_PATH,
+  SHOP_PATH,
+} from '../../../config/routes'
 import { FadeUp } from '../../ui/FadeUp'
 import { Logo } from '../../ui/Logo'
 import { FooterLinks } from './FooterLinks'
@@ -12,29 +18,28 @@ import { SocialLinks } from './SocialLinks'
 export function Footer() {
   const { t } = useTranslation()
 
+  // Only include destinations that exist in App routes (or in-page anchors on those pages).
   const policyLinks = useMemo(
     () => [
-      { label: t('footer.policyLinks.about'), to: '/about' },
-      { label: t('footer.policyLinks.quality'), to: '/quality' },
-      { label: t('footer.policyLinks.authenticity'), to: '/authenticity' },
-      { label: t('footer.policyLinks.standards'), to: '/standards' },
-      { label: t('footer.policyLinks.terms'), to: '/terms' },
-      { label: t('footer.policyLinks.privacy'), to: '/privacy' },
-      { label: t('footer.policyLinks.contact'), to: '/contact' },
+      { label: t('footer.policyLinks.about'), to: DOCS_PATH },
+      { label: t('footer.policyLinks.quality'), to: `${DOCS_PATH}#about-quality-title` },
+      { label: t('footer.policyLinks.authenticity'), to: `${DOCS_PATH}#about-cta-title` },
+      { label: t('footer.policyLinks.standards'), to: `${DOCS_PATH}#about-medical-title` },
+      { label: t('footer.policyLinks.contact'), to: `${HOME_PATH}#contact` },
+      // terms / privacy — no routes yet; omitted intentionally
     ],
     [t],
   )
 
   const shoppingLinks = useMemo(
     () => [
-      { label: t('footer.shoppingLinks.shopAll'), to: '/shop' },
-      { label: t('footer.shoppingLinks.skinConcerns'), to: '/concerns' },
-      { label: t('footer.shoppingLinks.brands'), to: '/brands' },
+      { label: t('footer.shoppingLinks.shopAll'), to: SHOP_PATH },
+      { label: t('footer.shoppingLinks.skinConcerns'), to: `${SHOP_PATH}#skin-concerns-heading` },
+      { label: t('footer.shoppingLinks.brands'), to: `${SHOP_PATH}#brand-stores-heading` },
       { label: t('footer.shoppingLinks.newArrivals'), to: getCollectionHref('new-arrivals') },
       { label: t('footer.shoppingLinks.bestSellers'), to: getCollectionHref('best-sellers') },
-      { label: t('footer.shoppingLinks.shipping'), to: '/shipping' },
-      { label: t('footer.shoppingLinks.returns'), to: '/returns/history' },
-      { label: t('footer.shoppingLinks.trackOrder'), to: '/track' },
+      { label: t('footer.shoppingLinks.returns'), to: RETURNS_HISTORY_PATH },
+      // shipping / track order — no standalone routes yet; omitted intentionally
     ],
     [t],
   )
@@ -51,7 +56,7 @@ export function Footer() {
           <div className="grid grid-cols-1 gap-10 min-[769px]:grid-cols-2 min-[769px]:gap-12 min-[1025px]:grid-cols-4 min-[1025px]:gap-10 xl:gap-14">
             <div className="min-[769px]:col-span-2 min-[1025px]:col-span-1">
               <Logo
-                linkTo="/home"
+                linkTo={HOME_PATH}
                 className="dark:[&_img:nth-child(2)]:brightness-0 dark:[&_img:nth-child(2)]:invert"
               />
               <p className="mt-4 max-w-sm font-serif text-sm leading-relaxed text-secondary-text sm:text-base">

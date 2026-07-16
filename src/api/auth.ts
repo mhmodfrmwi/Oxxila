@@ -42,6 +42,8 @@ export function login(payload: LoginPayload) {
   return apiRequest<LoginResponse>('/auth/login', {
     method: 'POST',
     body: payload,
+    // Store httpOnly refresh cookie for later /auth/refresh.
+    withCredentials: true,
   })
 }
 

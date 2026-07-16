@@ -1,9 +1,15 @@
+// src/components/auth/RegisterForm.tsx
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { register } from '../../api/auth'
 import { useToast } from '../../context/ToastContext'
 import { ApiError } from '../../lib/api'
+import {
+  hasFieldErrors,
+  validateRegisterFields,
+  type RegisterFieldErrors,
+} from '../../utils/authValidation'
 import { Button } from '../ui/Button'
 import { Heading } from '../ui/Heading'
 import { InputField } from '../ui/InputField'
@@ -18,6 +24,7 @@ export function RegisterForm() {
   const toast = useToast()
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<RegisterFieldErrors>({})
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -29,6 +36,13 @@ export function RegisterForm() {
     const email = String(formData.get('email') ?? '').trim()
     const phone = String(formData.get('phone') ?? '').trim()
     const nextPassword = String(formData.get('password') ?? '')
+
+    const nextFieldErrors = validateRegisterFields(
+      { name, email, phone, password: nextPassword },
+      t,
+    )
+    setFieldErrors(nextFieldErrors)
+    if (hasFieldErrors(nextFieldErrors)) return
 
     setLoading(true)
 
@@ -69,6 +83,8 @@ export function RegisterForm() {
           autoComplete="name"
           placeholder={t('auth.register.namePlaceholder')}
           required
+          error={fieldErrors.name}
+          onChange={() => setFieldErrors((prev) => ({ ...prev, name: undefined }))}
         />
 
         <InputField
@@ -78,6 +94,8 @@ export function RegisterForm() {
           autoComplete="email"
           placeholder={t('auth.fields.emailPlaceholder')}
           required
+          error={fieldErrors.email}
+          onChange={() => setFieldErrors((prev) => ({ ...prev, email: undefined }))}
         />
 
         <InputField
@@ -88,6 +106,8 @@ export function RegisterForm() {
           placeholder={t('auth.register.phonePlaceholder')}
           inputMode="tel"
           required
+          error={fieldErrors.phone}
+          onChange={() => setFieldErrors((prev) => ({ ...prev, phone: undefined }))}
         />
 
         <div className="space-y-2">
@@ -101,7 +121,11 @@ export function RegisterForm() {
             required
             minLength={8}
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            error={fieldErrors.password}
+            onChange={(e) => {
+              setPassword(e.target.value)
+              setFieldErrors((prev) => ({ ...prev, password: undefined }))
+            }}
           />
           <PasswordStrength password={password} />
         </div>

@@ -9,6 +9,7 @@ import concernSensitive from '../../assets/landing/image2_47_362.png'
 import concernDrought from '../../assets/landing/image3_47_362.png'
 import concernWrinkles from '../../assets/landing/image4_47_362.png'
 import concernFineLines from '../../assets/landing/image5_47_362.png'
+import { categoryBrowsePath } from '../../utils/categoryBrowseParams'
 
 export interface ShopHeroSlide {
   id: string
@@ -26,20 +27,30 @@ export interface ShopCategory {
 }
 
 export const shopCategories: ShopCategory[] = [
-  { id: 'skin-care', name: 'Skin Care', image: concernSensitive, href: '/shop?category=skin-care' },
-  { id: 'hair-care', name: 'Hair Care', image: ctaProduct4, href: '/shop?category=hair-care' },
-  { id: 'body-care', name: 'Body Care', image: concernDrought, href: '/shop?category=body-care' },
-  { id: 'face-treatments', name: 'Face Treatments', image: ctaProduct3, href: '/shop?category=face-treatments' },
-  { id: 'sun-protection', name: 'Sun Protection', image: ctaProduct1, href: '/shop?category=sun-protection' },
-  { id: 'anti-aging', name: 'Anti-Aging', image: concernWrinkles, href: '/shop?category=anti-aging' },
-  { id: 'acne', name: 'Acne Solutions', image: concernAcne, href: '/shop?category=acne' },
+  { id: 'skin-care', name: 'Skin Care', image: concernSensitive, href: categoryBrowsePath('skin-care') },
+  { id: 'hair-care', name: 'Hair Care', image: ctaProduct4, href: categoryBrowsePath('hair-care') },
+  { id: 'body-care', name: 'Body Care', image: concernDrought, href: categoryBrowsePath('body-care') },
+  {
+    id: 'face-treatments',
+    name: 'Face Treatments',
+    image: ctaProduct3,
+    href: categoryBrowsePath('face-treatments'),
+  },
+  {
+    id: 'sun-protection',
+    name: 'Sun Protection',
+    image: ctaProduct1,
+    href: categoryBrowsePath('sun-protection'),
+  },
+  { id: 'anti-aging', name: 'Anti-Aging', image: concernWrinkles, href: categoryBrowsePath('anti-aging') },
+  { id: 'acne', name: 'Acne Solutions', image: concernAcne, href: categoryBrowsePath('acne') },
   {
     id: 'pigmentation',
     name: 'Pigmentation & Brightening',
     image: concernPigmentation,
-    href: '/shop?category=pigmentation',
+    href: categoryBrowsePath('pigmentation'),
   },
-  { id: 'sensitive', name: 'Sensitive Skin', image: concernSensitive, href: '/shop?category=sensitive' },
-  { id: 'mens', name: "Men's Care", image: concernFineLines, href: '/shop?category=mens' },
-  { id: 'womens', name: "Women's Care", image: ctaProduct2, href: '/shop?category=womens' },
+  { id: 'sensitive', name: 'Sensitive Skin', image: concernSensitive, href: categoryBrowsePath('sensitive') },
+  { id: 'mens', name: "Men's Care", image: concernFineLines, href: categoryBrowsePath('mens') },
+  { id: 'womens', name: "Women's Care", image: ctaProduct2, href: categoryBrowsePath('womens') },
 ]

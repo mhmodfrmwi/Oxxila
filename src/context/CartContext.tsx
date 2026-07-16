@@ -1,5 +1,14 @@
 // src/context/CartContext.tsx
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import {
   addToCart as addToCartRequest,
   applyCoupon as applyCouponRequest,
@@ -17,6 +26,7 @@ interface CartContextValue {
   cart: ApiCart | null
   itemCount: number
   loading: boolean
+  loadError: string | null
   updatingItemId: string | null
   couponLoading: boolean
   addToCart: (productId: string, quantity?: number) => Promise<void>
@@ -29,49 +39,82 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | null>(null)
 
+function resolveLoadError(error: unknown): string {
+  if (error instanceof ApiError) return error.message
+  return 'Unable to load cart. Please try again.'
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
+  const userId = user?.id ?? null
   const toast = useToast()
   const [cart, setCart] = useState<ApiCart | null>(null)
   const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [updatingItemId, setUpdatingItemId] = useState<string | null>(null)
   const [couponLoading, setCouponLoading] = useState(false)
+  const updatingItemIdRef = useRef<string | null>(null)
+
+  const clearCartState = useCallback(() => {
+    setCart(null)
+    setLoadError(null)
+    setUpdatingItemId(null)
+    updatingItemIdRef.current = null
+    setCouponLoading(false)
+  }, [])
 
   const refreshCart = useCallback(async () => {
     if (!isAuthenticated) {
-      setCart(null)
+      clearCartState()
+      setLoading(false)
       return
     }
 
     setLoading(true)
+    setLoadError(null)
     try {
       const response = await getCart()
       setCart(response.data ?? null)
+      setLoadError(null)
     } catch (error) {
       if (error instanceof ApiError && error.statusCode === 401) {
+        clearCartState()
+      } else {
         setCart(null)
+        setLoadError(resolveLoadError(error))
       }
     } finally {
       setLoading(false)
     }
-  }, [isAuthenticated])
+  }, [clearCartState, isAuthenticated])
 
   useEffect(() => {
-    if (!isAuthenticated) return
+    if (!isAuthenticated || !userId) {
+      clearCartState()
+      setLoading(false)
+      return
+    }
+
+    // Never show a previous user's cart while the next session loads.
+    clearCartState()
+    setLoading(true)
 
     let cancelled = false
 
     async function load() {
-      await Promise.resolve()
-      if (cancelled) return
-
-      setLoading(true)
+      setLoadError(null)
       try {
         const response = await getCart()
-        if (!cancelled) setCart(response.data ?? null)
+        if (cancelled) return
+        setCart(response.data ?? null)
+        setLoadError(null)
       } catch (error) {
-        if (!cancelled && error instanceof ApiError && error.statusCode === 401) {
+        if (cancelled) return
+        if (error instanceof ApiError && error.statusCode === 401) {
+          clearCartState()
+        } else {
           setCart(null)
+          setLoadError(resolveLoadError(error))
         }
       } finally {
         if (!cancelled) setLoading(false)
@@ -83,7 +126,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [isAuthenticated])
+  }, [clearCartState, isAuthenticated, userId])
 
   const addToCart = useCallback(async (productId: string, quantity = 1) => {
     try {
@@ -92,6 +135,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         throw new ApiError('Cart was not updated. Please try again.')
       }
       setCart(response.data)
+      setLoadError(null)
       toast.success('Added to cart')
     } catch (error) {
       toast.error(
@@ -103,6 +147,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [toast])
 
   const updateCartItem = useCallback(async (itemId: string, quantity: number) => {
+    if (updatingItemIdRef.current === itemId) return
+
+    updatingItemIdRef.current = itemId
     setUpdatingItemId(itemId)
     try {
       const response = await updateCartItemRequest(itemId, quantity)
@@ -115,11 +162,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
       )
       throw error
     } finally {
-      setUpdatingItemId(null)
+      if (updatingItemIdRef.current === itemId) {
+        updatingItemIdRef.current = null
+        setUpdatingItemId(null)
+      }
     }
   }, [toast])
 
   const removeCartItem = useCallback(async (itemId: string) => {
+    if (updatingItemIdRef.current === itemId) return
+
+    updatingItemIdRef.current = itemId
     setUpdatingItemId(itemId)
     try {
       const response = await removeCartItemRequest(itemId)
@@ -132,7 +185,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       )
       throw error
     } finally {
-      setUpdatingItemId(null)
+      if (updatingItemIdRef.current === itemId) {
+        updatingItemIdRef.current = null
+        setUpdatingItemId(null)
+      }
     }
   }, [toast])
 
@@ -172,6 +228,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const resolvedCart = isAuthenticated ? cart : null
   const resolvedLoading = isAuthenticated ? loading : false
+  const resolvedLoadError = isAuthenticated ? loadError : null
 
   const itemCount = useMemo(
     () => resolvedCart?.items.reduce((total, item) => total + item.quantity, 0) ?? 0,
@@ -183,6 +240,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       cart: resolvedCart,
       itemCount,
       loading: resolvedLoading,
+      loadError: resolvedLoadError,
       updatingItemId,
       couponLoading,
       addToCart,
@@ -196,6 +254,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       resolvedCart,
       itemCount,
       resolvedLoading,
+      resolvedLoadError,
       updatingItemId,
       couponLoading,
       addToCart,

@@ -13,6 +13,14 @@ import { CartTrustBadges } from './CartTrustBadges'
 
 interface OrderSummaryCardProps {
   cart: ApiCart
+  /** When set, shows a Shipping row. Does not alter cart fields. */
+  shippingPrice?: number | null
+  /**
+   * Payable total to display. Defaults to `cart.totalPrice`.
+   * Callers pass a value already available on the frontend (e.g. order.totalPrice,
+   * or cart.totalPrice + resolved shipping) — never invent a different formula here.
+   */
+  totalPrice?: number
   couponLoading?: boolean
   checkoutDisabled?: boolean
   onApplyCoupon: (code: string) => Promise<void>
@@ -77,6 +85,8 @@ function OrderReviewItem({ item }: { item: ApiCartItem }) {
 
 export function OrderSummaryCard({
   cart,
+  shippingPrice,
+  totalPrice,
   couponLoading,
   checkoutDisabled,
   onApplyCoupon,
@@ -109,11 +119,13 @@ export function OrderSummaryCard({
   const resolvedShowPromo = showPromo ?? (!isReview && !isConfirmation)
   const showLineItems = isReview || isConfirmation
   const showCheckoutButton = showCta ?? !isConfirmation
+  const showShipping = typeof shippingPrice === 'number'
 
-  // Pricing pipeline (extensible): subtotal → − return credit → (+ shipping / tax later) → total
+  // Display backend/cart values as provided; optional totalPrice is caller-supplied.
   const subtotal = cart.subtotal
+  const discountAmount = cart.discountAmount ?? 0
   const returnCredit = cart.storeCreditApplied ?? 0
-  const total = Math.max(0, subtotal - returnCredit)
+  const total = totalPrice ?? cart.totalPrice
 
   async function handleApplyCoupon() {
     const code = promoDraft.trim()
@@ -176,15 +188,30 @@ export function OrderSummaryCard({
           label={t('cart.summary.subtotal')}
           value={formatCartPrice(subtotal)}
         />
-        <SummaryRow
-          label={t('cart.summary.returnCredit')}
-          value={
-            returnCredit > 0
-              ? `-${formatCartPrice(returnCredit)}`
-              : formatCartPrice(0)
-          }
-          valueClassName={returnCredit > 0 ? 'text-support-success' : undefined}
-        />
+        {discountAmount > 0 && (
+          <SummaryRow
+            label={t('cart.summary.discount')}
+            value={`-${formatCartPrice(discountAmount)}`}
+            valueClassName="text-support-success"
+          />
+        )}
+        {returnCredit > 0 && (
+          <SummaryRow
+            label={t('cart.summary.returnCredit')}
+            value={`-${formatCartPrice(returnCredit)}`}
+            valueClassName="text-support-success"
+          />
+        )}
+        {showShipping && (
+          <SummaryRow
+            label={t('cart.summary.shipping')}
+            value={
+              shippingPrice > 0
+                ? formatCartPrice(shippingPrice)
+                : t('cart.summary.free')
+            }
+          />
+        )}
       </div>
 
       {resolvedShowPromo && (

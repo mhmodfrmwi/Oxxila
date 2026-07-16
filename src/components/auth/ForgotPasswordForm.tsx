@@ -1,8 +1,14 @@
+// src/components/auth/ForgotPasswordForm.tsx
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { forgotPassword } from '../../api/auth'
 import { ApiError } from '../../lib/api'
+import {
+  hasFieldErrors,
+  validateForgotPasswordFields,
+  type ForgotPasswordFieldErrors,
+} from '../../utils/authValidation'
 import { Button } from '../ui/Button'
 import { Heading } from '../ui/Heading'
 import { InputField } from '../ui/InputField'
@@ -13,6 +19,7 @@ export function ForgotPasswordForm() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<ForgotPasswordFieldErrors>({})
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -21,6 +28,10 @@ export function ForgotPasswordForm() {
 
     const formData = new FormData(event.currentTarget)
     const email = String(formData.get('email') ?? '').trim()
+
+    const nextFieldErrors = validateForgotPasswordFields(email, t)
+    setFieldErrors(nextFieldErrors)
+    if (hasFieldErrors(nextFieldErrors)) return
 
     setLoading(true)
 
@@ -57,6 +68,8 @@ export function ForgotPasswordForm() {
           autoComplete="email"
           placeholder={t('auth.fields.emailPlaceholder')}
           required
+          error={fieldErrors.email}
+          onChange={() => setFieldErrors((prev) => ({ ...prev, email: undefined }))}
         />
 
         <Button type="submit" fullWidth pill className="h-14" disabled={loading}>

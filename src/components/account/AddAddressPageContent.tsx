@@ -51,6 +51,7 @@ export function AddAddressPageContent() {
     deletingId,
     submitError,
     submitSuccess,
+    zonesError,
     updateField,
     handleSave,
     handleDelete,
@@ -116,6 +117,11 @@ export function AddAddressPageContent() {
             {submitError && (
               <div className="mb-4">
                 <FormMessage message={submitError} />
+              </div>
+            )}
+            {!submitError && zonesError && (
+              <div className="mb-4">
+                <FormMessage message={zonesError} />
               </div>
             )}
             {submitSuccess && (

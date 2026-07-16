@@ -21,7 +21,7 @@ export type WishlistProduct = Pick<
       | 'subCategory'
       | 'ratingsAverage'
       | 'ratingsQuantity'
-      | 'sold'
+      | 'soldCount'
       | 'isBestSeller'
       | 'description'
     >

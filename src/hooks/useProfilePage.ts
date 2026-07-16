@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
+import { getAvatarFileValidationKey, normalizeAvatarUrl } from '../utils/userAvatar'
 import { joinFullName, profileToAuthUser, splitFullName } from '../utils/userProfile'
 
 export interface ProfileFormState {
@@ -83,6 +84,7 @@ export function useProfilePage() {
   const [submitting, setSubmitting] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [loadError, setLoadError] = useState('')
+  const [avatarError, setAvatarError] = useState('')
 
   const applyProfile = useCallback(
     (profile: {
@@ -104,6 +106,25 @@ export function useProfilePage() {
       })
       setAvatar(profile.avatar ?? '')
       setUser(profileToAuthUser(profile, userRef.current))
+    },
+    [setUser],
+  )
+
+  /** Avatar-only sync — never overwrite unsaved form fields. */
+  const applyAvatarOnly = useCallback(
+    (nextAvatar: string | undefined) => {
+      const resolved = normalizeAvatarUrl(nextAvatar) ?? ''
+      setAvatar(resolved)
+      setAvatarError('')
+
+      const previous = userRef.current
+      if (!previous) return
+
+      setUser({
+        ...previous,
+        avatar: resolved || undefined,
+        provisionalAvatar: undefined,
+      })
     },
     [setUser],
   )
@@ -173,19 +194,29 @@ export function useProfilePage() {
   async function handleAvatarChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     event.target.value = ''
-    if (!file) return
+    if (!file || submitting || uploadingAvatar) return
 
+    const validationKey = getAvatarFileValidationKey(file)
+    if (validationKey) {
+      const message = t(validationKey)
+      setAvatarError(message)
+      toast.error(t('profile.avatarUpdateFailed'), message)
+      return
+    }
+
+    setAvatarError('')
     setUploadingAvatar(true)
 
     try {
       const response = await uploadUserAvatar(file)
       if (response.data) {
-        applyProfile(response.data)
+        applyAvatarOnly(response.data.avatar)
         toast.success(t('profile.avatarUpdated'))
       }
     } catch (err) {
       const message =
         err instanceof ApiError ? err.message : t('profile.avatarUpdateFailed')
+      setAvatarError(message)
       toast.error(t('profile.avatarUpdateFailed'), message)
     } finally {
       setUploadingAvatar(false)
@@ -238,6 +269,7 @@ export function useProfilePage() {
     form,
     errors,
     avatar,
+    avatarError,
     loading,
     submitting,
     uploadingAvatar,

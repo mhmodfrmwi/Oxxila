@@ -1,5 +1,5 @@
 // src/components/category/CategoryPageContent.tsx
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CATEGORIES_PATH, HOME_PATH } from '../../config/routes'
 import { useBrowsingHistory } from '../../hooks/useBrowsingHistory'
@@ -7,8 +7,10 @@ import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import { useLandingCatalogContext } from '../../hooks/useLandingCatalogContext'
 import { useSubCategories } from '../../hooks/useSubCategories'
 import {
+  buildCategoryBrowseSearchParams,
   getCollectionTitle,
   parseCategoryBrowseParams,
+  type CategoryBrowseState,
 } from '../../utils/categoryBrowseParams'
 import { collectSubcategoriesFromCategories } from '../../utils/catalogSubcategories'
 import { Breadcrumb } from '../ui/Breadcrumb'
@@ -31,48 +33,26 @@ import { FilterSidebar } from './filters/FilterSidebar'
 
 export function CategoryPageContent() {
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const browseKey = searchParams.toString()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { categories, brands, loading: catalogLoading } = useLandingCatalogContext()
 
-  const [filters, setFilters] = useState<FilterState>(() =>
-    parseCategoryBrowseParams(searchParams).filters,
+  const browse = useMemo(
+    () => parseCategoryBrowseParams(searchParams),
+    [searchParams],
   )
-  const [sort, setSort] = useState<SortOption>(
-    () => parseCategoryBrowseParams(searchParams).sort,
-  )
-  const [categorySlug, setCategorySlug] = useState<string | null>(
-    () => parseCategoryBrowseParams(searchParams).categorySlug,
-  )
-  const [certifiedOnly, setCertifiedOnly] = useState(
-    () => parseCategoryBrowseParams(searchParams).certifiedOnly,
-  )
-  const [collection, setCollection] = useState(
-    () => parseCategoryBrowseParams(searchParams).collection,
-  )
-  const [page, setPage] = useState(1)
 
-  useEffect(() => {
-    let cancelled = false
+  const {
+    filters,
+    sort,
+    categorySlug,
+    certifiedOnly,
+    collection,
+    page,
+  } = browse
 
-    async function applyBrowseParams() {
-      await Promise.resolve()
-      if (cancelled) return
-
-      const parsed = parseCategoryBrowseParams(searchParams)
-      setFilters(parsed.filters)
-      setSort(parsed.sort)
-      setCategorySlug(parsed.categorySlug)
-      setCertifiedOnly(parsed.certifiedOnly)
-      setCollection(parsed.collection)
-      setPage(1)
-    }
-
-    void applyBrowseParams()
-    return () => {
-      cancelled = true
-    }
-  }, [browseKey, searchParams])
+  function commitBrowse(next: CategoryBrowseState) {
+    setSearchParams(buildCategoryBrowseSearchParams(next), { replace: false })
+  }
 
   const selectedCategory = useMemo(
     () => (categorySlug ? findCategoryBySlug(categories, categorySlug) : undefined),
@@ -136,9 +116,24 @@ export function CategoryPageContent() {
   const totalResults = pagination?.totalDocuments ?? products.length
 
   const handleFiltersChange = (patch: Partial<FilterState>) => {
-    setFilters((previous) => ({ ...previous, ...patch }))
-    setCollection(null)
-    setPage(1)
+    const nextFilters = { ...filters, ...patch }
+    let nextSort = sort
+
+    // Keep toolbar sort aligned when the price filter drives API sort.
+    if (patch.priceSort === 'low-to-high') nextSort = 'price-asc'
+    if (patch.priceSort === 'high-to-low') nextSort = 'price-desc'
+    if (patch.priceSort === 'all' && (sort === 'price-asc' || sort === 'price-desc')) {
+      nextSort = 'featured'
+    }
+
+    commitBrowse({
+      filters: nextFilters,
+      sort: nextSort,
+      categorySlug,
+      certifiedOnly,
+      collection: null,
+      page: 1,
+    })
   }
 
   const handleFiltersReset = () => {
@@ -146,19 +141,25 @@ export function CategoryPageContent() {
   }
 
   const handleSortChange = (nextSort: SortOption) => {
-    setSort(nextSort)
-    setCollection(null)
-    setPage(1)
+    commitBrowse({
+      filters: {
+        ...filters,
+        // Clear price-filter sort so toolbar sort is authoritative.
+        priceSort: 'all',
+      },
+      sort: nextSort,
+      categorySlug,
+      certifiedOnly,
+      collection: null,
+      page: 1,
+    })
   }
 
-  if (!catalogLoading && categories.length === 0) {
-    return (
-      <div className="container-content py-12">
-        <p className="text-center text-sm text-secondary-text" role="status">
-          No categories available.
-        </p>
-      </div>
-    )
+  const handlePageChange = (nextPage: number) => {
+    commitBrowse({
+      ...browse,
+      page: nextPage,
+    })
   }
 
   if (waitingForCategory) {
@@ -234,7 +235,7 @@ export function CategoryPageContent() {
             <Pagination
               currentPage={safePage}
               totalPages={totalPages}
-              onPageChange={setPage}
+              onPageChange={handlePageChange}
               className="pt-2"
             />
           </div>

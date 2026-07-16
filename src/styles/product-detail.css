@@ -230,6 +230,11 @@
   color: var(--support-success);
 }
 
+.product-detail-stock-badge--out-of-stock {
+  color: var(--support-error);
+  background-color: color-mix(in srgb, var(--support-error) 10%, var(--surface-subtle));
+}
+
 .product-detail-stock-badge svg {
   flex-shrink: 0;
 }

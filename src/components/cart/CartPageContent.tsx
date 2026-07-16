@@ -15,6 +15,8 @@ import { ContentSection } from '../layout/ContentSection'
 import { Footer } from '../landing/footer/Footer'
 import { SectionHeader } from '../landing/SectionHeader'
 import { ProductCarousel } from '../shop/recommended/ProductCarousel'
+import { FormMessage } from '../auth/FormMessage'
+import { Button } from '../ui/Button'
 import { CartEmptyState } from './CartEmptyState'
 import { CartItemRow } from './CartItemRow'
 import { CartPageSkeleton } from './CartPageSkeleton'
@@ -29,12 +31,14 @@ export function CartPageContent() {
     cart,
     itemCount,
     loading,
+    loadError,
     updatingItemId,
     couponLoading,
     updateCartItem,
     removeCartItem,
     applyCoupon,
     removeCoupon,
+    refreshCart,
   } = useCart()
   const { primaryAddress, loading: addressLoading } = useCartAddresses()
   const { products: browsingProducts, loading: browsingLoading } = useBrowsingHistory(6)
@@ -92,6 +96,18 @@ export function CartPageContent() {
 
         {loading && !cart ? (
           <CartPageSkeleton />
+        ) : loadError && !cart ? (
+          <div className="space-y-4" role="alert">
+            <header className="mb-5 sm:mb-6">
+              <Heading variant="page" className="mb-2">
+                {t('cart.title')}
+              </Heading>
+            </header>
+            <FormMessage message={loadError || t('cart.loadError')} />
+            <Button type="button" variant="outline" onClick={() => void refreshCart()}>
+              {t('cart.retry')}
+            </Button>
+          </div>
         ) : (
           <>
             <header className="mb-5 sm:mb-6">

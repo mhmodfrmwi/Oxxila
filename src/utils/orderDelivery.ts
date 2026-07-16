@@ -1,5 +1,6 @@
 // src/utils/orderDelivery.ts
 import type { ApiOrder } from '../types/order'
+import i18n from '../i18n'
 
 export const ESTIMATED_DELIVERY_BUSINESS_DAYS = {
   min: 3,
@@ -39,7 +40,10 @@ export function calculateEstimatedDelivery(order: ApiOrder): EstimatedDeliveryWi
 
 export function formatEstimatedDeliveryRange(order: ApiOrder): string {
   const { businessDays } = calculateEstimatedDelivery(order)
-  return `${businessDays.min}-${businessDays.max} business days`
+  return i18n.t('checkout.delivery.businessDaysRange', {
+    min: businessDays.min,
+    max: businessDays.max,
+  })
 }
 
 export function formatEstimatedDeliveryArrival(order: ApiOrder): string {

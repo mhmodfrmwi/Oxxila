@@ -1,5 +1,6 @@
 import { BrowserRouter } from 'react-router-dom'
 import { OAuthCallbackHandler } from './components/auth/OAuthCallbackHandler'
+import { HashScrollHandler } from './components/routing/HashScrollHandler'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
 import { LandingCatalogProvider } from './context/LandingCatalogContext'
@@ -12,6 +13,7 @@ import './index.css'
 export function AppRoot() {
   return (
     <BrowserRouter>
+      <HashScrollHandler />
       <ThemeProvider>
         <ToastProvider>
           <AuthProvider>

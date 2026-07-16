@@ -77,6 +77,7 @@ export function CartItemRow({
             min={1}
             max={maxQuantity}
             onChange={onQuantityChange}
+            disabled={disabled}
             className="cart-item-qty"
           />
           <p className="cart-item-line-total">

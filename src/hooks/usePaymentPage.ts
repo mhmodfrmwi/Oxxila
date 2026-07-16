@@ -1,5 +1,5 @@
 // src/hooks/usePaymentPage.ts
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createCodOrder, createPaymentSession } from '../api/orders'
 import {
@@ -11,6 +11,7 @@ import {
   getShippingCountries,
   getShippingGovernorates,
   getShippingZones,
+  resolveShippingPrice,
   type ShippingDistrict,
   type ShippingGovernorate,
 } from '../api/shipping'
@@ -78,15 +79,32 @@ function resolveProvider(method: PaymentMethodId): 'stripe' | 'paymob' | 'cod' {
   return 'stripe'
 }
 
+function resolveDistrictIdForShipping(address: {
+  isOther: boolean
+  district: { id: string } | null
+}): string {
+  if (address.isOther || !address.district?.id) return 'other'
+  return address.district.id
+}
+
 export function usePaymentPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const toast = useToast()
-  const { cart, loading: cartLoading, couponLoading, applyCoupon, removeCoupon } = useCart()
+  const {
+    cart,
+    loading: cartLoading,
+    loadError: cartLoadError,
+    couponLoading,
+    applyCoupon,
+    removeCoupon,
+    refreshCart,
+  } = useCart()
   const {
     addresses,
     loading: addressLoading,
+    loadError: addressLoadError,
     selectedAddressId,
     setSelectedAddressId,
     selectedAddress,
@@ -99,6 +117,7 @@ export function usePaymentPage() {
   const [districts, setDistricts] = useState<ShippingDistrict[]>([])
   const [hasDistricts, setHasDistricts] = useState(true)
   const [zonesLoading, setZonesLoading] = useState(false)
+  const [zonesError, setZonesError] = useState<string | null>(null)
   const [showNewAddressForm, setShowNewAddressForm] = useState(false)
   const [newAddressForm, setNewAddressForm] = useState<NewAddressFormState>(emptyNewAddressForm)
   const [newAddressErrors, setNewAddressErrors] = useState<NewAddressFormErrors>({})
@@ -107,6 +126,9 @@ export function usePaymentPage() {
   const [pageLoading, setPageLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [shippingPrice, setShippingPrice] = useState<number | null>(null)
+  const [shippingLoading, setShippingLoading] = useState(false)
+  const submittingRef = useRef(false)
 
   useEffect(() => {
     if (!isAuthenticated) return
@@ -151,6 +173,38 @@ export function usePaymentPage() {
     }
   }, [isAuthenticated])
 
+  useEffect(() => {
+    if (!selectedAddress) {
+      setShippingPrice(null)
+      setShippingLoading(false)
+      return
+    }
+
+    let cancelled = false
+    const governorateId = selectedAddress.governorate.id
+    const districtId = resolveDistrictIdForShipping(selectedAddress)
+
+    async function loadShipping() {
+      setShippingLoading(true)
+      try {
+        const response = await resolveShippingPrice(governorateId, districtId)
+        if (cancelled) return
+        const price = response.data?.shippingPrice
+        setShippingPrice(typeof price === 'number' ? price : null)
+      } catch {
+        if (!cancelled) setShippingPrice(null)
+      } finally {
+        if (!cancelled) setShippingLoading(false)
+      }
+    }
+
+    void loadShipping()
+
+    return () => {
+      cancelled = true
+    }
+  }, [selectedAddress])
+
   function selectAddress(addressId: string) {
     setSelectedAddressId(addressId)
     setShowNewAddressForm(false)
@@ -181,6 +235,7 @@ export function usePaymentPage() {
     if (key === 'governorateId') {
       setDistricts([])
       setHasDistricts(true)
+      setZonesError(null)
     }
     setNewAddressErrors((current) => ({ ...current, [key]: undefined }))
     setSubmitError(null)
@@ -196,6 +251,7 @@ export function usePaymentPage() {
       if (cancelled) return
 
       setZonesLoading(true)
+      setZonesError(null)
       try {
         const response = await getShippingZones(newAddressForm.governorateId)
         if (cancelled) return
@@ -203,6 +259,7 @@ export function usePaymentPage() {
         const data = response.data
         setHasDistricts(data?.hasDistricts ?? true)
         setDistricts(data?.districts ?? [])
+        setZonesError(null)
 
         if (data && !data.hasDistricts) {
           setNewAddressForm((current) =>
@@ -211,8 +268,19 @@ export function usePaymentPage() {
               : { ...current, districtId: 'other' },
           )
         }
-      } catch {
-        if (!cancelled) setDistricts([])
+      } catch (error) {
+        if (!cancelled) {
+          setDistricts([])
+          setHasDistricts(true)
+          setNewAddressForm((current) =>
+            current.districtId ? { ...current, districtId: '' } : current,
+          )
+          setZonesError(
+            error instanceof ApiError
+              ? error.message
+              : t('checkout.address.zonesLoadFailed'),
+          )
+        }
       } finally {
         if (!cancelled) setZonesLoading(false)
       }
@@ -223,9 +291,15 @@ export function usePaymentPage() {
     return () => {
       cancelled = true
     }
-  }, [showNewAddressForm, newAddressForm.governorateId])
+  }, [showNewAddressForm, newAddressForm.governorateId, t])
 
   async function handleCreateAddress() {
+    if (zonesError) {
+      setSubmitError(zonesError)
+      toast.error(t('checkout.payment.paymentFailed'), zonesError)
+      return
+    }
+
     const validation = validateNewAddressForm(newAddressForm, hasDistricts, t)
     if (Object.keys(validation).length > 0) {
       setNewAddressErrors(validation)
@@ -268,6 +342,8 @@ export function usePaymentPage() {
   }
 
   async function handlePayNow() {
+    if (submittingRef.current) return
+
     setSubmitError(null)
 
     if (!selectedAddressId) {
@@ -280,6 +356,7 @@ export function usePaymentPage() {
 
     const provider = resolveProvider(paymentMethod)
 
+    submittingRef.current = true
     setSubmitting(true)
     try {
       if (provider === 'cod') {
@@ -316,6 +393,7 @@ export function usePaymentPage() {
       setSubmitError(message)
       toast.error(t('checkout.payment.paymentFailed'), message)
     } finally {
+      submittingRef.current = false
       setSubmitting(false)
     }
   }
@@ -324,11 +402,21 @@ export function usePaymentPage() {
     navigate(CART_PATH)
   }
 
+  async function retryAddresses() {
+    try {
+      await refreshAddresses()
+    } catch {
+      // loadError is set inside refreshAddresses
+    }
+  }
+
   return {
     isAuthenticated,
     loginPath: LOGIN_PATH,
     cart,
     cartLoading,
+    cartLoadError,
+    refreshCart,
     couponLoading,
     applyCoupon,
     removeCoupon,
@@ -338,6 +426,8 @@ export function usePaymentPage() {
     selectedAddress,
     primaryAddress,
     addressLoading,
+    addressLoadError,
+    retryAddresses,
     selectAddress,
     showNewAddressForm,
     openNewAddressForm,
@@ -350,6 +440,9 @@ export function usePaymentPage() {
     districts,
     hasDistricts,
     zonesLoading,
+    zonesError,
+    shippingPrice,
+    shippingLoading,
     paymentMethod,
     setPaymentMethod,
     pageLoading,

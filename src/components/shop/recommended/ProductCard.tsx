@@ -48,7 +48,7 @@ export function ProductCard({
 
   const isGrid = layout === 'grid'
   const isWishlist = variant === 'wishlist'
-  const outOfStock = isWishlist && product.stock != null && product.stock <= 0
+  const outOfStock = product.stock != null && product.stock <= 0
   const showWishlistRating = rating > 0 || reviewCount > 0
 
   return (
@@ -60,144 +60,154 @@ export function ProductCard({
         className,
       )}
     >
-      <Link to={href} className={cn('block', focusRingClasses)}>
-        <div
-          className={cn(
-            'product-card-frame relative overflow-hidden',
-            isWishlist
-              ? 'wishlist-product-frame'
-              : cn(
-                  'rounded-[20px] border border-border-subtle',
-                  'shadow-sm shadow-black/[0.04] transition-[transform,box-shadow] duration-500 ease-out',
-                  'dark:shadow-none',
-                  '[@media(hover:hover)]:group-hover/card:-translate-y-1',
-                  '[@media(hover:hover)]:group-hover/card:shadow-lg [@media(hover:hover)]:group-hover/card:shadow-black/10',
-                  'dark:[@media(hover:hover)]:group-hover/card:shadow-black/30',
-                ),
-          )}
+      <div className="relative">
+        <Link
+          to={href}
+          className={cn('block', focusRingClasses)}
+          aria-label={brand ? `${brand} ${title}` : title}
         >
-          {badge && (
-            <span className={cn('absolute z-10', isWishlist ? 'start-2.5 top-2.5' : 'start-3 top-3')}>
-              {isWishlist ? (
-                <span className="wishlist-product-badge">{badge}</span>
-              ) : (
-                <ProductBadge>{badge}</ProductBadge>
-              )}
-            </span>
-          )}
-
           <div
             className={cn(
-              'w-full overflow-hidden',
+              'product-card-frame relative overflow-hidden',
               isWishlist
-                ? 'wishlist-product-image'
-                : isGrid
-                  ? 'aspect-square'
-                  : carouselImageHeightClasses,
+                ? 'wishlist-product-frame'
+                : cn(
+                    'rounded-[20px] border border-border-subtle',
+                    'shadow-sm shadow-black/[0.04] transition-[transform,box-shadow] duration-500 ease-out',
+                    'dark:shadow-none',
+                    '[@media(hover:hover)]:group-hover/card:-translate-y-1',
+                    '[@media(hover:hover)]:group-hover/card:shadow-lg [@media(hover:hover)]:group-hover/card:shadow-black/10',
+                    'dark:[@media(hover:hover)]:group-hover/card:shadow-black/30',
+                  ),
             )}
           >
-            <img
-              src={imageSrc}
-              alt={imageAlt}
+            {badge && (
+              <span className={cn('absolute z-10', isWishlist ? 'start-2.5 top-2.5' : 'start-3 top-3')}>
+                {isWishlist ? (
+                  <span className="wishlist-product-badge">{badge}</span>
+                ) : (
+                  <ProductBadge>{badge}</ProductBadge>
+                )}
+              </span>
+            )}
+
+            <div
               className={cn(
+                'w-full overflow-hidden',
                 isWishlist
-                  ? 'transition-transform duration-500 ease-out group-hover/card:scale-[1.03]'
-                  : 'h-full w-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-[1.04]',
+                  ? 'wishlist-product-image'
+                  : isGrid
+                    ? 'aspect-square'
+                    : carouselImageHeightClasses,
               )}
-              loading="lazy"
-              draggable={false}
-              onError={() => {
-                if (failedImageUrl !== image) {
-                  setFailedImageUrl(image)
-                }
-              }}
-            />
+            >
+              <img
+                src={imageSrc}
+                alt={imageAlt}
+                className={cn(
+                  isWishlist
+                    ? 'transition-transform duration-500 ease-out group-hover/card:scale-[1.03]'
+                    : 'h-full w-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-[1.04]',
+                )}
+                loading="lazy"
+                draggable={false}
+                onError={() => {
+                  if (failedImageUrl !== image) {
+                    setFailedImageUrl(image)
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </Link>
+
+        <IconActionButton
+          icon={Heart}
+          label={
+            wishlisted
+              ? t('wishlist.removeFromWishlist')
+              : t('shop.product.addToWishlist')
+          }
+          filled={wishlisted}
+          disabled={wishlistPending}
+          size={isWishlist ? 'sm' : 'md'}
+          onClick={(event) => {
+            void handleWishlistToggle(event)
+          }}
+          className={cn(
+            'absolute z-10',
+            isWishlist ? 'wishlist-action-btn bottom-2.5 start-2.5' : 'bottom-3 start-3',
+          )}
+        />
+
+        <IconActionButton
+          icon={ShoppingBag}
+          label={outOfStock ? t('wishlist.outOfStock') : t('actions.addToCart')}
+          onClick={(event) => {
+            void handleAddToCart(event)
+          }}
+          disabled={addingToCart || outOfStock}
+          size={isWishlist ? 'sm' : 'md'}
+          className={cn(
+            'absolute z-10',
+            isWishlist ? 'wishlist-action-btn end-2.5 bottom-2.5' : 'end-3 bottom-3',
+          )}
+        />
+      </div>
+
+      {isWishlist ? (
+        <div className="wishlist-product-info">
+          <h3 className="wishlist-product-title">
+            <Link to={href} className={cn('hover:underline', focusRingClasses)}>
+              {brand ? `${brand} ${title}` : title}
+            </Link>
+          </h3>
+
+          <div className="wishlist-product-prices">
+            <span className="wishlist-product-price">{formatProductPrice(price)}</span>
+            {originalPrice != null && (
+              <span className="wishlist-product-price-old">
+                {formatProductPrice(originalPrice)}
+              </span>
+            )}
           </div>
 
-          <IconActionButton
-            icon={Heart}
-            label={
-              wishlisted
-                ? t('wishlist.removeFromWishlist')
-                : t('shop.product.addToWishlist')
-            }
-            filled={wishlisted}
-            disabled={wishlistPending}
-            size={isWishlist ? 'sm' : 'md'}
-            onClick={(event) => {
-              void handleWishlistToggle(event)
-            }}
-            className={cn(
-              'absolute z-10',
-              isWishlist ? 'wishlist-action-btn bottom-2.5 start-2.5' : 'bottom-3 start-3',
-            )}
-          />
-
-          <IconActionButton
-            icon={ShoppingBag}
-            label={t('actions.addToCart')}
-            onClick={(event) => {
-              void handleAddToCart(event)
-            }}
-            disabled={addingToCart || outOfStock}
-            size={isWishlist ? 'sm' : 'md'}
-            className={cn(
-              'absolute z-10',
-              isWishlist ? 'wishlist-action-btn end-2.5 bottom-2.5' : 'end-3 bottom-3',
-            )}
-          />
+          <div className="wishlist-product-rating">
+            {showWishlistRating ? (
+              <ProductRating
+                rating={rating}
+                reviewCount={reviewCount}
+                variant="wishlist"
+                starSize={11}
+              />
+            ) : null}
+          </div>
         </div>
+      ) : (
+        <div className="mt-3 space-y-2">
+          <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-snug text-primary-text">
+            <Link to={href} className={cn('hover:underline', focusRingClasses)}>
+              <span className="font-semibold">{brand}</span>{' '}
+              <span className="font-normal">{title}</span>
+            </Link>
+          </h3>
 
-        {isWishlist ? (
-          <div className="wishlist-product-info">
-            <h3 className="wishlist-product-title">
-              {brand ? `${brand} ${title}` : title}
-            </h3>
-
-            <div className="wishlist-product-prices">
-              <span className="wishlist-product-price">{formatProductPrice(price)}</span>
+          <div className="flex items-end justify-between gap-2">
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <span className="text-base font-semibold text-primary-text">
+                {formatProductPrice(price)}
+              </span>
               {originalPrice != null && (
-                <span className="wishlist-product-price-old">
+                <span className="text-sm text-secondary-text line-through">
                   {formatProductPrice(originalPrice)}
                 </span>
               )}
             </div>
 
-            <div className="wishlist-product-rating">
-              {showWishlistRating ? (
-                <ProductRating
-                  rating={rating}
-                  reviewCount={reviewCount}
-                  variant="wishlist"
-                  starSize={11}
-                />
-              ) : null}
-            </div>
+            <ProductRating rating={rating} reviewCount={reviewCount} />
           </div>
-        ) : (
-          <div className="mt-3 space-y-2">
-            <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-snug text-primary-text">
-              <span className="font-semibold">{brand}</span>{' '}
-              <span className="font-normal">{title}</span>
-            </h3>
-
-            <div className="flex items-end justify-between gap-2">
-              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                <span className="text-base font-semibold text-primary-text">
-                  {formatProductPrice(price)}
-                </span>
-                {originalPrice != null && (
-                  <span className="text-sm text-secondary-text line-through">
-                    {formatProductPrice(originalPrice)}
-                  </span>
-                )}
-              </div>
-
-              <ProductRating rating={rating} reviewCount={reviewCount} />
-            </div>
-          </div>
-        )}
-      </Link>
+        </div>
+      )}
     </article>
   )
 }

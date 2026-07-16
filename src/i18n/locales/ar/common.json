@@ -59,6 +59,7 @@
     "subscribe": "اشترك",
     "subscribing": "جاري الاشتراك...",
     "subscribed": "تم الاشتراك",
+    "newsletterUnavailable": "الاشتراك في النشرة غير متاح مؤقتًا.",
     "policyLinks": {
       "about": "عن أوكسيلا",
       "quality": "وعد الجودة",
@@ -236,6 +237,7 @@
       "emailRequired": "البريد الإلكتروني مطلوب",
       "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
       "messageRequired": "الرسالة مطلوبة",
+      "unavailable": "إرسال الرسائل غير متاح مؤقتًا. يرجى التواصل عبر الهاتف أو البريد أدناه.",
       "call": "اتصال",
       "emailLabel": "البريد",
       "location": "الموقع"
@@ -429,6 +431,8 @@
     "itemCount_other": "{{count}} عناصر",
     "updateQuantityError": "تعذر تحديث الكمية",
     "removeItemError": "تعذر إزالة العنصر",
+    "loadError": "تعذر تحميل سلة التسوق. يرجى المحاولة مرة أخرى.",
+    "retry": "إعادة المحاولة",
     "selectItem": "تحديد {{name}}",
     "removeItem": "إزالة {{name}} من السلة",
     "freeDelivery": "توصيل مجاني على الطلبات المؤهلة",
@@ -523,6 +527,7 @@
       "fillRequired": "يرجى تعبئة جميع الحقول المطلوبة.",
       "unableToSave": "تعذر حفظ العنوان",
       "unableToDelete": "تعذر حذف العنوان",
+      "zonesLoadFailed": "تعذر تحميل المدن لهذه المحافظة. اختر المحافظة مرة أخرى للمحاولة مجددًا.",
       "toastUpdated": "تم تحديث العنوان",
       "toastAdded": "تمت إضافة العنوان",
       "toastDeleted": "تم حذف العنوان"
@@ -579,6 +584,10 @@
         "success": "النجاح",
         "failed": "الفشل"
       }
+    },
+    "delivery": {
+      "estimatedDelivery": "التوصيل المتوقع",
+      "businessDaysRange": "{{min}}–{{max}} أيام عمل"
     },
     "confirmation": {
       "ariaLabel": "تأكيد الطلب",
@@ -676,6 +685,18 @@
       "confirmPasswordPlaceholder": "أعد إدخال كلمة المرور",
       "showPassword": "إظهار كلمة المرور",
       "hidePassword": "إخفاء كلمة المرور"
+    },
+    "validation": {
+      "emailRequired": "البريد الإلكتروني مطلوب.",
+      "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا.",
+      "passwordRequired": "كلمة المرور مطلوبة.",
+      "passwordMinLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل.",
+      "nameRequired": "الاسم الكامل مطلوب.",
+      "nameMinLength": "يجب أن يكون الاسم حرفين على الأقل.",
+      "phoneRequired": "رقم الهاتف مطلوب."
+    },
+    "session": {
+      "expired": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى."
     },
     "forgot": {
       "title": "نسيت كلمة المرور؟",
@@ -780,6 +801,8 @@
     "updateFailed": "فشل التحديث",
     "avatarUpdated": "تم تحديث صورة الملف الشخصي",
     "avatarUpdateFailed": "تعذر تحديث صورة الملف الشخصي",
+    "avatarInvalidType": "استخدم صورة بصيغة JPEG أو PNG أو WebP.",
+    "avatarTooLarge": "يجب ألا يتجاوز حجم الصورة 2 ميجابايت.",
     "loadFailed": "تعذر تحميل ملفك الشخصي. يرجى المحاولة مرة أخرى.",
     "retry": "إعادة المحاولة",
     "invalidForm": "نموذج غير صالح",

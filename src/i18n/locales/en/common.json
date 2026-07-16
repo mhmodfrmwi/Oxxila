@@ -59,6 +59,7 @@
     "subscribe": "Subscribe",
     "subscribing": "Subscribing...",
     "subscribed": "Subscribed",
+    "newsletterUnavailable": "Newsletter signup is temporarily unavailable.",
     "policyLinks": {
       "about": "About Oxxila",
       "quality": "Our Quality Promise",
@@ -236,6 +237,7 @@
       "emailRequired": "Email is required",
       "emailInvalid": "Enter a valid email address",
       "messageRequired": "Message is required",
+      "unavailable": "Messaging is temporarily unavailable. Please reach us by phone or email below.",
       "call": "Call",
       "emailLabel": "Email",
       "location": "Location"
@@ -429,6 +431,8 @@
     "itemCount_other": "{{count}} items",
     "updateQuantityError": "Could not update quantity",
     "removeItemError": "Could not remove item",
+    "loadError": "Unable to load your cart. Please try again.",
+    "retry": "Try again",
     "selectItem": "Select {{name}}",
     "removeItem": "Remove {{name}} from cart",
     "freeDelivery": "Free delivery on qualifying orders",
@@ -523,6 +527,7 @@
       "fillRequired": "Please fill in all required fields.",
       "unableToSave": "Unable to save address",
       "unableToDelete": "Unable to delete address",
+      "zonesLoadFailed": "Unable to load cities for this governorate. Choose the governorate again to retry.",
       "toastUpdated": "Address updated",
       "toastAdded": "Address added",
       "toastDeleted": "Address deleted"
@@ -579,6 +584,10 @@
         "success": "success",
         "failed": "failed"
       }
+    },
+    "delivery": {
+      "estimatedDelivery": "Estimated Delivery",
+      "businessDaysRange": "{{min}}–{{max}} business days"
     },
     "confirmation": {
       "ariaLabel": "Order confirmation",
@@ -676,6 +685,18 @@
       "confirmPasswordPlaceholder": "Re-enter password",
       "showPassword": "Show password",
       "hidePassword": "Hide password"
+    },
+    "validation": {
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "passwordMinLength": "Password must be at least 8 characters.",
+      "nameRequired": "Full name is required.",
+      "nameMinLength": "Name must be at least 2 characters.",
+      "phoneRequired": "Phone number is required."
+    },
+    "session": {
+      "expired": "Your session has expired. Please log in again."
     },
     "forgot": {
       "title": "Forgot password?",
@@ -780,6 +801,8 @@
     "updateFailed": "Update failed",
     "avatarUpdated": "Profile photo updated",
     "avatarUpdateFailed": "Unable to update profile photo",
+    "avatarInvalidType": "Use a JPEG, PNG, or WebP image.",
+    "avatarTooLarge": "Image must be 2 MB or smaller.",
     "loadFailed": "Unable to load your profile. Please try again.",
     "retry": "Try again",
     "invalidForm": "Invalid form",

@@ -8,6 +8,15 @@ import type { ApiPagination } from '../lib/api'
 import { sortOptionToApiSort } from '../utils/productQueryParams'
 import { mapApiProductToRecommendedProduct } from '../utils/productDetailMappers'
 
+export interface SearchProductsQuery {
+  keyword?: string
+  brandId?: string
+  concerns?: string
+  sort: SortOption
+  page: number
+  limit?: number
+}
+
 const emptySearchResult = {
   loading: false,
   error: null as string | null,
@@ -15,15 +24,26 @@ const emptySearchResult = {
   pagination: null as ApiPagination | null,
 }
 
-export function useSearchProducts(keyword: string, sort: SortOption, page: number, limit = 12) {
+export function useSearchProducts({
+  keyword = '',
+  brandId = '',
+  concerns = '',
+  sort,
+  page,
+  limit = 12,
+}: SearchProductsQuery) {
   const trimmedKeyword = keyword.trim()
+  const trimmedBrand = brandId.trim()
+  const trimmedConcerns = concerns.trim()
+  const hasQuery = Boolean(trimmedKeyword || trimmedBrand || trimmedConcerns)
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [products, setProducts] = useState<RecommendedProduct[]>([])
   const [pagination, setPagination] = useState<ApiPagination | null>(null)
 
   useEffect(() => {
-    if (!trimmedKeyword) return
+    if (!hasQuery) return
 
     let cancelled = false
 
@@ -35,7 +55,9 @@ export function useSearchProducts(keyword: string, sort: SortOption, page: numbe
       setError(null)
       try {
         const response = await getProducts({
-          keyword: trimmedKeyword,
+          ...(trimmedKeyword ? { keyword: trimmedKeyword } : {}),
+          ...(trimmedBrand ? { brand: trimmedBrand } : {}),
+          ...(trimmedConcerns ? { concerns: trimmedConcerns } : {}),
           page,
           limit,
           sort: sortOptionToApiSort(sort),
@@ -60,9 +82,9 @@ export function useSearchProducts(keyword: string, sort: SortOption, page: numbe
     return () => {
       cancelled = true
     }
-  }, [trimmedKeyword, sort, page, limit])
+  }, [hasQuery, trimmedKeyword, trimmedBrand, trimmedConcerns, sort, page, limit])
 
-  if (!trimmedKeyword) {
+  if (!hasQuery) {
     return emptySearchResult
   }
 

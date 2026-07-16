@@ -22,7 +22,7 @@ const MOBILE_BREAKPOINT = 769
 
 export function BestSellerSection() {
   const { t } = useTranslation()
-  const { bestSellers, loading } = useLandingCatalogContext()
+  const { bestSellers, loading, error } = useLandingCatalogContext()
   const [activeIndex, setActiveIndex] = useState(0)
   const isMobile = useMaxWidth(MOBILE_BREAKPOINT)
   const total = bestSellers.length
@@ -68,6 +68,10 @@ export function BestSellerSection() {
             <div className="relative mx-auto flex h-[400px] max-w-4xl items-center justify-center sm:h-[430px] min-[769px]:h-[460px]">
               <div className="h-[360px] w-[min(260px,85vw)] animate-pulse rounded-[24px] bg-surface-muted/70 dark:bg-surface-subtle/40" />
             </div>
+          ) : error ? (
+            <p className="py-12 text-center text-sm text-support-error" role="alert">
+              {error}
+            </p>
           ) : total === 0 ? (
             <p className="py-12 text-center text-sm text-secondary-text" role="status">
               {t('home.bestSellers.empty')}
@@ -103,7 +107,7 @@ export function BestSellerSection() {
             </CarouselFrame>
           )}
 
-          {!loading && total > 0 && (
+          {!loading && !error && total > 0 && (
             <div className="relative z-10 mt-8">
               <CarouselControls count={total} activeIndex={activeSlide} onSelect={goTo} />
             </div>
