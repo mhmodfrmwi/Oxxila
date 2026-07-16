@@ -5,6 +5,7 @@ import { ADD_ADDRESS_PATH } from '../../config/routes'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../ui/interactionStyles'
 import type { UserAddress } from '../../api/users'
+import { formatAddressOneLine } from '../../utils/userAddress'
 
 interface CartShippingBarProps {
   address: UserAddress | null
@@ -12,14 +13,10 @@ interface CartShippingBarProps {
   className?: string
 }
 
-function formatAddress(address: UserAddress) {
-  return `${address.address}, ${address.city}`
-}
-
 export function CartShippingBar({ address, loading, className }: CartShippingBarProps) {
   const { t } = useTranslation()
   const displayAddress = address
-    ? formatAddress(address)
+    ? formatAddressOneLine(address)
     : t('cart.shipping.addAddress')
 
   return (

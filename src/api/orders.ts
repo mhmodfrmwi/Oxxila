@@ -2,18 +2,43 @@
 import { apiRequest } from '../lib/api'
 import type { ApiOrder } from '../types/order'
 
-export interface CheckoutAddressPayload {
+/** Inline address fields — mutually exclusive with `addressId` on the backend. */
+export interface InlineCheckoutAddressPayload {
   governorateId: string
   districtId?: string | 'other'
   addressLine: string
+  saveAddress?: boolean
+  label?: string
+  setAsDefault?: boolean
 }
 
-export interface CreateCodOrderPayload extends CheckoutAddressPayload {
+/** Prefer saved address id when selecting from the address book. */
+export interface SavedCheckoutAddressPayload {
+  addressId: string
+}
+
+export type CheckoutAddressPayload =
+  | SavedCheckoutAddressPayload
+  | InlineCheckoutAddressPayload
+
+export interface CreateCodOrderPayload extends InlineCheckoutAddressPayload {
   paymentMethod: 'cod'
+  addressId?: never
 }
 
-export interface CreatePaymentSessionPayload extends CheckoutAddressPayload {
+export interface CreateCodOrderWithAddressIdPayload {
+  paymentMethod: 'cod'
+  addressId: string
+}
+
+export interface CreatePaymentSessionPayload extends InlineCheckoutAddressPayload {
   provider: 'stripe' | 'paymob'
+  addressId?: never
+}
+
+export interface CreatePaymentSessionWithAddressIdPayload {
+  provider: 'stripe' | 'paymob'
+  addressId: string
 }
 
 export interface PaymentSessionResponse {
@@ -24,7 +49,9 @@ export interface PaymentSessionResponse {
   url?: string
 }
 
-export function createCodOrder(payload: CreateCodOrderPayload) {
+export function createCodOrder(
+  payload: CreateCodOrderPayload | CreateCodOrderWithAddressIdPayload,
+) {
   return apiRequest<ApiOrder>('/orders', {
     method: 'POST',
     auth: true,
@@ -32,7 +59,9 @@ export function createCodOrder(payload: CreateCodOrderPayload) {
   })
 }
 
-export function createPaymentSession(payload: CreatePaymentSessionPayload) {
+export function createPaymentSession(
+  payload: CreatePaymentSessionPayload | CreatePaymentSessionWithAddressIdPayload,
+) {
   return apiRequest<PaymentSessionResponse>('/orders/payment-session', {
     method: 'POST',
     auth: true,

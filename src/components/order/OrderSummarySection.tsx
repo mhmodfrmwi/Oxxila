@@ -30,9 +30,6 @@ export function OrderSummarySection({
         cart={summary.cart}
         mode="confirmation"
         title={t('cart.summary.title')}
-        shippingAmount={summary.shippingAmount}
-        shippingCompareAt={summary.shippingCompareAt}
-        totalCompareAt={summary.totalCompareAt}
         totalLabel={resolvedTotalLabel}
         onApplyCoupon={noopCoupon}
         onRemoveCoupon={noopCoupon}

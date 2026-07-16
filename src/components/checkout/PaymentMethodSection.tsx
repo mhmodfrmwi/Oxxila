@@ -1,9 +1,12 @@
 // src/components/checkout/PaymentMethodSection.tsx
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { ADD_ADDRESS_PATH } from '../../config/routes'
+import { MY_ACCOUNT_PATH } from '../../config/routes'
 import type { usePaymentPage } from '../../hooks/usePaymentPage'
 import { cn } from '../../lib/cn'
+import { SavedAddressCard } from '../account/SavedAddressCard'
+import { Button } from '../ui/Button'
+import { InputField } from '../ui/InputField'
 import { SelectField } from '../ui/SelectField'
 import { TextAreaField } from '../ui/TextAreaField'
 import { focusRingClasses } from '../ui/interactionStyles'
@@ -13,31 +16,43 @@ type PaymentPageState = ReturnType<typeof usePaymentPage>
 
 interface PaymentMethodSectionProps {
   phone: PaymentPageState['phone']
+  addresses: PaymentPageState['addresses']
+  selectedAddressId: PaymentPageState['selectedAddressId']
+  addressLoading: PaymentPageState['addressLoading']
+  selectAddress: PaymentPageState['selectAddress']
+  showNewAddressForm: PaymentPageState['showNewAddressForm']
+  openNewAddressForm: PaymentPageState['openNewAddressForm']
+  newAddressForm: PaymentPageState['newAddressForm']
+  newAddressErrors: PaymentPageState['newAddressErrors']
+  updateNewAddressField: PaymentPageState['updateNewAddressField']
+  handleCreateAddress: PaymentPageState['handleCreateAddress']
+  savingAddress: PaymentPageState['savingAddress']
   governorates: PaymentPageState['governorates']
   districts: PaymentPageState['districts']
   hasDistricts: PaymentPageState['hasDistricts']
-  billingForm: PaymentPageState['billingForm']
-  billingErrors: PaymentPageState['billingErrors']
   paymentMethod: PaymentPageState['paymentMethod']
   setPaymentMethod: PaymentPageState['setPaymentMethod']
-  billingSameAsShipping: PaymentPageState['billingSameAsShipping']
-  handleBillingSameChange: PaymentPageState['handleBillingSameChange']
-  updateBillingField: PaymentPageState['updateBillingField']
   className?: string
 }
 
 export function PaymentMethodSection({
   phone,
+  addresses,
+  selectedAddressId,
+  addressLoading,
+  selectAddress,
+  showNewAddressForm,
+  openNewAddressForm,
+  newAddressForm,
+  newAddressErrors,
+  updateNewAddressField,
+  handleCreateAddress,
+  savingAddress,
   governorates,
   districts,
   hasDistricts,
-  billingForm,
-  billingErrors,
   paymentMethod,
   setPaymentMethod,
-  billingSameAsShipping,
-  handleBillingSameChange,
-  updateBillingField,
   className,
 }: PaymentMethodSectionProps) {
   const { t } = useTranslation()
@@ -53,80 +68,149 @@ export function PaymentMethodSection({
           {t('checkout.payment.phoneNumber', { phone: phoneDisplay })}
         </span>{' '}
         <Link
-          to={ADD_ADDRESS_PATH}
+          to={MY_ACCOUNT_PATH}
           className={cn('payment-inline-link', focusRingClasses, 'rounded-sm')}
         >
-          {t('checkout.payment.changeAddress')}
+          {t('checkout.payment.changePhone')}
         </Link>
       </p>
 
-      <div className="payment-billing-panel">
-        <div className="payment-billing-fields">
-          <SelectField
-            label={t('checkout.payment.government')}
-            name="government"
-            value={billingForm.governorateId}
-            onChange={(event) => updateBillingField('governorateId', event.target.value)}
-            error={billingErrors.governorateId}
-            required
-            className="payment-field-input"
-          >
-            <option value="" disabled>
-              {t('checkout.payment.govPlaceholder')}
-            </option>
-            {governorates.map((governorate) => (
-              <option key={governorate._id} value={governorate._id}>
-                {governorate.name}
-              </option>
-            ))}
-          </SelectField>
+      <div className="payment-shipping-section" aria-label={t('checkout.payment.shippingAria')}>
+        <h3 className="payment-shipping-title">{t('checkout.payment.shippingTitle')}</h3>
 
-          <SelectField
-            label={t('checkout.payment.city')}
-            name="city"
-            value={billingForm.districtId}
-            onChange={(event) => updateBillingField('districtId', event.target.value)}
-            error={billingErrors.districtId}
-            required
-            className="payment-field-input"
-          >
-            <option value="" disabled>
-              {t('checkout.payment.cityPlaceholder')}
-            </option>
-            {hasDistricts ? (
-              <>
-                {districts.map((district) => (
-                  <option key={district._id} value={district._id}>
-                    {district.name}
-                  </option>
+        {addressLoading ? (
+          <div className="grid gap-3 sm:grid-cols-2" aria-hidden>
+            <div className="h-36 animate-pulse rounded-2xl bg-surface-muted" />
+            <div className="h-36 animate-pulse rounded-2xl bg-surface-muted" />
+          </div>
+        ) : (
+          <>
+            {addresses.length > 0 && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {addresses.map((address) => (
+                  <SavedAddressCard
+                    key={address._id}
+                    address={address}
+                    selected={selectedAddressId === address._id}
+                    showActions={false}
+                    onSelect={() => selectAddress(address._id)}
+                  />
                 ))}
-                <option value="other">{t('checkout.payment.other')}</option>
-              </>
-            ) : (
-              governorates
-                .filter((entry) => entry._id === billingForm.governorateId)
-                .map((entry) => (
-                  <option key={entry._id} value="other">
-                    {entry.name}
-                  </option>
-                ))
+              </div>
             )}
-          </SelectField>
 
-          <TextAreaField
-            label={t('checkout.payment.address')}
-            name="address"
-            value={billingForm.addressLine}
-            onChange={(event) => updateBillingField('addressLine', event.target.value)}
-            placeholder={t('checkout.payment.addressPlaceholder')}
-            error={billingErrors.addressLine}
-            required
-            className="payment-field-input payment-field-textarea"
-          />
-        </div>
+            {!showNewAddressForm && (
+              <Button
+                type="button"
+                variant="outline"
+                fullWidth
+                className="mt-3"
+                onClick={openNewAddressForm}
+              >
+                {t('checkout.payment.enterNewAddress')}
+              </Button>
+            )}
+
+            {showNewAddressForm && (
+              <div className="payment-billing-panel mt-3">
+                <div className="payment-billing-fields">
+                  <InputField
+                    label={t('checkout.address.label')}
+                    name="label"
+                    value={newAddressForm.label}
+                    onChange={(event) => updateNewAddressField('label', event.target.value)}
+                    placeholder={t('checkout.address.labelPlaceholder')}
+                    error={newAddressErrors.label}
+                    className="payment-field-input"
+                  />
+
+                  <SelectField
+                    label={t('checkout.payment.government')}
+                    name="governorateId"
+                    value={newAddressForm.governorateId}
+                    onChange={(event) =>
+                      updateNewAddressField('governorateId', event.target.value)
+                    }
+                    error={newAddressErrors.governorateId}
+                    required
+                    className="payment-field-input"
+                  >
+                    <option value="" disabled>
+                      {t('checkout.payment.govPlaceholder')}
+                    </option>
+                    {governorates.map((governorate) => (
+                      <option key={governorate._id} value={governorate._id}>
+                        {governorate.name}
+                      </option>
+                    ))}
+                  </SelectField>
+
+                  <SelectField
+                    label={t('checkout.payment.city')}
+                    name="districtId"
+                    value={newAddressForm.districtId}
+                    onChange={(event) =>
+                      updateNewAddressField('districtId', event.target.value)
+                    }
+                    error={newAddressErrors.districtId}
+                    required
+                    disabled={!newAddressForm.governorateId}
+                    className="payment-field-input"
+                  >
+                    <option value="" disabled>
+                      {t('checkout.payment.cityPlaceholder')}
+                    </option>
+                    {hasDistricts ? (
+                      <>
+                        {districts.map((district) => (
+                          <option key={district._id} value={district._id}>
+                            {district.name}
+                          </option>
+                        ))}
+                        <option value="other">{t('checkout.payment.other')}</option>
+                      </>
+                    ) : (
+                      <option value="other">{t('checkout.payment.other')}</option>
+                    )}
+                  </SelectField>
+
+                  <TextAreaField
+                    label={t('checkout.payment.address')}
+                    name="addressLine"
+                    value={newAddressForm.addressLine}
+                    onChange={(event) =>
+                      updateNewAddressField('addressLine', event.target.value)
+                    }
+                    placeholder={t('checkout.payment.addressPlaceholder')}
+                    error={newAddressErrors.addressLine}
+                    required
+                    className="payment-field-input payment-field-textarea"
+                  />
+                </div>
+
+                <Button
+                  type="button"
+                  variant="primary"
+                  fullWidth
+                  className="mt-4"
+                  disabled={savingAddress}
+                  onClick={() => void handleCreateAddress()}
+                >
+                  {savingAddress
+                    ? t('checkout.address.saving')
+                    : t('checkout.address.save')}
+                </Button>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
-      <div className="payment-method-options" role="radiogroup" aria-label={t('checkout.payment.methodsAria')}>
+      <div
+        className="payment-method-options"
+        role="radiogroup"
+        aria-label={t('checkout.payment.methodsAria')}
+      >
         <PaymentMethodCard
           selected={paymentMethod === 'stripe'}
           onSelect={() => setPaymentMethod('stripe')}
@@ -145,25 +229,6 @@ export function PaymentMethodSection({
           label={t('checkout.payment.cod')}
         />
       </div>
-
-      <label className="payment-billing-checkbox">
-        <input
-          type="checkbox"
-          className="payment-billing-checkbox-input"
-          checked={billingSameAsShipping}
-          onChange={(event) => handleBillingSameChange(event.target.checked)}
-        />
-        <span className="payment-billing-checkbox-text">
-          {t('checkout.payment.billingSame')}{' '}
-          <Link
-            to={ADD_ADDRESS_PATH}
-            className={cn('payment-inline-link', focusRingClasses, 'rounded-sm')}
-            onClick={(event) => event.stopPropagation()}
-          >
-            {t('checkout.payment.changeAddress')}
-          </Link>
-        </span>
-      </label>
     </section>
   )
 }

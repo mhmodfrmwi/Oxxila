@@ -2,12 +2,9 @@
 import { ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router-dom'
-import {
-  CART_PATH,
-} from '../../config/routes'
+import { CART_PATH } from '../../config/routes'
 import { usePaymentPage } from '../../hooks/usePaymentPage'
 import { cn } from '../../lib/cn'
-import { CartShippingBar } from '../cart/CartShippingBar'
 import { OrderSummaryCard } from '../cart/OrderSummaryCard'
 import { FormMessage } from '../auth/FormMessage'
 import { Footer } from '../landing/footer/Footer'
@@ -41,26 +38,27 @@ export function PaymentPageContent() {
     applyCoupon,
     removeCoupon,
     phone,
+    addresses,
+    selectedAddressId,
+    addressLoading,
+    selectAddress,
+    showNewAddressForm,
+    openNewAddressForm,
+    newAddressForm,
+    newAddressErrors,
+    updateNewAddressField,
+    handleCreateAddress,
+    savingAddress,
     governorates,
     districts,
     hasDistricts,
-    billingForm,
-    billingErrors,
     paymentMethod,
     setPaymentMethod,
-    billingSameAsShipping,
-    handleBillingSameChange,
-    shippingPrice,
-    shippingCompareAt,
     pageLoading,
     submitting,
     submitError,
-    updateBillingField,
     handlePayNow,
     handleBack,
-    totalCompareAt,
-    primaryAddress,
-    addressLoading,
   } = usePaymentPage()
 
   if (!isAuthenticated) {
@@ -95,12 +93,6 @@ export function PaymentPageContent() {
           <PaymentPageSkeleton />
         ) : (
           <>
-            <CartShippingBar
-              address={primaryAddress}
-              loading={addressLoading}
-              className="payment-page-shipping mb-8 sm:mb-10"
-            />
-
             {submitError && (
               <div className="mb-4">
                 <FormMessage message={submitError} />
@@ -111,16 +103,22 @@ export function PaymentPageContent() {
               <div className="min-w-0">
                 <PaymentMethodSection
                   phone={phone}
+                  addresses={addresses}
+                  selectedAddressId={selectedAddressId}
+                  addressLoading={addressLoading}
+                  selectAddress={selectAddress}
+                  showNewAddressForm={showNewAddressForm}
+                  openNewAddressForm={openNewAddressForm}
+                  newAddressForm={newAddressForm}
+                  newAddressErrors={newAddressErrors}
+                  updateNewAddressField={updateNewAddressField}
+                  handleCreateAddress={handleCreateAddress}
+                  savingAddress={savingAddress}
                   governorates={governorates}
                   districts={districts}
                   hasDistricts={hasDistricts}
-                  billingForm={billingForm}
-                  billingErrors={billingErrors}
                   paymentMethod={paymentMethod}
                   setPaymentMethod={setPaymentMethod}
-                  billingSameAsShipping={billingSameAsShipping}
-                  handleBillingSameChange={handleBillingSameChange}
-                  updateBillingField={updateBillingField}
                 />
 
                 <Button
@@ -141,12 +139,9 @@ export function PaymentPageContent() {
                 couponLoading={couponLoading}
                 onApplyCoupon={applyCoupon}
                 onRemoveCoupon={removeCoupon}
-                shippingAmount={shippingPrice}
-                shippingCompareAt={shippingCompareAt}
-                totalCompareAt={totalCompareAt}
                 ctaLabel={t('cart.summary.payNow')}
                 onCtaClick={() => void handlePayNow()}
-                ctaDisabled={submitting}
+                ctaDisabled={submitting || !selectedAddressId}
                 showPromo={false}
                 trustBadgeVariant="payment"
                 footerNote={t('checkout.payment.securityNote')}

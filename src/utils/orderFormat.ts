@@ -64,14 +64,8 @@ export function orderToSummaryCart(order: ApiOrder) {
 }
 
 export function getOrderSummaryProps(order: ApiOrder) {
-  const shippingCompareAt =
-    order.shippingPrice === 0 && order.shipping.price > 0 ? order.shipping.price : null
-
   return {
     cart: orderToSummaryCart(order),
-    shippingAmount: order.shippingPrice,
-    shippingCompareAt,
-    totalCompareAt: shippingCompareAt ? order.subtotal + shippingCompareAt : null,
   }
 }
 

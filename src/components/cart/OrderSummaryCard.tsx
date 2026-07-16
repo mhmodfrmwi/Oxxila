@@ -20,10 +20,6 @@ interface OrderSummaryCardProps {
   className?: string
   mode?: 'cart' | 'review' | 'confirmation'
   title?: string
-  shippingAmount?: number
-  shippingCompareAt?: number | null
-  estimatedTax?: number
-  totalCompareAt?: number | null
   ctaLabel?: string
   onCtaClick?: () => void
   ctaDisabled?: boolean
@@ -88,10 +84,6 @@ export function OrderSummaryCard({
   className,
   mode = 'cart',
   title,
-  shippingAmount,
-  shippingCompareAt = null,
-  estimatedTax = 0,
-  totalCompareAt = null,
   ctaLabel,
   onCtaClick,
   ctaDisabled,
@@ -117,13 +109,11 @@ export function OrderSummaryCard({
   const resolvedShowPromo = showPromo ?? (!isReview && !isConfirmation)
   const showLineItems = isReview || isConfirmation
   const showCheckoutButton = showCta ?? !isConfirmation
-  const resolvedShippingAmount = shippingAmount ?? 0
-  const shippingIsFree = resolvedShippingAmount === 0
-  const resolvedTotal = isConfirmation
-    ? cart.totalPrice
-    : cart.totalPrice + resolvedShippingAmount
-  const resolvedTotalCompareAt =
-    totalCompareAt ?? (shippingCompareAt ? cart.subtotal + shippingCompareAt : null)
+
+  // Pricing pipeline (extensible): subtotal → − return credit → (+ shipping / tax later) → total
+  const subtotal = cart.subtotal
+  const returnCredit = cart.storeCreditApplied ?? 0
+  const total = Math.max(0, subtotal - returnCredit)
 
   async function handleApplyCoupon() {
     const code = promoDraft.trim()
@@ -184,48 +174,17 @@ export function OrderSummaryCard({
       <div className={cn(isReview ? 'payment-order-summary-rows' : 'space-y-3')}>
         <SummaryRow
           label={t('cart.summary.subtotal')}
-          value={formatCartPrice(cart.subtotal)}
+          value={formatCartPrice(subtotal)}
         />
-
-        {cart.discountAmount > 0 && (
-          <SummaryRow
-            label={t('cart.summary.discount')}
-            value={`-${formatCartPrice(cart.discountAmount)}`}
-            valueClassName="text-support-success"
-          />
-        )}
-
         <SummaryRow
-          label={t('cart.summary.shipping')}
+          label={t('cart.summary.returnCredit')}
           value={
-            <span className="inline-flex items-center gap-2">
-              {shippingIsFree && (
-                <span className="text-support-success">{t('cart.summary.free')}</span>
-              )}
-              {shippingCompareAt != null && shippingCompareAt > 0 && (
-                <span className="payment-summary-strike">
-                  {formatCartPrice(shippingCompareAt)}
-                </span>
-              )}
-              {!shippingIsFree && (
-                <span>{formatCartPrice(resolvedShippingAmount)}</span>
-              )}
-            </span>
+            returnCredit > 0
+              ? `-${formatCartPrice(returnCredit)}`
+              : formatCartPrice(0)
           }
+          valueClassName={returnCredit > 0 ? 'text-support-success' : undefined}
         />
-
-        <SummaryRow
-          label={t('cart.summary.estimatedTax')}
-          value={formatCartPrice(estimatedTax)}
-        />
-
-        {cart.storeCreditApplied > 0 && (
-          <SummaryRow
-            label={t('cart.summary.storeCredit')}
-            value={`-${formatCartPrice(cart.storeCreditApplied)}`}
-            valueClassName="text-support-success"
-          />
-        )}
       </div>
 
       {resolvedShowPromo && (
@@ -275,14 +234,7 @@ export function OrderSummaryCard({
 
       <div className={cn('cart-summary-total', isReview && 'payment-order-summary-total')}>
         <span className="cart-summary-total-label">{resolvedTotalLabel}</span>
-        <span className="inline-flex items-baseline gap-1.5">
-          <span className="cart-summary-total-value">{formatCartPrice(resolvedTotal)}</span>
-          {resolvedTotalCompareAt != null && resolvedTotalCompareAt > resolvedTotal && (
-            <span className="payment-summary-strike">
-              {formatCartPrice(resolvedTotalCompareAt)}
-            </span>
-          )}
-        </span>
+        <span className="cart-summary-total-value">{formatCartPrice(total)}</span>
       </div>
 
       {showCheckoutButton && (
@@ -296,7 +248,14 @@ export function OrderSummaryCard({
           onClick={onCtaClick}
         >
           {buttonLabel}
-          {isReview && <ChevronRight size={18} strokeWidth={2} aria-hidden className="rtl:-scale-x-100" />}
+          {isReview && (
+            <ChevronRight
+              size={18}
+              strokeWidth={2}
+              aria-hidden
+              className="rtl:-scale-x-100"
+            />
+          )}
         </Button>
       )}
 

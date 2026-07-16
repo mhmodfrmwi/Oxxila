@@ -1,13 +1,20 @@
 // src/hooks/useAddAddressPage.ts
-import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { getShippingCountries, getShippingGovernorates } from '../api/shipping'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import {
+  getShippingCountries,
+  getShippingGovernorates,
+  getShippingZones,
+  type ShippingDistrict,
+  type ShippingGovernorate,
+} from '../api/shipping'
 import {
   createMyAddress,
   deleteMyAddress,
   getMyAddresses,
   getUserProfile,
   updateMyAddress,
+  type CreateAddressPayload,
   type UserAddress,
 } from '../api/users'
 import { ADDRESSES_PATH, LOGIN_PATH } from '../config/routes'
@@ -15,47 +22,75 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
+import { zoneRefId } from '../utils/userAddress'
 
 export interface AddressFormState {
-  city: string
-  government: string
-  address: string
+  label: string
+  governorateId: string
+  districtId: string
+  addressLine: string
 }
 
 export interface AddressFormErrors {
-  city?: string
-  government?: string
-  address?: string
+  label?: string
+  governorateId?: string
+  districtId?: string
+  addressLine?: string
 }
 
 const emptyForm: AddressFormState = {
-  city: '',
-  government: '',
-  address: '',
+  label: '',
+  governorateId: '',
+  districtId: '',
+  addressLine: '',
 }
 
 function validateForm(
   form: AddressFormState,
+  hasDistricts: boolean,
   t: (key: string) => string,
 ): AddressFormErrors {
   const errors: AddressFormErrors = {}
-  if (!form.city.trim()) errors.city = t('checkout.address.cityRequired')
-  if (!form.government.trim()) errors.government = t('checkout.address.governmentRequired')
-  if (!form.address.trim()) errors.address = t('checkout.address.addressRequired')
-  else if (form.address.trim().length > 500) errors.address = t('checkout.address.addressTooLong')
+  if (!form.governorateId.trim()) {
+    errors.governorateId = t('checkout.address.governmentRequired')
+  }
+  if (!form.districtId.trim()) {
+    errors.districtId = t('checkout.address.cityRequired')
+  } else if (hasDistricts && form.districtId !== 'other' && !/^[a-f\d]{24}$/i.test(form.districtId)) {
+    errors.districtId = t('checkout.address.cityRequired')
+  }
+  if (!form.addressLine.trim()) {
+    errors.addressLine = t('checkout.address.addressRequired')
+  } else if (form.addressLine.trim().length < 6) {
+    errors.addressLine = t('checkout.address.addressMinLength')
+  } else if (form.addressLine.trim().length > 500) {
+    errors.addressLine = t('checkout.address.addressTooLong')
+  }
   return errors
 }
 
-function buildAddressPayload(form: AddressFormState) {
+function buildAddressPayload(form: AddressFormState): CreateAddressPayload {
   return {
-    city: form.city.trim(),
-    address: `${form.government.trim()}, ${form.address.trim()}`,
+    governorateId: form.governorateId.trim(),
+    districtId: form.districtId.trim() || 'other',
+    addressLine: form.addressLine.trim(),
+    label: form.label.trim() || undefined,
+  }
+}
+
+function formFromAddress(address: UserAddress): AddressFormState {
+  return {
+    label: address.label ?? '',
+    governorateId: zoneRefId(address.governorate),
+    districtId: address.isOther ? 'other' : zoneRefId(address.district) || 'other',
+    addressLine: address.addressLine ?? '',
   }
 }
 
 export function useAddAddressPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const { isAuthenticated, user } = useAuth()
   const toast = useToast()
   const [form, setForm] = useState<AddressFormState>(emptyForm)
@@ -63,22 +98,16 @@ export function useAddAddressPage() {
   const [addresses, setAddresses] = useState<UserAddress[]>([])
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
-  const [governorates, setGovernorates] = useState<{ _id: string; name: string }[]>([])
+  const [governorates, setGovernorates] = useState<ShippingGovernorate[]>([])
+  const [districts, setDistricts] = useState<ShippingDistrict[]>([])
+  const [hasDistricts, setHasDistricts] = useState(true)
   const [phone, setPhone] = useState('')
   const [loading, setLoading] = useState(true)
+  const [zonesLoading, setZonesLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null)
-
-  const cityOptions = useMemo(() => {
-    const names = new Set<string>()
-    for (const entry of addresses) {
-      if (entry.city?.trim()) names.add(entry.city.trim())
-    }
-    if (form.city.trim()) names.add(form.city.trim())
-    return Array.from(names).sort((a, b) => a.localeCompare(b))
-  }, [addresses, form.city])
 
   useEffect(() => {
     if (!isAuthenticated) return
@@ -100,7 +129,8 @@ export function useAddAddressPage() {
         ])
         if (cancelled) return
 
-        setAddresses(addressesResponse.data?.addresses ?? [])
+        const nextAddresses = addressesResponse.data?.addresses ?? []
+        setAddresses(nextAddresses)
         setPhone(profileResponse.data?.phone ?? '')
 
         const countries = countriesResponse.data ?? []
@@ -108,6 +138,16 @@ export function useAddAddressPage() {
         if (defaultCountry) {
           const governoratesResponse = await getShippingGovernorates(defaultCountry._id)
           if (!cancelled) setGovernorates(governoratesResponse.data ?? [])
+        }
+
+        const editId = (location.state as { editAddressId?: string } | null)?.editAddressId
+        if (editId) {
+          const entry = nextAddresses.find((item) => item._id === editId)
+          if (entry) {
+            setForm(formFromAddress(entry))
+            setEditingAddressId(entry._id)
+            setSelectedAddressId(entry._id)
+          }
         }
       } catch (error) {
         if (!cancelled) {
@@ -125,24 +165,20 @@ export function useAddAddressPage() {
     return () => {
       cancelled = true
     }
-  }, [isAuthenticated])
-
-  function startEdit(address: UserAddress) {
-    const [government = '', ...rest] = address.address.split(',').map((part) => part.trim())
-    setForm({
-      city: address.city,
-      government,
-      address: rest.join(', '),
-    })
-    setEditingAddressId(address._id)
-    setSelectedAddressId(address._id)
-    setErrors({})
-    setSubmitError(null)
-    setSubmitSuccess(null)
-  }
+  }, [isAuthenticated, location.state])
 
   function updateField<K extends keyof AddressFormState>(key: K, value: AddressFormState[K]) {
-    setForm((current) => ({ ...current, [key]: value }))
+    setForm((current) => {
+      const next = { ...current, [key]: value }
+      if (key === 'governorateId') {
+        next.districtId = ''
+      }
+      return next
+    })
+    if (key === 'governorateId') {
+      setDistricts([])
+      setHasDistricts(true)
+    }
     setErrors((current) => ({ ...current, [key]: undefined }))
     setSubmitError(null)
     if (!editingAddressId) {
@@ -150,14 +186,67 @@ export function useAddAddressPage() {
     }
   }
 
+  useEffect(() => {
+    if (!form.governorateId) return
+
+    let cancelled = false
+
+    async function loadZones() {
+      await Promise.resolve()
+      if (cancelled) return
+
+      setZonesLoading(true)
+      try {
+        const response = await getShippingZones(form.governorateId)
+        if (cancelled) return
+
+        const data = response.data
+        setHasDistricts(data?.hasDistricts ?? true)
+        setDistricts(data?.districts ?? [])
+
+        if (data && !data.hasDistricts) {
+          setForm((current) =>
+            current.districtId === 'other' ? current : { ...current, districtId: 'other' },
+          )
+        }
+      } catch {
+        if (!cancelled) {
+          setDistricts([])
+        }
+      } finally {
+        if (!cancelled) setZonesLoading(false)
+      }
+    }
+
+    void loadZones()
+
+    return () => {
+      cancelled = true
+    }
+  }, [form.governorateId])
+
+  function startEdit(address: UserAddress) {
+    setForm(formFromAddress(address))
+    setEditingAddressId(address._id)
+    setSelectedAddressId(address._id)
+    setErrors({})
+    setSubmitError(null)
+    setSubmitSuccess(null)
+  }
+
   async function handleSave() {
     setSubmitError(null)
     setSubmitSuccess(null)
 
-    const validation = validateForm(form, t)
+    const validation = validateForm(form, hasDistricts, t)
     if (Object.keys(validation).length > 0) {
       setErrors(validation)
       toast.error(t('checkout.address.invalidForm'), t('checkout.address.fillRequired'))
+      return
+    }
+
+    if (zonesLoading) {
+      toast.error(t('checkout.address.unableToSave'), t('checkout.payment.loadingShipping'))
       return
     }
 
@@ -172,6 +261,7 @@ export function useAddAddressPage() {
           setAddresses((current) =>
             current.map((entry) => (entry._id === updated._id ? updated : entry)),
           )
+          setSelectedAddressId(updated._id)
         }
         setSubmitSuccess(t('checkout.address.updatedSuccess'))
         toast.success(t('checkout.address.toastUpdated'))
@@ -205,6 +295,10 @@ export function useAddAddressPage() {
       await deleteMyAddress(addressId)
       setAddresses((current) => current.filter((entry) => entry._id !== addressId))
       if (selectedAddressId === addressId) setSelectedAddressId(null)
+      if (editingAddressId === addressId) {
+        setEditingAddressId(null)
+        setForm(emptyForm)
+      }
       toast.success(t('checkout.address.toastDeleted'))
     } catch (error) {
       const message =
@@ -224,10 +318,6 @@ export function useAddAddressPage() {
     setSubmitError(null)
   }
 
-  function handleCancel() {
-    navigate(ADDRESSES_PATH)
-  }
-
   function handleClose() {
     navigate(ADDRESSES_PATH)
   }
@@ -241,7 +331,9 @@ export function useAddAddressPage() {
     errors,
     addresses,
     governorates,
-    cityOptions,
+    districts,
+    hasDistricts,
+    zonesLoading,
     selectedAddressId,
     loading,
     submitting,
@@ -252,7 +344,6 @@ export function useAddAddressPage() {
     handleSave,
     handleDelete,
     handleSelectAddress,
-    handleCancel,
     handleClose,
     startEdit,
     editingAddressId,

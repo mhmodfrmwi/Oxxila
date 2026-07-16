@@ -14,6 +14,7 @@ import { Button } from '../ui/Button'
 import { Footer } from '../landing/footer/Footer'
 import { FormMessage } from '../auth/FormMessage'
 import { Heading } from '../ui/Heading'
+import { InputField } from '../ui/InputField'
 import { SelectField } from '../ui/SelectField'
 import { TextAreaField } from '../ui/TextAreaField'
 import { focusRingClasses } from '../ui/interactionStyles'
@@ -42,7 +43,8 @@ export function AddAddressPageContent() {
     errors,
     addresses,
     governorates,
-    cityOptions,
+    districts,
+    hasDistricts,
     selectedAddressId,
     loading,
     submitting,
@@ -130,54 +132,66 @@ export function AddAddressPageContent() {
               }}
               noValidate
             >
-              <SelectField
-                label={t('checkout.address.city')}
-                name="city"
-                value={form.city}
-                onChange={(event) => updateField('city', event.target.value)}
-                error={errors.city}
-                required
-              >
-                <option value="" disabled>
-                  {t('checkout.address.selectCity')}
-                </option>
-                {cityOptions.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-                {governorates.map((governorate) => (
-                  <option key={governorate._id} value={governorate.name}>
-                    {governorate.name}
-                  </option>
-                ))}
-              </SelectField>
+              <InputField
+                label={t('checkout.address.label')}
+                name="label"
+                value={form.label}
+                onChange={(event) => updateField('label', event.target.value)}
+                placeholder={t('checkout.address.labelPlaceholder')}
+                error={errors.label}
+              />
 
               <SelectField
                 label={t('checkout.address.government')}
-                name="government"
-                value={form.government}
-                onChange={(event) => updateField('government', event.target.value)}
-                error={errors.government}
+                name="governorateId"
+                value={form.governorateId}
+                onChange={(event) => updateField('governorateId', event.target.value)}
+                error={errors.governorateId}
                 required
               >
                 <option value="" disabled>
                   {t('checkout.address.yourGov')}
                 </option>
                 {governorates.map((governorate) => (
-                  <option key={governorate._id} value={governorate.name}>
+                  <option key={governorate._id} value={governorate._id}>
                     {governorate.name}
                   </option>
                 ))}
               </SelectField>
 
+              <SelectField
+                label={t('checkout.address.city')}
+                name="districtId"
+                value={form.districtId}
+                onChange={(event) => updateField('districtId', event.target.value)}
+                error={errors.districtId}
+                required
+                disabled={!form.governorateId}
+              >
+                <option value="" disabled>
+                  {t('checkout.address.selectCity')}
+                </option>
+                {hasDistricts ? (
+                  <>
+                    {districts.map((district) => (
+                      <option key={district._id} value={district._id}>
+                        {district.name}
+                      </option>
+                    ))}
+                    <option value="other">{t('checkout.payment.other')}</option>
+                  </>
+                ) : (
+                  <option value="other">{t('checkout.payment.other')}</option>
+                )}
+              </SelectField>
+
               <TextAreaField
                 label={t('checkout.address.address')}
-                name="address"
-                value={form.address}
-                onChange={(event) => updateField('address', event.target.value)}
+                name="addressLine"
+                value={form.addressLine}
+                onChange={(event) => updateField('addressLine', event.target.value)}
                 placeholder={t('checkout.address.addressPlaceholder')}
-                error={errors.address}
+                error={errors.addressLine}
                 required
               />
 

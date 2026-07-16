@@ -16,6 +16,7 @@ export interface UserProfile {
   phone?: string
   avatar?: string
   role?: string
+  storeCreditBalance?: number
 }
 
 export interface UpdateProfilePayload {
@@ -67,19 +68,34 @@ export function updateUserPassword(payload: UpdatePasswordPayload) {
   })
 }
 
-export interface UserAddress {
-  _id: string
-  city: string
-  address: string
+/** Matches backend User.addresses subdocument (`GET /users/profile/addresses`). */
+export interface UserAddressZoneRef {
+  id: string
+  name: string
 }
 
-export function getMyAddresses() {
-  return apiRequest<{ addresses: UserAddress[] }>('/users/profile/addresses', { auth: true })
+export interface UserAddress {
+  _id: string
+  label: string
+  governorate: UserAddressZoneRef
+  district: UserAddressZoneRef | null
+  addressLine: string
+  isOther: boolean
+  isDefault: boolean
 }
 
 export interface CreateAddressPayload {
-  city: string
-  address: string
+  governorateId: string
+  districtId?: string | 'other' | null
+  addressLine: string
+  label?: string
+  isDefault?: boolean
+}
+
+export type UpdateAddressPayload = Partial<CreateAddressPayload>
+
+export function getMyAddresses() {
+  return apiRequest<{ addresses: UserAddress[] }>('/users/profile/addresses', { auth: true })
 }
 
 export function createMyAddress(payload: CreateAddressPayload) {
@@ -90,11 +106,18 @@ export function createMyAddress(payload: CreateAddressPayload) {
   })
 }
 
-export function updateMyAddress(addressId: string, payload: Partial<CreateAddressPayload>) {
+export function updateMyAddress(addressId: string, payload: UpdateAddressPayload) {
   return apiRequest<{ address: UserAddress }>(`/users/profile/addresses/${addressId}`, {
     method: 'PATCH',
     auth: true,
     body: payload,
+  })
+}
+
+export function setMyDefaultAddress(addressId: string) {
+  return apiRequest<{ address: UserAddress }>(`/users/profile/addresses/${addressId}/default`, {
+    method: 'PATCH',
+    auth: true,
   })
 }
 

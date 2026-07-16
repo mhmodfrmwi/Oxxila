@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { getPaymentSessionStatus } from '../api/orders'
 import { HOME_PATH, LOGIN_PATH, CHECKOUT_PATH, trackOrderPath } from '../config/routes'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import type { ApiOrder } from '../types/order'
+import {
+  clearPaymentSessionId,
+  isPaymobPaymentFailed,
+  resolvePaymentSessionIdFromCallback,
+  storePaymentSessionId,
+} from '../utils/paymentSessionStorage'
 
 const POLL_INTERVAL_MS = 3000
 const MAX_ATTEMPTS = 20
@@ -20,14 +26,19 @@ function resolveOrderId(order: ApiOrder | string | undefined): string | null {
 
 export function usePaymentCallbackPage() {
   const [searchParams] = useSearchParams()
-  const sessionId = searchParams.get('session')?.trim() ?? ''
+  const sessionId = useMemo(
+    () => resolvePaymentSessionIdFromCallback(searchParams),
+    [searchParams],
+  )
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const { refreshCart } = useCart()
 
-  const [status, setStatus] = useState<PaymentCallbackStatus>(() =>
-    sessionId ? 'loading' : 'failed',
-  )
+  const [status, setStatus] = useState<PaymentCallbackStatus>(() => {
+    if (!sessionId) return 'failed'
+    if (isPaymobPaymentFailed(searchParams)) return 'failed'
+    return 'loading'
+  })
   const [orderId, setOrderId] = useState<string | null>(null)
   const [totalPrice, setTotalPrice] = useState<number | null>(null)
 
@@ -66,6 +77,7 @@ export function usePaymentCallbackPage() {
           if (resolvedOrderId) {
             setOrderId(resolvedOrderId)
             setStatus('success')
+            clearPaymentSessionId()
             void refreshCart()
             timer = setTimeout(() => {
               if (!cancelled) {
@@ -74,14 +86,17 @@ export function usePaymentCallbackPage() {
             }, SUCCESS_REDIRECT_MS)
             return
           }
+          // completed but order not populated yet — keep polling briefly
         }
 
-        if (data.status === 'failed') {
+        if (data.status === 'failed' || data.status === 'expired') {
+          clearPaymentSessionId()
           setStatus('failed')
           return
         }
 
         if (attempts >= MAX_ATTEMPTS) {
+          clearPaymentSessionId()
           setStatus('failed')
           return
         }
@@ -105,7 +120,14 @@ export function usePaymentCallbackPage() {
       cancelled = true
       if (timer) clearTimeout(timer)
     }
-  }, [sessionId, isAuthenticated, navigate, refreshCart])
+  }, [sessionId, isAuthenticated, navigate, refreshCart, searchParams])
+
+  useEffect(() => {
+    const paymobSessionId = searchParams.get('paymentSessionId')?.trim()
+    if (paymobSessionId) {
+      storePaymentSessionId(paymobSessionId)
+    }
+  }, [searchParams])
 
   function handleRetry() {
     navigate(CHECKOUT_PATH)

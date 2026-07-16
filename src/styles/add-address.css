@@ -67,11 +67,32 @@
   background: rgb(123 101 251 / 0.08);
 }
 
+.saved-address-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
 .saved-address-card-name {
   font-family: var(--font-family-serif, var(--font-family-base));
   font-size: 1rem;
   font-weight: var(--font-weight-semibold);
   color: var(--primary-text);
+}
+
+.saved-address-card-default-badge {
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1px solid var(--primary-button);
+  padding: 0.125rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--primary-button);
+  background: color-mix(in srgb, var(--primary-button) 10%, transparent);
 }
 
 .saved-address-card-lines {
