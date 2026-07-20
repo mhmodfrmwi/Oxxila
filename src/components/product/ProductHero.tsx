@@ -6,7 +6,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { cn } from '../../lib/cn'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
-import { LOGIN_PATH } from '../../config/routes'
+import { useToast } from '../../context/ToastContext'
+import { LOGIN_PATH, PAYMENT_PATH } from '../../config/routes'
 import { ApiError, getAccessToken } from '../../lib/api'
 import { useProductCardActions } from '../../hooks/useProductCardActions'
 import { Button } from '../ui/Button'
@@ -21,6 +22,9 @@ import { VariantSelector } from './VariantSelector'
 
 interface ProductHeroProps {
   product: ProductDetail
+  /** Prefer reconciled review stats over product denormalized counters. */
+  ratingOverride?: number
+  reviewCountOverride?: number
   className?: string
 }
 
@@ -85,19 +89,36 @@ function translateBadge(badge: string | undefined, t: (key: string) => string) {
   }
 }
 
+function translateTag(tag: string, t: (key: string) => string) {
+  switch (tag) {
+    case 'Sensitive skin':
+      return t('productDetail.tag.sensitiveSkin')
+    case 'Certified':
+      return t('productDetail.badge.certified')
+    default:
+      return tag
+  }
+}
+
 function formatOfferDate(value: string, locale: string) {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
-  return date.toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-GB', {
+  return date.toLocaleDateString(locale.startsWith('ar') ? 'ar-EG' : 'en-GB', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   })
 }
 
-export function ProductHero({ product, className }: ProductHeroProps) {
+export function ProductHero({
+  product,
+  ratingOverride,
+  reviewCountOverride,
+  className,
+}: ProductHeroProps) {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const toast = useToast()
   const { isAuthenticated } = useAuth()
   const { addToCart } = useCart()
   const {
@@ -106,8 +127,10 @@ export function ProductHero({ product, className }: ProductHeroProps) {
     handleWishlistToggle,
   } = useProductCardActions(product.id)
   const [cartLoading, setCartLoading] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [cartMessage, setCartMessage] = useState<string | null>(null)
   const [cartMessageIsError, setCartMessageIsError] = useState(false)
+  const [sharePending, setSharePending] = useState(false)
 
   const {
     brand,
@@ -137,13 +160,16 @@ export function ProductHero({ product, className }: ProductHeroProps) {
     deliveryEstimate,
   } = product
 
+  const displayRating = ratingOverride ?? rating
+  const displayReviewCount = reviewCountOverride ?? reviewCount
+
   const [quantity, setQuantity] = useState(1)
   const [selectedShade, setSelectedShade] = useState(shades?.[0] ?? '')
   const [selectedSize, setSelectedSize] = useState(sizes[0] ?? '')
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
-  const maxQuantity = Math.max(1, stockCount)
   const isOutOfStock = stockCount <= 0
+  const maxQuantity = isOutOfStock ? 1 : Math.max(1, stockCount)
 
   useEffect(() => {
     setQuantity((current) => {
@@ -151,6 +177,12 @@ export function ProductHero({ product, className }: ProductHeroProps) {
       return Math.min(Math.max(1, current), maxQuantity)
     })
   }, [isOutOfStock, maxQuantity, product.id])
+
+  useEffect(() => {
+    setSelectedShade(shades?.[0] ?? '')
+    setSelectedSize(sizes[0] ?? '')
+    setActiveImageIndex(0)
+  }, [product.id, shades, sizes])
 
   const discountLabel =
     discountPercent != null && discountPercent > 0
@@ -175,11 +207,15 @@ export function ProductHero({ product, className }: ProductHeroProps) {
 
   const badgeLabel = translateBadge(badge, t)
 
+  function requireAuth(): boolean {
+    if (isAuthenticated && getAccessToken()) return true
+    toast.error(t('productDetail.auth.signInRequired'), t('productDetail.auth.signInRequiredDetail'))
+    navigate(LOGIN_PATH)
+    return false
+  }
+
   async function handleAddToCart() {
-    if (!isAuthenticated || !getAccessToken()) {
-      navigate(LOGIN_PATH)
-      return
-    }
+    if (!requireAuth()) return
 
     if (!product.id?.trim()) {
       setCartMessage(t('productDetail.cart.missingId'))
@@ -201,8 +237,7 @@ export function ProductHero({ product, className }: ProductHeroProps) {
 
     try {
       await addToCart(product.id, safeQuantity)
-      setCartMessage(t('productDetail.cart.added'))
-      setCartMessageIsError(false)
+      // CartContext already shows a success toast — avoid duplicate inline success.
     } catch (error) {
       setCartMessage(
         error instanceof ApiError ? error.message : t('productDetail.cart.failed'),
@@ -210,6 +245,57 @@ export function ProductHero({ product, className }: ProductHeroProps) {
       setCartMessageIsError(true)
     } finally {
       setCartLoading(false)
+    }
+  }
+
+  async function handleOneClickCheckout() {
+    if (!requireAuth()) return
+    if (!product.id?.trim() || isOutOfStock || checkoutLoading) return
+
+    const safeQuantity = Math.min(Math.max(1, quantity), maxQuantity)
+    setCheckoutLoading(true)
+    setCartMessage(null)
+    setCartMessageIsError(false)
+
+    try {
+      await addToCart(product.id, safeQuantity)
+      navigate(PAYMENT_PATH)
+    } catch (error) {
+      setCartMessage(
+        error instanceof ApiError ? error.message : t('productDetail.cart.failed'),
+      )
+      setCartMessageIsError(true)
+    } finally {
+      setCheckoutLoading(false)
+    }
+  }
+
+  async function handleShare() {
+    if (sharePending || typeof window === 'undefined') return
+    const url = window.location.href
+    const shareData = {
+      title: `${brand} ${title}`.trim(),
+      text: title,
+      url,
+    }
+
+    setSharePending(true)
+    try {
+      if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+        await navigator.share(shareData)
+        return
+      }
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url)
+        toast.success(t('productDetail.shareCopied'))
+        return
+      }
+      toast.error(t('productDetail.shareFailed'))
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return
+      toast.error(t('productDetail.shareFailed'))
+    } finally {
+      setSharePending(false)
     }
   }
 
@@ -247,8 +333,8 @@ export function ProductHero({ product, className }: ProductHeroProps) {
 
             <ProductRating
               className="product-detail-info-rating"
-              rating={rating}
-              reviewCount={reviewCount}
+              rating={displayRating}
+              reviewCount={displayReviewCount}
               variant="detail"
               starSize={16}
             />
@@ -271,7 +357,7 @@ export function ProductHero({ product, className }: ProductHeroProps) {
               )}
             </div>
 
-            {soldCount != null && (
+            {soldCount != null && soldCount > 0 && (
               <p className="product-detail-price-unit">
                 {t('productDetail.sold', { count: soldCount })}
               </p>
@@ -289,17 +375,19 @@ export function ProductHero({ product, className }: ProductHeroProps) {
 
             <p className="product-detail-info-description">{description}</p>
 
-            <section
-              className="product-detail-media-section"
-              aria-label={t('productDetail.mediaAria')}
-            >
-              <p className="product-detail-section-label">{t('productDetail.media')}</p>
-              <ProductMediaThumbnails
-                images={images}
-                activeIndex={activeImageIndex}
-                onSelect={setActiveImageIndex}
-              />
-            </section>
+            {images.length > 1 && (
+              <section
+                className="product-detail-media-section"
+                aria-label={t('productDetail.mediaAria')}
+              >
+                <p className="product-detail-section-label">{t('productDetail.media')}</p>
+                <ProductMediaThumbnails
+                  images={images}
+                  activeIndex={activeImageIndex}
+                  onSelect={setActiveImageIndex}
+                />
+              </section>
+            )}
 
             {beforeAfterImages.length > 0 && (
               <section
@@ -350,6 +438,7 @@ export function ProductHero({ product, className }: ProductHeroProps) {
                 onChange={setQuantity}
                 min={1}
                 max={maxQuantity}
+                disabled={isOutOfStock || cartLoading || checkoutLoading}
               />
             </div>
 
@@ -360,7 +449,8 @@ export function ProductHero({ product, className }: ProductHeroProps) {
                 fullWidth
                 className="product-detail-cta"
                 onClick={() => void handleAddToCart()}
-                disabled={cartLoading || isOutOfStock}
+                disabled={cartLoading || checkoutLoading || isOutOfStock}
+                aria-busy={cartLoading || undefined}
               >
                 <ShoppingBag size={18} strokeWidth={1.5} aria-hidden />
                 {cartLoading ? t('productDetail.adding') : t('actions.addToCart')}
@@ -370,8 +460,13 @@ export function ProductHero({ product, className }: ProductHeroProps) {
                 pill
                 fullWidth
                 className="product-detail-cta product-detail-cta-outline !border"
+                onClick={() => void handleOneClickCheckout()}
+                disabled={cartLoading || checkoutLoading || isOutOfStock}
+                aria-busy={checkoutLoading || undefined}
               >
-                {t('productDetail.oneClickCheckout')}
+                {checkoutLoading
+                  ? t('productDetail.oneClickCheckoutLoading')
+                  : t('productDetail.oneClickCheckout')}
               </Button>
             </div>
 
@@ -401,7 +496,14 @@ export function ProductHero({ product, className }: ProductHeroProps) {
                   void handleWishlistToggle()
                 }}
               />
-              <SocialIconButton icon={Share2} label={t('productDetail.share')} />
+              <SocialIconButton
+                icon={Share2}
+                label={t('productDetail.share')}
+                disabled={sharePending}
+                onClick={() => {
+                  void handleShare()
+                }}
+              />
             </div>
 
             <dl className="product-detail-meta">
@@ -434,19 +536,21 @@ export function ProductHero({ product, className }: ProductHeroProps) {
                 <dt>{t('productDetail.availability')}</dt>
                 <dd>{availabilityLabel}</dd>
               </div>
-              <div className="col-span-2">
-                <dt>{t('productDetail.tags')}</dt>
-                <dd className="mt-1 flex flex-wrap gap-1.5">
-                  {tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-md bg-surface-muted px-2 py-0.5 text-xs leading-4 text-primary-text"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </dd>
-              </div>
+              {tags.length > 0 && (
+                <div className="col-span-2">
+                  <dt>{t('productDetail.tags')}</dt>
+                  <dd className="mt-1 flex flex-wrap gap-1.5">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-md bg-surface-muted px-2 py-0.5 text-xs leading-4 text-primary-text"
+                      >
+                        {translateTag(tag, t)}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              )}
             </dl>
           </article>
         </div>

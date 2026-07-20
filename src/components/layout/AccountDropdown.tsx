@@ -1,24 +1,9 @@
 // src/components/layout/AccountDropdown.tsx
-import {
-  Heart,
-  Settings,
-  ShoppingCart,
-  Truck,
-  CircleDollarSign,
-  MapPin,
-  KeyRound,
-} from 'lucide-react'
+import { CircleDollarSign } from 'lucide-react'
 import { useEffect, useId, useRef, type RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import {
-  ACCOUNT_CHANGE_PASSWORD_PATH,
-  ACCOUNT_ORDERS_PATH,
-  ADDRESSES_PATH,
-  MY_ACCOUNT_PATH,
-  RETURNS_HISTORY_PATH,
-  WISHLIST_PATH,
-} from '../../config/routes'
+import { ACCOUNT_NAV_ICONS, ACCOUNT_SIDEBAR_NAV } from '../../config/accountNav'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../ui/interactionStyles'
 
@@ -111,45 +96,6 @@ export function AccountDropdown({
     ? String(storeCreditBalance)
     : storeCreditBalance.toFixed(0)
 
-  const items = [
-    {
-      id: 'account',
-      to: MY_ACCOUNT_PATH,
-      label: t('nav.dropdown.account'),
-      icon: Settings,
-    },
-    {
-      id: 'orders',
-      to: ACCOUNT_ORDERS_PATH,
-      label: t('nav.dropdown.myOrders'),
-      icon: ShoppingCart,
-    },
-    {
-      id: 'wishlist',
-      to: WISHLIST_PATH,
-      label: t('nav.dropdown.wishlist'),
-      icon: Heart,
-    },
-    {
-      id: 'returns',
-      to: RETURNS_HISTORY_PATH,
-      label: t('nav.dropdown.returns'),
-      icon: Truck,
-    },
-    {
-      id: 'addresses',
-      to: ADDRESSES_PATH,
-      label: t('profile.nav.myAddresses'),
-      icon: MapPin,
-    },
-    {
-      id: 'password',
-      to: ACCOUNT_CHANGE_PASSWORD_PATH,
-      label: t('profile.nav.changePassword'),
-      icon: KeyRound,
-    },
-  ] as const
-
   return (
     <div
       ref={panelRef}
@@ -164,8 +110,8 @@ export function AccountDropdown({
       )}
     >
       <ul className="flex flex-col gap-0.5 px-2">
-        {items.map((item) => {
-          const Icon = item.icon
+        {ACCOUNT_SIDEBAR_NAV.map((item) => {
+          const Icon = ACCOUNT_NAV_ICONS[item.id]
           return (
             <li key={item.id} role="none">
               <Link
@@ -181,7 +127,7 @@ export function AccountDropdown({
                 )}
               >
                 <Icon size={18} strokeWidth={1.5} aria-hidden className="shrink-0" />
-                <span className="min-w-0 flex-1 truncate text-start">{item.label}</span>
+                <span className="min-w-0 flex-1 truncate text-start">{t(item.labelKey)}</span>
               </Link>
             </li>
           )

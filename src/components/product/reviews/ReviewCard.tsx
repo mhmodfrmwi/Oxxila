@@ -1,14 +1,23 @@
 // src/components/product/reviews/ReviewCard.tsx
-import { Languages, ThumbsUp } from 'lucide-react'
+import { ThumbsUp, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { cn } from '../../../lib/cn'
 import { StarDisplay } from './StarDisplay'
 import type { Review } from './types'
 
 interface ReviewCardProps {
   review: Review
+  pending?: boolean
+  onToggleHelpful?: (reviewId: string) => void
+  onDelete?: (reviewId: string) => void
 }
 
-export function ReviewCard({ review }: ReviewCardProps) {
+export function ReviewCard({
+  review,
+  pending = false,
+  onToggleHelpful,
+  onDelete,
+}: ReviewCardProps) {
   const { t } = useTranslation()
   const titleId = review.title ? `review-title-${review.id}` : undefined
 
@@ -41,14 +50,41 @@ export function ReviewCard({ review }: ReviewCardProps) {
       )}
 
       <div className="review-card-footer">
-        <button type="button" className="review-card-action">
-          <ThumbsUp size={16} strokeWidth={1.5} aria-hidden />
+        <button
+          type="button"
+          className={cn(
+            'review-card-action',
+            review.liked && 'text-accent',
+            pending && 'pointer-events-none opacity-60',
+          )}
+          disabled={pending}
+          aria-pressed={review.liked ? true : undefined}
+          aria-busy={pending || undefined}
+          onClick={() => onToggleHelpful?.(review.id)}
+        >
+          <ThumbsUp
+            size={16}
+            strokeWidth={1.5}
+            aria-hidden
+            className={cn(review.liked && 'fill-accent')}
+          />
           <span>{t('productDetail.reviews.helpful', { count: review.helpful })}</span>
         </button>
-        <button type="button" className="review-card-action">
-          <Languages size={16} strokeWidth={1.5} aria-hidden />
-          <span>{t('productDetail.reviews.translate')}</span>
-        </button>
+        {review.isOwn && onDelete && (
+          <button
+            type="button"
+            className={cn(
+              'review-card-action text-support-error',
+              pending && 'pointer-events-none opacity-60',
+            )}
+            disabled={pending}
+            aria-busy={pending || undefined}
+            onClick={() => onDelete(review.id)}
+          >
+            <Trash2 size={16} strokeWidth={1.5} aria-hidden />
+            <span>{t('productDetail.reviews.delete')}</span>
+          </button>
+        )}
       </div>
     </article>
   )

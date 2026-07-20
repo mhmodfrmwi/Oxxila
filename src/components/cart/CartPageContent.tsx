@@ -176,30 +176,34 @@ export function CartPageContent() {
         )}
       </div>
 
-      <ContentSection padding="compact" aria-labelledby="cart-browsing-heading">
-        <SectionHeader
-          id="cart-browsing-heading"
-          title={t('cart.recentlyViewed')}
-          size="compact"
-        />
-        {browsingLoading ? (
-          <div className="h-[280px] animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
-        ) : (
-          <ProductCarousel
-            products={browsingProducts}
-            ariaLabel={t('cart.recentlyViewedAria')}
+      {(browsingLoading || browsingProducts.length > 0) && (
+        <ContentSection padding="compact" aria-labelledby="cart-browsing-heading">
+          <SectionHeader
+            id="cart-browsing-heading"
+            title={t('cart.recentlyViewed')}
+            size="compact"
           />
-        )}
-      </ContentSection>
+          {browsingLoading ? (
+            <div className="h-[280px] animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
+          ) : (
+            <ProductCarousel
+              products={browsingProducts}
+              ariaLabel={t('cart.recentlyViewedAria')}
+            />
+          )}
+        </ContentSection>
+      )}
 
-      <ContentSection padding="compact" aria-labelledby="cart-buy-again-heading">
-        <SectionHeader id="cart-buy-again-heading" title={t('cart.buyAgain')} size="compact" />
-        {buyAgainLoading ? (
-          <div className="h-[280px] animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
-        ) : (
-          <ProductCarousel products={buyAgainProducts} ariaLabel={t('cart.buyAgainAria')} />
-        )}
-      </ContentSection>
+      {(buyAgainLoading || buyAgainProducts.length > 0) && (
+        <ContentSection padding="compact" aria-labelledby="cart-buy-again-heading">
+          <SectionHeader id="cart-buy-again-heading" title={t('cart.buyAgain')} size="compact" />
+          {buyAgainLoading ? (
+            <div className="h-[280px] animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
+          ) : (
+            <ProductCarousel products={buyAgainProducts} ariaLabel={t('cart.buyAgainAria')} />
+          )}
+        </ContentSection>
+      )}
 
       <Footer />
     </>

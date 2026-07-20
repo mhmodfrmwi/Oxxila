@@ -3,23 +3,27 @@ import { useEffect, useState } from 'react'
 import { getBrowsingHistory } from '../api/users'
 import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
 import { useAuth } from '../context/AuthContext'
-import { ApiError } from '../lib/api'
 import { mapApiProductToRecommendedProduct } from '../utils/productDetailMappers'
 
+/**
+ * Browsing history for authenticated users only.
+ * Guests never trigger `/users/browsing-history`.
+ */
 export function useBrowsingHistory(limit = 6) {
   const { isAuthenticated } = useAuth()
   const [products, setProducts] = useState<RecommendedProduct[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated) return
+    if (!isAuthenticated) {
+      setProducts([])
+      setLoading(false)
+      return
+    }
 
     let cancelled = false
 
     async function load() {
-      await Promise.resolve()
-      if (cancelled) return
-
       setLoading(true)
       try {
         const response = await getBrowsingHistory()
@@ -32,11 +36,8 @@ export function useBrowsingHistory(limit = 6) {
           .map(mapApiProductToRecommendedProduct)
 
         setProducts(mapped)
-      } catch (error) {
-        if (cancelled) return
-        if (error instanceof ApiError && error.statusCode === 401) {
-          setProducts([])
-        }
+      } catch {
+        if (!cancelled) setProducts([])
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -50,6 +51,8 @@ export function useBrowsingHistory(limit = 6) {
   }, [isAuthenticated, limit])
 
   return {
+    /** False for guests — UI should not render browsing sections. */
+    enabled: isAuthenticated,
     products: isAuthenticated ? products : [],
     loading: isAuthenticated ? loading : false,
   }

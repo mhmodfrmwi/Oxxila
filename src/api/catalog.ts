@@ -114,3 +114,43 @@ export function getProductReviewStats(productId: string) {
 export function getProductFaqs(productId: string) {
   return apiRequest<ApiFaq[]>(`/products/${productId}/faqs`)
 }
+
+/** POST /products/:productId/faqs/ask — body: `{ question }` */
+export function askSpecialist(productId: string, question: string) {
+  return apiRequest<undefined>(`/products/${productId}/faqs/ask`, {
+    method: 'POST',
+    auth: true,
+    body: { question },
+  })
+}
+
+export interface CreateProductReviewPayload {
+  rating: number
+  comment: string
+  title?: string
+}
+
+/** POST /products/:productId/reviews — auth required */
+export function createProductReview(productId: string, payload: CreateProductReviewPayload) {
+  return apiRequest<ApiReview>(`/products/${productId}/reviews`, {
+    method: 'POST',
+    auth: true,
+    body: payload,
+  })
+}
+
+/** POST /reviews/:id/like — toggles like; returns `{ likesCount, liked }` */
+export function toggleReviewLike(reviewId: string) {
+  return apiRequest<{ likesCount: number; liked: boolean }>(`/reviews/${reviewId}/like`, {
+    method: 'POST',
+    auth: true,
+  })
+}
+
+/** DELETE /reviews/:id — owner or admin */
+export function deleteReview(reviewId: string) {
+  return apiRequest<undefined>(`/reviews/${reviewId}`, {
+    method: 'DELETE',
+    auth: true,
+  })
+}

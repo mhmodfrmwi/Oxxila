@@ -14,10 +14,8 @@ export function sortOptionToApiSort(sort: SortOption): string {
     case 'rating':
       return '-ratingsAverage'
     case 'newest':
-      return '-createdAt'
-    case 'featured':
     default:
-      return '-soldCount,-createdAt'
+      return '-createdAt'
   }
 }
 

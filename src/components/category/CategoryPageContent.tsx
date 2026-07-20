@@ -1,7 +1,8 @@
 // src/components/category/CategoryPageContent.tsx
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CATEGORIES_PATH, HOME_PATH } from '../../config/routes'
+import { useAuth } from '../../context/AuthContext'
 import { useBrowsingHistory } from '../../hooks/useBrowsingHistory'
 import { useCategoryProducts } from '../../hooks/useCategoryProducts'
 import { useLandingCatalogContext } from '../../hooks/useLandingCatalogContext'
@@ -12,7 +13,6 @@ import {
   parseCategoryBrowseParams,
   type CategoryBrowseState,
 } from '../../utils/categoryBrowseParams'
-import { collectSubcategoriesFromCategories } from '../../utils/catalogSubcategories'
 import { Breadcrumb } from '../ui/Breadcrumb'
 import { Pagination } from '../ui/Pagination'
 import { ContentSection } from '../layout/ContentSection'
@@ -24,6 +24,7 @@ import { ProductGrid } from './ProductGrid'
 import {
   browsingHistoryTitle,
   findCategoryBySlug,
+  DEFAULT_SORT,
   PRODUCTS_PER_PAGE,
   relatedBrowsingTitle,
   type SortOption,
@@ -31,9 +32,16 @@ import {
 import type { FilterState } from './filters/filterState'
 import { FilterSidebar } from './filters/FilterSidebar'
 
+function sameIdList(a: readonly string[], b: readonly string[]) {
+  if (a.length !== b.length) return false
+  const set = new Set(a)
+  return b.every((id) => set.has(id))
+}
+
 export function CategoryPageContent() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const { isAuthenticated } = useAuth()
   const { categories, brands, loading: catalogLoading } = useLandingCatalogContext()
 
   const browse = useMemo(
@@ -75,22 +83,88 @@ export function CategoryPageContent() {
     return filtered.length > 0 ? filtered : activeBrands
   }, [brands, selectedCategory])
 
-  const catalogSubcategories = useMemo(
-    () => collectSubcategoriesFromCategories(categories),
-    [categories],
-  )
-
   const { subcategories: fetchedSubcategories, loading: subcategoriesLoading } = useSubCategories(
     selectedCategory?._id,
-    !catalogLoading,
+    !catalogLoading && Boolean(selectedCategory?._id),
   )
 
   const subcategories = useMemo(() => {
+    if (!selectedCategory) return []
     if (fetchedSubcategories.length > 0) return fetchedSubcategories
-    if (selectedCategory?.subcategories?.length) return selectedCategory.subcategories
-    if (!selectedCategory) return catalogSubcategories
+    if (selectedCategory.subcategories?.length) return selectedCategory.subcategories
     return []
-  }, [fetchedSubcategories, selectedCategory, catalogSubcategories])
+  }, [fetchedSubcategories, selectedCategory])
+
+  const typeIdsKey = filters.typeOfCategoryIds.join(',')
+  const typePruneKeyRef = useRef('')
+
+  // Keep Type-of-Category selections valid for the active category (URL sync).
+  useEffect(() => {
+    const selectedTypes = filters.typeOfCategoryIds
+
+    if (!selectedCategory) {
+      if (selectedTypes.length === 0) {
+        typePruneKeyRef.current = 'none:[]'
+        return
+      }
+      const key = 'none:clear'
+      if (typePruneKeyRef.current === key) return
+      typePruneKeyRef.current = key
+      setSearchParams(
+        buildCategoryBrowseSearchParams({
+          filters: { ...filters, typeOfCategoryIds: [] },
+          sort,
+          categorySlug: null,
+          certifiedOnly,
+          collection,
+          page: 1,
+        }),
+        { replace: true },
+      )
+      return
+    }
+
+    const hasEmbedded = Boolean(selectedCategory.subcategories?.length)
+    if (subcategoriesLoading && !hasEmbedded && fetchedSubcategories.length === 0) {
+      return
+    }
+
+    const validIds = new Set(subcategories.map((item) => item._id))
+    const nextTypes = selectedTypes.filter((id) => validIds.has(id))
+    const key = `${selectedCategory._id}:${nextTypes.slice().sort().join(',')}`
+
+    if (sameIdList(nextTypes, selectedTypes)) {
+      typePruneKeyRef.current = key
+      return
+    }
+
+    if (typePruneKeyRef.current === key) return
+    typePruneKeyRef.current = key
+
+    setSearchParams(
+      buildCategoryBrowseSearchParams({
+        filters: { ...filters, typeOfCategoryIds: nextTypes },
+        sort,
+        categorySlug,
+        certifiedOnly,
+        collection: null,
+        page: 1,
+      }),
+      { replace: true },
+    )
+  }, [
+    selectedCategory,
+    categorySlug,
+    subcategories,
+    subcategoriesLoading,
+    fetchedSubcategories.length,
+    typeIdsKey,
+    filters,
+    sort,
+    certifiedOnly,
+    collection,
+    setSearchParams,
+  ])
 
   const pageTitle =
     selectedCategory?.name ??
@@ -123,7 +197,7 @@ export function CategoryPageContent() {
     if (patch.priceSort === 'low-to-high') nextSort = 'price-asc'
     if (patch.priceSort === 'high-to-low') nextSort = 'price-desc'
     if (patch.priceSort === 'all' && (sort === 'price-asc' || sort === 'price-desc')) {
-      nextSort = 'featured'
+      nextSort = DEFAULT_SORT
     }
 
     commitBrowse({
@@ -198,7 +272,7 @@ export function CategoryPageContent() {
             categories={categories}
             activeCategorySlug={selectedCategory?.slug}
             subcategories={subcategories}
-            subcategoriesLoading={subcategoriesLoading}
+            subcategoriesLoading={Boolean(selectedCategory) && subcategoriesLoading}
             brands={categoryBrands}
           />
 
@@ -242,19 +316,23 @@ export function CategoryPageContent() {
         </div>
       </div>
 
-      <ContentSection padding="compact" aria-labelledby="browsing-history-heading">
-        <SectionHeader id="browsing-history-heading" title={browsingHistoryTitle} size="compact" />
-        {browsingLoading ? (
-          <div className="h-[280px] animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
-        ) : (
-          <ProductCarousel products={browsingProducts} ariaLabel="Browsing history products" />
-        )}
-      </ContentSection>
+      {isAuthenticated && (browsingLoading || browsingProducts.length > 0) && (
+        <>
+          <ContentSection padding="compact" aria-labelledby="browsing-history-heading">
+            <SectionHeader id="browsing-history-heading" title={browsingHistoryTitle} size="compact" />
+            {browsingLoading ? (
+              <div className="h-[280px] animate-pulse rounded-[20px] bg-surface-muted" aria-hidden />
+            ) : (
+              <ProductCarousel products={browsingProducts} ariaLabel="Browsing history products" />
+            )}
+          </ContentSection>
 
-      <ContentSection padding="compact" aria-labelledby="related-browsing-heading">
-        <SectionHeader id="related-browsing-heading" title={relatedBrowsingTitle} size="compact" />
-        <ProductCarousel products={products} ariaLabel="Related browsing products" />
-      </ContentSection>
+          <ContentSection padding="compact" aria-labelledby="related-browsing-heading">
+            <SectionHeader id="related-browsing-heading" title={relatedBrowsingTitle} size="compact" />
+            <ProductCarousel products={products} ariaLabel="Related browsing products" />
+          </ContentSection>
+        </>
+      )}
 
       <Footer />
     </>

@@ -1,5 +1,5 @@
 // src/utils/categoryBrowseParams.ts
-import type { SortOption } from '../components/category/categoryData'
+import { DEFAULT_SORT, type SortOption } from '../components/category/categoryData'
 import {
   createDefaultFilterState,
   type FilterState,
@@ -8,11 +8,10 @@ import {
 import { CATEGORIES_PATH } from '../config/routes'
 
 const SORT_OPTIONS = new Set<SortOption>([
-  'featured',
+  'newest',
   'price-asc',
   'price-desc',
   'rating',
-  'newest',
 ])
 
 const PRICE_SORT_OPTIONS = new Set<PriceSort>(['all', 'low-to-high', 'high-to-low'])
@@ -82,7 +81,7 @@ export function applyCollectionPreset(slug: CollectionBrowseSlug): CategoryBrows
     case 'new-arrivals':
       return {
         filters: createDefaultFilterState(),
-        sort: 'newest',
+        sort: DEFAULT_SORT,
         categorySlug: null,
         certifiedOnly: false,
         collection: slug,
@@ -91,7 +90,7 @@ export function applyCollectionPreset(slug: CollectionBrowseSlug): CategoryBrows
     case 'best-sellers':
       return {
         filters: { ...createDefaultFilterState(), offerIds: ['best-seller'] },
-        sort: 'featured',
+        sort: DEFAULT_SORT,
         categorySlug: null,
         certifiedOnly: false,
         collection: slug,
@@ -100,7 +99,7 @@ export function applyCollectionPreset(slug: CollectionBrowseSlug): CategoryBrows
     case 'trending':
       return {
         filters: createDefaultFilterState(),
-        sort: 'featured',
+        sort: DEFAULT_SORT,
         categorySlug: null,
         certifiedOnly: false,
         collection: slug,
@@ -109,7 +108,7 @@ export function applyCollectionPreset(slug: CollectionBrowseSlug): CategoryBrows
     case 'offers':
       return {
         filters: { ...createDefaultFilterState(), offerIds: ['on-sale'] },
-        sort: 'featured',
+        sort: DEFAULT_SORT,
         categorySlug: null,
         certifiedOnly: false,
         collection: slug,
@@ -118,7 +117,7 @@ export function applyCollectionPreset(slug: CollectionBrowseSlug): CategoryBrows
     case 'featured':
       return {
         filters: createDefaultFilterState(),
-        sort: 'featured',
+        sort: DEFAULT_SORT,
         categorySlug: null,
         certifiedOnly: true,
         collection: slug,
@@ -154,12 +153,18 @@ export function parseCategoryBrowseParams(searchParams: URLSearchParams): Catego
       offerIds: splitCsv(searchParams.get('offers')),
       inStockOnly: searchParams.get('inStock') === '1',
     },
-    sort: isSortOption(sortParam) ? sortParam : 'featured',
+    sort: normalizeSortParam(sortParam),
     categorySlug: searchParams.get('category')?.trim() || null,
     certifiedOnly: searchParams.get('certified') === '1',
     collection: null,
     page,
   }
+}
+
+/** Maps legacy `featured` URLs to the current default (`newest`). */
+function normalizeSortParam(value: string | null): SortOption {
+  if (value === 'featured') return DEFAULT_SORT
+  return isSortOption(value) ? value : DEFAULT_SORT
 }
 
 function hasCustomFilterParams(searchParams: URLSearchParams): boolean {
@@ -175,7 +180,7 @@ function hasCustomFilterParams(searchParams: URLSearchParams): boolean {
     searchParams.has('inStock') ||
     searchParams.has('category') ||
     searchParams.has('certified') ||
-    (searchParams.has('sort') && searchParams.get('sort') !== 'featured')
+    (searchParams.has('sort') && searchParams.get('sort') !== DEFAULT_SORT)
   )
 }
 
@@ -190,7 +195,7 @@ export function buildCategoryBrowseSearchParams(state: CategoryBrowseState): URL
   }
 
   if (state.categorySlug) params.set('category', state.categorySlug)
-  if (state.sort !== 'featured') params.set('sort', state.sort)
+  if (state.sort !== DEFAULT_SORT) params.set('sort', state.sort)
   if (state.page > 1) params.set('page', String(state.page))
   if (state.certifiedOnly) params.set('certified', '1')
 
@@ -217,7 +222,7 @@ export function categoryBrowseHref(state: CategoryBrowseState): string {
 export function categoryBrowsePath(categorySlug: string): string {
   return categoryBrowseHref({
     filters: createDefaultFilterState(),
-    sort: 'featured',
+    sort: DEFAULT_SORT,
     categorySlug,
     certifiedOnly: false,
     collection: null,

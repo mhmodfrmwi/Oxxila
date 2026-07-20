@@ -243,6 +243,19 @@
       "location": "Location"
     }
   },
+  "categoryFilters": {
+    "typeOfCategory": "Type of Category",
+    "chooseCategoryFirst": "Choose a category first",
+    "loadingTypes": "Loading types…",
+    "noTypes": "No types available."
+  },
+  "categorySort": {
+    "label": "Sort products",
+    "newest": "Newest",
+    "priceAsc": "Price: Low to High",
+    "priceDesc": "Price: High to Low",
+    "rating": "Top Rated"
+  },
   "shop": {
     "promo": {
       "title": "Return within 20 days",
@@ -366,7 +379,13 @@
     "increaseQuantity": "Increase quantity",
     "adding": "Adding...",
     "oneClickCheckout": "One Click Checkout",
+    "oneClickCheckoutLoading": "Preparing checkout…",
     "share": "Share product",
+    "shareCopied": "Product link copied",
+    "shareFailed": "Unable to share this product.",
+    "tag": {
+      "sensitiveSkin": "Sensitive skin"
+    },
     "sku": "SKU",
     "category": "Category",
     "subcategory": "Subcategory",
@@ -406,7 +425,21 @@
       "title": "Questions & Safety",
       "subtitle": "Concerns regarding clinical usage and ingredient interactions.",
       "askSpecialist": "Ask a specialist",
-      "faqAria": "Product safety questions"
+      "faqAria": "Product safety questions",
+      "empty": "No safety questions available for this product yet.",
+      "askForm": {
+        "title": "Ask a specialist",
+        "description": "Share your question about clinical use or ingredient interactions. Our team will follow up by email.",
+        "questionLabel": "Your question",
+        "questionPlaceholder": "Ask about ingredients, usage, or safety concerns…",
+        "questionRequired": "Please enter your question.",
+        "questionMax": "Question cannot exceed {{max}} characters.",
+        "charCount": "{{count}} / {{max}}",
+        "submit": "Send question",
+        "submitting": "Sending…",
+        "success": "Your question has been sent. Our specialist will get back to you soon!",
+        "failed": "Could not send your question. Please try again."
+      }
     },
     "reviews": {
       "ariaLabel": "Customer reviews",
@@ -415,9 +448,36 @@
       "distribution": "Rating distribution",
       "writeReview": "Write a review",
       "viewAll": "View all comments",
+      "loadMore": "Load more reviews",
+      "loadingMore": "Loading reviews…",
       "empty": "No reviews yet.",
       "helpful": "Helpful ({{count}})",
-      "translate": "Translate"
+      "delete": "Delete",
+      "deleteSuccess": "Review deleted successfully",
+      "deleteFailed": "Could not delete this review. Please try again.",
+      "helpfulFailed": "Could not update helpful vote. Please try again.",
+      "writeForm": {
+        "title": "Write a review",
+        "description": "Share your experience with this product to help other shoppers.",
+        "ratingLabel": "Your rating",
+        "ratingStar": "{{count}} stars",
+        "ratingRequired": "Please select a rating from 1 to 5.",
+        "titleLabel": "Review title (optional)",
+        "titlePlaceholder": "Sum up your experience",
+        "titleMax": "Title cannot exceed {{max}} characters.",
+        "commentLabel": "Your review",
+        "commentPlaceholder": "What did you like or dislike?",
+        "commentRequired": "Please write your review.",
+        "commentMax": "Review cannot exceed {{max}} characters.",
+        "submit": "Submit review",
+        "submitting": "Submitting…",
+        "success": "Review created successfully",
+        "failed": "Could not submit your review. Please try again."
+      }
+    },
+    "auth": {
+      "signInRequired": "Sign in required",
+      "signInRequiredDetail": "Please sign in to continue."
     },
     "moreFromBrand": "More from {{brand}}",
     "moreFromBrandFallback": "More from this brand",
@@ -777,6 +837,7 @@
       "myProfile": "My Profile",
       "myOrders": "My Orders",
       "wishlist": "Wishlist",
+      "requestReturn": "Request Return",
       "myReturns": "My Returns",
       "myAddresses": "My Addresses",
       "changePassword": "Change Password",

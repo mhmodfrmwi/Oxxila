@@ -8,12 +8,17 @@ export function useSubCategories(categoryId: string | undefined, shouldFetch = t
   const [loading, setLoading] = useState(shouldFetch)
 
   useEffect(() => {
-    if (!shouldFetch) return
+    if (!shouldFetch) {
+      setSubcategories([])
+      setLoading(false)
+      return
+    }
 
     let cancelled = false
 
     async function load() {
       setLoading(true)
+      setSubcategories([])
 
       try {
         const response = await getSubCategories(categoryId ? { category: categoryId } : undefined)

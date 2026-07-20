@@ -11,14 +11,15 @@ export function useBuyAgainProducts() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated) return
+    if (!isAuthenticated) {
+      setProducts([])
+      setLoading(false)
+      return
+    }
 
     let cancelled = false
 
     async function load() {
-      await Promise.resolve()
-      if (cancelled) return
-
       setLoading(true)
       try {
         const response = await getRecommendations()
@@ -39,6 +40,7 @@ export function useBuyAgainProducts() {
   }, [isAuthenticated])
 
   return {
+    enabled: isAuthenticated,
     products: isAuthenticated ? products : [],
     loading: isAuthenticated ? loading : false,
   }

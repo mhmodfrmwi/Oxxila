@@ -12,6 +12,8 @@ export interface Review {
   title: string
   comment: string
   helpful: number
+  liked?: boolean
+  isOwn?: boolean
 }
 
 export interface ReviewsSectionProps {
@@ -21,8 +23,14 @@ export interface ReviewsSectionProps {
   reviews: Review[]
   reviewsTotalDocuments?: number
   loading?: boolean
+  loadingMore?: boolean
+  error?: string | null
   className?: string
   initialVisibleCount?: number
+  hasMoreReviews?: boolean
   onWriteReview?: () => void
-  onViewAll?: () => void
+  onLoadMore?: () => void | Promise<void>
+  onToggleHelpful?: (reviewId: string) => void
+  onDeleteReview?: (reviewId: string) => void
+  pendingReviewId?: string | null
 }

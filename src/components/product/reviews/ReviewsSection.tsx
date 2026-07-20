@@ -1,4 +1,5 @@
 // src/components/product/reviews/ReviewsSection.tsx
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/cn'
 import { Button } from '../../ui/Button'
@@ -41,15 +42,36 @@ export function ReviewsSection({
   reviews,
   reviewsTotalDocuments,
   loading = false,
+  loadingMore = false,
+  error = null,
   className,
   initialVisibleCount = 3,
+  hasMoreReviews = false,
   onWriteReview,
-  onViewAll,
+  onLoadMore,
+  onToggleHelpful,
+  onDeleteReview,
+  pendingReviewId = null,
 }: ReviewsSectionProps) {
   const { t } = useTranslation()
-  const visibleReviews = reviews.slice(0, initialVisibleCount)
+  const [expanded, setExpanded] = useState(false)
   const totalDocuments = reviewsTotalDocuments ?? totalReviews
-  const showViewAll = totalDocuments > initialVisibleCount
+  const visibleReviews = expanded ? reviews : reviews.slice(0, initialVisibleCount)
+  const showExpandLocal = !expanded && reviews.length > initialVisibleCount
+  const showLoadMore =
+    expanded && hasMoreReviews && typeof onLoadMore === 'function'
+  const showViewAll = !expanded && (showExpandLocal || totalDocuments > initialVisibleCount)
+
+  useEffect(() => {
+    setExpanded(false)
+  }, [totalDocuments])
+
+  async function handleViewAll() {
+    setExpanded(true)
+    if (hasMoreReviews && onLoadMore) {
+      await onLoadMore()
+    }
+  }
 
   return (
     <section
@@ -68,11 +90,22 @@ export function ReviewsSection({
           />
 
           <div>
+            {error && (
+              <p className="mb-4 text-sm text-support-error" role="alert">
+                {error}
+              </p>
+            )}
+
             <div className="reviews-list">
               {visibleReviews.length > 0 ? (
                 visibleReviews.map((review) => (
                   <div key={review.id} className="reviews-list-item">
-                    <ReviewCard review={review} />
+                    <ReviewCard
+                      review={review}
+                      pending={pendingReviewId === review.id}
+                      onToggleHelpful={onToggleHelpful}
+                      onDelete={onDeleteReview}
+                    />
                   </div>
                 ))
               ) : (
@@ -87,9 +120,31 @@ export function ReviewsSection({
                   variant="outline"
                   pill
                   className="reviews-view-all-btn !border"
-                  onClick={onViewAll}
+                  onClick={() => void handleViewAll()}
+                  disabled={loadingMore}
+                  aria-busy={loadingMore || undefined}
                 >
-                  {t('productDetail.reviews.viewAll')}
+                  {loadingMore
+                    ? t('productDetail.reviews.loadingMore')
+                    : t('productDetail.reviews.viewAll')}
+                </Button>
+              </div>
+            )}
+
+            {showLoadMore && (
+              <div className="reviews-view-all-wrap">
+                <Button
+                  type="button"
+                  variant="outline"
+                  pill
+                  className="reviews-view-all-btn !border"
+                  onClick={() => void onLoadMore?.()}
+                  disabled={loadingMore}
+                  aria-busy={loadingMore || undefined}
+                >
+                  {loadingMore
+                    ? t('productDetail.reviews.loadingMore')
+                    : t('productDetail.reviews.loadMore')}
                 </Button>
               </div>
             )}

@@ -19,14 +19,15 @@ export function RecommendedProductsSection() {
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated) return
+    if (!isAuthenticated) {
+      setRecommendedFromApi([])
+      setLoadingRecommendations(false)
+      return
+    }
 
     let cancelled = false
 
     async function load() {
-      await Promise.resolve()
-      if (cancelled) return
-
       setLoadingRecommendations(true)
       try {
         const response = await getRecommendations()

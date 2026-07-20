@@ -5,23 +5,27 @@ import { Layout } from '../components/layout/Layout'
 import { Footer } from '../components/landing/footer/Footer'
 import { CategoryToolbar } from '../components/category/CategoryToolbar'
 import { ProductGrid } from '../components/category/ProductGrid'
-import { PRODUCTS_PER_PAGE, type SortOption } from '../components/category/categoryData'
+import {
+  DEFAULT_SORT,
+  PRODUCTS_PER_PAGE,
+  type SortOption,
+} from '../components/category/categoryData'
 import { useSearchProducts } from '../hooks/useSearchProducts'
 import { Pagination } from '../components/ui/Pagination'
 import { useLandingCatalogContext } from '../hooks/useLandingCatalogContext'
 
 const SORT_OPTIONS = new Set<SortOption>([
-  'featured',
+  'newest',
   'price-asc',
   'price-desc',
   'rating',
-  'newest',
 ])
 
 function parseSort(value: string | null): SortOption {
+  if (value === 'featured') return DEFAULT_SORT
   return value != null && SORT_OPTIONS.has(value as SortOption)
     ? (value as SortOption)
-    : 'featured'
+    : DEFAULT_SORT
 }
 
 function parsePage(value: string | null): number {
@@ -71,7 +75,7 @@ export function SearchPage() {
   function updateParams(patch: { sort?: SortOption; page?: number }) {
     const next = new URLSearchParams(searchParams)
     if (patch.sort != null) {
-      if (patch.sort === 'featured') next.delete('sort')
+      if (patch.sort === DEFAULT_SORT) next.delete('sort')
       else next.set('sort', patch.sort)
     }
     if (patch.page != null) {

@@ -57,6 +57,7 @@ export function FilterSidebar({
         onChange={(typeOfCategoryIds) => onFiltersChange({ typeOfCategoryIds })}
         subcategories={subcategories}
         loading={subcategoriesLoading}
+        categorySelected={Boolean(activeCategorySlug)}
       />
       <ConcernsFilter
         selectedIds={filters.concernIds}

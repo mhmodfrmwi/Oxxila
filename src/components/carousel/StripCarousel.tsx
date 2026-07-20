@@ -31,6 +31,7 @@ export function StripCarousel<T>({
   const [maxIndex, setMaxIndex] = useState(0)
   const viewportRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
+  const dragDistanceRef = useRef(0)
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current
@@ -85,9 +86,22 @@ export function StripCarousel<T>({
             right: 0,
           }}
           dragElastic={0.08}
+          onDragStart={() => {
+            dragDistanceRef.current = 0
+          }}
+          onDrag={(_, info) => {
+            dragDistanceRef.current = Math.abs(info.offset.x)
+          }}
           onDragEnd={(_, info) => {
             if (info.offset.x < -SWIPE_THRESHOLD) goNext()
             else if (info.offset.x > SWIPE_THRESHOLD) goPrev()
+          }}
+          onClickCapture={(event) => {
+            // Prevent accidental link navigation after a swipe gesture.
+            if (dragDistanceRef.current > 8) {
+              event.preventDefault()
+              event.stopPropagation()
+            }
           }}
         >
           {items.map((item) => (

@@ -1,4 +1,6 @@
+// src/components/category/CategoryToolbar.tsx
 import { ChevronDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../ui/interactionStyles'
 import { typeSmallClasses } from '../ui/typography'
@@ -21,6 +23,8 @@ export function CategoryToolbar({
   onSortChange,
   className,
 }: CategoryToolbarProps) {
+  const { t } = useTranslation()
+
   return (
     <div
       className={cn(
@@ -41,7 +45,7 @@ export function CategoryToolbar({
 
       <div className="relative shrink-0">
         <label htmlFor="category-sort" className="sr-only">
-          Sort products
+          {t('categorySort.label')}
         </label>
         <select
           id="category-sort"
@@ -58,7 +62,7 @@ export function CategoryToolbar({
         >
           {sortOptions.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {t(option.labelKey)}
             </option>
           ))}
         </select>

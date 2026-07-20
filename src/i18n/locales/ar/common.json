@@ -243,6 +243,19 @@
       "location": "الموقع"
     }
   },
+  "categoryFilters": {
+    "typeOfCategory": "نوع الفئة",
+    "chooseCategoryFirst": "اختر فئة أولاً",
+    "loadingTypes": "جاري تحميل الأنواع…",
+    "noTypes": "لا توجد أنواع متاحة."
+  },
+  "categorySort": {
+    "label": "ترتيب المنتجات",
+    "newest": "الأحدث",
+    "priceAsc": "السعر: من الأقل إلى الأعلى",
+    "priceDesc": "السعر: من الأعلى إلى الأقل",
+    "rating": "الأعلى تقييمًا"
+  },
   "shop": {
     "promo": {
       "title": "إرجاع خلال 20 يومًا",
@@ -366,7 +379,13 @@
     "increaseQuantity": "زيادة الكمية",
     "adding": "جاري الإضافة...",
     "oneClickCheckout": "شراء بنقرة واحدة",
+    "oneClickCheckoutLoading": "جاري تحضير الدفع…",
     "share": "مشاركة المنتج",
+    "shareCopied": "تم نسخ رابط المنتج",
+    "shareFailed": "تعذر مشاركة هذا المنتج.",
+    "tag": {
+      "sensitiveSkin": "بشرة حساسة"
+    },
     "sku": "رمز المنتج",
     "category": "الفئة",
     "subcategory": "الفئة الفرعية",
@@ -406,7 +425,21 @@
       "title": "الأسئلة والسلامة",
       "subtitle": "استفسارات حول الاستخدام السريري وتفاعلات المكونات.",
       "askSpecialist": "اسأل متخصصًا",
-      "faqAria": "أسئلة سلامة المنتج"
+      "faqAria": "أسئلة سلامة المنتج",
+      "empty": "لا توجد أسئلة سلامة لهذا المنتج بعد.",
+      "askForm": {
+        "title": "اسأل متخصصًا",
+        "description": "شارك سؤالك حول الاستخدام السريري أو تفاعلات المكونات. سيتواصل فريقنا معك عبر البريد الإلكتروني.",
+        "questionLabel": "سؤالك",
+        "questionPlaceholder": "اسأل عن المكونات أو طريقة الاستخدام أو السلامة…",
+        "questionRequired": "يرجى إدخال سؤالك.",
+        "questionMax": "لا يمكن أن يتجاوز السؤال {{max}} حرفًا.",
+        "charCount": "{{count}} / {{max}}",
+        "submit": "إرسال السؤال",
+        "submitting": "جاري الإرسال…",
+        "success": "تم إرسال سؤالك. سيتواصل معك المتخصص قريبًا!",
+        "failed": "تعذر إرسال سؤالك. يرجى المحاولة مرة أخرى."
+      }
     },
     "reviews": {
       "ariaLabel": "آراء العملاء",
@@ -415,9 +448,36 @@
       "distribution": "توزيع التقييمات",
       "writeReview": "اكتب تقييمًا",
       "viewAll": "عرض كل التعليقات",
+      "loadMore": "تحميل المزيد من التقييمات",
+      "loadingMore": "جاري تحميل التقييمات…",
       "empty": "لا توجد تقييمات بعد.",
       "helpful": "مفيد ({{count}})",
-      "translate": "ترجمة"
+      "delete": "حذف",
+      "deleteSuccess": "تم حذف التقييم بنجاح",
+      "deleteFailed": "تعذر حذف هذا التقييم. يرجى المحاولة مرة أخرى.",
+      "helpfulFailed": "تعذر تحديث تصويت المفيد. يرجى المحاولة مرة أخرى.",
+      "writeForm": {
+        "title": "اكتب تقييمًا",
+        "description": "شارك تجربتك مع هذا المنتج لمساعدة المتسوقين الآخرين.",
+        "ratingLabel": "تقييمك",
+        "ratingStar": "{{count}} نجوم",
+        "ratingRequired": "يرجى اختيار تقييم من 1 إلى 5.",
+        "titleLabel": "عنوان التقييم (اختياري)",
+        "titlePlaceholder": "لخّص تجربتك",
+        "titleMax": "لا يمكن أن يتجاوز العنوان {{max}} حرفًا.",
+        "commentLabel": "تقييمك",
+        "commentPlaceholder": "ما الذي أعجبك أو لم يعجبك؟",
+        "commentRequired": "يرجى كتابة تقييمك.",
+        "commentMax": "لا يمكن أن يتجاوز التقييم {{max}} حرفًا.",
+        "submit": "إرسال التقييم",
+        "submitting": "جاري الإرسال…",
+        "success": "تم إنشاء التقييم بنجاح",
+        "failed": "تعذر إرسال تقييمك. يرجى المحاولة مرة أخرى."
+      }
+    },
+    "auth": {
+      "signInRequired": "تسجيل الدخول مطلوب",
+      "signInRequiredDetail": "يرجى تسجيل الدخول للمتابعة."
     },
     "moreFromBrand": "المزيد من {{brand}}",
     "moreFromBrandFallback": "المزيد من هذه العلامة",
@@ -777,6 +837,7 @@
       "myProfile": "ملفي الشخصي",
       "myOrders": "طلباتي",
       "wishlist": "المفضلة",
+      "requestReturn": "طلب إرجاع",
       "myReturns": "مرتجعاتي",
       "myAddresses": "عناويني",
       "changePassword": "تغيير كلمة المرور",

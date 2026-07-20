@@ -20,9 +20,13 @@ export function ProductImageGallery({
   onActiveIndexChange,
   className,
 }: ProductImageGalleryProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [internalIndex, setInternalIndex] = useState(0)
   const activeIndex = controlledIndex ?? internalIndex
+  const isRtl = i18n.dir() === 'rtl'
+  const showNav = images.length > 1
+  const PrevIcon = isRtl ? ChevronRight : ChevronLeft
+  const NextIcon = isRtl ? ChevronLeft : ChevronRight
 
   function setActiveIndex(index: number) {
     if (onActiveIndexChange) {
@@ -62,53 +66,54 @@ export function ProductImageGallery({
           onError={handleImageError}
         />
 
-        <div
-          className="product-detail-gallery-nav"
-          dir="ltr"
-          aria-label={t('productDetail.gallery.navigation')}
-        >
-          <button
-            type="button"
-            onClick={goPrev}
-            aria-label={t('productDetail.gallery.previous')}
-            className={cn(
-              'product-detail-gallery-arrow flex items-center justify-center p-1',
-              focusRingClasses,
-            )}
+        {showNav && (
+          <div
+            className="product-detail-gallery-nav"
+            aria-label={t('productDetail.gallery.navigation')}
           >
-            <ChevronLeft size={12} strokeWidth={1.5} aria-hidden />
-          </button>
+            <button
+              type="button"
+              onClick={goPrev}
+              aria-label={t('productDetail.gallery.previous')}
+              className={cn(
+                'product-detail-gallery-arrow flex items-center justify-center p-1',
+                focusRingClasses,
+              )}
+            >
+              <PrevIcon size={12} strokeWidth={1.5} aria-hidden />
+            </button>
 
-          <ul
-            className={cn('product-detail-gallery-dots flex items-center')}
-            aria-label={t('productDetail.gallery.pagination')}
-          >
-            {images.map((image, index) => (
-              <li key={`${image.src}-dot-${index}`} className="product-detail-gallery-dot-slot">
-                <button
-                  type="button"
-                  onClick={() => setActiveIndex(index)}
-                  aria-label={t('productDetail.gallery.goToImage', { number: index + 1 })}
-                  aria-current={index === activeIndex ? 'true' : undefined}
-                  className={cn('product-detail-gallery-dot', focusRingClasses)}
-                  data-active={index === activeIndex ? 'true' : 'false'}
-                />
-              </li>
-            ))}
-          </ul>
+            <ul
+              className={cn('product-detail-gallery-dots flex items-center')}
+              aria-label={t('productDetail.gallery.pagination')}
+            >
+              {images.map((image, index) => (
+                <li key={`${image.src}-dot-${index}`} className="product-detail-gallery-dot-slot">
+                  <button
+                    type="button"
+                    onClick={() => setActiveIndex(index)}
+                    aria-label={t('productDetail.gallery.goToImage', { number: index + 1 })}
+                    aria-current={index === activeIndex ? 'true' : undefined}
+                    className={cn('product-detail-gallery-dot', focusRingClasses)}
+                    data-active={index === activeIndex ? 'true' : 'false'}
+                  />
+                </li>
+              ))}
+            </ul>
 
-          <button
-            type="button"
-            onClick={goNext}
-            aria-label={t('productDetail.gallery.next')}
-            className={cn(
-              'product-detail-gallery-arrow flex items-center justify-center p-1',
-              focusRingClasses,
-            )}
-          >
-            <ChevronRight size={12} strokeWidth={1.5} aria-hidden />
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={goNext}
+              aria-label={t('productDetail.gallery.next')}
+              className={cn(
+                'product-detail-gallery-arrow flex items-center justify-center p-1',
+                focusRingClasses,
+              )}
+            >
+              <NextIcon size={12} strokeWidth={1.5} aria-hidden />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -128,6 +133,8 @@ export function ProductMediaThumbnails({
   className,
 }: ProductMediaThumbnailsProps) {
   const { t } = useTranslation()
+
+  if (images.length <= 1) return null
 
   return (
     <ul

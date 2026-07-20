@@ -17,6 +17,8 @@ export interface QuestionsSafetySectionProps {
   subtitle?: string
   buttonText?: string
   faqs?: FAQItem[]
+  /** Shown when the FAQ list is empty (optional load error / empty copy). */
+  emptyMessage?: string
   className?: string
   onAskSpecialist?: () => void
 }
@@ -28,6 +30,7 @@ export function QuestionsSafetySection({
   subtitle,
   buttonText,
   faqs = DEFAULT_FAQS,
+  emptyMessage,
   className,
   onAskSpecialist,
 }: QuestionsSafetySectionProps) {
@@ -38,6 +41,7 @@ export function QuestionsSafetySection({
   const resolvedTitle = title ?? t('productDetail.questions.title')
   const resolvedSubtitle = subtitle ?? t('productDetail.questions.subtitle')
   const resolvedButtonText = buttonText ?? t('productDetail.questions.askSpecialist')
+  const resolvedEmpty = emptyMessage ?? t('productDetail.questions.empty')
 
   return (
     <section
@@ -66,6 +70,9 @@ export function QuestionsSafetySection({
           role="region"
           aria-label={t('productDetail.questions.faqAria')}
         >
+          {faqs.length === 0 && (
+            <p className="text-sm text-secondary-text">{resolvedEmpty}</p>
+          )}
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index
             const triggerId = `${baseId}-trigger-${index}`

@@ -76,7 +76,8 @@ export interface ApiReview {
   review?: string
   createdAt?: string
   likesCount?: number
-  user?: ApiReviewUser
+  likes?: Array<string | { _id?: string }>
+  user?: ApiReviewUser | string
 }
 
 export interface ApiReviewBreakdown {

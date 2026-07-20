@@ -43,10 +43,7 @@ export function useCollectionProducts(
           ...activeConfig.query,
           page,
           limit,
-          sort:
-            sort === 'featured' && activeConfig.query.sort
-              ? activeConfig.query.sort
-              : sortOptionToApiSort(sort),
+          sort: sortOptionToApiSort(sort),
         })
 
         if (cancelled) return

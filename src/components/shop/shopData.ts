@@ -9,7 +9,6 @@ import concernSensitive from '../../assets/landing/image2_47_362.png'
 import concernDrought from '../../assets/landing/image3_47_362.png'
 import concernWrinkles from '../../assets/landing/image4_47_362.png'
 import concernFineLines from '../../assets/landing/image5_47_362.png'
-import { categoryBrowsePath } from '../../utils/categoryBrowseParams'
 
 export interface ShopHeroSlide {
   id: string
@@ -19,38 +18,30 @@ export interface ShopHeroSlide {
   href: string | null
 }
 
-export interface ShopCategory {
+export interface ShopCategoryArtwork {
   id: string
   name: string
   image: string
+}
+
+export interface ShopCategory extends ShopCategoryArtwork {
   href: string
 }
 
-export const shopCategories: ShopCategory[] = [
-  { id: 'skin-care', name: 'Skin Care', image: concernSensitive, href: categoryBrowsePath('skin-care') },
-  { id: 'hair-care', name: 'Hair Care', image: ctaProduct4, href: categoryBrowsePath('hair-care') },
-  { id: 'body-care', name: 'Body Care', image: concernDrought, href: categoryBrowsePath('body-care') },
-  {
-    id: 'face-treatments',
-    name: 'Face Treatments',
-    image: ctaProduct3,
-    href: categoryBrowsePath('face-treatments'),
-  },
-  {
-    id: 'sun-protection',
-    name: 'Sun Protection',
-    image: ctaProduct1,
-    href: categoryBrowsePath('sun-protection'),
-  },
-  { id: 'anti-aging', name: 'Anti-Aging', image: concernWrinkles, href: categoryBrowsePath('anti-aging') },
-  { id: 'acne', name: 'Acne Solutions', image: concernAcne, href: categoryBrowsePath('acne') },
-  {
-    id: 'pigmentation',
-    name: 'Pigmentation & Brightening',
-    image: concernPigmentation,
-    href: categoryBrowsePath('pigmentation'),
-  },
-  { id: 'sensitive', name: 'Sensitive Skin', image: concernSensitive, href: categoryBrowsePath('sensitive') },
-  { id: 'mens', name: "Men's Care", image: concernFineLines, href: categoryBrowsePath('mens') },
-  { id: 'womens', name: "Women's Care", image: ctaProduct2, href: categoryBrowsePath('womens') },
+/**
+ * Original Figma homepage category artwork (presentation only).
+ * Navigation hrefs are resolved from the live catalog by slug/name match.
+ */
+export const shopCategoryArtwork: readonly ShopCategoryArtwork[] = [
+  { id: 'skin-care', name: 'Skin Care', image: concernSensitive },
+  { id: 'hair-care', name: 'Hair Care', image: ctaProduct4 },
+  { id: 'body-care', name: 'Body Care', image: concernDrought },
+  { id: 'face-treatments', name: 'Face Treatments', image: ctaProduct3 },
+  { id: 'sun-protection', name: 'Sun Protection', image: ctaProduct1 },
+  { id: 'anti-aging', name: 'Anti-Aging', image: concernWrinkles },
+  { id: 'acne', name: 'Acne Solutions', image: concernAcne },
+  { id: 'pigmentation', name: 'Pigmentation & Brightening', image: concernPigmentation },
+  { id: 'sensitive', name: 'Sensitive Skin', image: concernSensitive },
+  { id: 'mens', name: "Men's Care", image: concernFineLines },
+  { id: 'womens', name: "Women's Care", image: ctaProduct2 },
 ]

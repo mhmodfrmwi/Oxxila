@@ -1,21 +1,16 @@
 // src/components/layout/Navbar.tsx
-import { ChevronDown, Heart, KeyRound, LogOut, MapPin, ShoppingBag, ShoppingCart, Truck, User, X } from 'lucide-react'
+import { ChevronDown, LogOut, ShoppingBag, User, X } from 'lucide-react'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { ACCOUNT_NAV_ICONS, ACCOUNT_SIDEBAR_NAV } from '../../config/accountNav'
 import {
-  ACCOUNT_CHANGE_PASSWORD_PATH,
-  ACCOUNT_ORDERS_PATH,
-  ADDRESSES_PATH,
   CART_PATH,
   CATEGORIES_PATH,
   DOCS_PATH,
   HOME_PATH,
   LOGIN_PATH,
-  MY_ACCOUNT_PATH,
-  RETURNS_HISTORY_PATH,
   SHOP_PATH,
-  WISHLIST_PATH,
 } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
@@ -307,72 +302,35 @@ export function Navbar() {
               <li className="pt-2">
                 {isAuthenticated ? (
                   <div className="space-y-1">
-                    <NavLink
-                      to={MY_ACCOUNT_PATH}
-                      className={mobileLinkClass}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <span className="inline-flex items-center gap-2">
-                        <UserAvatar
-                          name={name}
-                          src={src}
-                          size="sm"
-                          alt={name}
-                          loading={avatarLoading}
-                        />
-                        {name || t('nav.account')}
-                      </span>
-                    </NavLink>
-                    <NavLink
-                      to={ACCOUNT_ORDERS_PATH}
-                      className={mobileLinkClass}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <span className="inline-flex items-center gap-2">
-                        <ShoppingCart size={18} strokeWidth={1.5} aria-hidden />
-                        {t('nav.dropdown.myOrders')}
-                      </span>
-                    </NavLink>
-                    <NavLink
-                      to={WISHLIST_PATH}
-                      className={mobileLinkClass}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <span className="inline-flex items-center gap-2">
-                        <Heart size={18} strokeWidth={1.5} aria-hidden />
-                        {t('nav.dropdown.wishlist')}
-                      </span>
-                    </NavLink>
-                    <NavLink
-                      to={RETURNS_HISTORY_PATH}
-                      className={mobileLinkClass}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <span className="inline-flex items-center gap-2">
-                        <Truck size={18} strokeWidth={1.5} aria-hidden />
-                        {t('nav.dropdown.returns')}
-                      </span>
-                    </NavLink>
-                    <NavLink
-                      to={ADDRESSES_PATH}
-                      className={mobileLinkClass}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <span className="inline-flex items-center gap-2">
-                        <MapPin size={18} strokeWidth={1.5} aria-hidden />
-                        {t('profile.nav.myAddresses')}
-                      </span>
-                    </NavLink>
-                    <NavLink
-                      to={ACCOUNT_CHANGE_PASSWORD_PATH}
-                      className={mobileLinkClass}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <span className="inline-flex items-center gap-2">
-                        <KeyRound size={18} strokeWidth={1.5} aria-hidden />
-                        {t('profile.nav.changePassword')}
-                      </span>
-                    </NavLink>
+                    {ACCOUNT_SIDEBAR_NAV.map((item) => {
+                      const Icon = ACCOUNT_NAV_ICONS[item.id]
+                      return (
+                        <NavLink
+                          key={item.id}
+                          to={item.to}
+                          end={'end' in item ? item.end : undefined}
+                          className={mobileLinkClass}
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          <span className="inline-flex items-center gap-2">
+                            {item.id === 'profile' ? (
+                              <UserAvatar
+                                name={name}
+                                src={src}
+                                size="sm"
+                                alt={name}
+                                loading={avatarLoading}
+                              />
+                            ) : (
+                              <Icon size={18} strokeWidth={1.5} aria-hidden />
+                            )}
+                            {item.id === 'profile'
+                              ? name || t(item.labelKey)
+                              : t(item.labelKey)}
+                          </span>
+                        </NavLink>
+                      )
+                    })}
                     <button
                       type="button"
                       className={[

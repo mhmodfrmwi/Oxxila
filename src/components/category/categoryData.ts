@@ -1,3 +1,4 @@
+// src/components/category/categoryData.ts
 import type { ApiCategory } from '../../types/catalog'
 
 export interface CategoryMeta {
@@ -8,12 +9,14 @@ export interface CategoryMeta {
 
 export const PRODUCTS_PER_PAGE = 12
 
+/** Default browse/search sort — maps to API `sort=-createdAt`. */
+export const DEFAULT_SORT = 'newest' as const
+
 export const sortOptions = [
-  { value: 'featured', label: 'Featured' },
-  { value: 'price-asc', label: 'Price: Low to High' },
-  { value: 'price-desc', label: 'Price: High to Low' },
-  { value: 'rating', label: 'Top Rated' },
-  { value: 'newest', label: 'Newest' },
+  { value: 'newest', labelKey: 'categorySort.newest' },
+  { value: 'price-asc', labelKey: 'categorySort.priceAsc' },
+  { value: 'price-desc', labelKey: 'categorySort.priceDesc' },
+  { value: 'rating', labelKey: 'categorySort.rating' },
 ] as const
 
 export type SortOption = (typeof sortOptions)[number]['value']

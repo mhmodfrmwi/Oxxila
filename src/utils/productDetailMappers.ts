@@ -182,56 +182,164 @@ export function buildCatalogProductsForCategory(
     .map(mapApiProductToRecommendedProduct)
 }
 
-function formatReviewDate(value: string | undefined): string {
+function formatReviewDate(value: string | undefined, locale = 'en'): string {
   if (!value) return ''
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
-  return date.toLocaleDateString('en-GB', {
+  return date.toLocaleDateString(locale.startsWith('ar') ? 'ar-EG' : 'en-GB', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   })
 }
 
-export function mapApiReviewToReview(review: ApiReview): Review | null {
+export function mapApiReviewToReview(
+  review: ApiReview,
+  currentUserId?: string | null,
+  locale = 'en',
+): Review | null {
   const comment = review.comment?.trim() || review.review?.trim() || ''
   if (!comment) return null
 
+  const user =
+    typeof review.user === 'string'
+      ? { _id: review.user }
+      : review.user
+
+  const userId = user?._id
+  const liked =
+    Boolean(currentUserId) &&
+    (review.likes ?? []).some((entry) => {
+      const id = typeof entry === 'string' ? entry : entry?._id
+      return id === currentUserId
+    })
+
   return {
     id: review._id,
-    name: review.user?.name?.trim() || '',
-    avatar: review.user?.avatar ?? review.user?.photo ?? '',
-    date: formatReviewDate(review.createdAt),
+    name: user?.name?.trim() || '',
+    avatar: user?.avatar ?? user?.photo ?? '',
+    date: formatReviewDate(review.createdAt, locale),
     rating: review.rating,
     title: review.title?.trim() || '',
     comment,
     helpful: review.likesCount ?? 0,
+    liked,
+    isOwn: Boolean(currentUserId && userId && userId === currentUserId),
   }
 }
 
+const EMPTY_DISTRIBUTION: RatingDistribution[] = [
+  { stars: 5, percentage: 0 },
+  { stars: 4, percentage: 0 },
+  { stars: 3, percentage: 0 },
+  { stars: 2, percentage: 0 },
+  { stars: 1, percentage: 0 },
+]
+
 export function mapApiReviewStatsToDistribution(
-  breakdown: Array<{ star: number; percentage: number }>,
+  breakdown: Array<{ star: number; percentage: number; count?: number }>,
 ): RatingDistribution[] {
+  if (!breakdown.length) return EMPTY_DISTRIBUTION
   return breakdown.map((item) => ({
     stars: item.star,
     percentage: item.percentage,
   }))
 }
 
-export function buildReviewsSectionDataFromStats(
-  stats: { ratingsAverage: number; ratingsQuantity: number; breakdown: Array<{ star: number; percentage: number }> },
-  apiReviews: readonly ApiReview[],
-) {
+function averageFromReviews(reviews: readonly Review[]): number {
+  if (reviews.length === 0) return 0
+  const sum = reviews.reduce((total, review) => total + review.rating, 0)
+  return Math.round((sum / reviews.length) * 10) / 10
+}
+
+/**
+ * Keeps rating summary / histogram / list consistent when BE denormalized
+ * product counters disagree with visible reviews + breakdown aggregate.
+ */
+export function buildReconciledReviewsSectionData(options: {
+  stats?: {
+    ratingsAverage: number
+    ratingsQuantity: number
+    breakdown: Array<{ star: number; percentage: number; count?: number }>
+  } | null
+  apiReviews: readonly ApiReview[]
+  visibleTotalDocuments?: number | null
+  currentUserId?: string | null
+  locale?: string
+  fallbackAverage?: number
+  fallbackQuantity?: number
+}) {
+  const {
+    stats,
+    apiReviews,
+    visibleTotalDocuments,
+    currentUserId,
+    locale = 'en',
+    fallbackAverage = 0,
+  } = options
+
   const reviews = apiReviews
-    .map(mapApiReviewToReview)
+    .map((review) => mapApiReviewToReview(review, currentUserId, locale))
     .filter((review): review is Review => review != null)
 
-  return {
-    averageRating: stats.ratingsAverage,
-    totalReviews: stats.ratingsQuantity,
-    distribution: mapApiReviewStatsToDistribution(stats.breakdown),
-    reviews,
+  const breakdownTotal =
+    stats?.breakdown?.reduce((sum, item) => sum + (item.count ?? 0), 0) ?? 0
+  const listTotal =
+    visibleTotalDocuments != null ? visibleTotalDocuments : reviews.length
+
+  // Stale product counters with no listable reviews and empty histogram.
+  if (listTotal === 0 && breakdownTotal === 0) {
+    return {
+      averageRating: 0,
+      totalReviews: 0,
+      distribution: EMPTY_DISTRIBUTION,
+      reviews: [],
+      reviewsTotalDocuments: 0,
+    }
   }
+
+  const distribution =
+    breakdownTotal > 0 && stats?.breakdown
+      ? mapApiReviewStatsToDistribution(stats.breakdown)
+      : buildRatingDistribution(reviews)
+
+  const totalReviews =
+    listTotal > 0 ? listTotal : breakdownTotal > 0 ? breakdownTotal : 0
+
+  const averageRating =
+    breakdownTotal > 0 || listTotal > 0
+      ? (stats?.ratingsAverage ??
+        (reviews.length > 0 ? averageFromReviews(reviews) : fallbackAverage) ??
+        0)
+      : 0
+
+  return {
+    averageRating: Number.isFinite(averageRating) ? averageRating : 0,
+    totalReviews,
+    distribution,
+    reviews,
+    reviewsTotalDocuments: totalReviews,
+  }
+}
+
+export function buildReviewsSectionDataFromStats(
+  stats: {
+    ratingsAverage: number
+    ratingsQuantity: number
+    breakdown: Array<{ star: number; percentage: number; count?: number }>
+  },
+  apiReviews: readonly ApiReview[],
+  currentUserId?: string | null,
+  visibleTotalDocuments?: number | null,
+  locale = 'en',
+) {
+  return buildReconciledReviewsSectionData({
+    stats,
+    apiReviews,
+    currentUserId,
+    visibleTotalDocuments,
+    locale,
+  })
 }
 
 export function buildRatingDistribution(reviews: readonly Review[]): RatingDistribution[] {
@@ -254,15 +362,17 @@ export function buildReviewsSectionData(
   averageRating: number,
   totalReviews: number,
   apiReviews: readonly ApiReview[],
+  currentUserId?: string | null,
+  visibleTotalDocuments?: number | null,
+  locale = 'en',
 ) {
-  const reviews = apiReviews
-    .map(mapApiReviewToReview)
-    .filter((review): review is Review => review != null)
-
-  return {
-    averageRating,
-    totalReviews,
-    distribution: buildRatingDistribution(reviews),
-    reviews,
-  }
+  return buildReconciledReviewsSectionData({
+    stats: null,
+    apiReviews,
+    currentUserId,
+    visibleTotalDocuments: visibleTotalDocuments ?? totalReviews,
+    locale,
+    fallbackAverage: averageRating,
+    fallbackQuantity: totalReviews,
+  })
 }
