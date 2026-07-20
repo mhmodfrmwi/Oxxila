@@ -30,8 +30,11 @@ import {
   RETURNS_PATH,
   RETURNS_HISTORY_PATH,
   WISHLIST_PATH,
+  ADMIN_PATH,
 } from './config/routes'
 import { RouteFallback } from './components/ui/RouteFallback'
+import { RequireAdmin } from './components/admin/RequireAdmin'
+import { AdminLayout } from './components/admin/layout/AdminLayout'
 
 const LandingPage = lazy(() =>
   import('./pages/LandingPage').then((module) => ({ default: module.LandingPage })),
@@ -131,6 +134,21 @@ const WishlistPage = lazy(() =>
     default: module.WishlistPage,
   })),
 )
+const AdminDashboardPage = lazy(() =>
+  import('./pages/admin/AdminDashboardPage').then((module) => ({
+    default: module.AdminDashboardPage,
+  })),
+)
+const AdminProductsPage = lazy(() =>
+  import('./pages/admin/AdminProductsPage').then((module) => ({
+    default: module.AdminProductsPage,
+  })),
+)
+const AdminComingSoonPage = lazy(() =>
+  import('./pages/admin/AdminComingSoonPage').then((module) => ({
+    default: module.AdminComingSoonPage,
+  })),
+)
 
 export default function App() {
   return (
@@ -169,6 +187,23 @@ export default function App() {
         <Route path={RETURNS_PATH} element={<ReturnsPage />} />
         <Route path={RETURNS_HISTORY_PATH} element={<ReturnsHistoryPage />} />
         <Route path={WISHLIST_PATH} element={<WishlistPage />} />
+
+        <Route
+          path={ADMIN_PATH}
+          element={
+            <RequireAdmin>
+              <AdminLayout />
+            </RequireAdmin>
+          }
+        >
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="products" element={<AdminProductsPage />} />
+          <Route path="orders" element={<AdminComingSoonPage />} />
+          <Route path="customers" element={<AdminComingSoonPage />} />
+          <Route path="reviews" element={<AdminComingSoonPage />} />
+          <Route path="shipping" element={<AdminComingSoonPage />} />
+          <Route path="settings" element={<AdminComingSoonPage />} />
+        </Route>
       </Routes>
     </Suspense>
   )

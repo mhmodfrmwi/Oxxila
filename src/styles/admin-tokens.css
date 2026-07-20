@@ -1,0 +1,139 @@
+/**
+ * Admin-scoped design tokens.
+ * Applied only under `.admin-shell` so the storefront theme stays unchanged.
+ * Overrides shared CSS variables that Tailwind maps via `@theme inline`.
+ */
+
+.admin-shell {
+  /* Surfaces — dark glass admin canvas */
+  --background: #1a1c29;
+  --card-background: rgb(255 255 255 / 0.05);
+  --surface-muted: rgb(255 255 255 / 0.08);
+  --surface-subtle: #12121a;
+  --input-background: rgb(255 255 255 / 0.06);
+
+  /* Text */
+  --primary-text: #ffffff;
+  --secondary-text: rgb(255 255 255 / 0.55);
+  --placeholder-text: rgb(255 255 255 / 0.4);
+  --helper-text: rgb(255 255 255 / 0.35);
+  --text-on-color: #ffffff;
+
+  /* Borders */
+  --border-interactive: rgb(255 255 255 / 0.25);
+  --border-subtle: rgb(255 255 255 / 0.1);
+
+  /* Brand / actions — aligned with Figma admin purple */
+  --accent: #a394ff;
+  --accent-muted: #7c5cff;
+  --accent-soft: #8b5cf6;
+  --accent-glow: rgb(163 148 255 / 0.22);
+  --primary-button: #8b5cf6;
+  --primary-button-hover: #a78bfa;
+  --primary-button-active: #7c3aed;
+  --secondary-button: rgb(255 255 255 / 0.08);
+  --secondary-button-hover: rgb(255 255 255 / 0.14);
+  --secondary-button-active: rgb(255 255 255 / 0.2);
+  --danger-button: #ff6467;
+
+  /* Support */
+  --support-error: #ff6467;
+  --support-success: #00d492;
+  --support-warning: #f5a524;
+  --support-info: #4589ff;
+
+  /* Icons */
+  --primary-icon: #ffffff;
+  --secondary-icon: #a394ff;
+  --icon-on-color: #ffffff;
+
+  /* Links */
+  --primary-link: #a394ff;
+  --hover-primary-link: #c4b5fd;
+  --primary-link-active: #8b5cf6;
+
+  /* Admin-only tokens */
+  --admin-font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --admin-font-display: 'Playfair Display', Georgia, serif;
+  --admin-font-brand: 'Poppins', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* Figma Component 50 width ≈ 264px */
+  --admin-sidebar-width: 16.5rem;
+  --admin-content-gap: 2.5rem;
+  --admin-content-padding: 2rem;
+  --admin-radius-sm: 0.75rem;
+  --admin-radius-md: 1rem;
+  --admin-radius-lg: 1.5rem;
+  --admin-radius-xl: 2.5rem;
+  --admin-glass-bg: rgb(255 255 255 / 0.05);
+  --admin-glass-bg-strong: rgb(255 255 255 / 0.08);
+  --admin-glass-border: rgb(255 255 255 / 0.1);
+  --admin-glass-blur: 12px;
+  --admin-glow: rgb(163 148 255 / 0.18);
+  /* Sidebar glass — matches Figma rgba(255,255,255,0.05) + blur 12 */
+  --admin-sidebar-bg: rgb(255 255 255 / 0.05);
+  --admin-nav-active-bg: rgb(163 148 255 / 0.1);
+  --admin-nav-active-border: rgb(163 148 255 / 0.2);
+
+  /* Denser UI radii inside admin */
+  --radius-card: var(--admin-radius-lg);
+  --radius-input: var(--admin-radius-sm);
+  --radius-button: var(--admin-radius-sm);
+
+  min-height: 100dvh;
+  background-color: var(--background);
+  color: var(--primary-text);
+  font-family: var(--admin-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color-scheme: dark;
+  /* Keep admin dark glass even when the storefront theme is light. */
+  isolation: isolate;
+}
+
+.admin-shell .admin-page-title {
+  font-family: var(--admin-font-display);
+  font-size: 2.25rem;
+  font-weight: 400;
+  line-height: 1.11;
+  letter-spacing: -0.01em;
+  color: var(--primary-text);
+}
+
+.admin-shell .admin-page-subtitle {
+  font-family: var(--admin-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.43;
+  color: rgb(255 255 255 / 0.4);
+  max-width: 36rem;
+}
+
+.admin-shell .admin-section-title {
+  font-family: var(--admin-font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--primary-text);
+}
+
+.admin-shell .admin-label {
+  font-family: var(--admin-font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--secondary-text);
+}
+
+@utility admin-glass {
+  background-color: var(--admin-glass-bg);
+  border: 1px solid var(--admin-glass-border);
+  backdrop-filter: blur(var(--admin-glass-blur));
+  -webkit-backdrop-filter: blur(var(--admin-glass-blur));
+}
+
+@utility admin-glass-strong {
+  background-color: var(--admin-glass-bg-strong);
+  border: 1px solid var(--admin-glass-border);
+  backdrop-filter: blur(var(--admin-glass-blur));
+  -webkit-backdrop-filter: blur(var(--admin-glass-blur));
+}

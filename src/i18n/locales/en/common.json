@@ -1023,5 +1023,201 @@
     "startReturn": "Request a return",
     "requestAnother": "Request another return",
     "loadFailed": "Unable to load your returns. Please try again."
+  },
+  "admin": {
+    "brand": {
+      "subtitle": "Cosmetics Store",
+      "homeAria": "Oxxila admin home"
+    },
+    "nav": {
+      "ariaLabel": "Admin navigation",
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "orders": "Orders",
+      "customers": "Customers",
+      "reviews": "Reviews",
+      "shipping": "Shipping",
+      "settings": "Oxxila Settings"
+    },
+    "foundation": {
+      "title": "Admin foundation",
+      "subtitle": "Phase 0 shell is ready. Feature pages will mount here next.",
+      "phaseBadge": "Phase 0",
+      "shellLabel": "Shell",
+      "shellBody": "Layout, sidebar, tokens, and shared primitives are available for every admin page.",
+      "emptyTitle": "No feature modules yet",
+      "emptyDescription": "Dashboard, Products, Orders, and other screens will be added in later phases."
+    },
+    "comingSoon": {
+      "title": "Coming soon",
+      "subtitle": "This section is reserved for a future admin module.",
+      "description": "Navigation and layout are ready. Business UI will be implemented in a later phase."
+    },
+    "dashboard": {
+      "title": "Executive Overview",
+      "subtitle": "Welcome back, {{name}}. Here is the clinical summary for today.",
+      "fallbackName": "Admin",
+      "searchLabel": "Search dashboard data",
+      "searchPlaceholder": "Search data...",
+      "viewAll": "View All",
+      "retry": "Retry",
+      "loadErrorTitle": "Unable to load dashboard",
+      "loadErrorDescription": "Please try again in a moment.",
+      "kpis": {
+        "ariaLabel": "Key performance indicators",
+        "totalRevenue": "Total Revenue",
+        "orders": "Orders",
+        "conversionRate": "Conversion Rate",
+        "abandonedCart": "Abandoned Cart"
+      },
+      "revenue": {
+        "title": "Revenue Analytics",
+        "subtitle": "Fiscal performance over the last {{days}} business days",
+        "intervalGroup": "Revenue interval",
+        "intervals": {
+          "daily": "Daily",
+          "weekly": "Weekly"
+        },
+        "emptyTitle": "No revenue data",
+        "emptyDescription": "Paid orders in this period will appear here.",
+        "errorTitle": "Unable to load revenue chart",
+        "chartAria": "Revenue bar chart",
+        "chartEmptyAria": "Empty revenue chart"
+      },
+      "segments": {
+        "title": "Customer Segment",
+        "subtitle": "Acquisition vs Retention",
+        "returning": "Returning",
+        "loyal": "Loyal Patients",
+        "new": "New Clients",
+        "emptyTitle": "No customer segments yet",
+        "emptyDescription": "Segments appear once customers place paid orders."
+      },
+      "topProducts": {
+        "title": "Best Selling Formulas",
+        "unitsSold": "{{formatted}} units sold",
+        "unitsSold_one": "{{formatted}} unit sold",
+        "unitsSold_other": "{{formatted}} units sold",
+        "emptyTitle": "No top products",
+        "emptyDescription": "Best sellers will show once products have sales."
+      },
+      "lowStock": {
+        "title": "Low Stock Alerts",
+        "left": "{{count}} left",
+        "left_one": "{{count}} left",
+        "left_other": "{{count}} left",
+        "emptyTitle": "Stock looks healthy",
+        "emptyDescription": "Products at or below the threshold will appear here."
+      },
+      "recentOrders": {
+        "title": "Recent Orders",
+        "emptyTitle": "No recent orders",
+        "emptyDescription": "New orders will appear here as they come in."
+      }
+    },
+    "products": {
+      "title": "Products Catalog",
+      "subtitle": "Manage pharmaceutical-grade skincare inventory and formulation performance metrics.",
+      "addFormula": "Add New Formula",
+      "addSoon": "Create formula will be available in a later phase.",
+      "searchLabel": "Search products catalog",
+      "searchPlaceholder": "Search catalog by SKU, ingredient, or name...",
+      "filters": "Filters",
+      "bulkActions": "Bulk Actions",
+      "bulkSoon": "Bulk actions will be available in a later phase.",
+      "filterCategory": "Category",
+      "filterCategoryAll": "All categories",
+      "clearFilters": "Clear",
+      "sku": "SKU: {{sku}}",
+      "skuUnavailable": "SKU: —",
+      "unavailable": "Unavailable",
+      "tableAria": "Products catalog",
+      "paginationAria": "Products pagination",
+      "editAria": "Edit {{name}}",
+      "editSoon": "Formula specs will be available in a later phase.",
+      "columns": {
+        "details": "Product Details",
+        "category": "Category",
+        "inventory": "Inventory Status",
+        "price": "Price Index",
+        "performance": "Performance",
+        "actions": "Actions"
+      },
+      "inventory": {
+        "in_stock": "In Stock ({{formatted}})",
+        "low_stock": "Low Stock ({{formatted}})",
+        "out_of_stock": "Out of Stock ({{formatted}})"
+      },
+      "showing": "Showing {{showing}} of {{total}} formulations",
+      "prev": "Previous",
+      "next": "Next",
+      "emptyTitle": "No formulations yet",
+      "emptyDescription": "Active products in the catalog will appear here.",
+      "emptyFilteredTitle": "No matching formulations",
+      "emptyFilteredDescription": "Try a different search or clear your filters.",
+      "loadErrorTitle": "Unable to load products",
+      "loadErrorDescription": "Please try again in a moment.",
+      "retry": "Retry",
+      "formula": {
+        "title": "Formula Specs",
+        "ref": "REF: {{ref}}",
+        "refNew": "REF: NEW FORMULA",
+        "refUnavailable": "REF: —",
+        "gallery": "Visual Identity Gallery",
+        "uploadAsset": "Upload Asset",
+        "removeImage": "Remove image",
+        "galleryHint": "{{count}} / {{max}} images",
+        "metaTitle": "Meta Title Override",
+        "sensitivity": "Sensitivity",
+        "sensitiveSkin": "Sensitive skin",
+        "clinical": "Clinical Configuration",
+        "price": "Retail Unit Price ($)",
+        "stock": "In Stock",
+        "category": "Category",
+        "subCategory": "Sub Category",
+        "selectCategory": "Select category",
+        "selectSubCategory": "Select subcategory",
+        "loadingSubcategories": "Loading…",
+        "concerns": "Concerns",
+        "concernOptions": {
+          "acne": "Acne",
+          "pigmentation": "Pigmentation",
+          "sensitive-skin": "Sensitive skin",
+          "drought": "Drought",
+          "wrinkles": "Wrinkles",
+          "wide-pores": "Wide pores"
+        },
+        "description": "Description",
+        "advantages": "Advantages",
+        "composition": "Composition",
+        "descPlaceholder": "write product desc...",
+        "advPlaceholder": "write product Adv...",
+        "compPlaceholder": "write product Composition...",
+        "catalog": "Catalog",
+        "uploadFile": "Upload File",
+        "viewCatalog": "View current catalog",
+        "removeCatalog": "Remove catalog",
+        "archive": "Archive",
+        "save": "Save Formulation",
+        "saving": "Saving…",
+        "archiving": "Archiving…",
+        "close": "Close",
+        "cancel": "Cancel",
+        "createSuccess": "Formulation created",
+        "updateSuccess": "Formulation saved",
+        "archiveSuccess": "Formulation archived",
+        "saveFailed": "Unable to save formulation",
+        "archiveFailed": "Unable to archive formulation",
+        "discardTitle": "Discard unsaved changes?",
+        "discardDescription": "Unsaved changes will be lost.",
+        "discardBody": "Close the drawer without saving your edits?",
+        "keepEditing": "Keep editing",
+        "discardConfirm": "Discard",
+        "archiveTitle": "Archive formulation?",
+        "archiveDescription": "This hides the product from the active catalog.",
+        "archiveBody": "Archived formulas are set inactive and leave the Products list.",
+        "archiveConfirm": "Archive"
+      }
+    }
   }
 }

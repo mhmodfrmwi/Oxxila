@@ -17,4 +17,5 @@
 @import './styles/promo-carousel.css';
 @import 'tailwindcss';
 @import './styles/tailwind-theme.css';
+@import './styles/admin-tokens.css';
 @import './styles/base.css';
