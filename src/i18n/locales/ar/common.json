@@ -1224,6 +1224,65 @@
         "archiveBody": "التركيبات المؤرشفة تُعطَّل وتغادر قائمة المنتجات.",
         "archiveConfirm": "أرشفة"
       }
+    },
+    "orders": {
+      "title": "إدارة الطلبات",
+      "subtitle": "تتبّع وإدارة شحنات الوصفات السريرية.",
+      "searchLabel": "البحث في الطلبات",
+      "searchPlaceholder": "ابحث بالمعرّف أو العميل...",
+      "searchObjectIdHint": "ابحث بمعرّف الطلب الكامل (ObjectId من 24 حرفًا). البحث باسم العميل غير متاح على هذا المسار بعد.",
+      "dateFrom": "من",
+      "dateTo": "إلى",
+      "statusFilterAria": "تصفية الطلبات حسب الحالة",
+      "tabs": {
+        "all": "كل الطلبات",
+        "pending": "قيد الانتظار",
+        "processing": "قيد المعالجة",
+        "shipped": "تم الشحن",
+        "delivered": "تم التسليم",
+        "returned": "مرتجع"
+      },
+      "columns": {
+        "orderId": "رقم الطلب",
+        "date": "التاريخ",
+        "customer": "العميل",
+        "paymentStatus": "الدفع",
+        "orderStatus": "الحالة",
+        "total": "الإجمالي",
+        "action": "إجراء"
+      },
+      "paymentStatus": {
+        "pending": "قيد الانتظار",
+        "paid": "مدفوع",
+        "refunded": "مسترد"
+      },
+      "orderStatus": {
+        "pending": "قيد الانتظار",
+        "confirmed": "مؤكد",
+        "processing": "قيد المعالجة",
+        "shipped": "تم الشحن",
+        "out_for_delivery": "خارج للتسليم",
+        "failed_attempt": "محاولة فاشلة",
+        "returned": "مرتجع",
+        "partially_returned": "مرتجع جزئيًا",
+        "delivered": "تم التسليم",
+        "cancelled": "ملغى"
+      },
+      "tableAria": "قائمة الطلبات",
+      "paginationAria": "ترقيم الطلبات",
+      "showing": "عرض {{showing}} من {{total}} طلبات",
+      "prev": "السابق",
+      "next": "التالي",
+      "actionAria": "إجراءات {{id}}",
+      "actionSoon": "تفاصيل الطلب ستكون متاحة في مرحلة لاحقة.",
+      "emptyTitle": "لا توجد طلبات بعد",
+      "emptyDescription": "ستظهر الطلبات هنا بعد أن يقدّمها العملاء.",
+      "emptyFilteredTitle": "لا توجد طلبات مطابقة",
+      "emptyFilteredDescription": "جرّب بحثًا أو حالة أو نطاق تاريخ مختلف.",
+      "clearFilters": "مسح الفلاتر",
+      "loadErrorTitle": "تعذّر تحميل الطلبات",
+      "loadErrorDescription": "يرجى المحاولة مرة أخرى بعد لحظات.",
+      "retry": "إعادة المحاولة"
     }
   }
 }

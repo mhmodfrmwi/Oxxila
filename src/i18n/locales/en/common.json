@@ -1218,6 +1218,65 @@
         "archiveBody": "Archived formulas are set inactive and leave the Products list.",
         "archiveConfirm": "Archive"
       }
+    },
+    "orders": {
+      "title": "Orders Management",
+      "subtitle": "Track and manage clinical prescription shipments.",
+      "searchLabel": "Search orders",
+      "searchPlaceholder": "Search ID, Customer...",
+      "searchObjectIdHint": "Search by full order ID (24-character ObjectId). Customer name search is not available on this endpoint yet.",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "statusFilterAria": "Filter orders by status",
+      "tabs": {
+        "all": "All Orders",
+        "pending": "Pending",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "returned": "Returned"
+      },
+      "columns": {
+        "orderId": "Order ID",
+        "date": "Date",
+        "customer": "Customer",
+        "paymentStatus": "Payment",
+        "orderStatus": "Status",
+        "total": "Total",
+        "action": "Action"
+      },
+      "paymentStatus": {
+        "pending": "Pending",
+        "paid": "Paid",
+        "refunded": "Refunded"
+      },
+      "orderStatus": {
+        "pending": "Pending",
+        "confirmed": "Confirmed",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "out_for_delivery": "Out for delivery",
+        "failed_attempt": "Failed attempt",
+        "returned": "Returned",
+        "partially_returned": "Partially returned",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled"
+      },
+      "tableAria": "Orders list",
+      "paginationAria": "Orders pagination",
+      "showing": "Showing {{showing}} of {{total}} orders",
+      "prev": "Previous",
+      "next": "Next",
+      "actionAria": "Actions for {{id}}",
+      "actionSoon": "Order details will be available in a later phase.",
+      "emptyTitle": "No orders yet",
+      "emptyDescription": "Orders will appear here once customers place them.",
+      "emptyFilteredTitle": "No matching orders",
+      "emptyFilteredDescription": "Try a different search, status, or date range.",
+      "clearFilters": "Clear filters",
+      "loadErrorTitle": "Unable to load orders",
+      "loadErrorDescription": "Please try again in a moment.",
+      "retry": "Retry"
     }
   }
 }
