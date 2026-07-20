@@ -23,6 +23,7 @@ interface CustomersCatalogTableProps {
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
+  onOpenCustomer?: (customerId: string) => void
 }
 
 function CustomerNameCell({
@@ -75,6 +76,7 @@ export function CustomersCatalogTable({
   currentPage,
   totalPages,
   onPageChange,
+  onOpenCustomer,
 }: CustomersCatalogTableProps) {
   const { t, i18n } = useTranslation()
   const locale = i18n.language
@@ -136,22 +138,21 @@ export function CustomersCatalogTable({
         cell: (row) => (
           <button
             type="button"
-            disabled
+            onClick={() => onOpenCustomer?.(row.id)}
             className={cn(
               'inline-flex size-8 items-center justify-center rounded-full',
-              'border border-white/10 bg-white/5 text-white/40',
-              'cursor-not-allowed opacity-50',
+              'border border-white/10 bg-white/5 text-white/70',
+              'transition-colors hover:bg-white/10 hover:text-white',
               focusRingClasses,
             )}
             aria-label={t('admin.customers.actionAria', { name: row.name })}
-            title={t('admin.customers.actionSoon')}
           >
             <ChevronRight size={16} aria-hidden />
           </button>
         ),
       },
     ],
-    [locale, t, unavailable],
+    [locale, onOpenCustomer, t, unavailable],
   )
 
   const canGoPrev = currentPage > 1

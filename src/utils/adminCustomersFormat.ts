@@ -1,9 +1,12 @@
 // src/utils/adminCustomersFormat.ts
 import type {
+  AdminCustomerAddress,
+  AdminCustomerDetail,
   AdminCustomerRow,
   AdminCustomersListParams,
   AdminCustomersSegmentTab,
   ApiAdminCustomer,
+  ApiAdminCustomerAddress,
 } from '../types/adminCustomers'
 import {
   formatDashboardDate,
@@ -68,6 +71,47 @@ export function mapApiCustomerToAdminRow(user: ApiAdminCustomer): AdminCustomerR
     ordersCount: null,
     ltv: null,
     lastVisitAt: null,
+  }
+}
+
+function formatAddressLine(address: ApiAdminCustomerAddress): string {
+  const parts = [
+    address.addressLine?.trim(),
+    address.district?.name?.trim(),
+    address.governorate?.name?.trim(),
+  ].filter(Boolean)
+  return parts.join(', ') || '—'
+}
+
+function mapAddress(address: ApiAdminCustomerAddress, index: number): AdminCustomerAddress {
+  return {
+    id: address._id ? String(address._id) : `address-${index}`,
+    label: address.label?.trim() || null,
+    line: formatAddressLine(address),
+    isDefault: Boolean(address.isDefault),
+  }
+}
+
+export function mapApiCustomerToAdminDetail(user: ApiAdminCustomer): AdminCustomerDetail {
+  const id = String(user._id)
+  const name = user.name?.trim() || '—'
+  const email = user.email?.trim() || null
+  const phone = user.phone?.trim() || null
+  const avatar = user.avatar?.trim() || null
+
+  return {
+    id,
+    name,
+    email,
+    phone,
+    avatar,
+    initials: customerInitials(name === '—' ? '' : name),
+    active: user.active !== false,
+    role: user.role ?? 'user',
+    storeCreditBalance: Number(user.storeCreditBalance ?? 0),
+    createdAt: user.createdAt ?? null,
+    addresses: (user.addresses ?? []).map(mapAddress),
+    totalSpend: null,
   }
 }
 

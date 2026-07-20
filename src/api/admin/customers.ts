@@ -36,3 +36,15 @@ export function getAdminCustomers(
     signal: options?.signal,
   })
 }
+
+/** GET /api/v1/users/:id — admin customer detail. */
+export function getAdminCustomer(
+  customerId: string,
+  options?: { signal?: AbortSignal },
+) {
+  return apiRequest<ApiAdminCustomer>(`/users/${encodeURIComponent(customerId)}`, {
+    method: 'GET',
+    auth: true,
+    signal: options?.signal,
+  })
+}

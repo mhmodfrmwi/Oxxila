@@ -1,6 +1,8 @@
 // src/pages/admin/AdminCustomersPage.tsx
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
+import { CustomerDetailsDrawer } from '../../components/admin/customers/CustomerDetailsDrawer'
 import { CustomersCatalogTable } from '../../components/admin/customers/CustomersCatalogTable'
 import { CustomersListToolbar } from '../../components/admin/customers/CustomersListToolbar'
 import { CustomersSegmentTabs } from '../../components/admin/customers/CustomersSegmentTabs'
@@ -10,12 +12,21 @@ import { Button } from '../../components/ui/Button'
 import { useAdminCustomers } from '../../hooks/useAdminCustomers'
 
 /**
- * Customer Intelligence — list view only (Phase 4A).
- * Figma: Customers `937:18907`.
+ * Customer Intelligence — list + read-only details drawer (Phase 4A/4B).
+ * Figma: Customers `937:18907` / Patient Intelligence drawer `941:44197`.
  */
 export function AdminCustomersPage() {
   const { t } = useTranslation()
   const list = useAdminCustomers()
+  const [drawerCustomerId, setDrawerCustomerId] = useState<string | null>(null)
+
+  const openDrawer = useCallback((customerId: string) => {
+    setDrawerCustomerId(customerId)
+  }, [])
+
+  const closeDrawer = useCallback(() => {
+    setDrawerCustomerId(null)
+  }, [])
 
   const failed =
     Boolean(list.error) && !list.loading && list.customers.length === 0
@@ -100,9 +111,16 @@ export function AdminCustomersPage() {
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={list.setPage}
+            onOpenCustomer={openDrawer}
           />
         </>
       )}
+
+      <CustomerDetailsDrawer
+        open={Boolean(drawerCustomerId)}
+        customerId={drawerCustomerId}
+        onClose={closeDrawer}
+      />
     </>
   )
 }

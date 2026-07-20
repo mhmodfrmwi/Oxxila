@@ -34,8 +34,44 @@ export interface ApiAdminCustomer {
   avatar?: string
   role?: string
   active?: boolean
+  storeCreditBalance?: number
   createdAt?: string
   updatedAt?: string
+  addresses?: ApiAdminCustomerAddress[]
+}
+
+export interface ApiAdminCustomerAddress {
+  _id?: string
+  label?: string
+  governorate?: { id?: string; name?: string }
+  district?: { id?: string; name?: string } | null
+  addressLine?: string
+  isOther?: boolean
+  isDefault?: boolean
+}
+
+/** Normalized detail model for the Patient Intelligence drawer. */
+export interface AdminCustomerDetail {
+  id: string
+  name: string
+  email: string | null
+  phone: string | null
+  avatar: string | null
+  initials: string
+  active: boolean
+  role: string
+  storeCreditBalance: number
+  createdAt: string | null
+  addresses: AdminCustomerAddress[]
+  /** Not provided by GET /users/:id. */
+  totalSpend: number | null
+}
+
+export interface AdminCustomerAddress {
+  id: string
+  label: string | null
+  line: string
+  isDefault: boolean
 }
 
 export interface AdminCustomersListParams {

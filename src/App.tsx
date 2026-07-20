@@ -154,6 +154,11 @@ const AdminCustomersPage = lazy(() =>
     default: module.AdminCustomersPage,
   })),
 )
+const AdminReviewsPage = lazy(() =>
+  import('./pages/admin/AdminReviewsPage').then((module) => ({
+    default: module.AdminReviewsPage,
+  })),
+)
 const AdminComingSoonPage = lazy(() =>
   import('./pages/admin/AdminComingSoonPage').then((module) => ({
     default: module.AdminComingSoonPage,
@@ -210,7 +215,7 @@ export default function App() {
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="customers" element={<AdminCustomersPage />} />
-          <Route path="reviews" element={<AdminComingSoonPage />} />
+          <Route path="reviews" element={<AdminReviewsPage />} />
           <Route path="shipping" element={<AdminComingSoonPage />} />
           <Route path="settings" element={<AdminComingSoonPage />} />
         </Route>
