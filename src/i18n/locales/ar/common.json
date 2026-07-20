@@ -1282,6 +1282,73 @@
       "clearFilters": "مسح الفلاتر",
       "loadErrorTitle": "تعذّر تحميل الطلبات",
       "loadErrorDescription": "يرجى المحاولة مرة أخرى بعد لحظات.",
+      "retry": "إعادة المحاولة",
+      "details": {
+        "title": "طلب {{id}}",
+        "titleFallback": "تفاصيل الطلب",
+        "subtitle": "التفاصيل والتتبع",
+        "payment": "الدفع",
+        "contact": "التواصل",
+        "shipping": "الشحن",
+        "timeline": "مسار الشحنة",
+        "timelineEmpty": "لا توجد خطوات تتبع بعد",
+        "items": "المنتجات المشتراة",
+        "itemsEmpty": "لا توجد منتجات في هذا الطلب",
+        "itemMeta": "الكمية: {{qty}} • {{price}}",
+        "totalAmount": "المبلغ الإجمالي",
+        "invoice": "فاتورة",
+        "refund": "استرداد",
+        "updateStatus": "تحديث حالة التتبع",
+        "invoiceSoon": "طباعة الفاتورة غير متاحة بعد.",
+        "refundSoon": "الاسترداد غير متاح من هذا الدرج بعد.",
+        "updateStatusSoon": "تحديث الحالة غير متاح من هذا الدرج بعد.",
+        "loadErrorTitle": "تعذّر تحميل الطلب",
+        "emptyTitle": "الطلب غير موجود",
+        "emptyDescription": "تعذّر تحميل هذا الطلب."
+      }
+    },
+    "customers": {
+      "title": "ذكاء العملاء",
+      "subtitle": "إدارة شرائح المرضى المميزين وقيمة دورة الحياة.",
+      "searchLabel": "البحث في العملاء",
+      "searchPlaceholder": "ابحث عن مريض...",
+      "segmentFilterAria": "تصفية العملاء حسب الشريحة",
+      "statsAria": "ملخص مقاييس العملاء",
+      "stats": {
+        "totalCustomers": "إجمالي العملاء",
+        "averageLtv": "متوسط القيمة مدى الحياة",
+        "vipConcentration": "تركيز كبار العملاء",
+        "retentionRate": "معدل الاحتفاظ"
+      },
+      "tabs": {
+        "all": "كل المرضى",
+        "vip": "أعضاء مميزون",
+        "frequent": "متكررون",
+        "inactive": "غير نشطين"
+      },
+      "columns": {
+        "customerName": "اسم العميل",
+        "orders": "الطلبات",
+        "ltv": "مؤشر القيمة",
+        "lastVisit": "آخر زيارة",
+        "actions": "إجراءات"
+      },
+      "tableAria": "قائمة العملاء",
+      "paginationAria": "ترقيم العملاء",
+      "showing": "عرض {{showing}} من {{total}} عملاء",
+      "prev": "السابق",
+      "next": "التالي",
+      "actionAria": "عرض {{name}}",
+      "actionSoon": "تفاصيل العميل ستكون متاحة في مرحلة لاحقة.",
+      "emptyTitle": "لا يوجد عملاء بعد",
+      "emptyDescription": "سيظهر العملاء هنا بعد إنشاء الحسابات.",
+      "emptyFilteredTitle": "لا يوجد عملاء مطابقون",
+      "emptyFilteredDescription": "جرّب بحثًا أو شريحة مختلفة.",
+      "segmentUnavailableTitle": "الشريحة غير متاحة",
+      "segmentUnavailableDescription": "فلاتر كبار العملاء والمتكررين غير مدعومة في واجهة المستخدمين بعد.",
+      "clearFilters": "مسح الفلاتر",
+      "loadErrorTitle": "تعذّر تحميل العملاء",
+      "loadErrorDescription": "يرجى المحاولة مرة أخرى بعد لحظات.",
       "retry": "إعادة المحاولة"
     }
   }

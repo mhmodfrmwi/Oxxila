@@ -46,7 +46,39 @@ export interface AdminOrderRow {
   orderStatusLabel: string
 }
 
-/** Raw list item from GET /api/v1/orders (admin). */
+export interface ApiAdminOrderItem {
+  product: string
+  name: string
+  image: string | null
+  price: number
+  quantity: number
+}
+
+export interface ApiAdminOrderShippingAddress {
+  countryName: string
+  governorateName: string
+  districtName: string
+  addressLine: string
+  isOther?: boolean
+}
+
+export interface ApiAdminOrderTrackingStep {
+  key: string
+  label: string
+  order: number
+  status: 'completed' | 'active' | 'upcoming'
+}
+
+export interface ApiAdminOrderTracking {
+  phase: string
+  currentStep: string
+  steps: ApiAdminOrderTrackingStep[]
+  trackingNumber: string | null
+  carrierName?: string | null
+  carrierStatusLabel?: string | null
+}
+
+/** Raw list/detail item from GET /api/v1/orders (admin). */
 export interface ApiAdminOrder {
   _id: string
   user?:
@@ -59,13 +91,58 @@ export interface ApiAdminOrder {
         phone?: string
       }
     | null
+  items?: ApiAdminOrderItem[]
+  itemCount?: number
+  shippingAddress?: ApiAdminOrderShippingAddress
+  shipping?: {
+    methodName?: string
+    price?: number
+  }
+  subtotal?: number
+  shippingPrice?: number
+  discountAmount?: number
+  storeCreditApplied?: number
   totalPrice: number
+  couponCode?: string | null
+  paymentMethod?: 'cod' | 'card'
+  paymentProvider?: 'stripe' | 'paymob' | null
   paymentStatus: AdminPaymentStatus
   paymentStatusLabel?: string
+  isPaid?: boolean
   orderStatus: AdminOrderStatus
   orderStatusLabel?: string
   createdAt: string
   updatedAt?: string
+  tracking?: ApiAdminOrderTracking
+  shipment?: {
+    carrierName?: string | null
+    trackingNumber?: string | null
+    status?: string | null
+    carrierStatusLabel?: string | null
+  } | null
+}
+
+/** Normalized detail model for the Order Details drawer. */
+export interface AdminOrderDetail {
+  id: string
+  orderNumber: string
+  createdAt: string
+  customerName: string
+  customerEmail: string | null
+  customerPhone: string | null
+  customerInitials: string
+  paymentMethod: 'cod' | 'card' | null
+  paymentProvider: 'stripe' | 'paymob' | null
+  paymentStatus: AdminPaymentStatus
+  paymentStatusLabel: string
+  paymentSummary: string
+  orderStatus: AdminOrderStatus
+  orderStatusLabel: string
+  shippingMethodName: string
+  items: ApiAdminOrderItem[]
+  trackingSteps: ApiAdminOrderTrackingStep[]
+  trackingNumber: string | null
+  totalPrice: number
 }
 
 export interface AdminOrdersListParams {

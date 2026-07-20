@@ -25,6 +25,7 @@ interface OrdersCatalogTableProps {
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
+  onOpenOrder?: (orderId: string) => void
 }
 
 function CustomerCell({
@@ -60,6 +61,7 @@ export function OrdersCatalogTable({
   currentPage,
   totalPages,
   onPageChange,
+  onOpenOrder,
 }: OrdersCatalogTableProps) {
   const { t, i18n } = useTranslation()
   const locale = i18n.language
@@ -154,21 +156,20 @@ export function OrdersCatalogTable({
         cell: (row) => (
           <button
             type="button"
-            disabled
+            onClick={() => onOpenOrder?.(row.id)}
             className={cn(
-              'inline-flex rounded-lg p-2 text-white/40',
-              'cursor-not-allowed opacity-50',
+              'inline-flex rounded-lg p-2 text-white/70',
+              'transition-colors hover:bg-white/10 hover:text-white',
               focusRingClasses,
             )}
             aria-label={t('admin.orders.actionAria', { id: row.orderNumber })}
-            title={t('admin.orders.actionSoon')}
           >
             <MoreHorizontal size={24} aria-hidden />
           </button>
         ),
       },
     ],
-    [locale, t],
+    [locale, onOpenOrder, t],
   )
 
   const canGoPrev = currentPage > 1

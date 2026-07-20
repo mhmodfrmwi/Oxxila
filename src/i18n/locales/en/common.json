@@ -1276,6 +1276,73 @@
       "clearFilters": "Clear filters",
       "loadErrorTitle": "Unable to load orders",
       "loadErrorDescription": "Please try again in a moment.",
+      "retry": "Retry",
+      "details": {
+        "title": "Order {{id}}",
+        "titleFallback": "Order details",
+        "subtitle": "Details & Tracking",
+        "payment": "Payment",
+        "contact": "Contact",
+        "shipping": "Shipping",
+        "timeline": "Shipment Timeline",
+        "timelineEmpty": "No tracking steps yet",
+        "items": "Items Purchased",
+        "itemsEmpty": "No items on this order",
+        "itemMeta": "Qty: {{qty}} • {{price}}",
+        "totalAmount": "Total Amount",
+        "invoice": "Invoice",
+        "refund": "Refund",
+        "updateStatus": "Update Tracking Status",
+        "invoiceSoon": "Invoice printing is not available yet.",
+        "refundSoon": "Refunds are not available from this drawer yet.",
+        "updateStatusSoon": "Status updates are not available from this drawer yet.",
+        "loadErrorTitle": "Unable to load order",
+        "emptyTitle": "Order not found",
+        "emptyDescription": "This order could not be loaded."
+      }
+    },
+    "customers": {
+      "title": "Customer Intelligence",
+      "subtitle": "Manage your premium patient segments and lifecycle value.",
+      "searchLabel": "Search customers",
+      "searchPlaceholder": "Find a patient...",
+      "segmentFilterAria": "Filter customers by segment",
+      "statsAria": "Customer summary metrics",
+      "stats": {
+        "totalCustomers": "Total Customers",
+        "averageLtv": "Average LTV",
+        "vipConcentration": "VIP Concentration",
+        "retentionRate": "Retention Rate"
+      },
+      "tabs": {
+        "all": "All Patients",
+        "vip": "VIP Members",
+        "frequent": "Frequent",
+        "inactive": "Inactive"
+      },
+      "columns": {
+        "customerName": "Customer Name",
+        "orders": "Orders",
+        "ltv": "LTV Index",
+        "lastVisit": "Last Visit",
+        "actions": "Actions"
+      },
+      "tableAria": "Customers list",
+      "paginationAria": "Customers pagination",
+      "showing": "Showing {{showing}} of {{total}} customers",
+      "prev": "Previous",
+      "next": "Next",
+      "actionAria": "View {{name}}",
+      "actionSoon": "Customer details will be available in a later phase.",
+      "emptyTitle": "No customers yet",
+      "emptyDescription": "Customers will appear here once accounts are created.",
+      "emptyFilteredTitle": "No matching customers",
+      "emptyFilteredDescription": "Try a different search or segment.",
+      "segmentUnavailableTitle": "Segment not available",
+      "segmentUnavailableDescription": "VIP and Frequent filters are not supported by the users API yet.",
+      "clearFilters": "Clear filters",
+      "loadErrorTitle": "Unable to load customers",
+      "loadErrorDescription": "Please try again in a moment.",
       "retry": "Retry"
     }
   }

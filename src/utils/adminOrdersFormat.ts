@@ -1,6 +1,7 @@
 // src/utils/adminOrdersFormat.ts
 import type { StatusBadgeTone } from '../components/admin/ui/StatusBadge'
 import type {
+  AdminOrderDetail,
   AdminOrderRow,
   AdminOrderStatus,
   AdminOrdersStatusTab,
@@ -26,6 +27,18 @@ export function formatAdminOrderMoney(value: number, locale = 'en'): string {
 
 export function formatAdminOrderDate(value: string, locale = 'en'): string {
   return formatDashboardDate(value, locale)
+}
+
+/** Date + time for timeline steps when a real timestamp exists. */
+export function formatAdminOrderDateTime(value: string, locale = 'en'): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  const day = formatDashboardDate(value, locale)
+  const time = new Intl.DateTimeFormat(resolveDashboardLocale(locale), {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+  return `${day} • ${time}`
 }
 
 export function formatAdminOrderNumber(id: string): string {
@@ -121,4 +134,58 @@ export function startOfDayIso(dateInput: string): string | undefined {
 
 export function formatCount(value: number, locale = 'en'): string {
   return new Intl.NumberFormat(resolveDashboardLocale(locale)).format(value)
+}
+
+function formatPaymentSummary(order: ApiAdminOrder): string {
+  const method = order.paymentMethod
+  if (method === 'cod') return 'COD'
+  if (method === 'card') {
+    const provider = order.paymentProvider
+      ? order.paymentProvider.charAt(0).toUpperCase() + order.paymentProvider.slice(1)
+      : 'Card'
+    return provider
+  }
+  return order.paymentStatusLabel ?? order.paymentStatus
+}
+
+export function mapApiOrderToAdminDetail(order: ApiAdminOrder): AdminOrderDetail {
+  const id = String(order._id)
+  const user = order.user && typeof order.user === 'object' ? order.user : null
+  const customerName = resolveCustomerName(order)
+  const paymentStatusLabel = order.paymentStatusLabel ?? order.paymentStatus
+  const orderStatusLabel = order.orderStatusLabel ?? order.orderStatus
+  const shippingMethodName =
+    order.shipment?.carrierName?.trim() ||
+    order.shipping?.methodName?.trim() ||
+    order.tracking?.carrierName?.trim() ||
+    '—'
+
+  return {
+    id,
+    orderNumber: formatAdminOrderNumber(id),
+    createdAt: order.createdAt,
+    customerName,
+    customerEmail: user?.email?.trim() || null,
+    customerPhone: user?.phone?.trim() || null,
+    customerInitials: customerInitials(customerName === '—' ? '' : customerName),
+    paymentMethod: order.paymentMethod ?? null,
+    paymentProvider: order.paymentProvider ?? null,
+    paymentStatus: order.paymentStatus,
+    paymentStatusLabel,
+    paymentSummary: formatPaymentSummary(order),
+    orderStatus: order.orderStatus,
+    orderStatusLabel,
+    shippingMethodName,
+    items: order.items ?? [],
+    trackingSteps: order.tracking?.steps ?? [],
+    trackingNumber:
+      order.tracking?.trackingNumber ?? order.shipment?.trackingNumber ?? null,
+    totalPrice: order.totalPrice,
+  }
+}
+
+/** Customer card subtitle from real fields only (no invented membership/order counts). */
+export function formatOrderCustomerSubtitle(order: AdminOrderDetail): string {
+  if (order.customerPhone) return order.customerPhone
+  return `${order.paymentStatusLabel} • ${order.orderStatusLabel}`
 }

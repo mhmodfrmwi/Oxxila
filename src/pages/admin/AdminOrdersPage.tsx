@@ -1,6 +1,8 @@
 // src/pages/admin/AdminOrdersPage.tsx
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
+import { OrderDetailsDrawer } from '../../components/admin/orders/OrderDetailsDrawer'
 import { OrdersCatalogTable } from '../../components/admin/orders/OrdersCatalogTable'
 import { OrdersListToolbar } from '../../components/admin/orders/OrdersListToolbar'
 import { OrdersStatusTabs } from '../../components/admin/orders/OrdersStatusTabs'
@@ -9,12 +11,21 @@ import { Button } from '../../components/ui/Button'
 import { useAdminOrders } from '../../hooks/useAdminOrders'
 
 /**
- * Orders Management — list view only (Phase 3A).
- * Figma: Orders Management `937:18568` / `1007:740`.
+ * Orders Management — list + read-only details drawer (Phase 3A/3B).
+ * Figma: Orders Management `937:18568` / Order Details drawer `941:43893`.
  */
 export function AdminOrdersPage() {
   const { t } = useTranslation()
   const list = useAdminOrders()
+  const [drawerOrderId, setDrawerOrderId] = useState<string | null>(null)
+
+  const openDrawer = useCallback((orderId: string) => {
+    setDrawerOrderId(orderId)
+  }, [])
+
+  const closeDrawer = useCallback(() => {
+    setDrawerOrderId(null)
+  }, [])
 
   const failed = Boolean(list.error) && !list.loading && list.orders.length === 0
   const staleError = Boolean(list.error) && list.orders.length > 0
@@ -95,9 +106,16 @@ export function AdminOrdersPage() {
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={list.setPage}
+            onOpenOrder={openDrawer}
           />
         </>
       )}
+
+      <OrderDetailsDrawer
+        open={Boolean(drawerOrderId)}
+        orderId={drawerOrderId}
+        onClose={closeDrawer}
+      />
     </>
   )
 }

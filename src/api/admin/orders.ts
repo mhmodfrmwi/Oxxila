@@ -33,3 +33,12 @@ export function getAdminOrders(
     signal: options?.signal,
   })
 }
+
+/** GET /api/v1/orders/:id — admin order detail. */
+export function getAdminOrder(orderId: string, options?: { signal?: AbortSignal }) {
+  return apiRequest<ApiAdminOrder>(`/orders/${encodeURIComponent(orderId)}`, {
+    method: 'GET',
+    auth: true,
+    signal: options?.signal,
+  })
+}

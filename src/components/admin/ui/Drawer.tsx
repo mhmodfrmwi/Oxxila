@@ -14,7 +14,7 @@ interface DrawerProps {
   children: ReactNode
   footer?: ReactNode
   className?: string
-  width?: 'md' | 'lg' | 'xl' | 'formula'
+  width?: 'md' | 'lg' | 'xl' | 'formula' | 'order'
   /** When true, Escape / backdrop still call onClose (parent may confirm first). */
 }
 
@@ -24,6 +24,8 @@ const widthClasses = {
   xl: 'max-w-xl',
   /** Figma Formula Specs drawer is 500px. */
   formula: 'max-w-[31.25rem]',
+  /** Figma Order Details drawer is 420px. */
+  order: 'max-w-[26.25rem]',
 } as const
 
 export function Drawer({
