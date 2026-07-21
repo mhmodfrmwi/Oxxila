@@ -1,5 +1,5 @@
 // src/hooks/useAdminDashboard.ts
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   getAdminDashboardOverview,
   getAdminDashboardRevenue,
@@ -20,6 +20,13 @@ interface AsyncState<T> {
   error: string | null
 }
 
+function isAbortError(error: unknown): boolean {
+  return (
+    (error instanceof DOMException && error.name === 'AbortError') ||
+    (error instanceof Error && error.name === 'AbortError')
+  )
+}
+
 export function useAdminDashboardOverview(options?: {
   periodDays?: number
   limit?: number
@@ -35,7 +42,10 @@ export function useAdminDashboardOverview(options?: {
   const reload = useCallback(async () => {
     setState((previous) => ({ ...previous, loading: true, error: null }))
     try {
-      const response = await getAdminDashboardOverview({ period: periodDays, limit })
+      const response = await getAdminDashboardOverview({
+        period: periodDays,
+        limit,
+      })
       setState({
         data: response.data ?? null,
         loading: false,
@@ -71,31 +81,51 @@ export function useAdminDashboardRevenue(options?: {
     loading: true,
     error: null,
   })
+  const [reloadToken, setReloadToken] = useState(0)
+  const requestIdRef = useRef(0)
 
-  const reload = useCallback(async () => {
-    setState((previous) => ({ ...previous, loading: true, error: null }))
-    try {
-      const response = await getAdminDashboardRevenue({ period: periodDays, interval })
-      setState({
-        data: response.data ?? null,
-        loading: false,
-        error: null,
-      })
-    } catch (error) {
-      setState({
-        data: null,
-        loading: false,
-        error:
-          error instanceof ApiError
-            ? error.message
-            : 'Unable to load revenue chart.',
-      })
-    }
-  }, [periodDays, interval])
+  const reload = useCallback(() => {
+    setReloadToken((token) => token + 1)
+  }, [])
 
   useEffect(() => {
-    void reload()
-  }, [reload])
+    const controller = new AbortController()
+    const requestId = ++requestIdRef.current
+
+    setState((previous) => ({ ...previous, loading: true, error: null }))
+
+    void (async () => {
+      try {
+        const response = await getAdminDashboardRevenue(
+          { period: periodDays, interval },
+          { signal: controller.signal },
+        )
+        if (requestId !== requestIdRef.current) return
+        setState({
+          data: response.data ?? null,
+          loading: false,
+          error: null,
+        })
+      } catch (error) {
+        if (requestId !== requestIdRef.current) return
+        if (controller.signal.aborted || isAbortError(error)) return
+        setState({
+          data: null,
+          loading: false,
+          error:
+            error instanceof ApiError
+              ? error.message
+              : 'Unable to load revenue chart.',
+        })
+      }
+    })()
+
+    return () => {
+      // Invalidate before abort so a late non-throwing response cannot apply.
+      requestIdRef.current += 1
+      controller.abort()
+    }
+  }, [periodDays, interval, reloadToken])
 
   return { ...state, reload }
 }

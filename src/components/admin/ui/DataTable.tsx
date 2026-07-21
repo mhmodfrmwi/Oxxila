@@ -28,6 +28,9 @@ interface DataTableProps<T> {
   'aria-label'?: string
 }
 
+/** Figma table cells use ~16px horizontal / denser vertical rhythm. */
+const cellPad = 'px-4 py-2.5 sm:px-4'
+
 export function DataTable<T>({
   columns,
   rows,
@@ -50,12 +53,14 @@ export function DataTable<T>({
       aria-busy={loading || undefined}
     >
       {toolbar && (
-        <div className="border-b border-border-subtle px-4 py-3 sm:px-5">{toolbar}</div>
+        <div className="border-b border-border-subtle px-4 py-3 sm:px-4">
+          {toolbar}
+        </div>
       )}
 
       <div className="overflow-x-auto">
         <table
-          className="w-full min-w-[56rem] border-collapse text-start text-sm"
+          className="w-full min-w-0 border-collapse text-start text-sm"
           aria-label={ariaLabel}
         >
           <thead>
@@ -65,7 +70,8 @@ export function DataTable<T>({
                   key={column.id}
                   scope="col"
                   className={cn(
-                    'admin-label px-5 py-5 text-start text-[10px] tracking-[0.2em] text-white/30 sm:px-8',
+                    'admin-label whitespace-nowrap text-start text-[10px] tracking-[0.1em] text-white/40',
+                    cellPad,
                     column.headerClassName,
                   )}
                 >
@@ -77,9 +83,12 @@ export function DataTable<T>({
           <tbody>
             {loading &&
               Array.from({ length: 5 }).map((_, rowIndex) => (
-                <tr key={`skeleton-${rowIndex}`} className="border-b border-white/5">
+                <tr
+                  key={`skeleton-${rowIndex}`}
+                  className="border-b border-white/5"
+                >
                   {columns.map((column) => (
-                    <td key={column.id} className="px-5 py-5 sm:px-8">
+                    <td key={column.id} className={cellPad}>
                       <Skeleton className="h-4 w-full max-w-[10rem]" />
                     </td>
                   ))}
@@ -96,7 +105,8 @@ export function DataTable<T>({
                     <td
                       key={column.id}
                       className={cn(
-                        'px-5 py-5 align-middle text-primary-text sm:px-8',
+                        'align-middle text-primary-text',
+                        cellPad,
                         column.className,
                       )}
                     >
@@ -119,7 +129,7 @@ export function DataTable<T>({
       )}
 
       {footer && !showEmpty && (
-        <div className="border-t border-white/5 bg-white/[0.02] px-5 py-6 sm:px-8">
+        <div className="border-t border-white/5 bg-white/[0.02] px-4 py-4">
           {footer}
         </div>
       )}

@@ -72,7 +72,7 @@ export function AdminDashboardPage() {
         title={title}
         subtitle={subtitle}
         actions={
-          <label className="relative block w-full min-w-[14rem] sm:w-64">
+          <label className="relative block w-full sm:w-[var(--admin-search-width)]">
             <span className="sr-only">{t('admin.dashboard.searchLabel')}</span>
             <Search
               size={18}
@@ -86,7 +86,7 @@ export function AdminDashboardPage() {
               placeholder={t('admin.dashboard.searchPlaceholder')}
               autoComplete="off"
               className={cn(
-                'admin-glass w-full rounded-full py-2.5 pe-4 ps-11 text-sm text-primary-text',
+                'admin-glass h-[var(--admin-search-height)] w-full rounded-full pe-4 ps-11 text-sm text-primary-text',
                 'placeholder:text-placeholder-text',
                 focusRingClasses,
               )}
@@ -109,7 +109,7 @@ export function AdminDashboardPage() {
         <>
           <DashboardKpiGrid kpis={overview.data?.kpis ?? null} loading={overview.loading} />
 
-          <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
+          <div className="grid gap-8 lg:grid-cols-3">
             <DashboardRevenueCard
               chart={revenue.data}
               loading={revenue.loading}
@@ -125,7 +125,7 @@ export function AdminDashboardPage() {
             />
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
+          <div className="grid gap-8 lg:grid-cols-3">
             <DashboardTopProductsCard
               products={filteredTopProducts}
               loading={overview.loading}

@@ -20,10 +20,14 @@ const toneClasses: Record<StatusBadgeTone, string> = {
   warning: 'bg-support-warning/15 text-support-warning',
   danger: 'bg-support-error/10 text-support-error',
   info: 'bg-support-info/15 text-support-info',
-  neutral: 'bg-white/5 text-secondary-text',
-  accent: 'bg-accent/15 text-accent',
+  neutral: 'bg-white/5 text-white/40',
+  accent: 'bg-[rgba(163,148,255,0.1)] text-[#a394ff]',
 }
 
+/**
+ * Compact Figma overlay badge — ~10px bold, tight pad, full pill.
+ * Call sites may still override tone/size via className.
+ */
 export function StatusBadge({
   children,
   tone = 'neutral',
@@ -33,7 +37,8 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        'inline-flex max-w-full items-center rounded-full px-2.5 py-1 text-xs font-medium tracking-wide uppercase',
+        'inline-flex max-w-full items-center rounded-full',
+        'px-2 py-0.5 text-[10px] leading-[15px] font-bold tracking-normal uppercase',
         toneClasses[tone],
         className,
       )}

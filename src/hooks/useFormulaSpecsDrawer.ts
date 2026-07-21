@@ -5,7 +5,6 @@ import {
   createProduct,
   getAdminProduct,
   updateProduct,
-  uploadImages,
 } from '../api/admin/products'
 import { ApiError } from '../lib/api'
 import type { ApiProduct } from '../types/catalog'
@@ -24,6 +23,26 @@ import {
 } from '../utils/adminProductValidation'
 
 export type FormulaSpecsMode = 'create' | 'edit'
+
+/** Re-fetch existing gallery URLs as Files so one multipart PUT can keep them. */
+async function filesFromImageUrls(urls: string[]): Promise<File[]> {
+  const files: File[] = []
+  for (let index = 0; index < urls.length; index += 1) {
+    const url = urls[index]
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new ApiError(
+        `Unable to read existing image ${index + 1}. Save was cancelled so the gallery was not changed.`,
+      )
+    }
+    const blob = await response.blob()
+    const ext = blob.type.split('/')[1]?.split(';')[0] || 'jpeg'
+    const fromUrl = url.split('/').pop()?.split('?')[0]
+    const name = fromUrl && fromUrl.includes('.') ? fromUrl : `existing-${index + 1}.${ext}`
+    files.push(new File([blob], name, { type: blob.type || `image/${ext}` }))
+  }
+  return files
+}
 
 interface UseFormulaSpecsDrawerOptions {
   open: boolean
@@ -306,9 +325,11 @@ export function useFormulaSpecsDrawer({
       let saved: ApiProduct | undefined
 
       if (newImages.length > 0 && existingImages.length > 0) {
-        const uploaded = await uploadImages(productId, newImages)
-        const uploadedUrls = uploaded.data?.images ?? []
-        const merged = [...existingImages, ...uploadedUrls].slice(
+        // Never call uploadImages first — that replaces the gallery with only
+        // new files. Re-upload existing URLs + new files in one PUT so a failed
+        // request leaves the previous gallery untouched.
+        const existingFiles = await filesFromImageUrls(existingImages)
+        const mergedFiles = [...existingFiles, ...newImages].slice(
           0,
           ADMIN_PRODUCT_IMAGES_MAX,
         )
@@ -316,10 +337,12 @@ export function useFormulaSpecsDrawer({
           productId,
           {
             ...fields,
-            images: merged,
             ...(removeCatalog ? { catalog: null } : {}),
           },
-          catalogFile ? { catalog: catalogFile } : undefined,
+          {
+            images: mergedFiles,
+            catalog: catalogFile,
+          },
         )
         saved = response.data
       } else if (newImages.length > 0) {

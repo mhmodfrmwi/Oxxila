@@ -35,7 +35,7 @@ export function OrdersListToolbar({
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-      <label className="relative block w-full sm:w-64">
+      <label className="relative block w-full sm:w-[var(--admin-search-width)]">
         <span className="sr-only">{t('admin.orders.searchLabel')}</span>
         <Search
           size={18}
@@ -48,7 +48,7 @@ export function OrdersListToolbar({
           disabled={disabled}
           onChange={(event) => onKeywordChange(event.target.value)}
           placeholder={t('admin.orders.searchPlaceholder')}
-          className={cn(fieldClass, 'w-full py-2.5 pe-5 ps-12')}
+          className={cn(fieldClass, 'h-[var(--admin-search-height)] w-full pe-5 ps-12')}
           autoComplete="off"
         />
       </label>

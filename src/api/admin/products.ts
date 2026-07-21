@@ -1,5 +1,6 @@
 // src/api/admin/products.ts
 import { apiRequest } from '../../lib/api'
+import type { ApiResponse } from '../../lib/api'
 import type { ApiProduct } from '../../types/catalog'
 import type {
   AdminProductsListParams,
@@ -29,6 +30,22 @@ function toQuery(params: AdminProductsListParams): string {
   return query ? `?${query}` : ''
 }
 
+/**
+ * Multipart field parsers collapse one same-named key to a string, but the BE
+ * validator requires `Array.isArray(concerns)`. Repeated keys become an array —
+ * the same encoding used for multiple concerns.
+ *
+ * A single concern cannot become a length-1 array via multipart alone (multer
+ * needs ≥2 same-named fields, which would duplicate the value). Callers apply
+ * one concern via `normalizeSingleConcern` (JSON array) after the write.
+ */
+function appendConcerns(body: FormData, concerns: string[]) {
+  if (concerns.length <= 1) return
+  for (const concern of concerns) {
+    body.append('concerns', concern)
+  }
+}
+
 function appendWriteFields(body: FormData, fields: AdminProductWriteFields) {
   body.append('name', fields.name)
   body.append('price', String(fields.price))
@@ -38,9 +55,7 @@ function appendWriteFields(body: FormData, fields: AdminProductWriteFields) {
     body.append('subCategory', id)
   }
   if (fields.concerns) {
-    for (const concern of fields.concerns) {
-      body.append('concerns', concern)
-    }
+    appendConcerns(body, fields.concerns)
   }
   if (fields.isSensitiveSkin !== undefined) {
     body.append('isSensitiveSkin', String(fields.isSensitiveSkin))
@@ -74,6 +89,25 @@ function appendWriteFiles(body: FormData, files?: AdminProductWriteFiles) {
   }
 }
 
+/** JSON PUT so a single concern is stored as a true one-element array (no dup). */
+function putConcernsArray(id: string, concerns: string[]) {
+  return apiRequest<ApiProduct>(`/products/${id}`, {
+    method: 'PUT',
+    auth: true,
+    body: { concerns },
+  })
+}
+
+async function normalizeSingleConcern(
+  response: ApiResponse<ApiProduct>,
+  concerns: string[] | undefined,
+): Promise<ApiResponse<ApiProduct>> {
+  if (!concerns || concerns.length !== 1) return response
+  const id = response.data?._id
+  if (!id) return response
+  return putConcernsArray(id, concerns)
+}
+
 /** GET /api/v1/products — catalog list for admin Products page. */
 export function getAdminProducts(
   params: AdminProductsListParams = {},
@@ -85,7 +119,13 @@ export function getAdminProducts(
   })
 }
 
-/** GET /api/v1/products/:id */
+/**
+ * GET /api/v1/products/:id
+ *
+ * No admin-specific product read exists (only storefront `GET /products/:id`
+ * with `optionalAuth`). That handler increments `views` and, when authenticated,
+ * writes browsing history — cannot be avoided without a new BE endpoint.
+ */
 export function getAdminProduct(id: string, options?: { signal?: AbortSignal }) {
   return apiRequest<ApiProduct>(`/products/${id}`, {
     auth: true,
@@ -93,23 +133,52 @@ export function getAdminProduct(id: string, options?: { signal?: AbortSignal }) 
   })
 }
 
-/** POST /api/v1/products — create formula (multipart). */
-export function createProduct(
+function toJsonWriteBody(fields: AdminProductWriteFields) {
+  return {
+    name: fields.name,
+    price: fields.price,
+    stock: fields.stock,
+    category: fields.category,
+    subCategory: fields.subCategory,
+    concerns: fields.concerns ?? [],
+    isSensitiveSkin: fields.isSensitiveSkin ?? false,
+    description: fields.description ?? '',
+    advantages: fields.advantages ?? '',
+    composition: fields.composition ?? '',
+    ...(fields.images ? { images: fields.images } : {}),
+    ...(fields.catalog !== undefined ? { catalog: fields.catalog } : {}),
+    ...(fields.isActive !== undefined ? { isActive: fields.isActive } : {}),
+  }
+}
+
+/** POST /api/v1/products — create formula (JSON when no files, else multipart). */
+export async function createProduct(
   fields: AdminProductWriteFields,
   files?: AdminProductWriteFiles,
 ) {
+  const hasFiles = Boolean(files?.images?.length || files?.catalog)
+  if (!hasFiles) {
+    // JSON body keeps `concerns` as a real array for any length (including 1).
+    return apiRequest<ApiProduct>('/products', {
+      method: 'POST',
+      auth: true,
+      body: toJsonWriteBody(fields),
+    })
+  }
+
   const body = new FormData()
   appendWriteFields(body, fields)
   appendWriteFiles(body, files)
-  return apiRequest<ApiProduct>('/products', {
+  const response = await apiRequest<ApiProduct>('/products', {
     method: 'POST',
     auth: true,
     body,
   })
+  return normalizeSingleConcern(response, fields.concerns)
 }
 
 /** PUT /api/v1/products/:id — update formula (multipart or field URLs). */
-export function updateProduct(
+export async function updateProduct(
   id: string,
   fields: AdminProductWriteFields,
   files?: AdminProductWriteFiles,
@@ -123,37 +192,26 @@ export function updateProduct(
       images: undefined,
     })
     appendWriteFiles(body, files)
-    return apiRequest<ApiProduct>(`/products/${id}`, {
+    const response = await apiRequest<ApiProduct>(`/products/${id}`, {
       method: 'PUT',
       auth: true,
       body,
     })
+    return normalizeSingleConcern(response, fields.concerns)
   }
 
   return apiRequest<ApiProduct>(`/products/${id}`, {
     method: 'PUT',
     auth: true,
-    body: {
-      name: fields.name,
-      price: fields.price,
-      stock: fields.stock,
-      category: fields.category,
-      subCategory: fields.subCategory,
-      concerns: fields.concerns ?? [],
-      isSensitiveSkin: fields.isSensitiveSkin ?? false,
-      description: fields.description ?? '',
-      advantages: fields.advantages ?? '',
-      composition: fields.composition ?? '',
-      ...(fields.images ? { images: fields.images } : {}),
-      ...(fields.catalog !== undefined ? { catalog: fields.catalog } : {}),
-      ...(fields.isActive !== undefined ? { isActive: fields.isActive } : {}),
-    },
+    body: toJsonWriteBody(fields),
   })
 }
 
 /**
  * PUT /api/v1/products/:id with image files only.
  * Backend replaces the product `images` array with uploaded paths.
+ * Prefer merging via `updateProduct` with all File parts when existing URLs
+ * must be preserved — this helper replaces the gallery entirely.
  */
 export function uploadImages(id: string, images: File[]) {
   const body = new FormData()

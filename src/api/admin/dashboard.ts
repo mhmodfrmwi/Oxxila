@@ -18,24 +18,30 @@ function toQuery(params: Record<string, string | number | undefined>): string {
 }
 
 /** GET /api/v1/dashboard */
-export function getAdminDashboardOverview(params: DashboardOverviewParams = {}) {
+export function getAdminDashboardOverview(
+  params: DashboardOverviewParams = {},
+  options?: { signal?: AbortSignal },
+) {
   return apiRequest<DashboardOverviewData>(
     `/dashboard${toQuery({
       period: params.period,
       limit: params.limit,
       lowStockThreshold: params.lowStockThreshold,
     })}`,
-    { auth: true },
+    { auth: true, signal: options?.signal },
   )
 }
 
 /** GET /api/v1/dashboard/revenue */
-export function getAdminDashboardRevenue(params: DashboardRevenueParams = {}) {
+export function getAdminDashboardRevenue(
+  params: DashboardRevenueParams = {},
+  options?: { signal?: AbortSignal },
+) {
   return apiRequest<DashboardRevenueChartData>(
     `/dashboard/revenue${toQuery({
       period: params.period,
       interval: params.interval,
     })}`,
-    { auth: true },
+    { auth: true, signal: options?.signal },
   )
 }

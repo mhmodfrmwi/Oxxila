@@ -23,7 +23,7 @@ export function DashboardKpiGrid({ kpis, loading = false }: DashboardKpiGridProp
 
   if (loading || !kpis) {
     return (
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4 xl:gap-6">
+      <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
           <div
             key={index}
@@ -41,7 +41,7 @@ export function DashboardKpiGrid({ kpis, loading = false }: DashboardKpiGridProp
 
   return (
     <section
-      className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4 xl:gap-6"
+      className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4"
       aria-label={t('admin.dashboard.kpis.ariaLabel')}
     >
       <StatCard

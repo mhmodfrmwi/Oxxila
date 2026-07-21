@@ -116,9 +116,12 @@ export interface ApiAdminOrder {
   tracking?: ApiAdminOrderTracking
   shipment?: {
     carrierName?: string | null
+    carrierCode?: string | null
+    carrierType?: 'api' | 'known' | 'internal' | null
     trackingNumber?: string | null
     status?: string | null
     carrierStatusLabel?: string | null
+    driverName?: string | null
   } | null
 }
 
