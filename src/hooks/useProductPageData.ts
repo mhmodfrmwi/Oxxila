@@ -59,7 +59,11 @@ const emptyReviewsData: ProductPageDataState['reviewsData'] = {
 }
 
 const noopAsync = async () => undefined
-const noopUpdate = (_reviewId: string, _likesCount: number, _liked: boolean) => undefined
+const noopUpdate = (() => undefined) as (
+  reviewId: string,
+  likesCount: number,
+  liked: boolean,
+) => void
 
 const missingSlugState: ProductPageDataState = {
   loading: false,

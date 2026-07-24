@@ -1,4 +1,5 @@
 // src/hooks/useAdminUserDrawer.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   createAdminUser,
@@ -28,13 +29,6 @@ interface UseAdminUserDrawerOptions {
   adminId: string | null
   isSelf?: boolean
   onSaved: (admin: AdminUserRow) => void
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 export function useAdminUserDrawer({

@@ -1,4 +1,5 @@
 // src/hooks/useReviewDetailsDrawer.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   getAdminReview,
@@ -23,13 +24,6 @@ interface ReviewDetailsState {
 }
 
 type MutationAction = 'approve' | 'hide' | 'flag' | 'unflag' | null
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
-}
 
 function mutationErrorMessage(error: unknown, fallback: string): string {
   return error instanceof ApiError ? error.message : fallback

@@ -1,4 +1,5 @@
 // src/hooks/useZoneManager.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   createAdminCountry,
@@ -31,13 +32,6 @@ import {
   mapApiDistrictToRow,
   mapApiGovernorateToRow,
 } from '../utils/adminShippingFormat'
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
-}
 
 /** Zone Manager — three-column drill-down: Countries → Governorates → Districts. */
 export function useZoneManager() {

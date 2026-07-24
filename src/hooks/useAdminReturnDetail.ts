@@ -1,4 +1,5 @@
 // src/hooks/useAdminReturnDetail.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getAdminReturn } from '../api/admin/returns'
 import { ApiError } from '../lib/api'
@@ -13,13 +14,6 @@ interface ReturnDetailState {
   returnDetail: AdminReturnDetail | null
   loading: boolean
   error: string | null
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 /** Loads a single return's detail when a row is selected in the Returns split view. */

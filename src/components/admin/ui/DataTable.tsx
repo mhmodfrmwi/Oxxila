@@ -88,7 +88,7 @@ export function DataTable<T>({
                   key={column.id}
                   scope="col"
                   className={cn(
-                    'admin-label whitespace-nowrap text-start text-[8px] tracking-[0.1em] text-white/40',
+                    'admin-label whitespace-nowrap text-start text-[8px] tracking-[0.1em]',
                     headerPad,
                     column.headerClassName,
                   )}

@@ -40,11 +40,11 @@
   --surface-subtle: #12121a;
   --input-background: rgb(255 255 255 / 0.06);
 
-  /* Text */
+  /* Text — muted steps target ~AA on --background (#1a1c29) */
   --primary-text: #ffffff;
-  --secondary-text: rgb(255 255 255 / 0.55);
-  --placeholder-text: rgb(255 255 255 / 0.4);
-  --helper-text: rgb(255 255 255 / 0.35);
+  --secondary-text: rgb(255 255 255 / 0.65);
+  --placeholder-text: rgb(255 255 255 / 0.6);
+  --helper-text: rgb(255 255 255 / 0.6);
   --text-on-color: #ffffff;
 
   /* Borders */
@@ -150,7 +150,7 @@
   font-family: var(--admin-font-sans);
   font-size: var(--admin-page-subtitle-size);
   line-height: var(--admin-page-subtitle-leading);
-  color: rgb(255 255 255 / 0.4);
+  color: var(--helper-text);
 }
 
 .admin-shell .admin-section-title {

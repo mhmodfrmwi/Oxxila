@@ -1,7 +1,33 @@
 // src/utils/adminDashboardFormat.ts
-import type { DashboardOrderStatusBadge } from '../types/adminDashboard'
+import type {
+  DashboardLowStockItem,
+  DashboardLowStockSection,
+  DashboardOrderStatusBadge,
+} from '../types/adminDashboard'
 import type { StatusBadgeTone } from '../components/admin/ui/StatusBadge'
 import type { StatTrendTone } from '../components/admin/ui/StatCard'
+
+/**
+ * Normalize GET /dashboard `lowStock` — API returns `{ threshold, alertCount, items }`.
+ * Accepts a bare array for resilience against older payloads.
+ */
+export function getDashboardLowStockItems(
+  lowStock: DashboardLowStockSection | DashboardLowStockItem[] | null | undefined,
+): DashboardLowStockItem[] {
+  if (!lowStock) return []
+  if (Array.isArray(lowStock)) return lowStock
+  return Array.isArray(lowStock.items) ? lowStock.items : []
+}
+
+/** Low-stock card should only list products below the alert threshold. */
+export function getDashboardLowStockAlerts(
+  lowStock: DashboardLowStockSection | DashboardLowStockItem[] | null | undefined,
+  limit = 5,
+): DashboardLowStockItem[] {
+  const items = getDashboardLowStockItems(lowStock)
+  const alerts = items.filter((item) => item.isAlert === true || item.isCritical)
+  return alerts.slice(0, limit)
+}
 
 /** Normalize i18n language tags for Intl (e.g. `ar` → `ar-EG`). */
 export function resolveDashboardLocale(language: string): string {

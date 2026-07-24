@@ -8,9 +8,7 @@ import type {
   ApiAdminReview,
   ApiAdminReviewDetail,
   ApiAdminReviewMutationResult,
-  ApiAdminReviewsAverageRating,
   ApiAdminReviewsOverview,
-  ApiAdminReviewsRatingDistribution,
 } from '../../types/adminReviews'
 
 function toQuery(
@@ -74,23 +72,6 @@ export function getAdminReviewsOverview(
     auth: true,
     signal: options?.signal,
   })
-}
-
-/** GET /api/v1/reviews/admin/summary — average rating only. */
-export function getAdminReviewsSummary(options?: { signal?: AbortSignal }) {
-  return apiRequest<ApiAdminReviewsAverageRating>('/reviews/admin/summary', {
-    method: 'GET',
-    auth: true,
-    signal: options?.signal,
-  })
-}
-
-/** GET /api/v1/reviews/admin/rating-distribution — sentiment split only. */
-export function getAdminReviewsRatingDistribution(options?: { signal?: AbortSignal }) {
-  return apiRequest<ApiAdminReviewsRatingDistribution>(
-    '/reviews/admin/rating-distribution',
-    { method: 'GET', auth: true, signal: options?.signal },
-  )
 }
 
 /** GET /api/v1/reviews/admin/flagged — moderation queue only. */

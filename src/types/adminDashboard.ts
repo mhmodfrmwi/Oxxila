@@ -37,9 +37,19 @@ export interface DashboardTopProduct {
 export interface DashboardLowStockItem {
   id: string
   name: string
+  image?: string | null
   stock: number
   stockLevel: number
+  /** True when stock is below the configured threshold. */
+  isAlert?: boolean
   isCritical: boolean
+}
+
+/** GET /dashboard wraps the stock list with threshold metadata. */
+export interface DashboardLowStockSection {
+  threshold: number
+  alertCount: number
+  items: DashboardLowStockItem[]
 }
 
 export type DashboardOrderStatusBadge =
@@ -67,7 +77,7 @@ export interface DashboardOverviewData {
   kpis: DashboardKpis
   customerSegments: DashboardCustomerSegments
   topProducts: DashboardTopProduct[]
-  lowStock: DashboardLowStockItem[]
+  lowStock: DashboardLowStockSection
   recentOrders: DashboardRecentOrder[]
 }
 

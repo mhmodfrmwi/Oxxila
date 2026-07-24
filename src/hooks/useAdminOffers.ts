@@ -1,4 +1,5 @@
 // src/hooks/useAdminOffers.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getAdminOffers } from '../api/admin/offers'
@@ -18,13 +19,6 @@ interface AsyncState {
   pagination: ApiPagination | null
   loading: boolean
   error: string | null
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 export function useAdminOffers() {
@@ -80,6 +74,7 @@ export function useAdminOffers() {
         const totalPages = Math.max(pagination?.numberOfPages ?? 1, 1)
 
         if (page > totalPages) {
+          setState((previous) => ({ ...previous, loading: false }))
           setPageState(totalPages)
           return
         }

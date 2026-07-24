@@ -1141,7 +1141,6 @@
       "tableAria": "كتالوج المنتجات",
       "paginationAria": "ترقيم صفحات المنتجات",
       "editAria": "تعديل {{name}}",
-      "editSoon": "مواصفات التركيبة ستكون متاحة في مرحلة لاحقة.",
       "columns": {
         "details": "تفاصيل المنتج",
         "category": "الفئة",
@@ -1287,7 +1286,6 @@
       "prev": "السابق",
       "next": "التالي",
       "actionAria": "إجراءات {{id}}",
-      "actionSoon": "تفاصيل الطلب ستكون متاحة في مرحلة لاحقة.",
       "emptyTitle": "لا توجد طلبات بعد",
       "emptyDescription": "ستظهر الطلبات هنا بعد أن يقدّمها العملاء.",
       "emptyFilteredTitle": "لا توجد طلبات مطابقة",
@@ -1572,14 +1570,10 @@
       "statsAria": "ملخص مقاييس العملاء",
       "stats": {
         "totalCustomers": "إجمالي العملاء",
-        "averageLtv": "متوسط القيمة مدى الحياة",
-        "vipConcentration": "تركيز كبار العملاء",
-        "retentionRate": "معدل الاحتفاظ"
+        "averageLtv": "متوسط القيمة مدى الحياة"
       },
       "tabs": {
         "all": "كل المرضى",
-        "vip": "أعضاء مميزون",
-        "frequent": "متكررون",
         "inactive": "غير نشطين"
       },
       "columns": {
@@ -1595,13 +1589,10 @@
       "prev": "السابق",
       "next": "التالي",
       "actionAria": "عرض {{name}}",
-      "actionSoon": "تفاصيل العميل ستكون متاحة في مرحلة لاحقة.",
       "emptyTitle": "لا يوجد عملاء بعد",
       "emptyDescription": "سيظهر العملاء هنا بعد إنشاء الحسابات.",
       "emptyFilteredTitle": "لا يوجد عملاء مطابقون",
       "emptyFilteredDescription": "جرّب بحثًا أو شريحة مختلفة.",
-      "segmentUnavailableTitle": "الشريحة غير متاحة",
-      "segmentUnavailableDescription": "فلاتر كبار العملاء والمتكررين غير مدعومة في واجهة المستخدمين بعد.",
       "clearFilters": "مسح الفلاتر",
       "loadErrorTitle": "تعذّر تحميل العملاء",
       "loadErrorDescription": "يرجى المحاولة مرة أخرى بعد لحظات.",
@@ -2032,6 +2023,9 @@
         "editAria": "تعديل البانر {{title}}",
         "deleteAria": "حذف البانر {{title}}",
         "toggleAria": "تبديل حالة التفعيل لـ {{title}}",
+        "toggleOnSuccess": "تم تفعيل البانر",
+        "toggleOffSuccess": "تم إلغاء تفعيل البانر",
+        "toggleError": "تعذّر تحديث حالة البانر",
         "linkTypes": {
           "none": "بلا رابط",
           "product": "منتج",

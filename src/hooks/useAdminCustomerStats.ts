@@ -1,16 +1,10 @@
 // src/hooks/useAdminCustomerStats.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getAdminCustomerStats } from '../api/admin/customers'
 import { ApiError } from '../lib/api'
 import type { AdminCustomerStats } from '../types/adminCustomers'
 import { mapApiCustomerStats } from '../utils/adminCustomersFormat'
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
-}
 
 export function useAdminCustomerStats() {
   const [stats, setStats] = useState<AdminCustomerStats | null>(null)

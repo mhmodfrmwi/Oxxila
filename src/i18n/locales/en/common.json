@@ -1135,7 +1135,6 @@
       "tableAria": "Products catalog",
       "paginationAria": "Products pagination",
       "editAria": "Edit {{name}}",
-      "editSoon": "Formula specs will be available in a later phase.",
       "columns": {
         "details": "Product Details",
         "category": "Category",
@@ -1281,7 +1280,6 @@
       "prev": "Previous",
       "next": "Next",
       "actionAria": "Actions for {{id}}",
-      "actionSoon": "Order details will be available in a later phase.",
       "emptyTitle": "No orders yet",
       "emptyDescription": "Orders will appear here once customers place them.",
       "emptyFilteredTitle": "No matching orders",
@@ -1566,14 +1564,10 @@
       "statsAria": "Customer summary metrics",
       "stats": {
         "totalCustomers": "Total Customers",
-        "averageLtv": "Average LTV",
-        "vipConcentration": "VIP Concentration",
-        "retentionRate": "Retention Rate"
+        "averageLtv": "Average LTV"
       },
       "tabs": {
         "all": "All Patients",
-        "vip": "VIP Members",
-        "frequent": "Frequent",
         "inactive": "Inactive"
       },
       "columns": {
@@ -1589,13 +1583,10 @@
       "prev": "Previous",
       "next": "Next",
       "actionAria": "View {{name}}",
-      "actionSoon": "Customer details will be available in a later phase.",
       "emptyTitle": "No customers yet",
       "emptyDescription": "Customers will appear here once accounts are created.",
       "emptyFilteredTitle": "No matching customers",
       "emptyFilteredDescription": "Try a different search or segment.",
-      "segmentUnavailableTitle": "Segment not available",
-      "segmentUnavailableDescription": "VIP and Frequent filters are not supported by the users API yet.",
       "clearFilters": "Clear filters",
       "loadErrorTitle": "Unable to load customers",
       "loadErrorDescription": "Please try again in a moment.",
@@ -2018,6 +2009,9 @@
         "editAria": "Edit banner {{title}}",
         "deleteAria": "Delete banner {{title}}",
         "toggleAria": "Toggle active state for {{title}}",
+        "toggleOnSuccess": "Banner activated",
+        "toggleOffSuccess": "Banner deactivated",
+        "toggleError": "Unable to update banner status",
         "linkTypes": {
           "none": "None",
           "product": "Product",

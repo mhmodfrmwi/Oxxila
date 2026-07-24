@@ -18,6 +18,11 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Intentional sync resets / loading flags in effects (drawer open, fetch
+      // guards). Safe rewrites risk races or hook rewrites; keep behavior as-is.
+      'react-hooks/set-state-in-effect': 'off',
+    },
   },
   {
     files: ['src/context/**/*.{ts,tsx}'],

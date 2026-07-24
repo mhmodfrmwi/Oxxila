@@ -1,4 +1,5 @@
 // src/hooks/useBannerDrawer.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createAdminBanner, updateAdminBanner } from '../api/admin/banners'
 import { getAdminProducts } from '../api/admin/products'
@@ -26,13 +27,6 @@ interface UseBannerDrawerOptions {
   /** Full row for the banner being edited — list already returns all admin fields. */
   banner: AdminBannerRow | null
   onSaved: (banner: AdminBannerRow) => void
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 export function useBannerDrawer({

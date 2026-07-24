@@ -20,7 +20,7 @@ const toneClasses: Record<StatusBadgeTone, string> = {
   warning: 'bg-support-warning/15 text-support-warning',
   danger: 'bg-support-error/10 text-support-error',
   info: 'bg-support-info/15 text-support-info',
-  neutral: 'bg-white/5 text-white/40',
+  neutral: 'bg-white/5 text-secondary-text',
   accent: 'bg-[rgba(163,148,255,0.1)] text-[#a394ff]',
 }
 

@@ -1,4 +1,5 @@
 // src/hooks/useShippingMethods.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   getAdminShippingMethods,
@@ -10,13 +11,6 @@ import type {
   AdminShippingMethodType,
 } from '../types/adminShipping'
 import { mapApiShippingMethods } from '../utils/adminShippingFormat'
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
-}
 
 /** Shipping Methods panel — 3 live toggles: api / known / internal. */
 export function useShippingMethods() {

@@ -1,4 +1,5 @@
 // src/hooks/useAdminReviewsOverview.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   getAdminFlaggedReviews,
@@ -17,13 +18,6 @@ import {
 } from '../utils/adminReviewsFormat'
 
 const DEFAULT_QUEUE_LIMIT = 5
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
-}
 
 interface OverviewState {
   averageRating: AdminReviewsAverageRating | null

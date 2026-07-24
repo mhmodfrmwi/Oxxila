@@ -33,8 +33,17 @@ import {
   ADMIN_PATH,
 } from './config/routes'
 import { RouteFallback } from './components/ui/RouteFallback'
-import { RequireAdmin } from './components/admin/RequireAdmin'
-import { AdminLayout } from './components/admin/layout/AdminLayout'
+
+const RequireAdmin = lazy(() =>
+  import('./components/admin/RequireAdmin').then((module) => ({
+    default: module.RequireAdmin,
+  })),
+)
+const AdminLayout = lazy(() =>
+  import('./components/admin/layout/AdminLayout').then((module) => ({
+    default: module.AdminLayout,
+  })),
+)
 
 const LandingPage = lazy(() =>
   import('./pages/LandingPage').then((module) => ({ default: module.LandingPage })),

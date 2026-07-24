@@ -1,4 +1,5 @@
 // src/hooks/useAdminProducts.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getCategories } from '../api/catalog'
 import { getAdminProducts } from '../api/admin/products'
@@ -42,13 +43,6 @@ function normalizeFilters(
     limit: partial?.limit ?? DEFAULT_LIMIT,
     sort: partial?.sort ?? DEFAULT_SORT,
   }
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 export function useAdminProducts(options?: UseAdminProductsOptions) {
@@ -124,6 +118,7 @@ export function useAdminProducts(options?: UseAdminProductsOptions) {
 
         // Clamp out-of-range pages (stale links, emptied result sets).
         if (filters.page > totalPages) {
+          setState((previous) => ({ ...previous, loading: false }))
           setFilters((previous) => ({ ...previous, page: totalPages }))
           return
         }

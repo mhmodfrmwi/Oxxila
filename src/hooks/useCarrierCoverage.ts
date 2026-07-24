@@ -1,4 +1,5 @@
 // src/hooks/useCarrierCoverage.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   getAdminCarrierCoverage,
@@ -8,13 +9,6 @@ import { getAdminCountries, getAdminCountryGovernorates } from '../api/admin/shi
 import { ApiError } from '../lib/api'
 import type { AdminGovernorateOption } from '../types/adminShipping'
 import { mapApiCoverageToGovernorateIds } from '../utils/adminShippingFormat'
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
-}
 
 interface UseCarrierCoverageOptions {
   carrierId: string | null

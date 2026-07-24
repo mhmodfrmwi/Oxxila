@@ -1,4 +1,5 @@
 // src/hooks/useAdminOrders.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getAdminOrders } from '../api/admin/orders'
 import { ApiError } from '../lib/api'
@@ -54,13 +55,6 @@ function normalizeFilters(
     limit: partial?.limit ?? DEFAULT_LIMIT,
     sort: partial?.sort ?? DEFAULT_SORT,
   }
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 export function useAdminOrders(options?: UseAdminOrdersOptions) {
@@ -147,6 +141,7 @@ export function useAdminOrders(options?: UseAdminOrdersOptions) {
         const totalPages = Math.max(pagination?.numberOfPages ?? 1, 1)
 
         if (filters.page > totalPages) {
+          setState((previous) => ({ ...previous, loading: false }))
           setFilters((previous) => ({ ...previous, page: totalPages }))
           return
         }

@@ -1,4 +1,5 @@
 // src/hooks/useAdminShipping.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getAdminCarriers } from '../api/admin/carriers'
 import { ApiError } from '../lib/api'
@@ -9,13 +10,6 @@ import {
 } from '../utils/adminShippingFormat'
 
 const SEARCH_DEBOUNCE_MS = 300
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
-}
 
 /** Shipping page — Courier Companies list (carriers only; assign lives on Orders). */
 export function useAdminShipping() {

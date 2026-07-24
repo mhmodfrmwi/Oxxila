@@ -1,4 +1,5 @@
 // src/hooks/useAdminCarriers.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getAdminCarriers } from '../api/admin/carriers'
 import { ApiError } from '../lib/api'
@@ -9,13 +10,6 @@ interface AsyncState {
   carriers: AdminCarrierRow[]
   loading: boolean
   error: string | null
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 /** Settings Shipping & Logistics — carriers as Shipping Protocols (read-only). */

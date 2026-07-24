@@ -1,4 +1,5 @@
 // src/hooks/useAdminDashboard.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   getAdminDashboardOverview,
@@ -18,13 +19,6 @@ interface AsyncState<T> {
   data: T | null
   loading: boolean
   error: string | null
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 export function useAdminDashboardOverview(options?: {

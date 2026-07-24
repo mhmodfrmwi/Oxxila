@@ -36,7 +36,7 @@ async function fetchAllMatchingProducts(
 ): Promise<ApiProduct[]> {
   const collected: ApiProduct[] = []
   let page = 1
-  let totalPages = 1
+  let totalPages: number
 
   do {
     const response = await getProducts({

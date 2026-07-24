@@ -1,4 +1,5 @@
 // src/hooks/useOrderDetailsDrawer.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getAdminOrder } from '../api/admin/orders'
 import { getAdminCustomer } from '../api/admin/customers'
@@ -15,13 +16,6 @@ interface OrderDetailsState {
   order: AdminOrderDetail | null
   loading: boolean
   error: string | null
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 export function useOrderDetailsDrawer({ open, orderId }: UseOrderDetailsDrawerOptions) {

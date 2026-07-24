@@ -1,4 +1,5 @@
 // src/hooks/useCartRecovery.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getCartRecoveryMetrics } from '../api/admin/cartRecovery'
 import { ApiError } from '../lib/api'
@@ -11,13 +12,6 @@ interface AsyncState {
   hasData: boolean
   loading: boolean
   error: string | null
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 /**

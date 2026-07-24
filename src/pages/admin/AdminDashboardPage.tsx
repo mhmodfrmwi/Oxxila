@@ -18,6 +18,7 @@ import {
 } from '../../hooks/useAdminDashboard'
 import { cn } from '../../lib/cn'
 import type { RevenueInterval } from '../../types/adminDashboard'
+import { getDashboardLowStockAlerts } from '../../utils/adminDashboardFormat'
 
 const PERIOD_DAYS = 30
 
@@ -48,7 +49,8 @@ export function AdminDashboardPage() {
   }, [overview.data?.topProducts, query])
 
   const filteredLowStock = useMemo(() => {
-    const items = overview.data?.lowStock ?? []
+    // API returns `{ threshold, alertCount, items }` — not a bare array.
+    const items = getDashboardLowStockAlerts(overview.data?.lowStock)
     if (!query) return items
     return items.filter((item) => item.name.toLowerCase().includes(query))
   }, [overview.data?.lowStock, query])

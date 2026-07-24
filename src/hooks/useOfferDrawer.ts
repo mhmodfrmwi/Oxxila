@@ -1,4 +1,5 @@
 // src/hooks/useOfferDrawer.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   createAdminOffer,
@@ -30,13 +31,6 @@ interface UseOfferDrawerOptions {
   offerId: string | null
   locale?: string
   onSaved: (offer: AdminOfferRow) => void
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 export function useOfferDrawer({

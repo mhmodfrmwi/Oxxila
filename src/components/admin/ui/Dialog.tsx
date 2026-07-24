@@ -1,7 +1,7 @@
 // src/components/admin/ui/Dialog.tsx
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useEffect, useId, type ReactNode } from 'react'
+import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
@@ -23,6 +23,24 @@ const sizeClasses = {
   lg: 'max-w-2xl',
 } as const
 
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'textarea:not([disabled])',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+  ).filter((element) => {
+    if (element.closest('[aria-hidden="true"]')) return false
+    return element.getClientRects().length > 0
+  })
+}
+
 export function Dialog({
   open,
   title,
@@ -36,24 +54,72 @@ export function Dialog({
   const { t } = useTranslation()
   const titleId = useId()
   const descriptionId = useId()
+  const panelRef = useRef<HTMLDivElement>(null)
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (!open) return
+
+    previouslyFocusedRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const focusInitial = () => {
+      const panel = panelRef.current
+      if (!panel) return
+      const focusables = getFocusableElements(panel)
+      const target = focusables[0] ?? panel
+      target.focus()
+    }
+
+    const frame = window.requestAnimationFrame(focusInitial)
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         event.preventDefault()
         onClose()
+        return
+      }
+
+      if (event.key !== 'Tab') return
+
+      const panel = panelRef.current
+      if (!panel) return
+
+      const focusables = getFocusableElements(panel)
+      if (focusables.length === 0) {
+        event.preventDefault()
+        panel.focus()
+        return
+      }
+
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const active = document.activeElement
+
+      if (event.shiftKey) {
+        if (active === first || !panel.contains(active)) {
+          event.preventDefault()
+          last.focus()
+        }
+      } else if (active === last || !panel.contains(active)) {
+        event.preventDefault()
+        first.focus()
       }
     }
 
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
     document.addEventListener('keydown', onKeyDown)
 
     return () => {
+      window.cancelAnimationFrame(frame)
       document.body.style.overflow = previousOverflow
       document.removeEventListener('keydown', onKeyDown)
+      previouslyFocusedRef.current?.focus()
+      previouslyFocusedRef.current = null
     }
   }, [open, onClose])
 
@@ -72,14 +138,17 @@ export function Dialog({
         >
           <button
             type="button"
+            tabIndex={-1}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             aria-label={t('actions.cancel')}
             onClick={onClose}
           />
 
           <motion.div
+            ref={panelRef}
+            tabIndex={-1}
             className={cn(
-              'admin-glass-strong relative z-10 flex w-full flex-col overflow-hidden rounded-[var(--admin-radius-xl)] shadow-2xl',
+              'admin-glass-strong relative z-10 flex w-full flex-col overflow-hidden rounded-[var(--admin-radius-xl)] shadow-2xl outline-none',
               sizeClasses[size],
               className,
             )}

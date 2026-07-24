@@ -1,7 +1,7 @@
 // src/components/admin/ui/Drawer.tsx
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useEffect, useId, type ReactNode } from 'react'
+import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
@@ -32,6 +32,24 @@ const widthClasses = {
   customer: 'max-w-[24rem]',
 } as const
 
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'textarea:not([disabled])',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+  ).filter((element) => {
+    if (element.closest('[aria-hidden="true"]')) return false
+    return element.getClientRects().length > 0
+  })
+}
+
 export function Drawer({
   open,
   title,
@@ -45,26 +63,75 @@ export function Drawer({
   const { t, i18n } = useTranslation()
   const titleId = useId()
   const descriptionId = useId()
+  const panelRef = useRef<HTMLElement>(null)
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null)
   const isRtl = i18n.dir() === 'rtl'
   const enterX = isRtl ? '-100%' : '100%'
 
   useEffect(() => {
     if (!open) return
 
+    previouslyFocusedRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const focusInitial = () => {
+      const panel = panelRef.current
+      if (!panel) return
+      const focusables = getFocusableElements(panel)
+      const target = focusables[0] ?? panel
+      target.focus()
+    }
+
+    // Wait a frame so AnimatePresence mounts the panel before focusing.
+    const frame = window.requestAnimationFrame(focusInitial)
+
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         event.preventDefault()
         onClose()
+        return
+      }
+
+      if (event.key !== 'Tab') return
+
+      const panel = panelRef.current
+      if (!panel) return
+
+      const focusables = getFocusableElements(panel)
+      if (focusables.length === 0) {
+        event.preventDefault()
+        panel.focus()
+        return
+      }
+
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const active = document.activeElement
+
+      if (event.shiftKey) {
+        if (active === first || !panel.contains(active)) {
+          event.preventDefault()
+          last.focus()
+        }
+      } else if (active === last || !panel.contains(active)) {
+        event.preventDefault()
+        first.focus()
       }
     }
 
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
     document.addEventListener('keydown', onKeyDown)
 
     return () => {
+      window.cancelAnimationFrame(frame)
       document.body.style.overflow = previousOverflow
       document.removeEventListener('keydown', onKeyDown)
+      previouslyFocusedRef.current?.focus()
+      previouslyFocusedRef.current = null
     }
   }, [open, onClose])
 
@@ -80,6 +147,7 @@ export function Drawer({
         >
           <motion.button
             type="button"
+            tabIndex={-1}
             className="absolute inset-0 bg-black/55 backdrop-blur-sm"
             aria-label={t('actions.cancel')}
             onClick={onClose}
@@ -89,8 +157,10 @@ export function Drawer({
           />
 
           <motion.aside
+            ref={panelRef}
+            tabIndex={-1}
             className={cn(
-              'admin-glass-strong absolute inset-y-0 end-0 flex h-full w-full flex-col border-s border-border-subtle shadow-2xl',
+              'admin-glass-strong absolute inset-y-0 end-0 flex h-full w-full flex-col border-s border-border-subtle shadow-2xl outline-none',
               widthClasses[width],
               className,
             )}
@@ -110,7 +180,7 @@ export function Drawer({
                 {description && (
                   <p
                     id={descriptionId}
-                    className="text-[8px] font-medium uppercase tracking-[0.14em] text-white/35"
+                    className="text-[8px] font-medium uppercase tracking-[0.14em] text-helper-text"
                   >
                     {description}
                   </p>

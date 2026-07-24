@@ -1,4 +1,5 @@
 // src/hooks/useB2BOrderDrawer.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createAdminB2BOrder } from '../api/admin/orders'
 import { getAdminCustomers } from '../api/admin/customers'
@@ -33,13 +34,6 @@ export type B2BOrderFormErrors = {
 interface UseB2BOrderDrawerOptions {
   open: boolean
   onCreated: (order: ApiAdminOrder) => void
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 function emptyItem(): B2BOrderLineItem {

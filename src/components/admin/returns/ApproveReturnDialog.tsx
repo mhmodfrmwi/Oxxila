@@ -1,4 +1,5 @@
 // src/components/admin/returns/ApproveReturnDialog.tsx
+import { isAbortError } from '../../../lib/isAbortError'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -21,13 +22,6 @@ interface ApproveReturnDialogProps {
 }
 
 const HANDLERS = ['internal', 'bosta'] as const
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
-}
 
 function isBostaApiCarrier(carrier: ApiAdminCarrier): boolean {
   return carrier.type === 'api' && carrier.apiProvider === 'bosta' && carrier.isActive !== false

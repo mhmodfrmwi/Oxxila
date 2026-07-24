@@ -2,6 +2,7 @@
 import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useToast } from '../../../context/ToastContext'
 import { useAdminBanners } from '../../../hooks/useAdminBanners'
 import type { BannerDrawerMode } from '../../../hooks/useBannerDrawer'
 import { cn } from '../../../lib/cn'
@@ -42,6 +43,7 @@ function BannerThumbnail({ image, title }: { image: string; title: string }) {
  */
 export function BannersManagerCard() {
   const { t } = useTranslation()
+  const toast = useToast()
   const {
     banners,
     loading,
@@ -87,16 +89,25 @@ export function BannersManagerCard() {
 
   const handleToggle = useCallback(
     async (banner: AdminBannerRow) => {
+      const nextActive = !banner.isActive
       setTogglingId(banner.id)
       try {
-        await toggleActive(banner.id, !banner.isActive)
-      } catch {
-        // Best-effort toggle — list stays on prior state; user can retry.
+        await toggleActive(banner.id, nextActive)
+        toast.success(
+          nextActive
+            ? t('admin.settings.banners.toggleOnSuccess')
+            : t('admin.settings.banners.toggleOffSuccess'),
+        )
+      } catch (err) {
+        toast.error(
+          t('admin.settings.banners.toggleError'),
+          err instanceof ApiError ? err.message : undefined,
+        )
       } finally {
         setTogglingId(null)
       }
     },
-    [toggleActive],
+    [t, toast, toggleActive],
   )
 
   const handleDelete = useCallback(async () => {

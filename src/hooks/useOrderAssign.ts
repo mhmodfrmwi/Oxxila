@@ -1,4 +1,5 @@
 // src/hooks/useOrderAssign.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   assignAdminOrderShipping,
@@ -46,13 +47,6 @@ const emptyForm = (): AssignFormState => ({
   trackingNumber: '',
   notes: '',
 })
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
-}
 
 export function isBostaCarrier(carrier: ApiAdminAssignCarrier | null): boolean {
   return carrier?.type === 'api' && carrier.apiProvider === 'bosta'

@@ -1,4 +1,5 @@
 // src/hooks/usePaymentGateways.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   getAdminPaymentGateways,
@@ -18,13 +19,6 @@ function mapGateway(gateway: ApiAdminPaymentGateway): AdminPaymentGatewayRow {
     name: gateway.name?.trim() || gateway.code,
     isEnabled: Boolean(gateway.isEnabled),
   }
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 interface PaymentGatewaysState {

@@ -1,4 +1,5 @@
 // src/hooks/useAdminReturns.ts
+import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { getAdminReturns } from '../api/admin/returns'
@@ -27,13 +28,6 @@ interface AsyncListState {
   pagination: ApiPagination | null
   loading: boolean
   error: string | null
-}
-
-function isAbortError(error: unknown): boolean {
-  return (
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.name === 'AbortError')
-  )
 }
 
 export function useAdminReturns() {
