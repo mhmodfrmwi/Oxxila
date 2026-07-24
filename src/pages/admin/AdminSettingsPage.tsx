@@ -2,6 +2,7 @@
 import { useTranslation } from 'react-i18next'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
 import { AdminRolesCard } from '../../components/admin/settings/AdminRolesCard'
+import { BannersManagerCard } from '../../components/admin/settings/BannersManagerCard'
 import { CartRecoveryCard } from '../../components/admin/settings/CartRecoveryCard'
 import { CouponManagerCard } from '../../components/admin/settings/CouponManagerCard'
 import { OffersManagerCard } from '../../components/admin/settings/OffersManagerCard'
@@ -40,15 +41,17 @@ export function AdminSettingsPage() {
         }
       />
 
-      <div className="flex flex-col gap-8 xl:flex-row xl:items-start xl:gap-8">
-        <div className="flex min-w-0 flex-1 flex-col gap-8 xl:max-w-[66rem]">
+      {/* Figma: flex gap-32 justify-center w-full; left Fixed 1056; right Fixed 512 */}
+      <div className="flex w-full flex-col gap-[var(--admin-content-gap-tight)] xl:flex-row xl:items-start xl:justify-center">
+        <div className="flex w-full min-w-0 flex-col gap-[var(--admin-content-gap-tight)] xl:w-[min(var(--admin-settings-main-width),calc(100%-var(--admin-rail-width)-1.6rem))] xl:shrink-0">
           <PaymentGatewaysCard />
           <CouponManagerCard />
           <OffersManagerCard />
+          <BannersManagerCard />
           <ShippingLogisticsCard />
         </div>
 
-        <div className="flex w-full shrink-0 flex-col gap-8 xl:w-[min(100%,32rem)]">
+        <div className="flex w-full shrink-0 flex-col gap-[var(--admin-content-gap-tight)] xl:w-[var(--admin-rail-width)]">
           <CartRecoveryCard />
           <AdminRolesCard />
         </div>

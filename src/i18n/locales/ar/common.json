@@ -1124,7 +1124,7 @@
     "products": {
       "title": "كتالوج المنتجات",
       "subtitle": "إدارة مخزون العناية بالبشرة الصيدلانية ومؤشرات أداء التركيبات.",
-      "addFormula": "إضافة تركيبة جديدة",
+      "addFormula": "إضافة منتج جديد",
       "addSoon": "إنشاء التركيبة سيكون متاحًا في مرحلة لاحقة.",
       "searchLabel": "البحث في كتالوج المنتجات",
       "searchPlaceholder": "ابحث في الكتالوج برقم SKU أو المكوّن أو الاسم...",
@@ -1156,7 +1156,7 @@
       },
       "showing": "عرض {{showing}} من {{total}} تركيبة",
       "prev": "السابق",
-      "next": "التالي",
+      "next": "المرحلة التالية",
       "emptyTitle": "لا توجد تركيبات بعد",
       "emptyDescription": "ستظهر المنتجات النشطة في الكتالوج هنا.",
       "emptyFilteredTitle": "لا توجد تركيبات مطابقة",
@@ -1234,13 +1234,18 @@
       "dateFrom": "من",
       "dateTo": "إلى",
       "statusFilterAria": "تصفية الطلبات حسب الحالة",
+      "addOrder": "+ إضافة طلب جديد (B2B)",
       "tabs": {
         "all": "كل الطلبات",
         "pending": "قيد الانتظار",
         "processing": "قيد المعالجة",
         "shipped": "تم الشحن",
+        "out_for_delivery": "خارج للتسليم",
+        "failed_attempt": "محاولة فاشلة",
         "delivered": "تم التسليم",
-        "returned": "مرتجع"
+        "partially_returned": "مرتجع جزئيًا",
+        "returned": "مرتجع",
+        "cancelled": "ملغى"
       },
       "columns": {
         "orderId": "رقم الطلب",
@@ -1248,8 +1253,15 @@
         "customer": "العميل",
         "paymentStatus": "الدفع",
         "orderStatus": "الحالة",
+        "carrier": "شركة الشحن",
+        "tracking": "التتبع",
         "total": "الإجمالي",
         "action": "إجراء"
+      },
+      "carrierCell": {
+        "assign": "تعيين",
+        "assignAria": "تعيين شركة شحن لـ {{id}}",
+        "unassigned": "—"
       },
       "paymentStatus": {
         "pending": "قيد الانتظار",
@@ -1283,6 +1295,23 @@
       "loadErrorTitle": "تعذّر تحميل الطلبات",
       "loadErrorDescription": "يرجى المحاولة مرة أخرى بعد لحظات.",
       "retry": "إعادة المحاولة",
+      "menu": {
+        "viewDetails": "عرض التفاصيل",
+        "cancel": "إلغاء الطلب"
+      },
+      "cancel": {
+        "action": "إلغاء",
+        "title": "إلغاء الطلب",
+        "description": "إلغاء الطلب {{id}}؟ لا يمكن التراجع عن هذا الإجراء.",
+        "descriptionFallback": "إلغاء هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
+        "reasonLabel": "السبب (اختياري)",
+        "reasonPlaceholder": "أضف سبب الإلغاء…",
+        "keep": "الإبقاء على الطلب",
+        "confirm": "إلغاء الطلب",
+        "success": "تم إلغاء الطلب بنجاح",
+        "error": "تعذّر إلغاء الطلب.",
+        "unavailable": "لا يمكن إلغاء الطلبات المُسلَّمة أو الملغاة مسبقًا."
+      },
       "details": {
         "title": "طلب {{id}}",
         "titleFallback": "تفاصيل الطلب",
@@ -1301,10 +1330,92 @@
         "updateStatus": "تحديث حالة التتبع",
         "invoiceSoon": "طباعة الفاتورة غير متاحة بعد.",
         "refundSoon": "الاسترداد غير متاح من هذا الدرج بعد.",
-        "updateStatusSoon": "تحديث الحالة غير متاح من هذا الدرج بعد.",
         "loadErrorTitle": "تعذّر تحميل الطلب",
         "emptyTitle": "الطلب غير موجود",
-        "emptyDescription": "تعذّر تحميل هذا الطلب."
+        "emptyDescription": "تعذّر تحميل هذا الطلب.",
+        "ordersCount_one": "{{count}} طلب",
+        "ordersCount_other": "{{count}} طلبات",
+        "assign": {
+          "title": "تعيين شركة شحن",
+          "subtitle": "لا توجد شركة شحن معيّنة بعد — عيّن مباشرة دون خطوة تأكيد.",
+          "loadError": "تعذّر تحميل خيارات التعيين",
+          "noCarriers": "لا توجد شركات شحن نشطة تطابق إعدادات طريقة الشحن لهذا الطلب.",
+          "packageSize": "حجم الطرد",
+          "sizes": {
+            "SMALL": "صغير",
+            "MEDIUM": "متوسط",
+            "LARGE": "كبير",
+            "XLARGE": "كبير جدًا"
+          },
+          "carrier": "شركة الشحن",
+          "disabledCoverage": "لا تغطي هذه المحافظة",
+          "disabledPickups": "لا توجد مواقع استلام مهيأة",
+          "disabledDistrict": "المنطقة غير مغطاة من Bosta",
+          "pickup": "موقع الاستلام",
+          "pickupPlaceholder": "اختر موقع الاستلام",
+          "driverName": "اسم السائق",
+          "driverPhone": "هاتف السائق",
+          "trackingNumber": "رقم التتبع (اختياري)",
+          "notes": "ملاحظات (اختياري)",
+          "submit": "تعيين شركة الشحن",
+          "submitting": "جارٍ التعيين…",
+          "success": "تم تعيين شركة الشحن بنجاح",
+          "errors": {
+            "carrierRequired": "اختر شركة شحن",
+            "pickupRequired": "اختر موقع استلام",
+            "driverNameRequired": "اسم السائق مطلوب",
+            "driverPhoneRequired": "هاتف السائق مطلوب"
+          }
+        },
+        "manualStatus": {
+          "title": "حالة التتبع",
+          "subtitle": "شركة شحن يدوية — حدّث حالة الطلب أثناء تنقله.",
+          "label": "حالة الطلب",
+          "notes": "ملاحظات (اختياري)",
+          "submit": "تحديث حالة التتبع",
+          "submitting": "جارٍ التحديث…",
+          "success": "تم تحديث حالة التتبع بنجاح",
+          "bostaNote": "شحنات Bosta تُحدَّث تلقائيًا عبر webhook — التحديث اليدوي معطّل."
+        }
+      },
+      "b2b": {
+        "title": "إضافة طلب جديد (B2B)",
+        "subtitle": "إنشاء طلب نيابة عن عميل",
+        "customer": "العميل",
+        "customerSearchPlaceholder": "ابحث عن عميل بالاسم أو البريد الإلكتروني…",
+        "customerNotFound": "لا يوجد عملاء",
+        "changeCustomer": "تغيير",
+        "items": "عناصر الطلب",
+        "addItem": "+ إضافة عنصر",
+        "removeItemAria": "حذف العنصر {{index}}",
+        "productSearchPlaceholder": "ابحث عن منتج…",
+        "productNotFound": "لا توجد منتجات",
+        "quantity": "الكمية",
+        "unitPriceOptional": "سعر الوحدة (اختياري)",
+        "stockHint": "{{stock}} متوفر بالمخزون",
+        "address": "عنوان التوصيل",
+        "addressModeSaved": "عنوان محفوظ",
+        "addressModeManual": "عنوان جديد",
+        "savedAddress": "اختر عنوانًا محفوظًا",
+        "savedAddressEmpty": "لا توجد عناوين محفوظة لهذا العميل",
+        "selectCustomerFirst": "اختر عميلاً أولاً",
+        "governorate": "المحافظة",
+        "governoratePlaceholder": "اختر المحافظة",
+        "district": "المنطقة (اختياري)",
+        "districtPlaceholder": "اختر المنطقة",
+        "addressLine": "العنوان التفصيلي",
+        "couponCode": "كود الكوبون (اختياري)",
+        "freeShipping": "تجاوز الشحن المجاني",
+        "markPaid": "تحديد كمدفوع",
+        "submit": "إنشاء الطلب",
+        "submitting": "جارٍ الإنشاء…",
+        "success": "تم إنشاء طلب B2B بنجاح",
+        "errors": {
+          "customerRequired": "اختر عميلًا",
+          "itemsRequired": "أضف عنصرًا واحدًا على الأقل",
+          "productRequired": "اختر منتجًا",
+          "addressRequired": "أدخل عنوانًا محفوظًا أو محافظة وعنوانًا تفصيليًا"
+        }
       }
     },
     "customers": {
@@ -1329,8 +1440,8 @@
       "columns": {
         "customerName": "اسم العميل",
         "orders": "الطلبات",
-        "ltv": "مؤشر القيمة",
-        "lastVisit": "آخر زيارة",
+        "ltv": "إجمالي المدفوع",
+        "lastVisit": "آخر طلب",
         "actions": "إجراءات"
       },
       "tableAria": "قائمة العملاء",
@@ -1354,6 +1465,10 @@
         "title": "ذكاء المريض",
         "subtitle": "عرض الملف التفصيلي",
         "totalSpend": "إجمالي الإنفاق",
+        "orders": "الطلبات",
+        "ordersCount_one": "{{count}} طلب",
+        "ordersCount_other": "{{count}} طلبات",
+        "lastOrder": "آخر طلب",
         "contactInfo": "معلومات التواصل",
         "email": "البريد الإلكتروني",
         "phone": "الهاتف",
@@ -1383,12 +1498,12 @@
       "tableTitle": "أحدث الإرسالات",
       "tabs": {
         "all": "الكل",
-        "pending": "قيد الانتظار",
-        "approved": "موافق عليها",
-        "reported": "مبلّغ عنها"
+        "visible": "ظاهرة",
+        "hidden": "مخفية",
+        "flagged": "مُعلَّمة"
       },
       "columns": {
-        "patient": "المريض",
+        "patient": "العميل",
         "product": "المنتج",
         "rating": "التقييم",
         "feedback": "الملاحظة السريرية",
@@ -1396,8 +1511,8 @@
         "actions": "إجراءات"
       },
       "visibility": {
-        "approved": "موافق عليها",
-        "pending": "قيد الانتظار"
+        "visible": "ظاهرة",
+        "hidden": "مخفية"
       },
       "ordersCount_zero": "{{count}} طلب",
       "ordersCount_one": "{{count}} طلب",
@@ -1413,8 +1528,6 @@
       "next": "الصفحة التالية",
       "viewAria": "عرض المراجعة {{id}}",
       "flagAria": "الإبلاغ عن المراجعة {{id}}",
-      "viewSoon": "تفاصيل المراجعة ستكون متاحة في مرحلة لاحقة.",
-      "flagSoon": "الإبلاغ عن المراجعات غير متاح في هذه المرحلة.",
       "emptyTitle": "لا توجد مراجعات بعد",
       "emptyDescription": "ستظهر مراجعات المرضى هنا بعد إرسالها.",
       "emptyFilteredTitle": "لا توجد مراجعات مطابقة",
@@ -1434,130 +1547,204 @@
         "status": "حالة المراجعة",
         "email": "البريد الإلكتروني",
         "phone": "الهاتف",
-        "moderation": "معلومات الإشراف",
-        "flagReason": "سبب الإبلاغ",
-        "flaggedAt": "تاريخ الإبلاغ",
-        "flaggedBy": "أبلغ بواسطة",
-        "resolvedAt": "تاريخ الحل",
-        "resolvedBy": "حُل بواسطة",
-        "resolvedNote": "ملاحظة الحل",
-        "flagReasons": {
-          "medical_claim": "ادعاء طبي",
-          "profanity": "ألفاظ مسيئة",
-          "spam": "رسائل مزعجة",
-          "misinformation": "معلومات مضللة",
-          "other": "أخرى"
-        },
         "approve": "موافقة",
         "hide": "إخفاء",
         "flag": "الإبلاغ عن المراجعة",
-        "approveSoon": "الموافقة على المراجعات غير متاحة من هذا الدرج بعد.",
-        "hideSoon": "إخفاء المراجعات غير متاح من هذا الدرج بعد.",
         "loadErrorTitle": "تعذّر تحميل المراجعة",
         "emptyTitle": "المراجعة غير موجودة",
-        "emptyDescription": "تعذّر تحميل هذه المراجعة."
+        "emptyDescription": "تعذّر تحميل هذه المراجعة.",
+        "unflag": "إلغاء الإبلاغ",
+        "approveSuccess": "أصبحت المراجعة ظاهرة الآن",
+        "hideSuccess": "تم إخفاء المراجعة من المتجر",
+        "flagSuccess": "تم الإبلاغ عن المراجعة",
+        "unflagSuccess": "تم إلغاء الإبلاغ عن المراجعة",
+        "actionError": "تعذّر تحديث هذه المراجعة. حاول مرة أخرى."
+      },
+      "flagged": "مُعلَّمة",
+      "unflagAria": "إلغاء الإبلاغ عن المراجعة {{id}}",
+      "visibilityApprovedToast": "أصبحت المراجعة ظاهرة الآن",
+      "visibilityHiddenToast": "تم إخفاء المراجعة من المتجر",
+      "visibilityToggleError": "تعذّر تحديث ظهور المراجعة. حاول مرة أخرى.",
+      "flagUpdatedToast": "تم الإبلاغ عن المراجعة",
+      "unflagUpdatedToast": "تم إلغاء الإبلاغ عن المراجعة",
+      "flagToggleError": "تعذّر تحديث حالة الإبلاغ. حاول مرة أخرى.",
+      "overview": {
+        "averageRating": {
+          "title": "متوسط التقييم",
+          "subtitle": "بناءً على {{count}} مراجعة ظاهرة",
+          "emptyTitle": "لا توجد تقييمات بعد",
+          "emptyDescription": "يظهر متوسط التقييم بعد إرسال المراجعات."
+        },
+        "sentiment": {
+          "title": "المشاعر",
+          "subtitle": "توزيع التقييمات",
+          "positive": "إيجابي",
+          "neutral": "محايد",
+          "negative": "سلبي",
+          "emptyTitle": "لا توجد بيانات مشاعر",
+          "emptyDescription": "يظهر توزيع المشاعر بعد إرسال المراجعات."
+        },
+        "flaggedQueue": {
+          "title": "قائمة الإبلاغات",
+          "urgent_zero": "{{count}} عاجل",
+          "urgent_one": "{{count}} عاجل",
+          "urgent_two": "{{count}} عاجلان",
+          "urgent_few": "{{count}} عاجلة",
+          "urgent_many": "{{count}} عاجلة",
+          "urgent_other": "{{count}} عاجل",
+          "paginationAria": "ترقيم قائمة الإبلاغات",
+          "emptyTitle": "لا توجد مراجعات مُبلَّغ عنها",
+          "emptyDescription": "ستظهر المراجعات المُبلَّغ عنها هنا للمراجعة."
+        }
       }
     },
     "shipping": {
       "title": "إدارة الشحن",
-      "subtitle": "إدارة شركات الشحن وشحنات الطلبات.",
-      "searchLabel": "البحث في الشحن",
-      "searchPlaceholder": "تصفية الشركات أو معرّف الطلب...",
-      "statusFilterAria": "تصفية طلبات الشحن حسب الحالة",
+      "subtitle": "إدارة طرق الشحن وشركات الشحن والمناطق ونقاط استلام Bosta.",
+      "searchLabel": "البحث في شركات الشحن",
+      "searchPlaceholder": "تصفية الشركات بالاسم أو الكود...",
       "clearFilters": "مسح الفلاتر",
       "loadErrorTitle": "تعذّر تحميل الشحن",
       "loadErrorDescription": "يرجى المحاولة مرة أخرى بعد لحظات.",
       "retry": "إعادة المحاولة",
-      "tabs": {
-        "all": "الكل",
-        "pending": "قيد الانتظار",
-        "shipped": "تم الشحن",
-        "delivered": "تم التسليم"
-      },
       "carriers": {
         "title": "شركات الشحن",
         "addCompany": "إضافة شركة",
-        "addSoon": "إضافة شركات الشحن غير متاحة في هذه المرحلة.",
         "tableAria": "قائمة شركات الشحن",
         "active": "نشط",
         "inactive": "غير نشط",
+        "bosta": "Bosta (API)",
         "editAria": "تعديل {{name}}",
         "deleteAria": "حذف {{name}}",
-        "editSoon": "تعديل شركات الشحن غير متاح في هذه المرحلة.",
-        "deleteSoon": "حذف شركات الشحن غير متاح في هذه المرحلة.",
         "columns": {
           "company": "اسم الشركة",
+          "type": "النوع",
           "deliveryTime": "وقت التوصيل",
-          "cost": "التكلفة",
           "coverage": "التغطية",
           "status": "الحالة",
           "action": "إجراء"
         },
         "emptyTitle": "لا توجد شركات شحن بعد",
-        "emptyDescription": "ستظهر شركات الشحن هنا بعد إعدادها.",
+        "emptyDescription": "أضف شركة معروفة أو داخلية أو Bosta للبدء.",
         "emptyFilteredTitle": "لا توجد شركات مطابقة",
         "emptyFilteredDescription": "جرّب بحثًا مختلفًا.",
-        "loadErrorTitle": "تعذّر تحميل شركات الشحن"
-      },
-      "orders": {
-        "title": "شحن الطلبات",
-        "tableAria": "قائمة شحن الطلبات",
-        "paginationAria": "ترقيم شحن الطلبات",
-        "showing": "عرض {{showing}} من {{total}} طلب",
-        "prev": "السابق",
-        "next": "التالي",
-        "update": "تحديث",
-        "updateAria": "تحديث الشحن لـ {{id}}",
-        "updateSoon": "تحديث الشحنات غير متاح في هذه المرحلة.",
-        "methodInHouse": "داخلي",
-        "methodCourier": "شحن ({{name}})",
-        "methodCourierGeneric": "شحن",
-        "columns": {
-          "orderId": "رقم الطلب",
-          "patient": "اسم المريض",
-          "method": "الطريقة",
-          "status": "الحالة",
-          "tracking": "التتبع / السائق",
-          "action": "إجراء"
-        },
-        "emptyTitle": "لا توجد طلبات شحن بعد",
-        "emptyDescription": "ستظهر الطلبات هنا بعد أن يضعها العملاء.",
-        "emptyFilteredTitle": "لا توجد طلبات مطابقة",
-        "emptyFilteredDescription": "جرّب فلتر حالة أو معرّف طلب مختلف.",
-        "searchHint": "أدخل معرّف الطلب الكامل للبحث. بحث الشركات يصفّي قائمة الشركات أعلاه.",
-        "loadErrorTitle": "تعذّر تحميل طلبات الشحن"
+        "loadErrorTitle": "تعذّر تحميل شركات الشحن",
+        "deleteTitle": "حذف شركة الشحن",
+        "deleteDescription": "هل تريد حذف {{name}}؟",
+        "deleteWarning": "ستتم إزالة هذه الشركة من طرق الشحن ومن تعيين الشركة في كل مكان تُستخدم فيه.",
+        "cancel": "إلغاء",
+        "confirmDelete": "حذف",
+        "deleteSuccess": "تم حذف شركة الشحن بنجاح",
+        "deleteError": "تعذّر حذف شركة الشحن.",
+        "drawer": {
+          "createTitle": "إضافة شركة شحن",
+          "editTitle": "تعديل شركة الشحن",
+          "subtitle": "شركات الشحن",
+          "name": "اسم الشركة",
+          "code": "الكود",
+          "type": "النوع",
+          "immutableHint": "لا يمكن تغيير النوع أو الكود بعد الإنشاء.",
+          "apiProvider": "مزود الـ API",
+          "apiKey": "مفتاح الـ API",
+          "apiKeyEditPlaceholder": "اتركه فارغًا للاحتفاظ بالمفتاح الحالي",
+          "apiBaseUrl": "رابط الـ API الأساسي",
+          "apiBaseUrlOptional": "اختياري",
+          "deliveryDays": "مدة التوصيل",
+          "deliveryDaysPlaceholder": "مثال: 2-4 أيام عمل",
+          "active": "نشط",
+          "activeHint": "الشركات غير النشطة تُخفى من تعيين الشركة.",
+          "save": "حفظ",
+          "saving": "جارٍ الحفظ…",
+          "createSuccess": "تم إنشاء شركة الشحن بنجاح",
+          "updateSuccess": "تم تحديث شركة الشحن بنجاح",
+          "coverageTitle": "التغطية",
+          "coverageHint": "اختر المحافظات التي تغطيها هذه الشركة.",
+          "coverageLoading": "جارٍ تحميل المحافظات…",
+          "coverageEmpty": "أضف دولة ومحافظة في مدير المناطق أولاً.",
+          "coverageSave": "حفظ التغطية"
+        }
       },
       "method": {
-        "title": "طريقة الشحن",
+        "title": "طرق الشحن",
         "panelAria": "إعدادات طريقة الشحن",
-        "courier": "شركة شحن",
-        "courierHint": "شركات شحن خارجية.",
-        "inHouse": "توصيل داخلي",
-        "inHouseHint": "فريق توصيل محلي خاص.",
-        "courierToggleSoon": "إعدادات الشحن الخارجي للقراءة فقط في هذه المرحلة.",
-        "inHouseToggleSoon": "إعدادات التوصيل الداخلي للقراءة فقط في هذه المرحلة."
+        "loadErrorTitle": "تعذّر تحميل طرق الشحن",
+        "types": {
+          "api": {
+            "label": "API (Bosta)",
+            "hint": "شركات شحن آلية متصلة عبر API.",
+            "toggleAria": "تبديل طريقة الشحن API"
+          },
+          "known": {
+            "label": "شركات معروفة",
+            "hint": "شركات شحن خارجية تُتابع يدويًا.",
+            "toggleAria": "تبديل طريقة الشحن للشركات المعروفة"
+          },
+          "internal": {
+            "label": "داخلي",
+            "hint": "فريق توصيل محلي خاص.",
+            "toggleAria": "تبديل طريقة الشحن الداخلي"
+          }
+        }
       },
-      "details": {
-        "title": "الشحنة {{id}}",
-        "titleFallback": "تفاصيل الشحنة",
-        "subtitle": "تفاصيل الشحن",
-        "order": "الطلب",
-        "orderStatus": "حالة الطلب",
-        "shipmentInfo": "معلومات الشحنة",
-        "courier": "شركة الشحن",
-        "trackingNumber": "رقم التتبع",
-        "shippingStatus": "حالة الشحن",
-        "driver": "السائق",
-        "shippingMethod": "طريقة الشحن",
-        "timeline": "الجدول الزمني",
-        "timelineEmpty": "لا يتوفر جدول زمني للتتبع.",
-        "assign": "تعيين شركة شحن",
-        "updateStatus": "تحديث الحالة",
-        "assignSoon": "تعيين شركات الشحن غير متاح في هذه المرحلة.",
-        "updateStatusSoon": "تحديث حالة الشحنة غير متاح في هذه المرحلة.",
-        "loadErrorTitle": "تعذّر تحميل الشحنة",
-        "emptyTitle": "الشحنة غير موجودة",
-        "emptyDescription": "تعذّر تحميل هذه الشحنة."
+      "zones": {
+        "aria": "مدير المناطق",
+        "title": "مدير المناطق",
+        "subtitle": "الدول والمحافظات والمناطق المستخدمة في التغطية وتسعير الدفع.",
+        "countries": "الدول",
+        "governorates": "المحافظات",
+        "districts": "المناطق",
+        "countriesEmpty": "لا توجد دول بعد.",
+        "governoratesEmpty": "لا توجد محافظات بعد.",
+        "districtsEmpty": "لا توجد مناطق بعد.",
+        "selectCountryFirst": "اختر دولة لعرض محافظاتها.",
+        "selectGovernorateFirst": "اختر محافظة لعرض مناطقها.",
+        "covered": "مغطاة",
+        "closed": "مغلقة",
+        "bostaCovered": "مغطاة من Bosta",
+        "deleteTitle": "حذف المنطقة",
+        "deleteDescription": "هل تريد حذف {{name}}؟",
+        "deleteWarning": "سيتم أيضًا حذف كل ما هو مرتبط بها.",
+        "confirmDelete": "حذف",
+        "form": {
+          "cancel": "إلغاء",
+          "add": "إضافة",
+          "countryName": "اسم الدولة",
+          "countryCode": "الكود (حرفان)",
+          "currency": "العملة (3 أحرف)",
+          "flagOptional": "رمز العلم (اختياري)",
+          "governorateName": "اسم المحافظة",
+          "districtName": "اسم المنطقة",
+          "shippingPrice": "سعر الشحن",
+          "addCountryAria": "إضافة دولة",
+          "addGovernorateAria": "إضافة محافظة",
+          "addDistrictAria": "إضافة منطقة"
+        }
+      },
+      "pickups": {
+        "title": "نقاط استلام Bosta",
+        "sync": "مزامنة من Bosta",
+        "syncZones": "مزامنة المناطق",
+        "syncCoverage": "مزامنة التغطية",
+        "add": "إضافة نقطة استلام",
+        "default": "افتراضي",
+        "setDefault": "تعيين كافتراضي",
+        "delete": "حذف نقطة الاستلام",
+        "emptyTitle": "لا توجد نقاط استلام بعد",
+        "emptyDescription": "زامن من Bosta أو أضف نقطة استلام يدويًا.",
+        "form": {
+          "locationName": "اسم الموقع",
+          "firstLine": "العنوان",
+          "city": "المدينة",
+          "district": "المنطقة",
+          "selectCity": "اختر مدينة",
+          "selectDistrict": "اختر منطقة",
+          "loadingCities": "جارٍ تحميل المدن…",
+          "contactName": "اسم جهة الاتصال",
+          "contactPhone": "هاتف جهة الاتصال",
+          "isDefault": "تعيين كنقطة استلام افتراضية",
+          "cancel": "إلغاء",
+          "save": "إضافة نقطة الاستلام"
+        }
       }
     },
     "settings": {
@@ -1597,7 +1784,7 @@
         "next": "التالي",
         "columns": {
           "code": "الرمز",
-          "discount": "الخصم",
+          "discount": "النوع",
           "usage": "الاستخدام",
           "status": "الحالة",
           "action": "إجراء"
@@ -1623,7 +1810,8 @@
           "loadErrorTitle": "تعذّر تحميل القسيمة",
           "types": {
             "percentage": "نسبة مئوية",
-            "fixed": "ثابت"
+            "fixed": "ثابت",
+            "freeShipping": "شحن مجاني"
           }
         }
       },
@@ -1683,14 +1871,71 @@
         "emptyDescription": "ستظهر بروتوكولات شركات الشحن هنا بعد إعدادها.",
         "loadErrorTitle": "تعذّر تحميل بروتوكولات الشحن"
       },
+      "banners": {
+        "title": "البانرات",
+        "aria": "إدارة البانرات",
+        "addBanner": "إضافة بانر",
+        "emptyTitle": "لا توجد بانرات بعد",
+        "emptyDescription": "ستظهر بانرات الصفحة الرئيسية هنا بعد إنشائها.",
+        "loadErrorTitle": "تعذّر تحميل البانرات",
+        "deleteError": "تعذّر حذف البانر.",
+        "deleteTitle": "حذف البانر",
+        "deleteDescription": "هل تريد حذف \"{{title}}\"؟",
+        "deleteWarning": "سيتم حذف هذا البانر نهائيًا من واجهة المتجر.",
+        "cancel": "إلغاء",
+        "confirmDelete": "حذف",
+        "editAria": "تعديل البانر {{title}}",
+        "deleteAria": "حذف البانر {{title}}",
+        "toggleAria": "تبديل حالة التفعيل لـ {{title}}",
+        "linkTypes": {
+          "none": "بلا رابط",
+          "product": "منتج",
+          "category": "فئة",
+          "url": "رابط خارجي"
+        },
+        "columns": {
+          "banner": "البانر",
+          "link": "الرابط",
+          "status": "الحالة",
+          "action": "إجراء"
+        },
+        "drawer": {
+          "createTitle": "إضافة بانر",
+          "editTitle": "تعديل بانر",
+          "subtitle": "البانرات",
+          "image": "الصورة",
+          "uploadImage": "رفع صورة",
+          "title": "العنوان",
+          "titleOptional": "اختياري",
+          "linkType": "نوع الرابط",
+          "linkTypes": {
+            "none": "بلا رابط",
+            "product": "منتج",
+            "category": "فئة",
+            "url": "رابط خارجي"
+          },
+          "product": "المنتج",
+          "selectProduct": "اختر منتجًا",
+          "category": "الفئة",
+          "selectCategory": "اختر فئة",
+          "externalUrl": "الرابط الخارجي",
+          "active": "نشط",
+          "activeHint": "البانرات غير النشطة تختفي من واجهة المتجر.",
+          "save": "حفظ",
+          "saving": "جارٍ الحفظ…",
+          "createSuccess": "تم إنشاء البانر بنجاح",
+          "updateSuccess": "تم تحديث البانر بنجاح",
+          "loadErrorTitle": "تعذّر تحميل خيارات البانر"
+        }
+      },
       "recovery": {
         "title": "استرداد السلة",
         "aria": "استرداد السلة",
         "subtitle": "تحسين الفرص الضائعة",
         "recovered": "تم الاسترداد",
         "recoveryRate": "معدل الاسترداد",
-        "abandonedRevenue": "إيرادات مهجورة",
-        "recoveredRevenue": "إيرادات مستردة",
+        "abandonedRevenue": "إجمالي المهجور",
+        "recoveredRevenue": "الإيراد المسترد",
         "automate": "أتمتة الاسترداد",
         "automateSoon": "أتمتة استرداد السلة غير متاحة بعد.",
         "emptyTitle": "لا توجد تحليلات استرداد",

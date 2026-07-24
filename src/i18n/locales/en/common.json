@@ -1118,7 +1118,7 @@
     "products": {
       "title": "Products Catalog",
       "subtitle": "Manage pharmaceutical-grade skincare inventory and formulation performance metrics.",
-      "addFormula": "Add New Formula",
+      "addFormula": "Add New Product",
       "addSoon": "Create formula will be available in a later phase.",
       "searchLabel": "Search products catalog",
       "searchPlaceholder": "Search catalog by SKU, ingredient, or name...",
@@ -1150,7 +1150,7 @@
       },
       "showing": "Showing {{showing}} of {{total}} formulations",
       "prev": "Previous",
-      "next": "Next",
+      "next": "Next Phase",
       "emptyTitle": "No formulations yet",
       "emptyDescription": "Active products in the catalog will appear here.",
       "emptyFilteredTitle": "No matching formulations",
@@ -1228,13 +1228,18 @@
       "dateFrom": "From",
       "dateTo": "To",
       "statusFilterAria": "Filter orders by status",
+      "addOrder": "+ Add New Order (B2B)",
       "tabs": {
         "all": "All Orders",
         "pending": "Pending",
         "processing": "Processing",
         "shipped": "Shipped",
+        "out_for_delivery": "Out for delivery",
+        "failed_attempt": "Failed attempt",
         "delivered": "Delivered",
-        "returned": "Returned"
+        "partially_returned": "Partially returned",
+        "returned": "Returned",
+        "cancelled": "Cancelled"
       },
       "columns": {
         "orderId": "Order ID",
@@ -1242,8 +1247,15 @@
         "customer": "Customer",
         "paymentStatus": "Payment",
         "orderStatus": "Status",
+        "carrier": "Carrier",
+        "tracking": "Tracking",
         "total": "Total",
         "action": "Action"
+      },
+      "carrierCell": {
+        "assign": "Assign",
+        "assignAria": "Assign carrier for {{id}}",
+        "unassigned": "—"
       },
       "paymentStatus": {
         "pending": "Pending",
@@ -1277,6 +1289,23 @@
       "loadErrorTitle": "Unable to load orders",
       "loadErrorDescription": "Please try again in a moment.",
       "retry": "Retry",
+      "menu": {
+        "viewDetails": "View details",
+        "cancel": "Cancel order"
+      },
+      "cancel": {
+        "action": "Cancel",
+        "title": "Cancel order",
+        "description": "Cancel order {{id}}? This cannot be undone.",
+        "descriptionFallback": "Cancel this order? This cannot be undone.",
+        "reasonLabel": "Reason (optional)",
+        "reasonPlaceholder": "Add a cancellation reason…",
+        "keep": "Keep order",
+        "confirm": "Cancel order",
+        "success": "Order cancelled successfully",
+        "error": "Unable to cancel order.",
+        "unavailable": "Delivered or already cancelled orders cannot be cancelled."
+      },
       "details": {
         "title": "Order {{id}}",
         "titleFallback": "Order details",
@@ -1295,10 +1324,92 @@
         "updateStatus": "Update Tracking Status",
         "invoiceSoon": "Invoice printing is not available yet.",
         "refundSoon": "Refunds are not available from this drawer yet.",
-        "updateStatusSoon": "Status updates are not available from this drawer yet.",
         "loadErrorTitle": "Unable to load order",
         "emptyTitle": "Order not found",
-        "emptyDescription": "This order could not be loaded."
+        "emptyDescription": "This order could not be loaded.",
+        "ordersCount_one": "{{count}} order",
+        "ordersCount_other": "{{count}} orders",
+        "assign": {
+          "title": "Assign Carrier",
+          "subtitle": "No carrier assigned yet — assign directly, no confirm step needed.",
+          "loadError": "Unable to load assign options",
+          "noCarriers": "No active carriers match this order's shipping method settings.",
+          "packageSize": "Package size",
+          "sizes": {
+            "SMALL": "Small",
+            "MEDIUM": "Medium",
+            "LARGE": "Large",
+            "XLARGE": "Extra large"
+          },
+          "carrier": "Carrier",
+          "disabledCoverage": "Does not cover this governorate",
+          "disabledPickups": "No pickup locations configured",
+          "disabledDistrict": "District not covered by Bosta",
+          "pickup": "Pickup location",
+          "pickupPlaceholder": "Select a pickup location",
+          "driverName": "Driver name",
+          "driverPhone": "Driver phone",
+          "trackingNumber": "Tracking number (optional)",
+          "notes": "Notes (optional)",
+          "submit": "Assign Carrier",
+          "submitting": "Assigning…",
+          "success": "Carrier assigned successfully",
+          "errors": {
+            "carrierRequired": "Select a carrier",
+            "pickupRequired": "Select a pickup location",
+            "driverNameRequired": "Driver name is required",
+            "driverPhoneRequired": "Driver phone is required"
+          }
+        },
+        "manualStatus": {
+          "title": "Tracking Status",
+          "subtitle": "Manual carrier — update the order status as it moves.",
+          "label": "Order status",
+          "notes": "Notes (optional)",
+          "submit": "Update Tracking Status",
+          "submitting": "Updating…",
+          "success": "Tracking status updated successfully",
+          "bostaNote": "Bosta shipments update automatically via webhook — manual updates are disabled."
+        }
+      },
+      "b2b": {
+        "title": "Add New Order (B2B)",
+        "subtitle": "Create an order on behalf of a customer",
+        "customer": "Customer",
+        "customerSearchPlaceholder": "Search customers by name or email…",
+        "customerNotFound": "No customers found",
+        "changeCustomer": "Change",
+        "items": "Line Items",
+        "addItem": "+ Add item",
+        "removeItemAria": "Remove item {{index}}",
+        "productSearchPlaceholder": "Search products…",
+        "productNotFound": "No products found",
+        "quantity": "Qty",
+        "unitPriceOptional": "Unit price (optional)",
+        "stockHint": "{{stock}} in stock",
+        "address": "Delivery address",
+        "addressModeSaved": "Saved address",
+        "addressModeManual": "New address",
+        "savedAddress": "Select a saved address",
+        "savedAddressEmpty": "This customer has no saved addresses",
+        "selectCustomerFirst": "Select a customer first",
+        "governorate": "Governorate",
+        "governoratePlaceholder": "Select governorate",
+        "district": "District (optional)",
+        "districtPlaceholder": "Select district",
+        "addressLine": "Address line",
+        "couponCode": "Coupon code (optional)",
+        "freeShipping": "Free shipping override",
+        "markPaid": "Mark as paid",
+        "submit": "Create Order",
+        "submitting": "Creating…",
+        "success": "B2B order created successfully",
+        "errors": {
+          "customerRequired": "Select a customer",
+          "itemsRequired": "Add at least one item",
+          "productRequired": "Select a product",
+          "addressRequired": "Provide a saved address or governorate + address line"
+        }
       }
     },
     "customers": {
@@ -1323,8 +1434,8 @@
       "columns": {
         "customerName": "Customer Name",
         "orders": "Orders",
-        "ltv": "LTV Index",
-        "lastVisit": "Last Visit",
+        "ltv": "Total Paid",
+        "lastVisit": "Last Order",
         "actions": "Actions"
       },
       "tableAria": "Customers list",
@@ -1348,6 +1459,10 @@
         "title": "Patient Intelligence",
         "subtitle": "Detailed Profile View",
         "totalSpend": "Total Spend",
+        "orders": "Orders",
+        "ordersCount_one": "{{count}} order",
+        "ordersCount_other": "{{count}} orders",
+        "lastOrder": "Last Order",
         "contactInfo": "Contact Information",
         "email": "Email",
         "phone": "Phone",
@@ -1375,14 +1490,15 @@
       "searchPlaceholder": "Filter reviews...",
       "statusFilterAria": "Filter reviews by status",
       "tableTitle": "Recent Submissions",
+      "flagged": "Flagged",
       "tabs": {
         "all": "All",
-        "pending": "Pending",
-        "approved": "Approved",
-        "reported": "Reported"
+        "visible": "Visible",
+        "hidden": "Hidden",
+        "flagged": "Flagged"
       },
       "columns": {
-        "patient": "Patient",
+        "patient": "Customer",
         "product": "Product",
         "rating": "Rating",
         "feedback": "Clinical Feedback",
@@ -1390,8 +1506,8 @@
         "actions": "Actions"
       },
       "visibility": {
-        "approved": "Approved",
-        "pending": "Pending"
+        "visible": "Visible",
+        "hidden": "Hidden"
       },
       "ordersCount_one": "{{count}} order",
       "ordersCount_other": "{{count}} orders",
@@ -1403,8 +1519,13 @@
       "next": "Next Page",
       "viewAria": "View review {{id}}",
       "flagAria": "Flag review {{id}}",
-      "viewSoon": "Review details will be available in a later phase.",
-      "flagSoon": "Flagging reviews is not available in this phase.",
+      "unflagAria": "Unflag review {{id}}",
+      "visibilityApprovedToast": "Review is now visible",
+      "visibilityHiddenToast": "Review hidden from storefront",
+      "visibilityToggleError": "Could not update review visibility. Please try again.",
+      "flagUpdatedToast": "Review flagged",
+      "unflagUpdatedToast": "Review unflagged",
+      "flagToggleError": "Could not update review flag. Please try again.",
       "emptyTitle": "No reviews yet",
       "emptyDescription": "Patient reviews will appear here once submitted.",
       "emptyFilteredTitle": "No matching reviews",
@@ -1413,6 +1534,31 @@
       "loadErrorTitle": "Unable to load reviews",
       "loadErrorDescription": "Please try again in a moment.",
       "retry": "Retry",
+      "overview": {
+        "averageRating": {
+          "title": "Average Rating",
+          "subtitle": "Based on {{count}} visible reviews",
+          "emptyTitle": "No ratings yet",
+          "emptyDescription": "The average rating appears once reviews are submitted."
+        },
+        "sentiment": {
+          "title": "Sentiment",
+          "subtitle": "Rating distribution",
+          "positive": "Positive",
+          "neutral": "Neutral",
+          "negative": "Negative",
+          "emptyTitle": "No sentiment data",
+          "emptyDescription": "Sentiment breakdown appears once reviews are submitted."
+        },
+        "flaggedQueue": {
+          "title": "Flagged Queue",
+          "urgent_one": "{{count}} Urgent",
+          "urgent_other": "{{count}} Urgent",
+          "paginationAria": "Flagged queue pagination",
+          "emptyTitle": "No flagged reviews",
+          "emptyDescription": "Flagged reviews will appear here for moderation."
+        }
+      },
       "details": {
         "title": "Review Details",
         "subtitle": "Clinical Feedback",
@@ -1424,25 +1570,15 @@
         "status": "Review Status",
         "email": "Email",
         "phone": "Phone",
-        "moderation": "Moderation Information",
-        "flagReason": "Flag Reason",
-        "flaggedAt": "Flagged On",
-        "flaggedBy": "Flagged By",
-        "resolvedAt": "Resolved On",
-        "resolvedBy": "Resolved By",
-        "resolvedNote": "Resolution Note",
-        "flagReasons": {
-          "medical_claim": "Medical claim",
-          "profanity": "Profanity",
-          "spam": "Spam",
-          "misinformation": "Misinformation",
-          "other": "Other"
-        },
         "approve": "Approve",
         "hide": "Hide",
         "flag": "Flag Review",
-        "approveSoon": "Approving reviews is not available from this drawer yet.",
-        "hideSoon": "Hiding reviews is not available from this drawer yet.",
+        "unflag": "Unflag Review",
+        "approveSuccess": "Review is now visible",
+        "hideSuccess": "Review hidden from storefront",
+        "flagSuccess": "Review flagged",
+        "unflagSuccess": "Review unflagged",
+        "actionError": "Could not update this review. Please try again.",
         "loadErrorTitle": "Unable to load review",
         "emptyTitle": "Review not found",
         "emptyDescription": "This review could not be loaded."
@@ -1450,104 +1586,151 @@
     },
     "shipping": {
       "title": "Shipping Management",
-      "subtitle": "Manage courier companies and order shipments.",
-      "searchLabel": "Search shipping",
-      "searchPlaceholder": "Filter carriers or order ID...",
-      "statusFilterAria": "Filter shipping orders by status",
+      "subtitle": "Manage shipping methods, courier companies, zones, and Bosta pickups.",
+      "searchLabel": "Search carriers",
+      "searchPlaceholder": "Filter carriers by name or code...",
       "clearFilters": "Clear filters",
       "loadErrorTitle": "Unable to load shipping",
       "loadErrorDescription": "Please try again in a moment.",
       "retry": "Retry",
-      "tabs": {
-        "all": "All",
-        "pending": "Pending",
-        "shipped": "Shipped",
-        "delivered": "Delivered"
-      },
       "carriers": {
         "title": "Courier Companies",
         "addCompany": "Add Company",
-        "addSoon": "Adding carriers is not available in this phase.",
         "tableAria": "Courier companies list",
         "active": "Active",
         "inactive": "Inactive",
+        "bosta": "Bosta (API)",
         "editAria": "Edit {{name}}",
         "deleteAria": "Delete {{name}}",
-        "editSoon": "Editing carriers is not available in this phase.",
-        "deleteSoon": "Deleting carriers is not available in this phase.",
         "columns": {
           "company": "Company Name",
+          "type": "Type",
           "deliveryTime": "Delivery Time",
-          "cost": "Cost",
           "coverage": "Coverage",
           "status": "Status",
           "action": "Action"
         },
         "emptyTitle": "No courier companies yet",
-        "emptyDescription": "Carriers will appear here once configured.",
+        "emptyDescription": "Add a known, internal, or Bosta carrier to get started.",
         "emptyFilteredTitle": "No matching carriers",
         "emptyFilteredDescription": "Try a different search.",
-        "loadErrorTitle": "Unable to load carriers"
-      },
-      "orders": {
-        "title": "Orders Shipping",
-        "tableAria": "Orders shipping list",
-        "paginationAria": "Orders shipping pagination",
-        "showing": "Showing {{showing}} of {{total}} orders",
-        "prev": "Previous",
-        "next": "Next",
-        "update": "Update",
-        "updateAria": "Update shipping for {{id}}",
-        "updateSoon": "Shipment updates are not available in this phase.",
-        "methodInHouse": "In-House",
-        "methodCourier": "Courier ({{name}})",
-        "methodCourierGeneric": "Courier",
-        "columns": {
-          "orderId": "Order ID",
-          "patient": "Patient Name",
-          "method": "Method",
-          "status": "Status",
-          "tracking": "Tracking / Driver",
-          "action": "Action"
-        },
-        "emptyTitle": "No shipping orders yet",
-        "emptyDescription": "Orders will appear here once customers place them.",
-        "emptyFilteredTitle": "No matching orders",
-        "emptyFilteredDescription": "Try a different status filter or order ID.",
-        "searchHint": "Enter a full order ObjectId to search orders. Carrier search filters the companies list above.",
-        "loadErrorTitle": "Unable to load shipping orders"
+        "loadErrorTitle": "Unable to load carriers",
+        "deleteTitle": "Delete carrier",
+        "deleteDescription": "Delete {{name}}?",
+        "deleteWarning": "This carrier will be removed from Shipping Methods and Assign Carrier everywhere it is used.",
+        "cancel": "Cancel",
+        "confirmDelete": "Delete",
+        "deleteSuccess": "Carrier deleted successfully",
+        "deleteError": "Unable to delete carrier.",
+        "drawer": {
+          "createTitle": "Add Courier Company",
+          "editTitle": "Edit Courier Company",
+          "subtitle": "Courier Companies",
+          "name": "Company name",
+          "code": "Code",
+          "type": "Type",
+          "immutableHint": "Type and code cannot be changed after creation.",
+          "apiProvider": "API provider",
+          "apiKey": "API key",
+          "apiKeyEditPlaceholder": "Leave blank to keep the existing key",
+          "apiBaseUrl": "API base URL",
+          "apiBaseUrlOptional": "Optional",
+          "deliveryDays": "Delivery days",
+          "deliveryDaysPlaceholder": "e.g. 2-4 business days",
+          "active": "Active",
+          "activeHint": "Inactive carriers are hidden from Assign Carrier.",
+          "save": "Save",
+          "saving": "Saving…",
+          "createSuccess": "Carrier created successfully",
+          "updateSuccess": "Carrier updated successfully",
+          "coverageTitle": "Coverage",
+          "coverageHint": "Select governorates this carrier delivers to.",
+          "coverageLoading": "Loading governorates…",
+          "coverageEmpty": "Add a country and governorate in Zone Manager first.",
+          "coverageSave": "Save coverage"
+        }
       },
       "method": {
-        "title": "Shipping Method",
+        "title": "Shipping Methods",
         "panelAria": "Shipping method settings",
-        "courier": "Courier Company",
-        "courierHint": "Third-party shipping carriers.",
-        "inHouse": "In-House Delivery",
-        "inHouseHint": "Own local delivery staff.",
-        "courierToggleSoon": "Courier method settings are read-only in this phase.",
-        "inHouseToggleSoon": "In-house method settings are read-only in this phase."
+        "loadErrorTitle": "Unable to load shipping methods",
+        "types": {
+          "api": {
+            "label": "API (Bosta)",
+            "hint": "Automated carriers integrated via API.",
+            "toggleAria": "Toggle API shipping method"
+          },
+          "known": {
+            "label": "Known Carriers",
+            "hint": "Third-party carriers tracked manually.",
+            "toggleAria": "Toggle known carriers shipping method"
+          },
+          "internal": {
+            "label": "Internal",
+            "hint": "Own local delivery staff.",
+            "toggleAria": "Toggle internal shipping method"
+          }
+        }
       },
-      "details": {
-        "title": "Shipment {{id}}",
-        "titleFallback": "Shipment Details",
-        "subtitle": "Shipping Details",
-        "order": "Order",
-        "orderStatus": "Order Status",
-        "shipmentInfo": "Shipment Information",
-        "courier": "Courier",
-        "trackingNumber": "Tracking Number",
-        "shippingStatus": "Shipping Status",
-        "driver": "Driver",
-        "shippingMethod": "Shipping Method",
-        "timeline": "Timeline",
-        "timelineEmpty": "No tracking timeline available.",
-        "assign": "Assign Carrier",
-        "updateStatus": "Update Status",
-        "assignSoon": "Assigning carriers is not available in this phase.",
-        "updateStatusSoon": "Updating shipment status is not available in this phase.",
-        "loadErrorTitle": "Unable to load shipment",
-        "emptyTitle": "Shipment not found",
-        "emptyDescription": "This shipment could not be loaded."
+      "zones": {
+        "aria": "Zone manager",
+        "title": "Zone Manager",
+        "subtitle": "Countries, governorates, and districts used for coverage and checkout pricing.",
+        "countries": "Countries",
+        "governorates": "Governorates",
+        "districts": "Districts",
+        "countriesEmpty": "No countries yet.",
+        "governoratesEmpty": "No governorates yet.",
+        "districtsEmpty": "No districts yet.",
+        "selectCountryFirst": "Select a country to see its governorates.",
+        "selectGovernorateFirst": "Select a governorate to see its districts.",
+        "covered": "Covered",
+        "closed": "Closed",
+        "bostaCovered": "Bosta covered",
+        "deleteTitle": "Delete zone",
+        "deleteDescription": "Delete {{name}}?",
+        "deleteWarning": "This will also delete everything nested under it.",
+        "confirmDelete": "Delete",
+        "form": {
+          "cancel": "Cancel",
+          "add": "Add",
+          "countryName": "Country name",
+          "countryCode": "Code (2 letters)",
+          "currency": "Currency (3 letters)",
+          "flagOptional": "Flag emoji (optional)",
+          "governorateName": "Governorate name",
+          "districtName": "District name",
+          "shippingPrice": "Shipping price",
+          "addCountryAria": "Add country",
+          "addGovernorateAria": "Add governorate",
+          "addDistrictAria": "Add district"
+        }
+      },
+      "pickups": {
+        "title": "Bosta Pickups",
+        "sync": "Sync from Bosta",
+        "syncZones": "Sync Zones",
+        "syncCoverage": "Sync Coverage",
+        "add": "Add Pickup",
+        "default": "Default",
+        "setDefault": "Set as default",
+        "delete": "Delete pickup",
+        "emptyTitle": "No pickup locations yet",
+        "emptyDescription": "Sync from Bosta or add a pickup location manually.",
+        "form": {
+          "locationName": "Location name",
+          "firstLine": "Address line",
+          "city": "City",
+          "district": "District",
+          "selectCity": "Select a city",
+          "selectDistrict": "Select a district",
+          "loadingCities": "Loading cities…",
+          "contactName": "Contact name",
+          "contactPhone": "Contact phone",
+          "isDefault": "Set as default pickup",
+          "cancel": "Cancel",
+          "save": "Add pickup"
+        }
       }
     },
     "settings": {
@@ -1587,7 +1770,7 @@
         "next": "Next",
         "columns": {
           "code": "Code",
-          "discount": "Discount",
+          "discount": "Type",
           "usage": "Usage",
           "status": "Status",
           "action": "Action"
@@ -1613,7 +1796,8 @@
           "loadErrorTitle": "Unable to load coupon",
           "types": {
             "percentage": "Percentage",
-            "fixed": "Fixed"
+            "fixed": "Fixed",
+            "freeShipping": "Free Shipping"
           }
         }
       },
@@ -1673,14 +1857,71 @@
         "emptyDescription": "Carrier protocols will appear here once configured.",
         "loadErrorTitle": "Unable to load shipping protocols"
       },
+      "banners": {
+        "title": "Banners",
+        "aria": "Banners manager",
+        "addBanner": "Add Banner",
+        "emptyTitle": "No banners yet",
+        "emptyDescription": "Homepage banners will appear here once created.",
+        "loadErrorTitle": "Unable to load banners",
+        "deleteError": "Unable to delete banner.",
+        "deleteTitle": "Delete banner",
+        "deleteDescription": "Delete \"{{title}}\"?",
+        "deleteWarning": "This banner will be permanently removed from the storefront.",
+        "cancel": "Cancel",
+        "confirmDelete": "Delete",
+        "editAria": "Edit banner {{title}}",
+        "deleteAria": "Delete banner {{title}}",
+        "toggleAria": "Toggle active state for {{title}}",
+        "linkTypes": {
+          "none": "None",
+          "product": "Product",
+          "category": "Category",
+          "url": "External URL"
+        },
+        "columns": {
+          "banner": "Banner",
+          "link": "Link",
+          "status": "Status",
+          "action": "Action"
+        },
+        "drawer": {
+          "createTitle": "Add Banner",
+          "editTitle": "Edit Banner",
+          "subtitle": "Banners",
+          "image": "Image",
+          "uploadImage": "Upload image",
+          "title": "Title",
+          "titleOptional": "Optional",
+          "linkType": "Link type",
+          "linkTypes": {
+            "none": "None",
+            "product": "Product",
+            "category": "Category",
+            "url": "External URL"
+          },
+          "product": "Product",
+          "selectProduct": "Select a product",
+          "category": "Category",
+          "selectCategory": "Select a category",
+          "externalUrl": "External URL",
+          "active": "Active",
+          "activeHint": "Inactive banners are hidden from the storefront.",
+          "save": "Save",
+          "saving": "Saving…",
+          "createSuccess": "Banner created successfully",
+          "updateSuccess": "Banner updated successfully",
+          "loadErrorTitle": "Unable to load banner options"
+        }
+      },
       "recovery": {
         "title": "Cart Recovery",
         "aria": "Cart recovery",
         "subtitle": "Optimization of lost opportunities",
         "recovered": "Recovered",
         "recoveryRate": "Recovery Rate",
-        "abandonedRevenue": "Abandoned Revenue",
-        "recoveredRevenue": "Recovered Revenue",
+        "abandonedRevenue": "Total Abandoned",
+        "recoveredRevenue": "Recovered Rev",
         "automate": "Automate Recovery",
         "automateSoon": "Cart recovery automation is not available yet.",
         "emptyTitle": "No recovery analytics",
