@@ -1,6 +1,10 @@
 // src/hooks/useReturnActions.ts
 import { useCallback, useState } from 'react'
-import { scheduleAdminBostaReturn, updateAdminReturnStatus } from '../api/admin/returns'
+import {
+  refundAdminReturn,
+  scheduleAdminBostaReturn,
+  updateAdminReturnStatus,
+} from '../api/admin/returns'
 import { ApiError } from '../lib/api'
 import type {
   ApproveReturnFormPayload,
@@ -32,6 +36,7 @@ export function useReturnActions({ returnId, onMutated }: UseReturnActionsOption
   const [rejectState, setRejectState] = useState<ActionState>(idleState)
   const [advanceState, setAdvanceState] = useState<ActionState>(idleState)
   const [scheduleState, setScheduleState] = useState<ActionState>(idleState)
+  const [refundState, setRefundState] = useState<ActionState>(idleState)
 
   const resetApproveError = useCallback(() => {
     setApproveState((previous) => (previous.error ? { ...previous, error: null } : previous))
@@ -120,6 +125,21 @@ export function useReturnActions({ returnId, onMutated }: UseReturnActionsOption
     }
   }, [returnId, onMutated])
 
+  const refundReturn = useCallback(async (): Promise<ReturnActionResult> => {
+    if (!returnId) return { ok: false, error: null }
+    setRefundState({ submitting: true, error: null })
+    try {
+      await refundAdminReturn(returnId)
+      setRefundState(idleState)
+      onMutated()
+      return { ok: true, error: null }
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : 'Unable to refund return request'
+      setRefundState({ submitting: false, error: message })
+      return { ok: false, error: message }
+    }
+  }, [returnId, onMutated])
+
   return {
     approveSubmitting: approveState.submitting,
     approveError: approveState.error,
@@ -135,6 +155,9 @@ export function useReturnActions({ returnId, onMutated }: UseReturnActionsOption
     scheduleSubmitting: scheduleState.submitting,
     scheduleError: scheduleState.error,
     scheduleBostaReturn,
+    refundSubmitting: refundState.submitting,
+    refundError: refundState.error,
+    refundReturn,
   }
 }
 

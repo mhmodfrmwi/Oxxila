@@ -157,6 +157,10 @@ export interface AdminReturnDetail {
   bostaExternalId: string | null
   bostaTrackingNumber: string | null
   bostaStateLabel: string | null
+  logisticsScheduledAt: string | null
+  /** Order's payment method — drives Milestone 3 refund dialog copy (store credit vs gateway). */
+  orderPaymentMethod: 'cod' | 'card' | null
+  refundedAt: string | null
   pickupAddress: {
     firstLine: string
     secondLine: string | null
@@ -190,12 +194,26 @@ export interface UpdateReturnStatusAdvancePayload {
   refundStatus: 'picked_up' | 'received'
 }
 
+/** Milestone 3 — only allowed from `received`; backend runs the gateway/store-credit refund. */
+export interface UpdateReturnStatusRefundPayload {
+  refundStatus: 'refunded'
+}
+
 /** Body for `PATCH /returns/:id/status` — shape depends on the target `refundStatus`. */
 export type UpdateReturnStatusPayload =
   | UpdateReturnStatusApprovePayload
   | UpdateReturnStatusApproveBostaPayload
   | UpdateReturnStatusRejectPayload
   | UpdateReturnStatusAdvancePayload
+  | UpdateReturnStatusRefundPayload
+
+/** Response data when `refundStatus` transitions to `refunded` — shape differs from other transitions. */
+export interface ApiRefundReturnResult {
+  returnRequest: ApiAdminReturn
+  gatewayRefundId?: string | null
+  storeCreditIssued?: boolean
+  refundAmount?: number
+}
 
 /** Form-level approve payload — dialog resolves this into the right API body shape. */
 export interface ApproveReturnFormPayload {

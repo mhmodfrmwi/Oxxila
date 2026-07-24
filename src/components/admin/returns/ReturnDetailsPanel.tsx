@@ -6,10 +6,12 @@ import { useAdminReturnDetail } from '../../../hooks/useAdminReturnDetail'
 import { useReturnActions } from '../../../hooks/useReturnActions'
 import { useToast } from '../../../context/ToastContext'
 import { cn } from '../../../lib/cn'
+import type { ReturnTimelineStep } from '../../../utils/adminReturnsFormat'
 import {
   formatAdminReturnDate,
   formatAdminReturnMoney,
   getReturnActionAvailability,
+  getReturnTimelineSteps,
   returnStatusBadgeTone,
 } from '../../../utils/adminReturnsFormat'
 import { Button } from '../../ui/Button'
@@ -19,6 +21,7 @@ import { GlassCard } from '../ui/GlassCard'
 import { Skeleton } from '../ui/Skeleton'
 import { StatusBadge } from '../ui/StatusBadge'
 import { ApproveReturnDialog } from './ApproveReturnDialog'
+import { RefundReturnDialog } from './RefundReturnDialog'
 import { RejectReturnDialog } from './RejectReturnDialog'
 
 interface ReturnDetailsPanelProps {
@@ -56,6 +59,78 @@ function DetailsSkeleton() {
   )
 }
 
+function ReturnTimelineDot({ status }: { status: ReturnTimelineStep['status'] | 'rejected' }) {
+  if (status === 'rejected') {
+    return (
+      <span
+        className="absolute start-0 top-1.5 size-2.5 -translate-x-1/2 rounded-full bg-support-error shadow-[0_0_8px_rgba(255,100,103,0.8)] rtl:translate-x-1/2"
+        aria-hidden
+      />
+    )
+  }
+  if (status === 'completed') {
+    return (
+      <span
+        className="absolute start-0 top-1.5 size-2.5 -translate-x-1/2 rounded-full bg-[#00d492] shadow-[0_0_8px_rgba(52,211,153,0.8)] rtl:translate-x-1/2"
+        aria-hidden
+      />
+    )
+  }
+  if (status === 'active') {
+    return (
+      <span
+        className="absolute start-0 top-1.5 size-2.5 -translate-x-1/2 rounded-full bg-[#a394ff] shadow-[0_0_8px_rgba(163,148,255,0.8)] rtl:translate-x-1/2"
+        aria-hidden
+      />
+    )
+  }
+  return (
+    <span
+      className="absolute start-0 top-1.5 size-2.5 -translate-x-1/2 rounded-full bg-white/10 rtl:translate-x-1/2"
+      aria-hidden
+    />
+  )
+}
+
+/** Milestone 3 — return lifecycle timeline (pending → approved → picked_up → received → refunded, with a rejected branch). */
+function ReturnTimeline({ steps, locale }: { steps: ReturnTimelineStep[]; locale: string }) {
+  const { t } = useTranslation()
+
+  return (
+    <ol className="relative flex flex-col">
+      <span
+        className="absolute bottom-2 start-0 top-2 w-0.5 -translate-x-1/2 bg-white/10 rtl:translate-x-1/2"
+        aria-hidden
+      />
+      {steps.map((step, index) => {
+        const isLast = index === steps.length - 1
+        const isRejected = step.key === 'rejected'
+        const labelClass = step.status === 'upcoming' ? 'text-white/30' : 'text-white'
+        const metaClass = step.status === 'upcoming' ? 'text-white/20' : 'text-white/40'
+
+        return (
+          <li key={step.key} className={cn('relative flex flex-col ps-8', !isLast && 'pb-6')}>
+            <ReturnTimelineDot status={isRejected ? 'rejected' : step.status} />
+            <p
+              className={cn(
+                'text-sm font-semibold leading-5',
+                isRejected ? 'text-support-error' : labelClass,
+              )}
+            >
+              {t(`admin.returns.timeline.${step.key}`)}
+            </p>
+            {step.timestamp ? (
+              <p className={cn('text-xs leading-4', metaClass)}>
+                {formatAdminReturnDate(step.timestamp, locale)}
+              </p>
+            ) : null}
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
 export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDetailsPanelProps) {
   const { t, i18n } = useTranslation()
   const toast = useToast()
@@ -63,6 +138,7 @@ export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDet
   const { returnDetail, loading, error, reload } = useAdminReturnDetail({ returnId })
   const [approveOpen, setApproveOpen] = useState(false)
   const [rejectOpen, setRejectOpen] = useState(false)
+  const [refundOpen, setRefundOpen] = useState(false)
 
   const handleMutated = () => {
     reload()
@@ -187,6 +263,13 @@ export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDet
             </div>
           </GlassCard>
 
+          <section className="flex flex-col gap-3" aria-labelledby="return-timeline-heading">
+            <h4 id="return-timeline-heading" className="text-sm font-bold leading-5 text-white">
+              {t('admin.returns.details.timeline')}
+            </h4>
+            <ReturnTimeline steps={getReturnTimelineSteps(returnDetail)} locale={locale} />
+          </section>
+
           {returnDetail.note ? (
             <div className="flex flex-col gap-1.5">
               <FieldLabel>{t('admin.returns.details.note')}</FieldLabel>
@@ -245,6 +328,14 @@ export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDet
                       <FieldLabel>{t('admin.returns.details.bostaState')}</FieldLabel>
                       <p className="truncate text-sm font-medium leading-5 text-white">
                         {returnDetail.bostaStateLabel}
+                      </p>
+                    </div>
+                  ) : null}
+                  {returnDetail.logisticsScheduledAt ? (
+                    <div className="min-w-0">
+                      <FieldLabel>{t('admin.returns.details.scheduledAt')}</FieldLabel>
+                      <p className="truncate text-sm font-medium leading-5 text-white">
+                        {formatAdminReturnDate(returnDetail.logisticsScheduledAt, locale)}
                       </p>
                     </div>
                   ) : null}
@@ -332,6 +423,7 @@ export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDet
             onMarkPickedUp={() => void handleMarkPickedUp()}
             onMarkReceived={() => void handleMarkReceived()}
             onScheduleBosta={() => void handleScheduleBosta()}
+            onRefundClick={() => setRefundOpen(true)}
           />
         </div>
       ) : null}
@@ -369,6 +461,22 @@ export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDet
           return result.ok
         }}
       />
+
+      <RefundReturnDialog
+        open={refundOpen}
+        returnShortId={returnDetail?.shortId}
+        refundAmount={returnDetail?.refundAmount ?? 0}
+        paymentMethod={returnDetail?.orderPaymentMethod ?? null}
+        submitting={actions.refundSubmitting}
+        error={actions.refundError}
+        onClose={() => setRefundOpen(false)}
+        onSubmit={async () => {
+          const result = await actions.refundReturn()
+          if (result.ok) toast.success(t('admin.returns.actions.refundSuccess'))
+          else if (result.error) toast.error(result.error)
+          return result.ok
+        }}
+      />
     </GlassCard>
   )
 }
@@ -381,6 +489,7 @@ interface ReturnActionsFooterProps {
   onMarkPickedUp: () => void
   onMarkReceived: () => void
   onScheduleBosta: () => void
+  onRefundClick: () => void
 }
 
 /** Status-driven action buttons — business rules live in `getReturnActionAvailability`. */
@@ -392,11 +501,20 @@ function ReturnActionsFooter({
   onMarkPickedUp,
   onMarkReceived,
   onScheduleBosta,
+  onRefundClick,
 }: ReturnActionsFooterProps) {
   const { t } = useTranslation()
-  const { canApprove, canReject, canMarkPickedUp, canMarkReceived, canScheduleBosta } = availability
+  const { canApprove, canReject, canMarkPickedUp, canMarkReceived, canScheduleBosta, canRefund } =
+    availability
 
-  if (!canApprove && !canReject && !canMarkPickedUp && !canMarkReceived && !canScheduleBosta) {
+  if (
+    !canApprove &&
+    !canReject &&
+    !canMarkPickedUp &&
+    !canMarkReceived &&
+    !canScheduleBosta &&
+    !canRefund
+  ) {
     return null
   }
 
@@ -463,6 +581,11 @@ function ReturnActionsFooter({
           ) : null}
           {t('admin.returns.actions.scheduleBostaButton')}
         </button>
+      ) : null}
+      {canRefund ? (
+        <Button type="button" variant="gradient" onClick={onRefundClick}>
+          {t('admin.returns.actions.refundButton')}
+        </Button>
       ) : null}
       {canReject ? (
         <button

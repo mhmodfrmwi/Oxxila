@@ -3,6 +3,7 @@ import { apiRequest } from '../../lib/api'
 import type {
   AdminReturnsListParams,
   ApiAdminReturn,
+  ApiRefundReturnResult,
   ApiScheduleBostaReturnResult,
   UpdateReturnStatusPayload,
 } from '../../types/adminReturns'
@@ -55,6 +56,19 @@ export function updateAdminReturnStatus(
     method: 'PATCH',
     auth: true,
     body: payload,
+    signal: options?.signal,
+  })
+}
+
+/**
+ * PATCH /api/v1/returns/:id/status with `{ refundStatus: "refunded" }` — only valid from `received`.
+ * Response shape differs from other status transitions (wraps `returnRequest` + refund metadata).
+ */
+export function refundAdminReturn(returnId: string, options?: { signal?: AbortSignal }) {
+  return apiRequest<ApiRefundReturnResult>(`/returns/${encodeURIComponent(returnId)}/status`, {
+    method: 'PATCH',
+    auth: true,
+    body: { refundStatus: 'refunded' },
     signal: options?.signal,
   })
 }

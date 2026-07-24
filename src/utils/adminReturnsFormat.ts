@@ -69,6 +69,12 @@ function resolveOrderId(returnRequest: ApiAdminReturn): string | null {
   return order._id ?? null
 }
 
+function resolveOrderPaymentMethod(returnRequest: ApiAdminReturn): 'cod' | 'card' | null {
+  const order = returnRequest.order
+  if (!order || typeof order === 'string') return null
+  return order.paymentMethod ?? null
+}
+
 export function mapApiReturnToRow(returnRequest: ApiAdminReturn): AdminReturnRow {
   const id = String(returnRequest._id)
   const user = resolveUser(returnRequest)
@@ -123,6 +129,9 @@ export function mapApiReturnToDetail(returnRequest: ApiAdminReturn): AdminReturn
     bostaExternalId: returnRequest.bostaExternalId?.trim() || null,
     bostaTrackingNumber: returnRequest.bostaTrackingNumber?.trim() || null,
     bostaStateLabel: returnRequest.bostaStateLabel?.trim() || null,
+    logisticsScheduledAt: returnRequest.logisticsScheduledAt ?? null,
+    orderPaymentMethod: resolveOrderPaymentMethod(returnRequest),
+    refundedAt: returnRequest.refundedAt ?? null,
     pickupAddress: pickupAddress
       ? {
           firstLine: pickupAddress.firstLine,
@@ -141,7 +150,7 @@ export function mapApiReturnToDetail(returnRequest: ApiAdminReturn): AdminReturn
   }
 }
 
-/** Milestone 2 — which action buttons apply to a return's current `refundStatus`. */
+/** Milestone 2/3 — which action buttons apply to a return's current `refundStatus`. */
 export interface ReturnActionAvailability {
   canApprove: boolean
   /** BE allows reject from both `pending` and `approved`. */
@@ -150,6 +159,8 @@ export interface ReturnActionAvailability {
   canMarkReceived: boolean
   /** Bosta handler, approved/picked_up, and not yet scheduled. */
   canScheduleBosta: boolean
+  /** Milestone 3 — refund is only allowed once the item has been received back. */
+  canRefund: boolean
 }
 
 export function getReturnActionAvailability(detail: AdminReturnDetail): ReturnActionAvailability {
@@ -163,5 +174,63 @@ export function getReturnActionAvailability(detail: AdminReturnDetail): ReturnAc
       logisticsHandler === 'bosta' &&
       !bostaExternalId &&
       (refundStatus === 'approved' || refundStatus === 'picked_up'),
+    canRefund: refundStatus === 'received',
   }
+}
+
+// --- Milestone 3: status timeline ---
+
+export type ReturnTimelineStepKey =
+  | 'pending'
+  | 'approved'
+  | 'picked_up'
+  | 'received'
+  | 'refunded'
+  | 'rejected'
+
+export interface ReturnTimelineStep {
+  key: ReturnTimelineStepKey
+  status: 'completed' | 'active' | 'upcoming'
+  /** ISO timestamp shown under the step label, when known. */
+  timestamp: string | null
+}
+
+/** Main happy-path order — `rejected` is a separate terminal branch, not part of this chain. */
+const RETURN_TIMELINE_FLOW: readonly ReturnTimelineStepKey[] = [
+  'pending',
+  'approved',
+  'picked_up',
+  'received',
+  'refunded',
+]
+
+/**
+ * Builds the lifecycle timeline for the details panel — highlights the current step and
+ * branches to a terminal `rejected` step when the return was declined.
+ */
+export function getReturnTimelineSteps(detail: AdminReturnDetail): ReturnTimelineStep[] {
+  if (detail.refundStatus === 'rejected') {
+    return [
+      { key: 'pending', status: 'completed', timestamp: detail.createdAt },
+      { key: 'rejected', status: 'active', timestamp: null },
+    ]
+  }
+
+  const currentIndex = RETURN_TIMELINE_FLOW.indexOf(detail.refundStatus)
+
+  return RETURN_TIMELINE_FLOW.map((key, index) => {
+    const status: ReturnTimelineStep['status'] =
+      index < currentIndex ? 'completed' : index === currentIndex ? 'active' : 'upcoming'
+
+    const timestamp =
+      key === 'pending'
+        ? detail.createdAt
+        : key === 'picked_up'
+          ? detail.logisticsScheduledAt
+          : key === 'refunded'
+            ? detail.refundedAt
+            : null
+
+    return { key, status, timestamp }
+  })
 }

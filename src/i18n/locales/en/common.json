@@ -1292,6 +1292,7 @@
       "retry": "Retry",
       "menu": {
         "viewDetails": "View details",
+        "viewReturns": "View return requests",
         "cancel": "Cancel order"
       },
       "cancel": {
@@ -1322,6 +1323,7 @@
         "totalAmount": "Total Amount",
         "invoice": "Invoice",
         "refund": "Refund",
+        "viewReturns": "View return requests",
         "updateStatus": "Update Tracking Status",
         "invoiceSoon": "Invoice printing is not available yet.",
         "refundSoon": "Refunds are not available from this drawer yet.",
@@ -1453,6 +1455,14 @@
         "bosta": "Bosta",
         "internal": "Internal"
       },
+      "timeline": {
+        "pending": "Request submitted",
+        "approved": "Approved",
+        "picked_up": "Picked up",
+        "received": "Received at warehouse",
+        "refunded": "Refunded",
+        "rejected": "Rejected"
+      },
       "unknownOrder": "—",
       "tableAria": "Return requests list",
       "paginationAria": "Return requests pagination",
@@ -1485,7 +1495,9 @@
         "dropOff": "Drop-off warehouse",
         "tracking": "Bosta tracking number",
         "bostaState": "Bosta status",
+        "scheduledAt": "Pickup scheduled",
         "pickupAddress": "Pickup address",
+        "timeline": "Return timeline",
         "items": "Items",
         "itemsEmpty": "No items on this return",
         "proofImages": "Proof images",
@@ -1499,9 +1511,11 @@
         "markPickedUpButton": "Mark picked up",
         "markReceivedButton": "Mark received",
         "scheduleBostaButton": "Schedule Bosta",
+        "refundButton": "Refund",
         "approveSuccess": "Return approved successfully",
         "rejectSuccess": "Return rejected",
         "scheduleSuccess": "Bosta pickup scheduled successfully",
+        "refundSuccess": "Return refunded successfully",
         "advanceSuccess": {
           "picked_up": "Return marked as picked up",
           "received": "Return marked as received"
@@ -1531,6 +1545,15 @@
           "notePlaceholder": "Explain why this return is being rejected...",
           "noteRequired": "An admin note is required to reject a return",
           "confirm": "Reject"
+        },
+        "refund": {
+          "title": "Refund return request",
+          "description": "Confirm the refund for return {{id}}.",
+          "confirm": "Confirm refund",
+          "copy": {
+            "cod": "This order was paid by cash on delivery. Confirming will issue {{amount}} as store credit to the customer's account.",
+            "card": "This order was paid by card. Confirming will trigger a gateway refund of {{amount}} and restock the returned items."
+          }
         }
       }
     },

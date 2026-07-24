@@ -2,6 +2,8 @@
 import { MoreHorizontal } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+import { ADMIN_RETURNS_PATH } from '../../../config/routes'
 import type { AdminOrderRow } from '../../../types/adminOrders'
 import { canAdminCancelOrder } from '../../../utils/adminOrdersFormat'
 import { cn } from '../../../lib/cn'
@@ -23,6 +25,9 @@ export function OrderRowActionsMenu({
   const rootRef = useRef<HTMLDivElement>(null)
   const menuId = useId()
   const canCancel = canAdminCancelOrder(order.orderStatus)
+  // Milestone 3 — orders already tied to a return request deep-link into Returns Management.
+  const hasReturnRequests =
+    order.orderStatus === 'returned' || order.orderStatus === 'partially_returned'
 
   useEffect(() => {
     if (!open) return
@@ -84,6 +89,20 @@ export function OrderRowActionsMenu({
           >
             {t('admin.orders.menu.viewDetails')}
           </button>
+          {hasReturnRequests ? (
+            <Link
+              to={`${ADMIN_RETURNS_PATH}?orderId=${encodeURIComponent(order.id)}`}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className={cn(
+                'block w-full px-3 py-2 text-start text-xs font-medium text-white/80',
+                'hover:bg-white/10 hover:text-white',
+                focusRingClasses,
+              )}
+            >
+              {t('admin.orders.menu.viewReturns')}
+            </Link>
+          ) : null}
           {canCancel ? (
             <button
               type="button"

@@ -10,9 +10,8 @@ import { Button } from '../../components/ui/Button'
 import { useAdminReturns } from '../../hooks/useAdminReturns'
 
 /**
- * Returns Management — list + split detail panel (Milestone 1), with approve/reject
- * and logistics actions (Milestone 2). Refund-to-`refunded` and orders deep-link UI
- * land in Milestone 3.
+ * Returns Management — list + split detail panel (Milestone 1), approve/reject and
+ * logistics actions (Milestone 2), and refund/timeline/orders deep-link (Milestone 3).
  */
 export function AdminReturnsPage() {
   const { t } = useTranslation()

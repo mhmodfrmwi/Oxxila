@@ -17,8 +17,6 @@ const DEFAULT_SORT = '-createdAt'
 
 export interface AdminReturnsFilters {
   statusTab: AdminReturnsStatusTab
-  /** Deep-link filter from `?orderId=` — sent to the API as `order`. */
-  orderId: string
   page: number
   limit: number
   sort: string
@@ -39,13 +37,12 @@ function isAbortError(error: unknown): boolean {
 }
 
 export function useAdminReturns() {
-  // Deep-link support (Milestone 3): `/admin/returns?orderId=<id>` pre-filters the list.
-  const [searchParams] = useSearchParams()
-  const initialOrderId = searchParams.get('orderId')?.trim() || ''
+  // Deep-link: `/admin/returns?orderId=<id>` — always read from URL (source of truth).
+  const [searchParams, setSearchParams] = useSearchParams()
+  const orderId = searchParams.get('orderId')?.trim() || ''
 
   const [filters, setFilters] = useState<AdminReturnsFilters>({
     statusTab: 'all',
-    orderId: initialOrderId,
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
     sort: DEFAULT_SORT,
@@ -66,9 +63,9 @@ export function useAdminReturns() {
       limit: filters.limit,
       sort: filters.sort,
       ...(refundStatus ? { refundStatus } : {}),
-      ...(filters.orderId ? { order: filters.orderId } : {}),
+      ...(orderId ? { order: orderId } : {}),
     }
-  }, [filters.limit, filters.orderId, filters.page, filters.sort, filters.statusTab])
+  }, [filters.limit, filters.page, filters.sort, filters.statusTab, orderId])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -112,30 +109,30 @@ export function useAdminReturns() {
     setFilters((previous) => ({ ...previous, statusTab, page: 1 }))
   }, [])
 
-  const setOrderId = useCallback((orderId: string) => {
-    setFilters((previous) => ({ ...previous, orderId, page: 1 }))
-  }, [])
-
   const setPage = useCallback((page: number) => {
     setFilters((previous) => ({ ...previous, page: Math.max(1, page) }))
   }, [])
 
   const clearFilters = useCallback(() => {
-    setFilters((previous) => ({ ...previous, statusTab: 'all', orderId: '', page: 1 }))
-  }, [])
+    setFilters((previous) => ({ ...previous, statusTab: 'all', page: 1 }))
+    if (searchParams.has('orderId')) {
+      const next = new URLSearchParams(searchParams)
+      next.delete('orderId')
+      setSearchParams(next, { replace: true })
+    }
+  }, [searchParams, setSearchParams])
 
   const reload = useCallback(() => {
     setReloadToken((token) => token + 1)
   }, [])
 
-  const hasActiveFilters = Boolean(filters.statusTab !== 'all' || filters.orderId)
+  const hasActiveFilters = Boolean(filters.statusTab !== 'all' || orderId)
 
   return {
     ...state,
-    filters,
+    filters: { ...filters, orderId },
     hasActiveFilters,
     setStatusTab,
-    setOrderId,
     setPage,
     clearFilters,
     reload,

@@ -9,6 +9,8 @@ import {
 } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+import { ADMIN_RETURNS_PATH } from '../../../config/routes'
 import { useOrderAssign } from '../../../hooks/useOrderAssign'
 import { useOrderDetailsDrawer } from '../../../hooks/useOrderDetailsDrawer'
 import { cn } from '../../../lib/cn'
@@ -135,6 +137,10 @@ export function OrderDetailsDrawer({
   }, [onOrderChanged, reload])
 
   const canCancel = order ? canAdminCancelOrder(order.orderStatus) : false
+  // Milestone 3 — orders already tied to a return request deep-link into Returns Management.
+  const hasReturnRequests = order
+    ? order.orderStatus === 'returned' || order.orderStatus === 'partially_returned'
+    : false
 
   const title = order
     ? t('admin.orders.details.title', { id: order.orderNumber })
@@ -163,19 +169,33 @@ export function OrderDetailsDrawer({
             <FileText size={13} aria-hidden />
             {t('admin.orders.details.invoice')}
           </button>
-          <button
-            type="button"
-            disabled
-            title={t('admin.orders.details.refundSoon')}
-            className={cn(
-              'inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[rgba(255,100,103,0.2)] bg-[rgba(255,100,103,0.1)] px-4 py-3 text-sm font-medium text-[#ff6467]',
-              'cursor-not-allowed opacity-50',
-              focusRingClasses,
-            )}
-          >
-            <RotateCcw size={13} aria-hidden />
-            {t('admin.orders.details.refund')}
-          </button>
+          {hasReturnRequests ? (
+            <Link
+              to={`${ADMIN_RETURNS_PATH}?orderId=${encodeURIComponent(order.id)}`}
+              className={cn(
+                'inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[rgba(255,100,103,0.2)] bg-[rgba(255,100,103,0.1)] px-4 py-3 text-sm font-medium text-[#ff6467]',
+                'transition-colors hover:bg-[rgba(255,100,103,0.18)]',
+                focusRingClasses,
+              )}
+            >
+              <RotateCcw size={13} aria-hidden />
+              {t('admin.orders.details.viewReturns')}
+            </Link>
+          ) : (
+            <button
+              type="button"
+              disabled
+              title={t('admin.orders.details.refundSoon')}
+              className={cn(
+                'inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[rgba(255,100,103,0.2)] bg-[rgba(255,100,103,0.1)] px-4 py-3 text-sm font-medium text-[#ff6467]',
+                'cursor-not-allowed opacity-50',
+                focusRingClasses,
+              )}
+            >
+              <RotateCcw size={13} aria-hidden />
+              {t('admin.orders.details.refund')}
+            </button>
+          )}
           <button
             type="button"
             disabled={!canCancel}
