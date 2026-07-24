@@ -10,8 +10,9 @@ import { Button } from '../../components/ui/Button'
 import { useAdminReturns } from '../../hooks/useAdminReturns'
 
 /**
- * Returns Management — Milestone 1: read-only shell (list + split detail panel).
- * Approve / Reject / Refund / Bosta scheduling land in later milestones.
+ * Returns Management — list + split detail panel (Milestone 1), with approve/reject
+ * and logistics actions (Milestone 2). Refund-to-`refunded` and orders deep-link UI
+ * land in Milestone 3.
  */
 export function AdminReturnsPage() {
   const { t } = useTranslation()
@@ -92,6 +93,7 @@ export function AdminReturnsPage() {
             <ReturnDetailsPanel
               returnId={selectedReturnId}
               className="xl:sticky xl:top-6"
+              onMutated={list.reload}
             />
           </div>
         </>

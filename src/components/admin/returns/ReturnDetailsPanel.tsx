@@ -1,22 +1,31 @@
 // src/components/admin/returns/ReturnDetailsPanel.tsx
-import { ExternalLink, MapPin, PackageX, Truck } from 'lucide-react'
+import { ExternalLink, Loader2, MapPin, PackageX, Truck } from 'lucide-react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAdminReturnDetail } from '../../../hooks/useAdminReturnDetail'
+import { useReturnActions } from '../../../hooks/useReturnActions'
+import { useToast } from '../../../context/ToastContext'
 import { cn } from '../../../lib/cn'
 import {
   formatAdminReturnDate,
   formatAdminReturnMoney,
+  getReturnActionAvailability,
   returnStatusBadgeTone,
 } from '../../../utils/adminReturnsFormat'
 import { Button } from '../../ui/Button'
+import { focusRingClasses } from '../../ui/interactionStyles'
 import { EmptyState } from '../ui/EmptyState'
 import { GlassCard } from '../ui/GlassCard'
 import { Skeleton } from '../ui/Skeleton'
 import { StatusBadge } from '../ui/StatusBadge'
+import { ApproveReturnDialog } from './ApproveReturnDialog'
+import { RejectReturnDialog } from './RejectReturnDialog'
 
 interface ReturnDetailsPanelProps {
   returnId: string | null
   className?: string
+  /** Called after a successful status mutation — refreshes the list row. */
+  onMutated?: () => void
 }
 
 function FieldLabel({ children }: { children: string }) {
@@ -47,10 +56,38 @@ function DetailsSkeleton() {
   )
 }
 
-export function ReturnDetailsPanel({ returnId, className }: ReturnDetailsPanelProps) {
+export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDetailsPanelProps) {
   const { t, i18n } = useTranslation()
+  const toast = useToast()
   const locale = i18n.language
   const { returnDetail, loading, error, reload } = useAdminReturnDetail({ returnId })
+  const [approveOpen, setApproveOpen] = useState(false)
+  const [rejectOpen, setRejectOpen] = useState(false)
+
+  const handleMutated = () => {
+    reload()
+    onMutated?.()
+  }
+
+  const actions = useReturnActions({ returnId, onMutated: handleMutated })
+
+  const handleMarkPickedUp = async () => {
+    const result = await actions.advanceReturnStatus('picked_up')
+    if (result.ok) toast.success(t('admin.returns.actions.advanceSuccess.picked_up'))
+    else if (result.error) toast.error(result.error)
+  }
+
+  const handleMarkReceived = async () => {
+    const result = await actions.advanceReturnStatus('received')
+    if (result.ok) toast.success(t('admin.returns.actions.advanceSuccess.received'))
+    else if (result.error) toast.error(result.error)
+  }
+
+  const handleScheduleBosta = async () => {
+    const result = await actions.scheduleBostaReturn()
+    if (result.ok) toast.success(t('admin.returns.actions.scheduleSuccess'))
+    else if (result.error) toast.error(result.error)
+  }
 
   if (!returnId) {
     return (
@@ -286,8 +323,160 @@ export function ReturnDetailsPanel({ returnId, className }: ReturnDetailsPanelPr
               </ul>
             )}
           </section>
+
+          <ReturnActionsFooter
+            availability={getReturnActionAvailability(returnDetail)}
+            actions={actions}
+            onApproveClick={() => setApproveOpen(true)}
+            onRejectClick={() => setRejectOpen(true)}
+            onMarkPickedUp={() => void handleMarkPickedUp()}
+            onMarkReceived={() => void handleMarkReceived()}
+            onScheduleBosta={() => void handleScheduleBosta()}
+          />
         </div>
       ) : null}
+
+      <ApproveReturnDialog
+        open={approveOpen}
+        returnShortId={returnDetail?.shortId}
+        submitting={actions.approveSubmitting}
+        error={actions.approveError}
+        onClose={() => {
+          setApproveOpen(false)
+          actions.resetApproveError()
+        }}
+        onSubmit={async (payload) => {
+          const result = await actions.approveReturn(payload)
+          if (result.ok) toast.success(t('admin.returns.actions.approveSuccess'))
+          else if (result.error) toast.error(result.error)
+          return result.ok
+        }}
+      />
+
+      <RejectReturnDialog
+        open={rejectOpen}
+        returnShortId={returnDetail?.shortId}
+        submitting={actions.rejectSubmitting}
+        error={actions.rejectError}
+        onClose={() => {
+          setRejectOpen(false)
+          actions.resetRejectError()
+        }}
+        onSubmit={async (adminNote) => {
+          const result = await actions.rejectReturn(adminNote)
+          if (result.ok) toast.success(t('admin.returns.actions.rejectSuccess'))
+          else if (result.error) toast.error(result.error)
+          return result.ok
+        }}
+      />
     </GlassCard>
+  )
+}
+
+interface ReturnActionsFooterProps {
+  availability: ReturnType<typeof getReturnActionAvailability>
+  actions: ReturnType<typeof useReturnActions>
+  onApproveClick: () => void
+  onRejectClick: () => void
+  onMarkPickedUp: () => void
+  onMarkReceived: () => void
+  onScheduleBosta: () => void
+}
+
+/** Status-driven action buttons — business rules live in `getReturnActionAvailability`. */
+function ReturnActionsFooter({
+  availability,
+  actions,
+  onApproveClick,
+  onRejectClick,
+  onMarkPickedUp,
+  onMarkReceived,
+  onScheduleBosta,
+}: ReturnActionsFooterProps) {
+  const { t } = useTranslation()
+  const { canApprove, canReject, canMarkPickedUp, canMarkReceived, canScheduleBosta } = availability
+
+  if (!canApprove && !canReject && !canMarkPickedUp && !canMarkReceived && !canScheduleBosta) {
+    return null
+  }
+
+  return (
+    <section
+      className="flex flex-wrap gap-2 border-t border-white/10 pt-4"
+      aria-label={t('admin.returns.actions.sectionAria')}
+    >
+      {canApprove ? (
+        <Button type="button" variant="gradient" onClick={onApproveClick}>
+          {t('admin.returns.actions.approveButton')}
+        </Button>
+      ) : null}
+      {canMarkPickedUp ? (
+        <button
+          type="button"
+          disabled={actions.advanceSubmitting}
+          onClick={onMarkPickedUp}
+          className={cn(
+            'inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5',
+            'text-sm font-semibold text-white transition-colors hover:bg-white/10',
+            'disabled:cursor-not-allowed disabled:opacity-50',
+            focusRingClasses,
+          )}
+        >
+          {actions.advanceSubmitting ? (
+            <Loader2 size={13} className="animate-spin" aria-hidden />
+          ) : null}
+          {t('admin.returns.actions.markPickedUpButton')}
+        </button>
+      ) : null}
+      {canMarkReceived ? (
+        <button
+          type="button"
+          disabled={actions.advanceSubmitting}
+          onClick={onMarkReceived}
+          className={cn(
+            'inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5',
+            'text-sm font-semibold text-white transition-colors hover:bg-white/10',
+            'disabled:cursor-not-allowed disabled:opacity-50',
+            focusRingClasses,
+          )}
+        >
+          {actions.advanceSubmitting ? (
+            <Loader2 size={13} className="animate-spin" aria-hidden />
+          ) : null}
+          {t('admin.returns.actions.markReceivedButton')}
+        </button>
+      ) : null}
+      {canScheduleBosta ? (
+        <button
+          type="button"
+          disabled={actions.scheduleSubmitting}
+          onClick={onScheduleBosta}
+          className={cn(
+            'inline-flex items-center gap-2 rounded-full border border-[#a394ff]/40 bg-[rgba(163,148,255,0.12)] px-4 py-2.5',
+            'text-sm font-semibold text-[#a394ff] transition-colors hover:bg-[rgba(163,148,255,0.2)]',
+            'disabled:cursor-not-allowed disabled:opacity-50',
+            focusRingClasses,
+          )}
+        >
+          {actions.scheduleSubmitting ? (
+            <Loader2 size={13} className="animate-spin" aria-hidden />
+          ) : null}
+          {t('admin.returns.actions.scheduleBostaButton')}
+        </button>
+      ) : null}
+      {canReject ? (
+        <button
+          type="button"
+          onClick={onRejectClick}
+          className={cn(
+            'inline-flex items-center gap-2 rounded-full border border-support-error/40 bg-transparent px-4 py-2.5',
+            'text-sm font-semibold text-support-error transition-colors hover:bg-support-error/10',
+            focusRingClasses,
+          )}
+        >
+          {t('admin.returns.actions.rejectButton')}
+        </button>
+      ) : null}
+    </section>
   )
 }

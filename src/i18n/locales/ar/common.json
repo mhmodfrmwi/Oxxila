@@ -1497,6 +1497,47 @@
         "proofImages": "صور الإثبات",
         "proofEmpty": "لم يتم إرسال صور إثبات",
         "proofLink": "صورة {{index}}"
+      },
+      "actions": {
+        "sectionAria": "إجراءات الإرجاع",
+        "approveButton": "الموافقة",
+        "rejectButton": "رفض",
+        "markPickedUpButton": "تحديد كمستلم من العميل",
+        "markReceivedButton": "تحديد كمستلم بالمستودع",
+        "scheduleBostaButton": "جدولة استلام بوسطة",
+        "approveSuccess": "تمت الموافقة على طلب الإرجاع بنجاح",
+        "rejectSuccess": "تم رفض طلب الإرجاع",
+        "scheduleSuccess": "تمت جدولة استلام بوسطة بنجاح",
+        "advanceSuccess": {
+          "picked_up": "تم تحديد الإرجاع كمستلم من العميل",
+          "received": "تم تحديد الإرجاع كمستلم بالمستودع"
+        },
+        "approve": {
+          "title": "الموافقة على طلب الإرجاع",
+          "description": "وافق على الإرجاع {{id}} واختر طريقة الاستلام.",
+          "handlerLabel": "الجهة المسؤولة عن اللوجستيات",
+          "carrierLabel": "شركة بوسطة",
+          "carrierPlaceholder": "اختر شركة الشحن",
+          "carriersLoading": "جارٍ تحميل شركات الشحن…",
+          "carriersError": "تعذر تحميل شركات الشحن",
+          "noCarriers": "لا توجد شركة بوسطة نشطة مُعدّة",
+          "carrierRequired": "اختر شركة بوسطة",
+          "pickupLabel": "موقع الاستلام",
+          "pickupPlaceholder": "اختر موقع استلام",
+          "pickupsLoading": "جارٍ تحميل مواقع الاستلام…",
+          "pickupsError": "تعذر تحميل مواقع الاستلام",
+          "noPickups": "لا توجد مواقع استلام مُعدّة لهذه الشركة",
+          "pickupRequired": "اختر موقع استلام",
+          "confirm": "موافقة"
+        },
+        "reject": {
+          "title": "رفض طلب الإرجاع",
+          "description": "رفض الإرجاع {{id}}. سيتم مشاركة هذه الملاحظة مع العميل.",
+          "noteLabel": "ملاحظة الإدارة",
+          "notePlaceholder": "اشرح سبب رفض هذا الإرجاع...",
+          "noteRequired": "ملاحظة الإدارة مطلوبة لرفض طلب الإرجاع",
+          "confirm": "رفض"
+        }
       }
     },
     "customers": {

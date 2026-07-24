@@ -1,6 +1,11 @@
 // src/api/admin/returns.ts
 import { apiRequest } from '../../lib/api'
-import type { AdminReturnsListParams, ApiAdminReturn } from '../../types/adminReturns'
+import type {
+  AdminReturnsListParams,
+  ApiAdminReturn,
+  ApiScheduleBostaReturnResult,
+  UpdateReturnStatusPayload,
+} from '../../types/adminReturns'
 
 function toQuery(params: AdminReturnsListParams): string {
   const search = new URLSearchParams()
@@ -38,4 +43,30 @@ export function getAdminReturn(returnId: string, options?: { signal?: AbortSigna
     auth: true,
     signal: options?.signal,
   })
+}
+
+/** PATCH /api/v1/returns/:id/status — approve/reject/advance a return request. */
+export function updateAdminReturnStatus(
+  returnId: string,
+  payload: UpdateReturnStatusPayload,
+  options?: { signal?: AbortSignal },
+) {
+  return apiRequest<ApiAdminReturn>(`/returns/${encodeURIComponent(returnId)}/status`, {
+    method: 'PATCH',
+    auth: true,
+    body: payload,
+    signal: options?.signal,
+  })
+}
+
+/** POST /api/v1/returns/:id/bosta/schedule — schedule a Bosta customer-return pickup. */
+export function scheduleAdminBostaReturn(returnId: string, options?: { signal?: AbortSignal }) {
+  return apiRequest<ApiScheduleBostaReturnResult>(
+    `/returns/${encodeURIComponent(returnId)}/bosta/schedule`,
+    {
+      method: 'POST',
+      auth: true,
+      signal: options?.signal,
+    },
+  )
 }

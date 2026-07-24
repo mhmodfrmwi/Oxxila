@@ -1491,6 +1491,47 @@
         "proofImages": "Proof images",
         "proofEmpty": "No proof images submitted",
         "proofLink": "Photo {{index}}"
+      },
+      "actions": {
+        "sectionAria": "Return actions",
+        "approveButton": "Approve",
+        "rejectButton": "Reject",
+        "markPickedUpButton": "Mark picked up",
+        "markReceivedButton": "Mark received",
+        "scheduleBostaButton": "Schedule Bosta",
+        "approveSuccess": "Return approved successfully",
+        "rejectSuccess": "Return rejected",
+        "scheduleSuccess": "Bosta pickup scheduled successfully",
+        "advanceSuccess": {
+          "picked_up": "Return marked as picked up",
+          "received": "Return marked as received"
+        },
+        "approve": {
+          "title": "Approve return request",
+          "description": "Approve return {{id}} and choose how it will be picked up.",
+          "handlerLabel": "Logistics handler",
+          "carrierLabel": "Bosta carrier",
+          "carrierPlaceholder": "Select a carrier",
+          "carriersLoading": "Loading carriers…",
+          "carriersError": "Unable to load carriers",
+          "noCarriers": "No active Bosta carrier is configured",
+          "carrierRequired": "Select a Bosta carrier",
+          "pickupLabel": "Drop-off pickup location",
+          "pickupPlaceholder": "Select a pickup location",
+          "pickupsLoading": "Loading pickup locations…",
+          "pickupsError": "Unable to load pickup locations",
+          "noPickups": "No pickup locations configured for this carrier",
+          "pickupRequired": "Select a drop-off pickup location",
+          "confirm": "Approve"
+        },
+        "reject": {
+          "title": "Reject return request",
+          "description": "Reject return {{id}}. This note is shared with the customer.",
+          "noteLabel": "Admin note",
+          "notePlaceholder": "Explain why this return is being rejected...",
+          "noteRequired": "An admin note is required to reject a return",
+          "confirm": "Reject"
+        }
       }
     },
     "customers": {

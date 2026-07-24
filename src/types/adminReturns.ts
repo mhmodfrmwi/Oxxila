@@ -154,6 +154,7 @@ export interface AdminReturnDetail {
   orderShortLabel: string | null
   logisticsHandler: AdminReturnLogisticsHandler | null
   dropOffLocationName: string | null
+  bostaExternalId: string | null
   bostaTrackingNumber: string | null
   bostaStateLabel: string | null
   pickupAddress: {
@@ -164,6 +165,51 @@ export interface AdminReturnDetail {
   } | null
   items: AdminReturnDetailItem[]
   proofImages: AdminReturnDetailProofImage[]
+}
+
+// --- Milestone 2: status mutation payloads ---
+
+export interface UpdateReturnStatusApprovePayload {
+  refundStatus: 'approved'
+  logisticsHandler: 'internal'
+}
+
+export interface UpdateReturnStatusApproveBostaPayload {
+  refundStatus: 'approved'
+  logisticsHandler: 'bosta'
+  carrierId: string
+  dropOffPickupId: string
+}
+
+export interface UpdateReturnStatusRejectPayload {
+  refundStatus: 'rejected'
+  adminNote: string
+}
+
+export interface UpdateReturnStatusAdvancePayload {
+  refundStatus: 'picked_up' | 'received'
+}
+
+/** Body for `PATCH /returns/:id/status` — shape depends on the target `refundStatus`. */
+export type UpdateReturnStatusPayload =
+  | UpdateReturnStatusApprovePayload
+  | UpdateReturnStatusApproveBostaPayload
+  | UpdateReturnStatusRejectPayload
+  | UpdateReturnStatusAdvancePayload
+
+/** Form-level approve payload — dialog resolves this into the right API body shape. */
+export interface ApproveReturnFormPayload {
+  logisticsHandler: AdminReturnLogisticsHandler
+  carrierId?: string
+  dropOffPickupId?: string
+}
+
+/** Response data from `POST /returns/:id/bosta/schedule`. */
+export interface ApiScheduleBostaReturnResult {
+  returnRequest: ApiAdminReturn
+  trackingNumber?: string | null
+  externalDeliveryId?: string | null
+  alreadyScheduled?: boolean
 }
 
 export interface AdminReturnsListParams {

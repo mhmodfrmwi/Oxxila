@@ -120,6 +120,7 @@ export function mapApiReturnToDetail(returnRequest: ApiAdminReturn): AdminReturn
     orderShortLabel: orderId ? formatReturnOrderLabel(orderId) : null,
     logisticsHandler: returnRequest.logisticsHandler ?? null,
     dropOffLocationName: resolveDropOffLocationName(returnRequest),
+    bostaExternalId: returnRequest.bostaExternalId?.trim() || null,
     bostaTrackingNumber: returnRequest.bostaTrackingNumber?.trim() || null,
     bostaStateLabel: returnRequest.bostaStateLabel?.trim() || null,
     pickupAddress: pickupAddress
@@ -137,5 +138,30 @@ export function mapApiReturnToDetail(returnRequest: ApiAdminReturn): AdminReturn
       quantity: item.quantity,
     })),
     proofImages: (returnRequest.proofImages ?? []).map((image) => ({ url: image.url })),
+  }
+}
+
+/** Milestone 2 — which action buttons apply to a return's current `refundStatus`. */
+export interface ReturnActionAvailability {
+  canApprove: boolean
+  /** BE allows reject from both `pending` and `approved`. */
+  canReject: boolean
+  canMarkPickedUp: boolean
+  canMarkReceived: boolean
+  /** Bosta handler, approved/picked_up, and not yet scheduled. */
+  canScheduleBosta: boolean
+}
+
+export function getReturnActionAvailability(detail: AdminReturnDetail): ReturnActionAvailability {
+  const { refundStatus, logisticsHandler, bostaExternalId } = detail
+  return {
+    canApprove: refundStatus === 'pending',
+    canReject: refundStatus === 'pending' || refundStatus === 'approved',
+    canMarkPickedUp: refundStatus === 'approved',
+    canMarkReceived: refundStatus === 'picked_up',
+    canScheduleBosta:
+      logisticsHandler === 'bosta' &&
+      !bostaExternalId &&
+      (refundStatus === 'approved' || refundStatus === 'picked_up'),
   }
 }
