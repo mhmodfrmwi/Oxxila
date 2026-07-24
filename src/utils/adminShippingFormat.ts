@@ -1,49 +1,32 @@
 // src/utils/adminShippingFormat.ts
 import type { StatusBadgeTone } from '../components/admin/ui/StatusBadge'
-import type { AdminOrderStatus, ApiAdminOrder } from '../types/adminOrders'
 import type {
+  AdminCarrierFormErrors,
+  AdminCarrierFormValues,
+  AdminCarrierPickupRow,
   AdminCarrierRow,
-  AdminCarrierType,
-  AdminShipmentDetail,
-  AdminShippingMethodKind,
-  AdminShippingOrderRow,
-  AdminShippingOrdersTab,
+  AdminCountryRow,
+  AdminDistrictRow,
+  AdminGovernorateRow,
+  AdminPickupFormErrors,
+  AdminPickupFormValues,
+  AdminShippingMethodRow,
+  AdminShippingMethodType,
   ApiAdminCarrier,
-  ApiAdminShipmentDetail,
+  ApiCarrierCoverageItem,
+  ApiCarrierPickup,
+  ApiCountry,
+  ApiDistrict,
+  ApiGovernorate,
+  ApiShippingMethod,
+  CreateCarrierPayload,
+  CreateCarrierPickupPayload,
+  UpdateCarrierPayload,
 } from '../types/adminShipping'
-import { formatAdminOrderNumber, customerInitials } from './adminOrdersFormat'
-
-export function shippingOrdersTabToOrderStatus(
-  tab: AdminShippingOrdersTab,
-): AdminOrderStatus | undefined {
-  if (tab === 'all') return undefined
-  return tab
-}
+import { customerInitials } from './adminOrdersFormat'
 
 export function carrierStatusBadgeTone(isActive: boolean): StatusBadgeTone {
   return isActive ? 'success' : 'neutral'
-}
-
-export function shippingOrderStatusBadgeTone(
-  status: AdminOrderStatus,
-): StatusBadgeTone {
-  switch (status) {
-    case 'delivered':
-      return 'success'
-    case 'shipped':
-    case 'out_for_delivery':
-      return 'accent'
-    case 'pending':
-    case 'confirmed':
-    case 'processing':
-      return 'warning'
-    case 'cancelled':
-    case 'returned':
-    case 'failed_attempt':
-      return 'danger'
-    default:
-      return 'neutral'
-  }
 }
 
 export function carrierInitials(name: string): string {
@@ -62,50 +45,9 @@ export function mapApiCarrierToAdminRow(carrier: ApiAdminCarrier): AdminCarrierR
     cost: null,
     coverageLabel: coverage.length > 0 ? coverage.join(', ') : '—',
     isActive: carrier.isActive !== false,
-  }
-}
-
-function resolveCustomerName(order: ApiAdminOrder): string {
-  const user = order.user
-  if (user && typeof user === 'object' && user.name?.trim()) return user.name.trim()
-  return '—'
-}
-
-function resolveMethodKind(order: ApiAdminOrder): AdminShippingMethodKind {
-  if (order.shipment?.carrierType === 'internal') return 'in_house'
-  if (
-    order.shipment?.carrierName?.trim() ||
-    order.shipment?.carrierType === 'api' ||
-    order.shipment?.carrierType === 'known'
-  ) {
-    return 'courier'
-  }
-  // Checkout `shipping.methodName` (e.g. "Standard delivery") is not an
-  // assigned courier — leave unassigned as unknown.
-  return 'unknown'
-}
-
-function resolveTrackingOrDriver(order: ApiAdminOrder): string {
-  const tracking =
-    order.shipment?.trackingNumber?.trim() ||
-    order.tracking?.trackingNumber?.trim()
-  if (tracking) return tracking
-  // List enrichment does not expose driverName — never invent one.
-  return '—'
-}
-
-export function mapApiOrderToShippingRow(order: ApiAdminOrder): AdminShippingOrderRow {
-  const id = String(order._id)
-  const methodKind = resolveMethodKind(order)
-  return {
-    id,
-    orderNumber: formatAdminOrderNumber(id),
-    customerName: resolveCustomerName(order),
-    methodKind,
-    carrierName: order.shipment?.carrierName?.trim() || null,
-    orderStatus: order.orderStatus,
-    statusLabel: order.orderStatusLabel ?? order.orderStatus,
-    trackingOrDriver: resolveTrackingOrDriver(order),
+    apiProvider: carrier.apiProvider ?? null,
+    apiBaseUrl: carrier.apiBaseUrl?.trim() || null,
+    hasApiKey: Boolean(carrier.hasApiKey),
   }
 }
 
@@ -122,75 +64,219 @@ export function filterCarriersByKeyword(
   )
 }
 
-function resolveDetailMethodKind(
-  order: ApiAdminOrder,
-  carrierType: AdminCarrierType | null,
-): AdminShippingMethodKind {
-  if (carrierType === 'internal') return 'in_house'
-  if (carrierType === 'api' || carrierType === 'known') return 'courier'
-  return resolveMethodKind(order)
-}
-
-export function mapApiShipmentDetailToAdmin(
-  payload: ApiAdminShipmentDetail,
-): AdminShipmentDetail {
-  const order = payload.order
-  const shipment = payload.shipment
-  const id = String(order._id)
-  const user = order.user
-  const customerName =
-    user && typeof user === 'object' && user.name?.trim()
-      ? user.name.trim()
-      : '—'
-  const carrierType = shipment?.carrierType ?? order.shipment?.carrierType ?? null
-  const carrierName =
-    shipment?.carrierName?.trim() ||
-    order.shipment?.carrierName?.trim() ||
-    null
-  const trackingNumber =
-    shipment?.trackingNumber?.trim() ||
-    order.shipment?.trackingNumber?.trim() ||
-    order.tracking?.trackingNumber?.trim() ||
-    null
-  const shippingMethodName =
-    shipment?.methodSnapshot?.methodName?.trim() ||
-    order.shipping?.methodName?.trim() ||
-    carrierName ||
-    '—'
-
+export function emptyCarrierFormValues(): AdminCarrierFormValues {
   return {
-    id,
-    shipmentId: shipment?._id ? String(shipment._id) : null,
-    orderNumber: formatAdminOrderNumber(id),
-    createdAt: order.createdAt,
-    customerName,
-    customerEmail:
-      user && typeof user === 'object' ? user.email?.trim() || null : null,
-    customerPhone:
-      user && typeof user === 'object' ? user.phone?.trim() || null : null,
-    customerInitials: customerInitials(customerName === '—' ? '' : customerName),
-    orderStatus: order.orderStatus,
-    orderStatusLabel: order.orderStatusLabel ?? order.orderStatus,
-    carrierName,
-    carrierCode:
-      shipment?.carrierCode?.trim() || order.shipment?.carrierCode?.trim() || null,
-    carrierType,
-    methodKind: resolveDetailMethodKind(order, carrierType),
-    shippingMethodName,
-    trackingNumber,
-    driverName: shipment?.driverName?.trim() || null,
-    shipmentStatus: shipment?.status ?? order.shipment?.status ?? null,
-    shipmentStatusLabel:
-      shipment?.providerStateLabel?.trim() ||
-      order.shipment?.carrierStatusLabel?.trim() ||
-      shipment?.status ||
-      order.shipment?.status ||
-      null,
-    trackingSteps: order.tracking?.steps ?? [],
+    name: '',
+    code: '',
+    type: 'known',
+    isActive: true,
+    deliveryDays: '',
+    apiKey: '',
+    apiBaseUrl: '',
   }
 }
 
-export function formatShipmentCustomerSubtitle(detail: AdminShipmentDetail): string {
-  const parts = [detail.customerEmail, detail.customerPhone].filter(Boolean)
-  return parts.length > 0 ? parts.join(' · ') : '—'
+export function carrierRowToFormValues(row: AdminCarrierRow): AdminCarrierFormValues {
+  return {
+    name: row.name === '—' ? '' : row.name,
+    code: row.code === '—' ? '' : row.code,
+    type: row.type,
+    isActive: row.isActive,
+    deliveryDays: row.deliveryDays ?? '',
+    apiKey: '',
+    apiBaseUrl: row.apiBaseUrl ?? '',
+  }
+}
+
+export function validateCarrierForm(
+  values: AdminCarrierFormValues,
+  mode: 'create' | 'edit',
+): AdminCarrierFormErrors {
+  const errors: AdminCarrierFormErrors = {}
+  if (!values.name.trim()) errors.name = 'Name is required.'
+  if (mode === 'create' && !values.code.trim()) errors.code = 'Code is required.'
+  if (values.type === 'api') {
+    if (mode === 'create' && !values.apiKey.trim()) {
+      errors.apiKey = 'API key is required for Bosta carriers.'
+    }
+  } else if (!values.deliveryDays.trim()) {
+    errors.deliveryDays = 'Delivery days is required.'
+  }
+  return errors
+}
+
+export function formValuesToCreateCarrierPayload(
+  values: AdminCarrierFormValues,
+): CreateCarrierPayload {
+  const payload: CreateCarrierPayload = {
+    name: values.name.trim(),
+    code: values.code.trim().toUpperCase(),
+    type: values.type,
+    isActive: values.isActive,
+  }
+  if (values.type === 'api') {
+    payload.apiProvider = 'bosta'
+    payload.apiKey = values.apiKey.trim()
+    if (values.apiBaseUrl.trim()) payload.apiBaseUrl = values.apiBaseUrl.trim()
+  } else {
+    payload.deliveryDays = values.deliveryDays.trim()
+  }
+  return payload
+}
+
+export function formValuesToUpdateCarrierPayload(
+  values: AdminCarrierFormValues,
+  original: AdminCarrierRow,
+): UpdateCarrierPayload {
+  const payload: UpdateCarrierPayload = {
+    name: values.name.trim(),
+    isActive: values.isActive,
+  }
+  if (original.type === 'api') {
+    if (values.apiKey.trim()) payload.apiKey = values.apiKey.trim()
+    payload.apiBaseUrl = values.apiBaseUrl.trim() || undefined
+  } else {
+    payload.deliveryDays = values.deliveryDays.trim()
+  }
+  return payload
+}
+
+export function mapApiCoverageToGovernorateIds(
+  items: readonly ApiCarrierCoverageItem[],
+): string[] {
+  return items
+    .map((item) =>
+      typeof item.governorate === 'string' ? item.governorate : item.governorate?._id,
+    )
+    .filter((id): id is string => Boolean(id))
+}
+
+export function mapApiPickupToRow(pickup: ApiCarrierPickup): AdminCarrierPickupRow {
+  const address = pickup.address ?? {}
+  const contact = pickup.contactPerson ?? {}
+  const cityParts = [address.city, address.districtName].filter(Boolean)
+  return {
+    id: String(pickup._id),
+    locationName: pickup.locationName?.trim() || '—',
+    isDefault: Boolean(pickup.isDefault),
+    contactName: contact.name?.trim() || '—',
+    contactPhone: contact.phone?.trim() || '—',
+    addressLine: address.firstLine?.trim() || '—',
+    cityLabel: cityParts.length > 0 ? cityParts.join(', ') : '—',
+  }
+}
+
+export function emptyPickupFormValues(): AdminPickupFormValues {
+  return {
+    locationName: '',
+    firstLine: '',
+    city: '',
+    cityId: '',
+    districtId: '',
+    districtName: '',
+    zoneId: '',
+    contactName: '',
+    contactPhone: '',
+    isDefault: false,
+  }
+}
+
+export function validatePickupForm(values: AdminPickupFormValues): AdminPickupFormErrors {
+  const errors: AdminPickupFormErrors = {}
+  if (!values.locationName.trim()) errors.locationName = 'Location name is required.'
+  if (!values.firstLine.trim()) errors.firstLine = 'Address is required.'
+  if (!values.city.trim()) errors.city = 'City is required.'
+  if (!values.districtId.trim()) errors.districtId = 'District is required.'
+  if (!values.zoneId.trim()) errors.zoneId = 'Zone is required.'
+  if (!values.contactName.trim()) errors.contactName = 'Contact name is required.'
+  if (!values.contactPhone.trim()) errors.contactPhone = 'Contact phone is required.'
+  return errors
+}
+
+export function formValuesToPickupPayload(
+  values: AdminPickupFormValues,
+): CreateCarrierPickupPayload {
+  return {
+    locationName: values.locationName.trim(),
+    isDefault: values.isDefault,
+    address: {
+      firstLine: values.firstLine.trim(),
+      city: values.city.trim(),
+      cityId: values.cityId.trim() || undefined,
+      zoneId: values.zoneId.trim(),
+      districtId: values.districtId.trim(),
+      districtName: values.districtName.trim() || undefined,
+    },
+    contactPerson: {
+      name: values.contactName.trim(),
+      phone: values.contactPhone.trim(),
+    },
+  }
+}
+
+const METHOD_TYPE_ORDER: AdminShippingMethodType[] = ['api', 'known', 'internal']
+
+function defaultMethodName(type: AdminShippingMethodType): string {
+  switch (type) {
+    case 'api':
+      return 'API Carriers (Bosta)'
+    case 'known':
+      return 'Known Carriers'
+    case 'internal':
+      return 'Internal Delivery'
+    default:
+      return type
+  }
+}
+
+export function mapApiShippingMethods(
+  methods: readonly ApiShippingMethod[],
+): AdminShippingMethodRow[] {
+  const byType = new Map(methods.map((method) => [method.type, method]))
+  return METHOD_TYPE_ORDER.map((type) => {
+    const found = byType.get(type)
+    return {
+      type,
+      name: found?.name?.trim() || defaultMethodName(type),
+      isEnabled: Boolean(found?.isEnabled),
+    }
+  })
+}
+
+function resolveRefId(value: string | { _id: string } | undefined): string {
+  if (!value) return ''
+  return typeof value === 'string' ? value : String(value._id)
+}
+
+export function mapApiCountryToRow(country: ApiCountry): AdminCountryRow {
+  return {
+    id: String(country._id),
+    name: country.name?.trim() || '—',
+    code: country.code?.trim().toUpperCase() || '—',
+    currency: country.currency?.trim().toUpperCase() || '—',
+    flag: country.flag?.trim() || null,
+    isActive: country.isActive !== false,
+  }
+}
+
+export function mapApiGovernorateToRow(gov: ApiGovernorate): AdminGovernorateRow {
+  return {
+    id: String(gov._id),
+    countryId: resolveRefId(gov.country),
+    name: gov.name?.trim() || '—',
+    shippingPrice: gov.shippingPrice ?? 0,
+    districtCount: gov.districtCount ?? null,
+    isActive: gov.isActive !== false,
+  }
+}
+
+export function mapApiDistrictToRow(district: ApiDistrict): AdminDistrictRow {
+  return {
+    id: String(district._id),
+    governorateId: resolveRefId(district.governorate),
+    name: district.name?.trim() || '—',
+    shippingPrice: district.shippingPrice ?? 0,
+    isCovered: district.isCovered !== false,
+    bostaCovered: Boolean(district.bostaCovered),
+  }
 }

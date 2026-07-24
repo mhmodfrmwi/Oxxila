@@ -11,8 +11,10 @@ interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
 const paddingClasses = {
   none: '',
   sm: 'p-4',
-  md: 'p-5 sm:p-6',
-  lg: 'p-6 sm:p-8',
+  /* Figma 25px × 0.8 */
+  md: 'p-[var(--admin-card-pad-md)]',
+  /* Figma 33px × 0.8 */
+  lg: 'p-[var(--admin-card-pad-lg)]',
 } as const
 
 export function GlassCard({

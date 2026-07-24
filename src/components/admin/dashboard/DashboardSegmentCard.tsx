@@ -25,7 +25,8 @@ export function DashboardSegmentCard({
   return (
     <GlassCard
       padding="lg"
-      className="flex min-h-[28rem] flex-col justify-between rounded-[var(--admin-radius-xl)]"
+      strong
+      className="flex min-h-[22.4rem] w-full shrink-0 flex-col justify-between rounded-[var(--admin-radius-xl)] lg:w-[var(--admin-rail-width)]"
     >
       <div className="space-y-1">
         <h2 className="admin-section-title">

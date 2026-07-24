@@ -34,7 +34,7 @@ export function InventoryStatusCell({
   const fillWidth = status === 'out_of_stock' ? 0 : Math.max(clamped, 4)
 
   return (
-    <div className="flex min-w-[7rem] flex-col gap-1">
+    <div className="flex min-w-[5.6rem] flex-col gap-1">
       <p className={cn('text-sm font-medium tabular-nums', statusToneClass[status])}>
         {label}
       </p>

@@ -108,7 +108,7 @@ export function Dialog({
                 )}
                 aria-label={t('actions.cancel')}
               >
-                <X size={18} aria-hidden />
+                <X size={14} aria-hidden />
               </button>
             </div>
 

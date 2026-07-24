@@ -5,12 +5,16 @@ import {
   RotateCcw,
   Truck,
   User,
+  XCircle,
 } from 'lucide-react'
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useOrderAssign } from '../../../hooks/useOrderAssign'
 import { useOrderDetailsDrawer } from '../../../hooks/useOrderDetailsDrawer'
 import { cn } from '../../../lib/cn'
 import type { ApiAdminOrderTrackingStep } from '../../../types/adminOrders'
 import {
+  canAdminCancelOrder,
   formatAdminOrderDateTime,
   formatAdminOrderMoney,
   formatOrderCustomerSubtitle,
@@ -21,11 +25,15 @@ import { Drawer } from '../ui/Drawer'
 import { EmptyState } from '../ui/EmptyState'
 import { GlassCard } from '../ui/GlassCard'
 import { Skeleton } from '../ui/Skeleton'
+import { CancelOrderDialog } from './CancelOrderDialog'
+import { OrderAssignPanel } from './OrderAssignPanel'
 
 interface OrderDetailsDrawerProps {
   open: boolean
   orderId: string | null
   onClose: () => void
+  /** Notifies the Orders list to reload after an assign or status update. */
+  onOrderChanged?: () => void
 }
 
 function TimelineDot({ status }: { status: ApiAdminOrderTrackingStep['status'] }) {
@@ -56,7 +64,7 @@ function TimelineDot({ status }: { status: ApiAdminOrderTrackingStep['status'] }
 function OrderDetailsSkeleton() {
   return (
     <div className="flex flex-col gap-8" aria-busy="true" aria-live="polite">
-      <GlassCard className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-[25px]" padding="none">
+      <GlassCard className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-[20px]" padding="none">
         <div className="flex items-center gap-4">
           <Skeleton className="size-12 rounded-2xl" />
           <div className="flex-1 space-y-2">
@@ -95,10 +103,38 @@ function OrderDetailsSkeleton() {
   )
 }
 
-export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawerProps) {
+export function OrderDetailsDrawer({
+  open,
+  orderId,
+  onClose,
+  onOrderChanged,
+}: OrderDetailsDrawerProps) {
   const { t, i18n } = useTranslation()
   const locale = i18n.language
   const { order, loading, error, reload } = useOrderDetailsDrawer({ open, orderId })
+  const [cancelOpen, setCancelOpen] = useState(false)
+
+  const handleOrderUpdated = useCallback(() => {
+    reload()
+  }, [reload])
+
+  const assign = useOrderAssign({
+    open,
+    orderId,
+    onOrderUpdated: handleOrderUpdated,
+  })
+
+  const handleAssignSuccess = useCallback(() => {
+    onOrderChanged?.()
+  }, [onOrderChanged])
+
+  const handleCancelled = useCallback(() => {
+    setCancelOpen(false)
+    reload()
+    onOrderChanged?.()
+  }, [onOrderChanged, reload])
+
+  const canCancel = order ? canAdminCancelOrder(order.orderStatus) : false
 
   const title = order
     ? t('admin.orders.details.title', { id: order.orderNumber })
@@ -113,7 +149,7 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
             {formatAdminOrderMoney(order.totalPrice, locale)}
           </span>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button
             type="button"
             disabled
@@ -124,7 +160,7 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
               focusRingClasses,
             )}
           >
-            <FileText size={16} aria-hidden />
+            <FileText size={13} aria-hidden />
             {t('admin.orders.details.invoice')}
           </button>
           <button
@@ -137,26 +173,34 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
               focusRingClasses,
             )}
           >
-            <RotateCcw size={16} aria-hidden />
+            <RotateCcw size={13} aria-hidden />
             {t('admin.orders.details.refund')}
           </button>
+          <button
+            type="button"
+            disabled={!canCancel}
+            title={
+              canCancel
+                ? undefined
+                : t('admin.orders.cancel.unavailable')
+            }
+            onClick={() => setCancelOpen(true)}
+            className={cn(
+              'inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white',
+              'transition-colors hover:bg-white/10',
+              'disabled:cursor-not-allowed disabled:opacity-50',
+              focusRingClasses,
+            )}
+          >
+            <XCircle size={13} aria-hidden />
+            {t('admin.orders.cancel.action')}
+          </button>
         </div>
-        <button
-          type="button"
-          disabled
-          title={t('admin.orders.details.updateStatusSoon')}
-          className={cn(
-            'w-full rounded-2xl bg-gradient-to-r from-[#a394ff] to-[#8274d6] px-4 pb-4 pt-5 text-sm font-bold text-white',
-            'cursor-not-allowed opacity-50',
-            focusRingClasses,
-          )}
-        >
-          {t('admin.orders.details.updateStatus')}
-        </button>
       </div>
     ) : undefined
 
   return (
+    <>
     <Drawer
       open={open}
       title={title}
@@ -191,12 +235,12 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
       {order && !error ? (
         <div className={cn('flex flex-col gap-8', loading && 'opacity-60')}>
           <GlassCard
-            className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-[25px]"
+            className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-[20px]"
             padding="none"
           >
             <div className="flex items-center gap-4">
               <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(163,148,255,0.2)] text-[#a394ff]">
-                <User size={24} aria-hidden />
+                <User size={19} aria-hidden />
               </span>
               <div className="min-w-0">
                 <p className="truncate text-base font-bold leading-6 text-white">
@@ -204,12 +248,17 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
                 </p>
                 <p className="truncate text-xs leading-4 text-white/40">
                   {formatOrderCustomerSubtitle(order)}
+                  {typeof order.userOrdersCount === 'number'
+                    ? ` • ${t('admin.orders.details.ordersCount', {
+                        count: order.userOrdersCount,
+                      })}`
+                    : ''}
                 </p>
               </div>
             </div>
             <div className="flex gap-4">
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] uppercase leading-[15px] tracking-[-0.5px] text-white/30">
+                <p className="text-[8px] uppercase leading-[12px] tracking-[-0.4px] text-white/30">
                   {t('admin.orders.details.payment')}
                 </p>
                 <p className="truncate text-sm font-medium leading-5 text-white">
@@ -217,7 +266,7 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
                 </p>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] uppercase leading-[15px] tracking-[-0.5px] text-white/30">
+                <p className="text-[8px] uppercase leading-[12px] tracking-[-0.4px] text-white/30">
                   {t('admin.orders.details.contact')}
                 </p>
                 <p
@@ -241,7 +290,7 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
                 value={order.shippingMethodName}
                 aria-label={t('admin.orders.details.shipping')}
                 className={cn(
-                  'w-full appearance-none rounded-xl border border-white/10 bg-white/5 px-[17px] py-[13px] pe-10',
+                  'w-full appearance-none rounded-xl border border-white/10 bg-white/5 px-[13.6px] py-[10.4px] pe-10',
                   'text-sm text-white',
                   'cursor-not-allowed opacity-80',
                   focusRingClasses,
@@ -250,8 +299,8 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
                 <option value={order.shippingMethodName}>{order.shippingMethodName}</option>
               </select>
               <ChevronDown
-                size={20}
-                className="pointer-events-none absolute end-[17px] top-1/2 -translate-y-1/2 text-white/50"
+                size={16}
+                className="pointer-events-none absolute end-[13.6px] top-1/2 -translate-y-1/2 text-white/50"
                 aria-hidden
               />
             </div>
@@ -259,7 +308,7 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
 
           <section className="flex w-full flex-col gap-6" aria-labelledby="order-timeline-heading">
             <div className="flex items-center gap-2">
-              <Truck size={16} className="text-[#a394ff]" aria-hidden />
+              <Truck size={13} className="text-[#a394ff]" aria-hidden />
               <h3 id="order-timeline-heading" className="text-sm font-bold leading-5 text-white">
                 {t('admin.orders.details.timeline')}
               </h3>
@@ -333,7 +382,7 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
                 {order.items.map((item, index) => (
                   <li
                     key={`${item.product}-${index}`}
-                    className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-[17px]"
+                    className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-[13.6px]"
                   >
                     <div className="size-12 shrink-0 overflow-hidden rounded-xl bg-white/10 p-1">
                       {item.image ? (
@@ -350,7 +399,7 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
                       <p className="truncate text-xs font-semibold leading-4 text-white">
                         {item.name}
                       </p>
-                      <p className="text-[10px] leading-[15px] text-white/40">
+                      <p className="text-[8px] leading-[12px] text-white/40">
                         {t('admin.orders.details.itemMeta', {
                           qty: item.quantity,
                           price: formatAdminOrderMoney(item.price, locale),
@@ -362,8 +411,30 @@ export function OrderDetailsDrawer({ open, orderId, onClose }: OrderDetailsDrawe
               </ul>
             )}
           </section>
+
+          <GlassCard
+            className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-[20px]"
+            padding="none"
+          >
+            <OrderAssignPanel
+              assign={assign}
+              hasAssignedCarrier={order.hasAssignedCarrier}
+              carrierType={order.carrierType}
+              onSuccess={handleAssignSuccess}
+            />
+          </GlassCard>
         </div>
       ) : null}
     </Drawer>
+
+    <CancelOrderDialog
+      key={order?.id ?? 'cancel-order'}
+      open={cancelOpen}
+      orderId={order?.id ?? null}
+      orderNumber={order?.orderNumber ?? null}
+      onClose={() => setCancelOpen(false)}
+      onCancelled={handleCancelled}
+    />
+    </>
   )
 }

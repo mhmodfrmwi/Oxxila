@@ -1,11 +1,33 @@
 // src/types/adminCustomers.ts
 
-/** Segment tabs from Figma Customer Intelligence. */
-export type AdminCustomersSegmentTab =
-  | 'all'
-  | 'vip'
-  | 'frequent'
-  | 'inactive'
+/** Segment tabs — only All / Inactive are API-backed. */
+export type AdminCustomersSegmentTab = 'all' | 'inactive'
+
+export interface AdminCustomerStatsKpi {
+  value: number
+  trend: number | null
+  trendLabel: string | null
+  newThisMonth?: number | null
+}
+
+export interface AdminCustomerStats {
+  totalCustomers: AdminCustomerStatsKpi
+  averageLtv: AdminCustomerStatsKpi
+}
+
+export interface ApiAdminCustomerStats {
+  totalCustomers?: {
+    value?: number
+    newThisMonth?: number
+    trendLabel?: string
+    trend?: number
+  }
+  averageLtv?: {
+    value?: number
+    trend?: number
+    trendLabel?: string
+  }
+}
 
 export interface AdminCustomerRow {
   id: string
@@ -17,12 +39,10 @@ export interface AdminCustomerRow {
   active: boolean
   role: string
   createdAt: string
-  /** Not provided by GET /users — UI shows em dash. */
   ordersCount: number | null
-  /** Not provided by GET /users — UI shows em dash. */
-  ltv: number | null
-  /** Not provided by GET /users — UI shows em dash. */
-  lastVisitAt: string | null
+  /** totalPaid / totalSpend from API */
+  totalSpend: number | null
+  lastOrderAt: string | null
 }
 
 /** Raw user from GET /api/v1/users (admin). */
@@ -38,6 +58,10 @@ export interface ApiAdminCustomer {
   createdAt?: string
   updatedAt?: string
   addresses?: ApiAdminCustomerAddress[]
+  orders?: number
+  totalPaid?: number
+  totalSpend?: number
+  lastOrder?: string | null
 }
 
 export interface ApiAdminCustomerAddress {
@@ -63,8 +87,9 @@ export interface AdminCustomerDetail {
   storeCreditBalance: number
   createdAt: string | null
   addresses: AdminCustomerAddress[]
-  /** Not provided by GET /users/:id. */
+  ordersCount: number | null
   totalSpend: number | null
+  lastOrderAt: string | null
 }
 
 export interface AdminCustomerAddress {

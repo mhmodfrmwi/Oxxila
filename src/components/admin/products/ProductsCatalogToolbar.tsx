@@ -18,8 +18,9 @@ interface ProductsCatalogToolbarProps {
   onBulkOpenChange: (open: boolean) => void
 }
 
+/* Figma Products: search Fill h-54 rounded-16; filter hug h-54 rounded-16 */
 const glassControlClass = cn(
-  'admin-glass inline-flex items-center gap-2 rounded-2xl px-6 py-[1.05rem]',
+  'admin-glass inline-flex h-[43.2px] shrink-0 items-center gap-2 rounded-2xl px-[20px]',
   'text-sm font-medium text-primary-text',
   'transition-colors hover:bg-white/[0.08]',
   'disabled:pointer-events-none disabled:opacity-50',
@@ -42,11 +43,11 @@ export function ProductsCatalogToolbar({
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+      <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:gap-4">
         <label className="relative block min-w-0 flex-1">
           <span className="sr-only">{t('admin.products.searchLabel')}</span>
           <Search
-            size={20}
+            size={19}
             className="pointer-events-none absolute start-5 top-1/2 -translate-y-1/2 text-secondary-text"
             aria-hidden
           />
@@ -57,14 +58,14 @@ export function ProductsCatalogToolbar({
             placeholder={t('admin.products.searchPlaceholder')}
             autoComplete="off"
             className={cn(
-              'admin-glass w-full rounded-2xl py-[1.1rem] pe-5 ps-14 text-sm text-primary-text',
+              'admin-glass h-[43.2px] w-full rounded-2xl pe-5 ps-14 text-sm text-primary-text',
               'placeholder:text-placeholder-text',
               focusRingClasses,
             )}
           />
         </label>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex shrink-0 flex-wrap items-center gap-3">
           <button
             type="button"
             className={glassControlClass}
@@ -72,7 +73,7 @@ export function ProductsCatalogToolbar({
             aria-controls="admin-products-filters"
             onClick={() => onFiltersOpenChange(!filtersOpen)}
           >
-            <ListFilter size={16} aria-hidden />
+            <ListFilter size={13} aria-hidden />
             {t('admin.products.filters')}
           </button>
 
@@ -86,7 +87,7 @@ export function ProductsCatalogToolbar({
               onClick={() => onBulkOpenChange(!bulkOpen)}
             >
               {t('admin.products.bulkActions')}
-              <ChevronDown size={16} aria-hidden className="opacity-70" />
+              <ChevronDown size={13} aria-hidden className="opacity-70" />
             </button>
 
             {bulkOpen && (
@@ -94,7 +95,7 @@ export function ProductsCatalogToolbar({
                 role="menu"
                 aria-labelledby="admin-products-bulk-trigger"
                 className={cn(
-                  'admin-glass absolute end-0 z-20 mt-2 min-w-[12rem] rounded-xl p-1.5 shadow-lg',
+                  'admin-glass absolute end-0 z-20 mt-2 min-w-[9.6rem] rounded-xl p-1.5 shadow-lg',
                 )}
               >
                 <p className="px-3 py-2 text-xs text-secondary-text" role="menuitem" tabIndex={-1}>
@@ -111,7 +112,7 @@ export function ProductsCatalogToolbar({
           id="admin-products-filters"
           className="admin-glass flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-end"
         >
-          <label className="flex min-w-[14rem] flex-1 flex-col gap-1.5">
+          <label className="flex min-w-[11.2rem] flex-1 flex-col gap-1.5">
             <span className="admin-label">{t('admin.products.filterCategory')}</span>
             <select
               value={category}

@@ -95,7 +95,7 @@ export function CouponManagerCard() {
         cell: (row) => (
           <StatusBadge
             tone={row.isActive ? 'success' : 'neutral'}
-            className="px-2 py-0.5 text-[10px] font-bold"
+            className="px-2 py-0.5 text-[8px] font-bold"
           >
             {row.isActive
               ? t('admin.settings.coupons.active')
@@ -119,7 +119,7 @@ export function CouponManagerCard() {
             )}
             aria-label={t('admin.settings.coupons.editAria', { code: row.code })}
           >
-            <Pencil size={16} aria-hidden />
+            <Pencil size={13} aria-hidden />
           </button>
         ),
       },
@@ -139,7 +139,7 @@ export function CouponManagerCard() {
       <EmptyState
         title={t('admin.settings.coupons.loadErrorTitle')}
         description={error ?? t('admin.settings.loadErrorTitle')}
-        className="rounded-[2.5rem]"
+        className="rounded-[2rem]"
         action={
           <Button type="button" variant="outline" onClick={reload}>
             {t('admin.settings.retry')}
@@ -173,7 +173,7 @@ export function CouponManagerCard() {
           </Button>
         }
         aria-label={t('admin.settings.coupons.aria')}
-        className="rounded-[2.5rem]"
+        className="rounded-[2rem]"
         toolbar={
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">

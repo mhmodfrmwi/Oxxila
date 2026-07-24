@@ -11,6 +11,8 @@ interface StatCardProps {
   trend?: ReactNode
   trendTone?: StatTrendTone
   className?: string
+  /** Customers KPIs use blur 12 in Figma; Dashboard KPIs use blur 6. */
+  strong?: boolean
 }
 
 const trendToneClasses: Record<StatTrendTone, string> = {
@@ -25,9 +27,17 @@ export function StatCard({
   trend,
   trendTone = 'neutral',
   className,
+  strong = false,
 }: StatCardProps) {
   return (
-    <GlassCard className={cn('flex min-h-[9.5rem] flex-col gap-2 overflow-hidden', className)}>
+    <GlassCard
+      padding="none"
+      strong={strong}
+      className={cn(
+        'flex min-h-[var(--admin-kpi-min-height)] flex-col gap-2 overflow-hidden p-[var(--admin-card-pad-md)]',
+        className,
+      )}
+    >
       <p className="admin-label">{label}</p>
       <p className="text-2xl font-bold tabular-nums text-primary-text">{value}</p>
       {trend != null && (

@@ -1,6 +1,7 @@
 // src/hooks/useOrderDetailsDrawer.ts
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getAdminOrder } from '../api/admin/orders'
+import { getAdminCustomer } from '../api/admin/customers'
 import { ApiError } from '../lib/api'
 import type { AdminOrderDetail } from '../types/adminOrders'
 import { mapApiOrderToAdminDetail } from '../utils/adminOrdersFormat'
@@ -36,6 +37,22 @@ export function useOrderDetailsDrawer({ open, orderId }: UseOrderDetailsDrawerOp
     setReloadToken((token) => token + 1)
   }, [])
 
+  const loadCustomerOrdersCount = useCallback(async (customerId: string, requestId: number) => {
+    try {
+      const response = await getAdminCustomer(customerId)
+      if (requestId !== requestIdRef.current) return
+      const ordersCount = response.data?.orders
+      if (typeof ordersCount !== 'number') return
+      setState((prev) =>
+        prev.order
+          ? { ...prev, order: { ...prev.order, userOrdersCount: ordersCount } }
+          : prev,
+      )
+    } catch {
+      // Best-effort only — the drawer works fine without this count.
+    }
+  }, [])
+
   useEffect(() => {
     if (!open || !orderId) {
       setState({ order: null, loading: false, error: null })
@@ -64,11 +81,17 @@ export function useOrderDetailsDrawer({ open, orderId }: UseOrderDetailsDrawerOp
           })
           return
         }
+        const detail = mapApiOrderToAdminDetail(data)
         setState({
-          order: mapApiOrderToAdminDetail(data),
+          order: detail,
           loading: false,
           error: null,
         })
+
+        // Nice-to-have: customer orders count from GET /users/:id — best-effort, never blocks the drawer.
+        if (detail.customerId) {
+          void loadCustomerOrdersCount(detail.customerId, requestId)
+        }
       } catch (error) {
         if (isAbortError(error) || requestId !== requestIdRef.current) return
         const message =
@@ -84,7 +107,7 @@ export function useOrderDetailsDrawer({ open, orderId }: UseOrderDetailsDrawerOp
     return () => {
       controller.abort()
     }
-  }, [open, orderId, reloadToken])
+  }, [open, orderId, reloadToken, loadCustomerOrdersCount])
 
   return {
     order: state.order,

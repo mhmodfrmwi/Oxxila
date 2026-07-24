@@ -24,12 +24,17 @@ interface DataTableProps<T> {
   toolbar?: ReactNode
   footer?: ReactNode
   className?: string
+  /** Products Figma uses ~24px cell pad; list tables use denser default. */
+  density?: 'default' | 'spacious'
   /** Accessible name for the table region. */
   'aria-label'?: string
 }
 
-/** Figma table cells use ~16px horizontal / denser vertical rhythm. */
-const cellPad = 'px-4 py-2.5 sm:px-4'
+const densityPad = {
+  default: { header: 'px-6 py-4', cell: 'px-6 py-5' },
+  /* Products Management: header/body ~p-24 / first col px-32 */
+  spacious: { header: 'px-8 py-6', cell: 'px-8 py-6' },
+} as const
 
 export function DataTable<T>({
   columns,
@@ -42,14 +47,21 @@ export function DataTable<T>({
   toolbar,
   footer,
   className,
+  density = 'default',
   'aria-label': ariaLabel,
 }: DataTableProps<T>) {
   const showEmpty = !loading && rows.length === 0
+  const headerPad = densityPad[density].header
+  const cellPad = densityPad[density].cell
 
   return (
     <GlassCard
       padding="none"
-      className={cn('overflow-hidden', className)}
+      strong
+      className={cn(
+        'w-full min-w-0 overflow-hidden rounded-[var(--admin-radius-xl)]',
+        className,
+      )}
       aria-busy={loading || undefined}
     >
       {toolbar && (
@@ -70,8 +82,8 @@ export function DataTable<T>({
                   key={column.id}
                   scope="col"
                   className={cn(
-                    'admin-label whitespace-nowrap text-start text-[10px] tracking-[0.1em] text-white/40',
-                    cellPad,
+                    'admin-label whitespace-nowrap text-start text-[8px] tracking-[0.1em] text-white/40',
+                    headerPad,
                     column.headerClassName,
                   )}
                 >
@@ -89,7 +101,7 @@ export function DataTable<T>({
                 >
                   {columns.map((column) => (
                     <td key={column.id} className={cellPad}>
-                      <Skeleton className="h-4 w-full max-w-[10rem]" />
+                      <Skeleton className="h-4 w-full max-w-[8rem]" />
                     </td>
                   ))}
                 </tr>

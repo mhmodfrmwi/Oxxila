@@ -1,6 +1,10 @@
 // src/api/admin/orders.ts
 import { apiRequest } from '../../lib/api'
-import type { ApiAdminOrder, AdminOrdersListParams } from '../../types/adminOrders'
+import type {
+  ApiAdminOrder,
+  AdminB2BOrderPayload,
+  AdminOrdersListParams,
+} from '../../types/adminOrders'
 
 function toQuery(params: AdminOrdersListParams): string {
   const search = new URLSearchParams()
@@ -41,4 +45,26 @@ export function getAdminOrder(orderId: string, options?: { signal?: AbortSignal 
     auth: true,
     signal: options?.signal,
   })
+}
+
+/** POST /api/v1/orders/b2b — create a B2B order from the admin dashboard (no cart). */
+export function createAdminB2BOrder(body: AdminB2BOrderPayload) {
+  return apiRequest<ApiAdminOrder>('/orders/b2b', {
+    method: 'POST',
+    auth: true,
+    body,
+  })
+}
+
+/** PATCH /api/v1/orders/:id/cancel — admin or owner cancel (`reason` optional). */
+export function cancelAdminOrder(orderId: string, reason?: string) {
+  const trimmed = reason?.trim()
+  return apiRequest<ApiAdminOrder>(
+    `/orders/${encodeURIComponent(orderId)}/cancel`,
+    {
+      method: 'PATCH',
+      auth: true,
+      body: trimmed ? { reason: trimmed } : {},
+    },
+  )
 }

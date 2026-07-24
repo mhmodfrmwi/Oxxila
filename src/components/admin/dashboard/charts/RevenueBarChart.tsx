@@ -61,7 +61,7 @@ export function RevenueBarChart({
         return (
           <div
             key={`${point.date}-${index}`}
-            className="group relative flex h-full min-w-[0.5rem] flex-1 flex-col items-center justify-end"
+            className="group relative flex h-full min-w-[0.4rem] flex-1 flex-col items-center justify-end"
           >
             <button
               type="button"

@@ -75,8 +75,8 @@ export function AdminDashboardPage() {
           <label className="relative block w-full sm:w-[var(--admin-search-width)]">
             <span className="sr-only">{t('admin.dashboard.searchLabel')}</span>
             <Search
-              size={18}
-              className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-secondary-text"
+              size={19}
+              className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-secondary-text"
               aria-hidden
             />
             <input
@@ -86,7 +86,7 @@ export function AdminDashboardPage() {
               placeholder={t('admin.dashboard.searchPlaceholder')}
               autoComplete="off"
               className={cn(
-                'admin-glass h-[var(--admin-search-height)] w-full rounded-full pe-4 ps-11 text-sm text-primary-text',
+                'admin-glass h-[var(--admin-search-height)] w-full rounded-full pe-4 ps-12 text-sm text-primary-text',
                 'placeholder:text-placeholder-text',
                 focusRingClasses,
               )}
@@ -109,7 +109,8 @@ export function AdminDashboardPage() {
         <>
           <DashboardKpiGrid kpis={overview.data?.kpis ?? null} loading={overview.loading} />
 
-          <div className="grid gap-8 lg:grid-cols-3">
+          {/* Figma: flex gap-32 justify-center; Revenue Fixed 1056; Segment Fixed 512 */}
+          <div className="flex w-full flex-col gap-[var(--admin-content-gap-tight)] lg:flex-row lg:items-stretch lg:justify-center">
             <DashboardRevenueCard
               chart={revenue.data}
               loading={revenue.loading}
@@ -125,7 +126,8 @@ export function AdminDashboardPage() {
             />
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-3">
+          {/* Figma Section: three cards flex-[1_0_0] gap-32 Fill */}
+          <div className="flex w-full flex-col gap-[var(--admin-content-gap-tight)] lg:flex-row lg:items-stretch">
             <DashboardTopProductsCard
               products={filteredTopProducts}
               loading={overview.loading}

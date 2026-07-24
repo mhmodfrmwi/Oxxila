@@ -24,11 +24,11 @@ function CustomerDetailsSkeleton() {
   return (
     <div className="flex flex-col gap-10" aria-busy="true" aria-live="polite">
       <div className="flex flex-col items-center gap-4 pt-2">
-        <Skeleton className="size-[7rem] rounded-full" />
+        <Skeleton className="size-[5.6rem] rounded-full" />
         <Skeleton className="h-7 w-40" />
         <Skeleton className="h-4 w-28" />
       </div>
-      <Skeleton className="h-[175px] w-full rounded-3xl" />
+      <Skeleton className="h-[140px] w-full rounded-3xl" />
       <div className="space-y-4">
         <Skeleton className="h-4 w-32" />
         <Skeleton className="h-16 w-full rounded-2xl" />
@@ -41,7 +41,7 @@ function CustomerDetailsSkeleton() {
 function DetailField({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <p className="text-[10px] uppercase leading-[15px] tracking-[0.1em] text-white/30">
+      <p className="text-[8px] uppercase leading-[12px] tracking-[0.1em] text-white/30">
         {label}
       </p>
       <p className="truncate text-sm font-medium leading-5 text-white" title={value}>
@@ -78,7 +78,7 @@ export function CustomerDetailsDrawer({
           disabled
           title={t('admin.customers.details.blockSoon')}
           className={cn(
-            'inline-flex flex-1 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-[17px]',
+            'inline-flex flex-1 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-[13.6px]',
             'text-sm font-bold text-white',
             'cursor-not-allowed opacity-50',
             focusRingClasses,
@@ -90,7 +90,7 @@ export function CustomerDetailsDrawer({
           <a
             href={`mailto:${customer.email}`}
             className={cn(
-              'inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-[17px]',
+              'inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-[13.6px]',
               'bg-gradient-to-r from-[#a394ff] to-[#8e7dff] text-sm font-bold text-white',
               'shadow-[0_10px_15px_-3px_rgba(163,148,255,0.2),0_4px_6px_-4px_rgba(163,148,255,0.2)]',
               'transition-opacity hover:opacity-95',
@@ -105,7 +105,7 @@ export function CustomerDetailsDrawer({
             disabled
             title={t('admin.customers.details.contactUnavailable')}
             className={cn(
-              'inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-[17px]',
+              'inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-[13.6px]',
               'bg-gradient-to-r from-[#a394ff] to-[#8e7dff] text-sm font-bold text-white',
               'cursor-not-allowed opacity-50',
               focusRingClasses,
@@ -151,21 +151,21 @@ export function CustomerDetailsDrawer({
 
       {customer && !error ? (
         <div className={cn('flex flex-col gap-10', loading && 'opacity-60')}>
-          <div className="relative flex min-h-[11rem] flex-col items-center">
+          <div className="relative flex min-h-[8.8rem] flex-col items-center">
             <div className="relative">
               <span
-                className="pointer-events-none absolute -inset-2 rounded-full bg-gradient-to-r from-[#a394ff] to-[#8e7dff] opacity-30 blur-[8px]"
+                className="pointer-events-none absolute -inset-2 rounded-full bg-gradient-to-r from-[#a394ff] to-[#8e7dff] opacity-30 blur-[6.4px]"
                 aria-hidden
               />
               {customer.avatar ? (
                 <img
                   src={customer.avatar}
                   alt=""
-                  className="relative size-[7rem] rounded-full border-4 border-[#1a1c29] object-cover"
+                  className="relative size-[5.6rem] rounded-full border-4 border-[#1a1c29] object-cover"
                 />
               ) : (
                 <span
-                  className="relative inline-flex size-[7rem] items-center justify-center rounded-full border-4 border-[#1a1c29] bg-[rgba(163,148,255,0.2)] text-xl font-bold text-[#a394ff]"
+                  className="relative inline-flex size-[5.6rem] items-center justify-center rounded-full border-4 border-[#1a1c29] bg-[rgba(163,148,255,0.2)] text-xl font-bold text-[#a394ff]"
                   aria-hidden
                 >
                   {customer.initials}
@@ -189,10 +189,10 @@ export function CustomerDetailsDrawer({
           </div>
 
           <GlassCard
-            className="flex h-[175px] flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/5 p-[17px] text-center"
+            className="flex h-[140px] flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/5 p-[13.6px] text-center"
             padding="none"
           >
-            <p className="text-[10px] uppercase leading-[15px] tracking-[0.1em] text-white/40">
+            <p className="text-[8px] uppercase leading-[12px] tracking-[0.1em] text-white/40">
               {t('admin.customers.details.totalSpend')}
             </p>
             <p className="mt-2 text-2xl font-bold leading-8 text-white">
@@ -200,8 +200,12 @@ export function CustomerDetailsDrawer({
                 ? unavailable
                 : formatCustomerMoney(customer.totalSpend, locale)}
             </p>
-            <p className="mt-1 text-[10px] leading-[15px] text-white/30">
-              {unavailable}
+            <p className="mt-1 text-[8px] leading-[12px] text-white/30">
+              {customer.ordersCount == null
+                ? unavailable
+                : t('admin.customers.details.ordersCount', {
+                    count: customer.ordersCount,
+                  })}
             </p>
           </GlassCard>
 
@@ -236,6 +240,22 @@ export function CustomerDetailsDrawer({
                     : unavailable
                 }
               />
+              <DetailField
+                label={t('admin.customers.details.orders')}
+                value={
+                  customer.ordersCount == null
+                    ? unavailable
+                    : String(customer.ordersCount)
+                }
+              />
+              <DetailField
+                label={t('admin.customers.details.lastOrder')}
+                value={
+                  customer.lastOrderAt
+                    ? formatCustomerDate(customer.lastOrderAt, locale)
+                    : unavailable
+                }
+              />
             </GlassCard>
           </section>
 
@@ -265,7 +285,7 @@ export function CustomerDetailsDrawer({
                           {address.label || t('admin.customers.details.addressFallback')}
                         </p>
                         {address.isDefault ? (
-                          <span className="shrink-0 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-accent">
+                          <span className="shrink-0 rounded-full bg-accent/15 px-2 py-0.5 text-[8px] font-medium uppercase tracking-wide text-accent">
                             {t('admin.customers.details.defaultAddress')}
                           </span>
                         ) : null}

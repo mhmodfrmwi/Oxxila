@@ -14,7 +14,7 @@ interface DrawerProps {
   children: ReactNode
   footer?: ReactNode
   className?: string
-  width?: 'md' | 'lg' | 'xl' | 'formula' | 'order' | 'customer'
+  width?: 'md' | 'lg' | 'xl' | 'formula' | 'settings' | 'order' | 'customer'
   /** When true, Escape / backdrop still call onClose (parent may confirm first). */
 }
 
@@ -22,12 +22,14 @@ const widthClasses = {
   md: 'max-w-md',
   lg: 'max-w-lg',
   xl: 'max-w-xl',
-  /** Figma Formula Specs drawer is 500px. */
-  formula: 'max-w-[31.25rem]',
+  /** Figma Formula Specs drawer is 500px (scaled ×0.8 by scale-admin-ui). */
+  formula: 'max-w-[25rem]',
+  /** Figma Coupon / Offer drawers are 512px. */
+  settings: 'max-w-[25.6rem]',
   /** Figma Order Details drawer is 420px. */
-  order: 'max-w-[26.25rem]',
+  order: 'max-w-[21rem]',
   /** Figma Patient Intelligence drawer is 480px. */
-  customer: 'max-w-[30rem]',
+  customer: 'max-w-[24rem]',
 } as const
 
 export function Drawer({
@@ -108,7 +110,7 @@ export function Drawer({
                 {description && (
                   <p
                     id={descriptionId}
-                    className="text-[10px] font-medium uppercase tracking-[0.14em] text-white/35"
+                    className="text-[8px] font-medium uppercase tracking-[0.14em] text-white/35"
                   >
                     {description}
                   </p>
@@ -124,7 +126,7 @@ export function Drawer({
                 )}
                 aria-label={t('actions.cancel')}
               >
-                <X size={18} aria-hidden />
+                <X size={14} aria-hidden />
               </button>
             </div>
 

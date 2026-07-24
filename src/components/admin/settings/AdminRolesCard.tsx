@@ -35,7 +35,7 @@ function AdminRow({
   const lockDisabled = locking || (isSelf && admin.active)
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-[13px]">
+    <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-[10.4px]">
       <button
         type="button"
         onClick={() => onEdit(admin.id)}
@@ -48,7 +48,7 @@ function AdminRow({
         <span
           className={cn(
             'inline-flex size-10 shrink-0 items-center justify-center rounded-full',
-            'text-[10px] font-bold text-white',
+            'text-[8px] font-bold text-white',
             AVATAR_COLORS[index % AVATAR_COLORS.length],
           )}
           aria-hidden
@@ -61,7 +61,7 @@ function AdminRow({
           </p>
           <p
             className={cn(
-              'truncate text-[10px] uppercase leading-[15px]',
+              'truncate text-[8px] uppercase leading-[12px]',
               admin.active ? 'text-[#a394ff]' : 'text-white/30',
             )}
           >
@@ -69,7 +69,7 @@ function AdminRow({
           </p>
           <StatusBadge
             tone={admin.active ? 'success' : 'neutral'}
-            className="mt-1 px-2 py-0.5 text-[9px] font-bold"
+            className="mt-1 px-2 py-0.5 text-[7.2px] font-bold"
           >
             {admin.active
               ? t('admin.settings.admins.active')
@@ -104,11 +104,11 @@ function AdminRow({
         }
       >
         {locking ? (
-          <Loader2 size={16} className="animate-spin" aria-hidden />
+          <Loader2 size={13} className="animate-spin" aria-hidden />
         ) : admin.active ? (
-          <Lock size={16} aria-hidden />
+          <Lock size={13} aria-hidden />
         ) : (
-          <LockOpen size={16} aria-hidden />
+          <LockOpen size={13} aria-hidden />
         )}
       </button>
     </div>
@@ -176,14 +176,15 @@ export function AdminRolesCard() {
   return (
     <>
       <GlassCard
-        padding="none"
-        className="rounded-[2rem] border border-white/10 bg-white/5 p-[33px]"
+        padding="lg"
+        strong
+        className="w-full rounded-[var(--admin-radius-2xl)]"
         aria-label={t('admin.settings.admins.aria')}
         aria-busy={loading || undefined}
       >
         <div className="mb-8 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Shield size={24} className="text-[#a394ff]" aria-hidden />
+            <Shield size={19} className="text-[#a394ff]" aria-hidden />
             <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">
               {t('admin.settings.admins.title')}
             </h3>
@@ -198,7 +199,7 @@ export function AdminRolesCard() {
             )}
             aria-label={t('admin.settings.admins.addAria')}
           >
-            <Plus size={16} aria-hidden />
+            <Plus size={13} aria-hidden />
           </button>
         </div>
 
@@ -213,8 +214,8 @@ export function AdminRolesCard() {
 
         {loading && admins.length === 0 ? (
           <div className="flex flex-col gap-4" aria-busy="true">
-            <Skeleton className="h-[66px] w-full rounded-2xl" />
-            <Skeleton className="h-[66px] w-full rounded-2xl" />
+            <Skeleton className="h-[52.8px] w-full rounded-2xl" />
+            <Skeleton className="h-[52.8px] w-full rounded-2xl" />
           </div>
         ) : null}
 

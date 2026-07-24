@@ -5,12 +5,7 @@ import { formatCount } from '../../../utils/adminCustomersFormat'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
 
-const TABS: readonly AdminCustomersSegmentTab[] = [
-  'all',
-  'vip',
-  'frequent',
-  'inactive',
-] as const
+const TABS: readonly AdminCustomersSegmentTab[] = ['all', 'inactive']
 
 interface CustomersSegmentTabsProps {
   active: AdminCustomersSegmentTab
@@ -44,10 +39,10 @@ export function CustomersSegmentTabs({
             disabled={disabled}
             onClick={() => onChange(tab)}
             className={cn(
-              'relative shrink-0 px-2 pb-[17.5px] text-sm transition-colors',
+              'relative shrink-0 px-2 pb-[14px] text-sm transition-colors',
               focusRingClasses,
               isActive
-                ? 'border-b-2 border-accent pb-[16.5px] font-semibold text-accent'
+                ? 'border-b-2 border-accent pb-[13.2px] font-semibold text-accent'
                 : 'font-medium text-white/40 hover:text-white/60',
               disabled && 'cursor-not-allowed opacity-60',
             )}
@@ -55,7 +50,7 @@ export function CustomersSegmentTabs({
             <span className="inline-flex items-end gap-2">
               <span>{t(`admin.customers.tabs.${tab}`)}</span>
               {isActive ? (
-                <span className="rounded-full bg-accent/20 px-1.5 py-px text-[10px] font-semibold leading-[14px] text-accent">
+                <span className="rounded-full bg-accent/20 px-1.5 py-px text-[8px] font-semibold leading-[11.2px] text-accent">
                   {formatCount(activeCount, i18n.language)}
                 </span>
               ) : null}

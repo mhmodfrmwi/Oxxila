@@ -9,7 +9,6 @@ import type {
   AdminCustomersSegmentTab,
 } from '../types/adminCustomers'
 import {
-  isUnsupportedCustomerSegment,
   mapApiCustomerToAdminRow,
   segmentTabToListParams,
 } from '../utils/adminCustomersFormat'
@@ -57,17 +56,6 @@ function isAbortError(error: unknown): boolean {
   )
 }
 
-function emptyPagination(limit: number): ApiPagination {
-  return {
-    currentPage: 1,
-    limit,
-    numberOfPages: 1,
-    totalDocuments: 0,
-    nextPage: null,
-    prevPage: null,
-  }
-}
-
 export function useAdminCustomers(options?: UseAdminCustomersOptions) {
   const [filters, setFilters] = useState<AdminCustomersFilters>(() =>
     normalizeFilters(options?.initialFilters),
@@ -88,8 +76,6 @@ export function useAdminCustomers(options?: UseAdminCustomersOptions) {
     }, SEARCH_DEBOUNCE_MS)
     return () => window.clearTimeout(handle)
   }, [filters.keyword])
-
-  const segmentUnsupported = isUnsupportedCustomerSegment(filters.segmentTab)
 
   const queryParams = useMemo<AdminCustomersListParams>(() => {
     const segment = segmentTabToListParams(filters.segmentTab)
@@ -113,16 +99,6 @@ export function useAdminCustomers(options?: UseAdminCustomersOptions) {
     const requestId = ++requestIdRef.current
 
     async function load() {
-      if (segmentUnsupported) {
-        setState({
-          customers: [],
-          pagination: emptyPagination(filters.limit),
-          loading: false,
-          error: null,
-        })
-        return
-      }
-
       setState((previous) => ({ ...previous, loading: true, error: null }))
       try {
         const response = await getAdminCustomers(queryParams, {
@@ -166,7 +142,7 @@ export function useAdminCustomers(options?: UseAdminCustomersOptions) {
     return () => {
       controller.abort()
     }
-  }, [filters.limit, filters.page, queryParams, reloadToken, segmentUnsupported])
+  }, [filters.limit, filters.page, queryParams, reloadToken])
 
   const setKeyword = useCallback((keyword: string) => {
     setFilters((previous) => ({ ...previous, keyword, page: 1 }))
@@ -202,7 +178,6 @@ export function useAdminCustomers(options?: UseAdminCustomersOptions) {
     filters,
     debouncedKeyword,
     hasActiveFilters,
-    segmentUnsupported,
     setKeyword,
     setSegmentTab,
     setPage,

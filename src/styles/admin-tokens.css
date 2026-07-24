@@ -1,10 +1,38 @@
 /**
  * Admin-scoped design tokens.
  * Applied only under `.admin-shell` so the storefront theme stays unchanged.
- * Overrides shared CSS variables that Tailwind maps via `@theme inline`.
+ *
+ * Visual scale: Figma dimensions × 0.8 so 100% browser zoom matches prior 80% zoom.
+ * Outer shell matches Settings Figma `937:21865` after scale (set from adminPageShell.ts).
  */
 
 .admin-shell {
+  /*
+   * Tailwind v4 theme inheritance — scales rem-based utilities (p-*, gap-*, text-*,
+   * rounded-*, size-*, etc.) without CSS zoom/transform.
+   */
+  --spacing: 0.2rem; /* default 0.25rem × 0.8 */
+
+  --text-xs: 0.6rem; /* 0.75 × 0.8 */
+  --text-sm: 0.7rem; /* 0.875 × 0.8 */
+  --text-base: 0.8rem; /* 1 × 0.8 */
+  --text-lg: 0.9rem; /* 1.125 × 0.8 */
+  --text-xl: 1rem; /* 1.25 × 0.8 */
+  --text-2xl: 1.2rem; /* 1.5 × 0.8 */
+  --text-3xl: 1.5rem; /* 1.875 × 0.8 */
+  --text-4xl: 1.8rem; /* 2.25 × 0.8 */
+
+  --container-sm: 19.2rem; /* 24 × 0.8 */
+  --container-md: 22.4rem; /* 28 × 0.8 */
+  --container-lg: 25.6rem; /* 32 × 0.8 */
+  --container-xl: 28.8rem; /* 36 × 0.8 */
+  --container-2xl: 33.6rem; /* 42 × 0.8 */
+  --container-3xl: 38.4rem; /* 48 × 0.8 */
+  --container-4xl: 44.8rem; /* 56 × 0.8 */
+  --container-5xl: 51.2rem; /* 64 × 0.8 */
+  --container-6xl: 57.6rem; /* 72 × 0.8 */
+  --container-7xl: 64rem; /* 80 × 0.8 */
+
   /* Surfaces — dark glass admin canvas */
   --background: #1a1c29;
   --card-background: rgb(255 255 255 / 0.05);
@@ -52,33 +80,49 @@
   --hover-primary-link: #c4b5fd;
   --primary-link-active: #8b5cf6;
 
-  /* Admin-only tokens */
+  /* Canonical Admin shell = Settings Figma 937:21865 × 0.8 */
   --admin-font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --admin-font-display: 'Playfair Display', Georgia, serif;
   --admin-font-brand: 'Poppins', 'Inter', ui-sans-serif, system-ui, sans-serif;
-  /* Figma Component 50 width ≈ 264px */
-  --admin-sidebar-width: 16.5rem;
-  /* Figma main pad / section rhythm ≈ 32px */
-  --admin-content-gap: 2rem;
-  --admin-content-padding: 2rem;
-  /* Figma header search ≈ 256×42 */
-  --admin-search-width: 16rem;
-  --admin-search-height: 2.625rem;
-  --admin-radius-sm: 0.75rem;
-  --admin-radius-md: 1rem;
-  --admin-radius-lg: 1.5rem;
-  --admin-radius-xl: 2.5rem;
+  /* Component 50 × 0.8 */
+  --admin-sidebar-width: 211.4286px;
+  /* Main.x × 0.8 */
+  --admin-main-offset: 204.8px;
+  --admin-content-gap: 1.6rem; /* 32px × 0.8 */
+  --admin-content-gap-tight: 1.6rem;
+  --admin-content-padding: 1.6rem;
+  --admin-page-title-size: 24px;
+  --admin-page-title-leading: 28.8px;
+  --admin-page-subtitle-size: 12.8px;
+  --admin-page-subtitle-leading: 19.2px;
+  --admin-title-subtitle-gap: 3.2px;
+  /* Search 256×42 / Orders 38 × 0.8 */
+  --admin-search-width: 12.8rem;
+  --admin-search-height: 2.1rem;
+  --admin-search-height-compact: 1.9rem;
+  /* Settings columns 1056 / 512 × 0.8 */
+  --admin-settings-main-width: 52.8rem;
+  --admin-rail-width: 25.6rem;
+  --admin-radius-sm: 0.6rem;
+  --admin-radius-md: 0.8rem;
+  --admin-radius-lg: 1.2rem;
+  --admin-radius-2xl: 1.6rem;
+  --admin-radius-xl: 2rem;
   --admin-glass-bg: rgb(255 255 255 / 0.05);
   --admin-glass-bg-strong: rgb(255 255 255 / 0.08);
   --admin-glass-border: rgb(255 255 255 / 0.1);
-  --admin-glass-blur: 12px;
+  --admin-glass-blur: 4.8px;
+  --admin-glass-blur-strong: 9.6px;
   --admin-glow: rgb(163 148 255 / 0.18);
-  /* Sidebar glass — matches Figma rgba(255,255,255,0.05) + blur 12 */
   --admin-sidebar-bg: rgb(255 255 255 / 0.05);
   --admin-nav-active-bg: rgb(163 148 255 / 0.1);
   --admin-nav-active-border: rgb(163 148 255 / 0.2);
 
-  /* Denser UI radii inside admin */
+  /* Shared card/input pads (Figma × 0.8) */
+  --admin-card-pad-md: 20px; /* 25 */
+  --admin-card-pad-lg: 26.4px; /* 33 */
+  --admin-kpi-min-height: 7.55rem; /* 9.4375 × 0.8 */
+
   --radius-card: var(--admin-radius-lg);
   --radius-input: var(--admin-radius-sm);
   --radius-button: var(--admin-radius-sm);
@@ -87,41 +131,39 @@
   background-color: var(--background);
   color: var(--primary-text);
   font-family: var(--admin-font-sans);
-  font-size: 0.9375rem;
+  font-size: 0.75rem; /* 0.9375rem × 0.8 */
   line-height: 1.5;
   color-scheme: dark;
-  /* Keep admin dark glass even when the storefront theme is light. */
   isolation: isolate;
 }
 
 .admin-shell .admin-page-title {
   font-family: var(--admin-font-display);
-  font-size: 2.25rem;
+  font-size: var(--admin-page-title-size);
   font-weight: 400;
-  line-height: 1.11;
+  line-height: var(--admin-page-title-leading);
   letter-spacing: -0.01em;
   color: var(--primary-text);
 }
 
 .admin-shell .admin-page-subtitle {
   font-family: var(--admin-font-sans);
-  font-size: 0.875rem;
-  line-height: 1.43;
+  font-size: var(--admin-page-subtitle-size);
+  line-height: var(--admin-page-subtitle-leading);
   color: rgb(255 255 255 / 0.4);
-  max-width: 36rem;
 }
 
 .admin-shell .admin-section-title {
   font-family: var(--admin-font-display);
-  font-size: 1.25rem;
+  font-size: 1rem; /* 1.25rem × 0.8 */
   font-weight: 400;
-  line-height: 1.4;
+  line-height: 1.4rem; /* 1.75rem × 0.8 */
   color: var(--primary-text);
 }
 
 .admin-shell .admin-label {
   font-family: var(--admin-font-sans);
-  font-size: 0.75rem;
+  font-size: 0.6rem; /* 0.75rem × 0.8 */
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -138,6 +180,6 @@
 @utility admin-glass-strong {
   background-color: var(--admin-glass-bg-strong);
   border: 1px solid var(--admin-glass-border);
-  backdrop-filter: blur(var(--admin-glass-blur));
-  -webkit-backdrop-filter: blur(var(--admin-glass-blur));
+  backdrop-filter: blur(var(--admin-glass-blur-strong));
+  -webkit-backdrop-filter: blur(var(--admin-glass-blur-strong));
 }

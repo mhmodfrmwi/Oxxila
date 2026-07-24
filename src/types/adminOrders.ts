@@ -16,14 +16,18 @@ export type AdminOrderStatus =
 /** Payment statuses from the Order model. */
 export type AdminPaymentStatus = 'pending' | 'paid' | 'refunded'
 
-/** Status tab keys that map to Figma Orders Management filters. */
+/** Status tab keys that map to Figma Orders Management filters (full contract list). */
 export type AdminOrdersStatusTab =
   | 'all'
   | 'pending'
   | 'processing'
   | 'shipped'
+  | 'out_for_delivery'
+  | 'failed_attempt'
   | 'delivered'
+  | 'partially_returned'
   | 'returned'
+  | 'cancelled'
 
 export interface AdminOrderUser {
   id: string
@@ -38,12 +42,16 @@ export interface AdminOrderRow {
   orderNumber: string
   createdAt: string
   customerName: string
+  customerEmail: string | null
   customerInitials: string
   totalPrice: number
-  paymentStatus: AdminPaymentStatus
-  paymentStatusLabel: string
   orderStatus: AdminOrderStatus
   orderStatusLabel: string
+  /** `shipment.carrierName` — null when no committed carrier yet (shows Assign button). */
+  carrierName: string | null
+  hasCommittedCarrier: boolean
+  /** `shipment.trackingNumber` / `providerStateLabel` / `tracking.trackingNumber`. */
+  trackingLabel: string | null
 }
 
 export interface ApiAdminOrderItem {
@@ -115,12 +123,15 @@ export interface ApiAdminOrder {
   updatedAt?: string
   tracking?: ApiAdminOrderTracking
   shipment?: {
+    carrier?: string | null
     carrierName?: string | null
     carrierCode?: string | null
     carrierType?: 'api' | 'known' | 'internal' | null
     trackingNumber?: string | null
+    externalDeliveryId?: string | null
     status?: string | null
     carrierStatusLabel?: string | null
+    providerStateLabel?: string | null
     driverName?: string | null
   } | null
 }
@@ -130,6 +141,7 @@ export interface AdminOrderDetail {
   id: string
   orderNumber: string
   createdAt: string
+  customerId: string | null
   customerName: string
   customerEmail: string | null
   customerPhone: string | null
@@ -146,6 +158,33 @@ export interface AdminOrderDetail {
   trackingSteps: ApiAdminOrderTrackingStep[]
   trackingNumber: string | null
   totalPrice: number
+  /** Carrier committed on the shipment (null when unassigned). */
+  carrierName: string | null
+  carrierType: 'api' | 'known' | 'internal' | null
+  hasAssignedCarrier: boolean
+  /** Fetched separately via GET /users/:id — nice-to-have, not always loaded. */
+  userOrdersCount?: number | null
+}
+
+/** POST /api/v1/orders/b2b line item. */
+export interface AdminB2BOrderItem {
+  productId: string
+  quantity: number
+  unitPrice?: number
+}
+
+/** POST /api/v1/orders/b2b request body. */
+export interface AdminB2BOrderPayload {
+  userId: string
+  items: AdminB2BOrderItem[]
+  addressId?: string
+  governorateId?: string
+  districtId?: string
+  addressLine?: string
+  couponCode?: string
+  freeShipping?: boolean
+  paymentMethod: 'cod'
+  markPaid?: boolean
 }
 
 export interface AdminOrdersListParams {

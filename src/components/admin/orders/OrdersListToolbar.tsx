@@ -38,7 +38,7 @@ export function OrdersListToolbar({
       <label className="relative block w-full sm:w-[var(--admin-search-width)]">
         <span className="sr-only">{t('admin.orders.searchLabel')}</span>
         <Search
-          size={18}
+          size={19}
           className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-white/45"
           aria-hidden
         />
@@ -48,14 +48,17 @@ export function OrdersListToolbar({
           disabled={disabled}
           onChange={(event) => onKeywordChange(event.target.value)}
           placeholder={t('admin.orders.searchPlaceholder')}
-          className={cn(fieldClass, 'h-[var(--admin-search-height)] w-full pe-5 ps-12')}
+          className={cn(
+            fieldClass,
+            'h-[var(--admin-search-height-compact)] w-full pe-5 ps-12',
+          )}
           autoComplete="off"
         />
       </label>
 
       <div className="flex flex-wrap items-center gap-2">
         <label className="flex items-center gap-2">
-          <span className="text-[10px] font-medium tracking-[0.08em] text-white/40 uppercase">
+          <span className="text-[8px] font-medium tracking-[0.08em] text-white/40 uppercase">
             {t('admin.orders.dateFrom')}
           </span>
           <input
@@ -68,7 +71,7 @@ export function OrdersListToolbar({
           />
         </label>
         <label className="flex items-center gap-2">
-          <span className="text-[10px] font-medium tracking-[0.08em] text-white/40 uppercase">
+          <span className="text-[8px] font-medium tracking-[0.08em] text-white/40 uppercase">
             {t('admin.orders.dateTo')}
           </span>
           <input

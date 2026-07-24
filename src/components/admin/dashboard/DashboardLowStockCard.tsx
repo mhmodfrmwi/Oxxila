@@ -19,16 +19,20 @@ export function DashboardLowStockCard({
   const { t } = useTranslation()
 
   return (
-    <GlassCard className="flex flex-col gap-6 rounded-[var(--admin-radius-lg)]">
-      <div className="flex items-center gap-2">
+    <GlassCard
+      strong
+      className="flex min-w-0 flex-1 flex-col gap-6 rounded-[var(--admin-radius-2xl)]"
+    >
+      {/* Figma: title Hug left, alert icon 24 Fixed right */}
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-[14.4px] leading-7 font-bold text-white">
+          {t('admin.dashboard.lowStock.title')}
+        </h2>
         <AlertTriangle
-          size={18}
+          size={19}
           className="shrink-0 text-support-error"
           aria-hidden
         />
-        <h2 className="text-lg font-bold text-primary-text">
-          {t('admin.dashboard.lowStock.title')}
-        </h2>
       </div>
 
       {loading ? (

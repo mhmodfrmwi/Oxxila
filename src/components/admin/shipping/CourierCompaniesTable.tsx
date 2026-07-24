@@ -1,5 +1,5 @@
 // src/components/admin/shipping/CourierCompaniesTable.tsx
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useMemo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { AdminCarrierRow } from '../../../types/adminShipping'
@@ -18,6 +18,10 @@ interface CourierCompaniesTableProps {
   emptyTitle: string
   emptyDescription?: string
   emptyAction?: ReactNode
+  deletingId?: string | null
+  onAdd: () => void
+  onEdit: (carrier: AdminCarrierRow) => void
+  onDelete: (carrier: AdminCarrierRow) => void
 }
 
 function CompanyCell({
@@ -32,7 +36,7 @@ function CompanyCell({
   const initials = carrierInitials(code !== '—' ? code : name).slice(0, 3)
 
   return (
-    <div className="flex min-w-[10rem] items-center gap-3">
+    <div className="flex min-w-[8rem] items-center gap-3">
       {logo ? (
         <img
           src={logo}
@@ -41,7 +45,7 @@ function CompanyCell({
         />
       ) : (
         <span
-          className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[10px] font-bold text-[#a394ff]"
+          className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[8px] font-bold text-[#a394ff]"
           aria-hidden
         >
           {initials}
@@ -60,6 +64,10 @@ export function CourierCompaniesTable({
   emptyTitle,
   emptyDescription,
   emptyAction,
+  deletingId = null,
+  onAdd,
+  onEdit,
+  onDelete,
 }: CourierCompaniesTableProps) {
   const { t } = useTranslation()
 
@@ -73,23 +81,30 @@ export function CourierCompaniesTable({
         ),
       },
       {
+        id: 'type',
+        header: t('admin.shipping.carriers.columns.type'),
+        headerClassName: 'text-center',
+        className: 'text-center',
+        cell: (row) => (
+          <StatusBadge
+            tone="accent"
+            className="border border-current/20 text-[7.2px] font-black tracking-tight"
+          >
+            {t(`admin.shipping.method.types.${row.type}.label`)}
+          </StatusBadge>
+        ),
+      },
+      {
         id: 'deliveryTime',
         header: t('admin.shipping.carriers.columns.deliveryTime'),
         headerClassName: 'text-center',
         className: 'text-center',
         cell: (row) => (
           <span className="text-sm text-white/60">
-            {row.deliveryDays ?? '—'}
+            {row.type === 'api'
+              ? t('admin.shipping.carriers.bosta')
+              : row.deliveryDays ?? '—'}
           </span>
-        ),
-      },
-      {
-        id: 'cost',
-        header: t('admin.shipping.carriers.columns.cost'),
-        headerClassName: 'text-center',
-        className: 'text-center',
-        cell: () => (
-          <span className="text-sm font-bold text-white">—</span>
         ),
       },
       {
@@ -114,7 +129,7 @@ export function CourierCompaniesTable({
         cell: (row) => (
           <StatusBadge
             tone={carrierStatusBadgeTone(row.isActive)}
-            className="border border-current/20 text-[9px] font-black tracking-tight"
+            className="border border-current/20 text-[7.2px] font-black tracking-tight"
           >
             {row.isActive
               ? t('admin.shipping.carriers.active')
@@ -131,35 +146,39 @@ export function CourierCompaniesTable({
           <div className="inline-flex items-center gap-1">
             <button
               type="button"
-              disabled
+              onClick={() => onEdit(row)}
               className={cn(
                 'inline-flex size-8 items-center justify-center rounded-lg',
-                'text-white/40 cursor-not-allowed opacity-50',
+                'text-white/50 transition-colors hover:bg-white/10 hover:text-white',
                 focusRingClasses,
               )}
               aria-label={t('admin.shipping.carriers.editAria', { name: row.name })}
-              title={t('admin.shipping.carriers.editSoon')}
             >
-              <Pencil size={16} aria-hidden />
+              <Pencil size={13} aria-hidden />
             </button>
             <button
               type="button"
-              disabled
+              disabled={deletingId === row.id}
+              onClick={() => onDelete(row)}
               className={cn(
                 'inline-flex size-8 items-center justify-center rounded-lg',
-                'text-white/40 cursor-not-allowed opacity-50',
+                'text-white/50 transition-colors hover:bg-support-error/10 hover:text-support-error',
+                'disabled:cursor-not-allowed disabled:opacity-50',
                 focusRingClasses,
               )}
               aria-label={t('admin.shipping.carriers.deleteAria', { name: row.name })}
-              title={t('admin.shipping.carriers.deleteSoon')}
             >
-              <Trash2 size={16} aria-hidden />
+              {deletingId === row.id ? (
+                <Loader2 size={13} className="animate-spin" aria-hidden />
+              ) : (
+                <Trash2 size={13} aria-hidden />
+              )}
             </button>
           </div>
         ),
       },
     ],
-    [t],
+    [deletingId, onDelete, onEdit, t],
   )
 
   return (
@@ -172,7 +191,7 @@ export function CourierCompaniesTable({
       emptyDescription={emptyDescription}
       emptyAction={emptyAction}
       aria-label={t('admin.shipping.carriers.tableAria')}
-      className="rounded-[2rem]"
+      className="rounded-[1.6rem]"
       toolbar={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">
@@ -180,17 +199,16 @@ export function CourierCompaniesTable({
           </h3>
           <button
             type="button"
-            disabled
+            onClick={onAdd}
             className={cn(
               'inline-flex items-center gap-2 rounded-xl border border-[#a394ff]/20',
               'bg-[rgba(163,148,255,0.1)] px-5 py-2.5',
               'text-xs font-bold uppercase tracking-[0.1em] text-[#a394ff]',
-              'cursor-not-allowed opacity-60',
+              'transition-colors hover:bg-[rgba(163,148,255,0.18)]',
               focusRingClasses,
             )}
-            title={t('admin.shipping.carriers.addSoon')}
           >
-            <Plus size={16} aria-hidden />
+            <Plus size={13} aria-hidden />
             {t('admin.shipping.carriers.addCompany')}
           </button>
         </div>

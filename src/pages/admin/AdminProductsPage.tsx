@@ -108,7 +108,7 @@ export function AdminProductsPage() {
             )}
             aria-label={t('admin.products.addFormula')}
           >
-            <Plus size={16} aria-hidden />
+            <Plus size={13} aria-hidden />
             {t('admin.products.addFormula')}
           </button>
         }
@@ -125,7 +125,7 @@ export function AdminProductsPage() {
           }
         />
       ) : (
-        <div className="space-y-6">
+        <div className="flex w-full min-w-0 flex-col gap-8">
           {staleError ? (
             <div
               role="alert"

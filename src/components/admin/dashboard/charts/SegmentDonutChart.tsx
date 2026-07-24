@@ -7,8 +7,8 @@ interface SegmentDonutChartProps {
   className?: string
 }
 
-const SIZE = 192
-const STROKE = 18
+const SIZE = 153.6 // 192 × 0.8
+const STROKE = 14.4 // 18 × 0.8
 const RADIUS = (SIZE - STROKE) / 2
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
@@ -55,7 +55,7 @@ export function SegmentDonutChart({
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <p className="text-3xl font-bold text-primary-text">{Math.round(clamped)}%</p>
-        <p className="text-[10px] tracking-[0.1em] text-secondary-text uppercase">
+        <p className="text-[8px] tracking-[0.1em] text-secondary-text uppercase">
           {centerLabel}
         </p>
       </div>

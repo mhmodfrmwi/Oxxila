@@ -1,23 +1,30 @@
 // src/pages/admin/AdminOrdersPage.tsx
+import { Plus } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
+import { B2BOrderDrawer } from '../../components/admin/orders/B2BOrderDrawer'
+import { CancelOrderDialog } from '../../components/admin/orders/CancelOrderDialog'
 import { OrderDetailsDrawer } from '../../components/admin/orders/OrderDetailsDrawer'
 import { OrdersCatalogTable } from '../../components/admin/orders/OrdersCatalogTable'
 import { OrdersListToolbar } from '../../components/admin/orders/OrdersListToolbar'
 import { OrdersStatusTabs } from '../../components/admin/orders/OrdersStatusTabs'
 import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { Button } from '../../components/ui/Button'
+import { focusRingClasses } from '../../components/ui/interactionStyles'
 import { useAdminOrders } from '../../hooks/useAdminOrders'
+import { cn } from '../../lib/cn'
+import type { AdminOrderRow } from '../../types/adminOrders'
 
 /**
- * Orders Management — list + read-only details drawer (Phase 3A/3B).
- * Figma: Orders Management `937:18568` / Order Details drawer `941:43893`.
+ * Orders Management — list + details drawer, Assign Carrier, B2B create, cancel.
  */
 export function AdminOrdersPage() {
   const { t } = useTranslation()
   const list = useAdminOrders()
   const [drawerOrderId, setDrawerOrderId] = useState<string | null>(null)
+  const [b2bDrawerOpen, setB2bDrawerOpen] = useState(false)
+  const [cancelTarget, setCancelTarget] = useState<AdminOrderRow | null>(null)
 
   const openDrawer = useCallback((orderId: string) => {
     setDrawerOrderId(orderId)
@@ -26,6 +33,25 @@ export function AdminOrdersPage() {
   const closeDrawer = useCallback(() => {
     setDrawerOrderId(null)
   }, [])
+
+  const openB2bDrawer = useCallback(() => setB2bDrawerOpen(true), [])
+  const closeB2bDrawer = useCallback(() => setB2bDrawerOpen(false), [])
+  const handleB2bCreated = useCallback(() => {
+    list.reload()
+  }, [list])
+
+  const handleCancelFromMenu = useCallback((order: AdminOrderRow) => {
+    setCancelTarget(order)
+  }, [])
+
+  const handleCancelClosed = useCallback(() => {
+    setCancelTarget(null)
+  }, [])
+
+  const handleCancelled = useCallback(() => {
+    setCancelTarget(null)
+    list.reload()
+  }, [list])
 
   const failed = Boolean(list.error) && !list.loading && list.orders.length === 0
   const staleError = Boolean(list.error) && list.orders.length > 0
@@ -49,15 +75,30 @@ export function AdminOrdersPage() {
         title={t('admin.orders.title')}
         subtitle={t('admin.orders.subtitle')}
         actions={
-          <OrdersListToolbar
-            keyword={list.filters.keyword}
-            dateFrom={list.filters.dateFrom}
-            dateTo={list.filters.dateTo}
-            onKeywordChange={list.setKeyword}
-            onDateFromChange={list.setDateFrom}
-            onDateToChange={list.setDateTo}
-            disabled={list.loading && list.orders.length === 0}
-          />
+          <>
+            <OrdersListToolbar
+              keyword={list.filters.keyword}
+              dateFrom={list.filters.dateFrom}
+              dateTo={list.filters.dateTo}
+              onKeywordChange={list.setKeyword}
+              onDateFromChange={list.setDateFrom}
+              onDateToChange={list.setDateTo}
+              disabled={list.loading && list.orders.length === 0}
+            />
+            <button
+              type="button"
+              onClick={openB2bDrawer}
+              className={cn(
+                'inline-flex shrink-0 items-center gap-2 rounded-2xl',
+                'bg-gradient-to-r from-[#a394ff] to-[#8274d6] px-4 py-2.5',
+                'text-sm font-bold text-white transition-opacity hover:opacity-90',
+                focusRingClasses,
+              )}
+            >
+              <Plus size={14} aria-hidden />
+              {t('admin.orders.addOrder')}
+            </button>
+          </>
         }
       />
 
@@ -107,6 +148,8 @@ export function AdminOrdersPage() {
             totalPages={totalPages}
             onPageChange={list.setPage}
             onOpenOrder={openDrawer}
+            onAssignOrder={openDrawer}
+            onCancelOrder={handleCancelFromMenu}
           />
         </>
       )}
@@ -115,6 +158,22 @@ export function AdminOrdersPage() {
         open={Boolean(drawerOrderId)}
         orderId={drawerOrderId}
         onClose={closeDrawer}
+        onOrderChanged={list.reload}
+      />
+
+      <B2BOrderDrawer
+        open={b2bDrawerOpen}
+        onClose={closeB2bDrawer}
+        onCreated={handleB2bCreated}
+      />
+
+      <CancelOrderDialog
+        key={cancelTarget?.id ?? 'table-cancel'}
+        open={Boolean(cancelTarget)}
+        orderId={cancelTarget?.id ?? null}
+        orderNumber={cancelTarget?.orderNumber ?? null}
+        onClose={handleCancelClosed}
+        onCancelled={handleCancelled}
       />
     </>
   )

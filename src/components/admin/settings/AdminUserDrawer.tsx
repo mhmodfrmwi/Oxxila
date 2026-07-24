@@ -25,7 +25,7 @@ interface AdminUserDrawerProps {
 }
 
 const fieldClass = cn(
-  'w-full rounded-xl border border-white/10 bg-white/5 px-[17px] py-[13px]',
+  'w-full rounded-xl border border-white/10 bg-white/5 px-[13.6px] py-[10.4px]',
   'text-sm text-white placeholder:text-white/40',
   'focus:outline-none focus:ring-2 focus:ring-accent/40',
   'disabled:cursor-not-allowed disabled:opacity-60',
@@ -92,7 +92,7 @@ export function AdminUserDrawer({
       >
         {drawer.submitting ? (
           <>
-            <Loader2 size={16} className="animate-spin" aria-hidden />
+            <Loader2 size={13} className="animate-spin" aria-hidden />
             {t('admin.settings.admins.drawer.saving')}
           </>
         ) : (
@@ -223,7 +223,7 @@ export function AdminUserDrawer({
                 <p className="text-sm font-semibold text-white">
                   {t('admin.settings.admins.drawer.active')}
                 </p>
-                <p className="text-[10px] text-white/40">
+                <p className="text-[8px] text-white/40">
                   {isSelf
                     ? 'You cannot disable your own account.'
                     : t('admin.settings.admins.drawer.activeHint')}

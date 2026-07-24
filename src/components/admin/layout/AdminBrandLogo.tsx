@@ -26,18 +26,18 @@ export function AdminBrandLogo({
     <div className={cn('flex flex-col gap-1', className)}>
       <Link
         to={ADMIN_PATH}
-        className={cn('inline-flex items-center gap-[4.615px]', focusRingClasses, 'rounded-sm')}
+        className={cn('inline-flex items-center gap-[3.692px]', focusRingClasses, 'rounded-sm')}
         aria-label={t('admin.brand.homeAria')}
       >
         <img
           src={logoMark}
           alt=""
-          width={25}
-          height={25}
-          className="h-[25.385px] w-[24.615px] shrink-0 object-contain"
+          width={20}
+          height={20}
+          className="h-[20.308px] w-[19.692px] shrink-0 object-contain"
           aria-hidden
         />
-        <span className="whitespace-nowrap font-[family-name:var(--admin-font-brand)] text-[32px] font-bold leading-[13.846px]">
+        <span className="whitespace-nowrap font-[family-name:var(--admin-font-brand)] text-[25.6px] font-bold leading-[11.077px]">
           <span className="text-[#9179d2]">O</span>
           <span className="text-[#c0b5de]">xxila</span>
         </span>

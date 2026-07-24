@@ -1,5 +1,6 @@
 // src/components/admin/layout/AdminNavIcon.tsx
 import { cn } from '../../../lib/cn'
+import { ADMIN_UI_SCALE } from '../config/adminPageShell'
 
 interface AdminNavIconProps {
   src: string
@@ -10,15 +11,17 @@ interface AdminNavIconProps {
 
 /**
  * Renders the exact SVG asset exported from Figma Component 50 as an <img>.
- * No CSS mask, no path rewriting, no icon library fallback.
+ * Display size is Figma × ADMIN_UI_SCALE (no CSS zoom/transform).
  */
 export function AdminNavIcon({ src, size, className }: AdminNavIconProps) {
+  const display = Math.round(size * ADMIN_UI_SCALE)
+
   return (
     <img
       src={src}
       alt=""
-      width={size}
-      height={size}
+      width={display}
+      height={display}
       className={cn('shrink-0 object-contain', className)}
       aria-hidden
     />

@@ -1,35 +1,42 @@
 // src/components/admin/customers/CustomersStatsRow.tsx
 import { useTranslation } from 'react-i18next'
+import type { AdminCustomerStats } from '../../../types/adminCustomers'
 import {
   formatCustomerCount,
+  formatCustomerMoney,
   formatUnavailableMetric,
 } from '../../../utils/adminCustomersFormat'
 import { Skeleton } from '../ui/Skeleton'
-import { StatCard } from '../ui/StatCard'
+import { StatCard, type StatTrendTone } from '../ui/StatCard'
 
 interface CustomersStatsRowProps {
-  totalCustomers: number | null
+  stats: AdminCustomerStats | null
   loading?: boolean
 }
 
+function trendTone(trend: number | null): StatTrendTone {
+  if (trend == null || trend === 0) return 'neutral'
+  return trend > 0 ? 'positive' : 'negative'
+}
+
 /**
- * Figma KPI row. Only Total Customers comes from the list pagination;
- * LTV / VIP / Retention have no admin endpoint — show em dash, no fake trends.
+ * Contract: only Total Customers + Average LTV from GET /users/stats.
  */
 export function CustomersStatsRow({
-  totalCustomers,
+  stats,
   loading = false,
 }: CustomersStatsRowProps) {
   const { t, i18n } = useTranslation()
+  const locale = i18n.language
   const unavailable = formatUnavailableMetric()
 
-  if (loading && totalCustomers == null) {
+  if (loading && !stats) {
     return (
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4 xl:gap-6">
-        {Array.from({ length: 4 }).map((_, index) => (
+      <div className="flex w-full flex-col gap-6 sm:flex-row sm:flex-wrap xl:flex-nowrap">
+        {Array.from({ length: 2 }).map((_, index) => (
           <div
             key={index}
-            className="admin-glass flex min-h-[7.8125rem] flex-col gap-3 rounded-[var(--admin-radius-lg)] p-6"
+            className="admin-glass-strong flex min-h-[6.25rem] min-w-0 flex-1 flex-col gap-3 rounded-[var(--admin-radius-lg)] p-[var(--admin-card-pad-md)] sm:basis-[calc(50%-0.6rem)] xl:basis-0"
             aria-hidden
           >
             <Skeleton className="h-3 w-28" />
@@ -42,32 +49,32 @@ export function CustomersStatsRow({
 
   return (
     <section
-      className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4 xl:gap-[1.5rem]"
+      className="flex w-full flex-col gap-6 sm:flex-row sm:flex-wrap xl:flex-nowrap"
       aria-label={t('admin.customers.statsAria')}
     >
       <StatCard
-        className="min-h-[7.8125rem]"
+        strong
+        className="min-h-[6.25rem] min-w-0 flex-1 sm:basis-[calc(50%-0.6rem)] xl:basis-0"
         label={t('admin.customers.stats.totalCustomers')}
         value={
-          totalCustomers == null
-            ? unavailable
-            : formatCustomerCount(totalCustomers, i18n.language)
+          stats
+            ? formatCustomerCount(stats.totalCustomers.value, locale)
+            : unavailable
         }
+        trend={stats?.totalCustomers.trendLabel ?? undefined}
+        trendTone={trendTone(stats?.totalCustomers.trend ?? null)}
       />
       <StatCard
-        className="min-h-[7.8125rem]"
+        strong
+        className="min-h-[6.25rem] min-w-0 flex-1 sm:basis-[calc(50%-0.6rem)] xl:basis-0"
         label={t('admin.customers.stats.averageLtv')}
-        value={unavailable}
-      />
-      <StatCard
-        className="min-h-[7.8125rem]"
-        label={t('admin.customers.stats.vipConcentration')}
-        value={unavailable}
-      />
-      <StatCard
-        className="min-h-[7.8125rem]"
-        label={t('admin.customers.stats.retentionRate')}
-        value={unavailable}
+        value={
+          stats
+            ? formatCustomerMoney(stats.averageLtv.value, locale)
+            : unavailable
+        }
+        trend={stats?.averageLtv.trendLabel ?? undefined}
+        trendTone={trendTone(stats?.averageLtv.trend ?? null)}
       />
     </section>
   )

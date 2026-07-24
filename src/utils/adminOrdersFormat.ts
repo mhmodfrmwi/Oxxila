@@ -99,20 +99,46 @@ export function statusTabToOrderStatus(
   return tab
 }
 
+/** Admin cancel is blocked for delivered/cancelled (matches backend). */
+export function canAdminCancelOrder(status: AdminOrderStatus): boolean {
+  return status !== 'delivered' && status !== 'cancelled'
+}
+
+/** Committed carrier means a real assignment exists, not just a draft shipment doc. */
+export function hasCommittedCarrier(order: ApiAdminOrder): boolean {
+  const shipment = order.shipment
+  if (!shipment?.carrier && !shipment?.carrierName) return false
+  if (shipment.carrierType === 'api') return Boolean(shipment.externalDeliveryId)
+  return Boolean(shipment.trackingNumber)
+}
+
+function resolveTrackingLabel(order: ApiAdminOrder): string | null {
+  return (
+    order.shipment?.trackingNumber?.trim() ||
+    order.shipment?.providerStateLabel?.trim() ||
+    order.shipment?.carrierStatusLabel?.trim() ||
+    order.tracking?.trackingNumber?.trim() ||
+    null
+  )
+}
+
 export function mapApiOrderToAdminRow(order: ApiAdminOrder): AdminOrderRow {
   const id = String(order._id)
   const customerName = resolveCustomerName(order)
+  const user = order.user && typeof order.user === 'object' ? order.user : null
   return {
     id,
     orderNumber: formatAdminOrderNumber(id),
     createdAt: order.createdAt,
     customerName,
+    customerEmail: user?.email?.trim() || null,
     customerInitials: customerInitials(customerName === '—' ? '' : customerName),
     totalPrice: order.totalPrice,
-    paymentStatus: order.paymentStatus,
-    paymentStatusLabel: order.paymentStatusLabel ?? order.paymentStatus,
     orderStatus: order.orderStatus,
     orderStatusLabel: order.orderStatusLabel ?? order.orderStatus,
+    carrierName: order.shipment?.carrierName?.trim() || null,
+    hasCommittedCarrier: hasCommittedCarrier(order),
+    trackingLabel: resolveTrackingLabel(order),
   }
 }
 
@@ -164,6 +190,7 @@ export function mapApiOrderToAdminDetail(order: ApiAdminOrder): AdminOrderDetail
     id,
     orderNumber: formatAdminOrderNumber(id),
     createdAt: order.createdAt,
+    customerId: user?._id ?? user?.id ?? null,
     customerName,
     customerEmail: user?.email?.trim() || null,
     customerPhone: user?.phone?.trim() || null,
@@ -181,6 +208,9 @@ export function mapApiOrderToAdminDetail(order: ApiAdminOrder): AdminOrderDetail
     trackingNumber:
       order.tracking?.trackingNumber ?? order.shipment?.trackingNumber ?? null,
     totalPrice: order.totalPrice,
+    carrierName: order.shipment?.carrierName?.trim() || null,
+    carrierType: order.shipment?.carrierType ?? null,
+    hasAssignedCarrier: hasCommittedCarrier(order),
   }
 }
 

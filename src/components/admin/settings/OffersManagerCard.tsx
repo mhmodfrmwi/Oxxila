@@ -130,7 +130,7 @@ export function OffersManagerCard() {
               name: row.productName,
             })}
           >
-            <Pencil size={16} aria-hidden />
+            <Pencil size={13} aria-hidden />
           </button>
         ),
       },
@@ -150,7 +150,7 @@ export function OffersManagerCard() {
       <EmptyState
         title={t('admin.settings.offers.loadErrorTitle')}
         description={error ?? t('admin.settings.loadErrorTitle')}
-        className="rounded-[2.5rem]"
+        className="rounded-[2rem]"
         action={
           <Button type="button" variant="outline" onClick={reload}>
             {t('admin.settings.retry')}
@@ -184,7 +184,7 @@ export function OffersManagerCard() {
           </Button>
         }
         aria-label={t('admin.settings.offers.aria')}
-        className="rounded-[2.5rem]"
+        className="rounded-[2rem]"
         toolbar={
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">

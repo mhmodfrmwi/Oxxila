@@ -9,6 +9,7 @@ interface AdminPageHeaderProps {
   className?: string
 }
 
+/** Settings shell Header: Fixed 1600×64, title/subtitle gap 4, items-center. */
 export function AdminPageHeader({
   title,
   subtitle,
@@ -18,16 +19,16 @@ export function AdminPageHeader({
   return (
     <header
       className={cn(
-        'flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between',
+        'flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between',
         className,
       )}
     >
-      <div className="min-w-0 space-y-1">
+      <div className="flex min-w-0 shrink flex-col gap-[var(--admin-title-subtitle-gap)]">
         <h1 className="admin-page-title">{title}</h1>
         {subtitle && <p className="admin-page-subtitle">{subtitle}</p>}
       </div>
       {actions && (
-        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
+        <div className="flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
           {actions}
         </div>
       )}

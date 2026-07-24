@@ -33,14 +33,14 @@ function ProtocolRow({
       {carrier.isActive ? (
         <StatusBadge
           tone="accent"
-          className="shrink-0 bg-[rgba(163,148,255,0.1)] px-2 py-0.5 text-[10px] font-bold text-[#a394ff]"
+          className="shrink-0 bg-[rgba(163,148,255,0.1)] px-2 py-0.5 text-[8px] font-bold text-[#a394ff]"
         >
           {t('admin.settings.shipping.active')}
         </StatusBadge>
       ) : (
         <StatusBadge
           tone="neutral"
-          className="shrink-0 bg-white/5 px-2 py-0.5 text-[10px] font-bold text-white/20"
+          className="shrink-0 bg-white/5 px-2 py-0.5 text-[8px] font-bold text-white/20"
         >
           {t('admin.settings.shipping.disabled')}
         </StatusBadge>
@@ -63,13 +63,14 @@ export function ShippingLogisticsCard() {
 
   return (
     <GlassCard
-      padding="none"
-      className="rounded-[2rem] border border-white/10 bg-white/5 p-[33px]"
+      padding="lg"
+      strong
+      className="w-full rounded-[var(--admin-radius-2xl)]"
       aria-label={t('admin.settings.shipping.aria')}
       aria-busy={loading || undefined}
     >
       <div className="mb-8 flex items-center gap-3">
-        <Truck size={24} className="text-[#a394ff]" aria-hidden />
+        <Truck size={19} className="text-[#a394ff]" aria-hidden />
         <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">
           {t('admin.settings.shipping.title')}
         </h3>
@@ -99,7 +100,7 @@ export function ShippingLogisticsCard() {
       ) : (
         <div className="grid gap-8 md:grid-cols-2 md:gap-8">
           <div className="flex flex-col gap-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-white/40">
+            <p className="text-[8px] font-semibold uppercase tracking-[0.1em] text-white/40">
               {t('admin.settings.shipping.hubs')}
             </p>
             <div
@@ -116,7 +117,7 @@ export function ShippingLogisticsCard() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-white/40">
+            <p className="text-[8px] font-semibold uppercase tracking-[0.1em] text-white/40">
               {t('admin.settings.shipping.protocols')}
             </p>
 

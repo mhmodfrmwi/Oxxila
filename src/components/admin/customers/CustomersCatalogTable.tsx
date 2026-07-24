@@ -38,7 +38,7 @@ function CustomerNameCell({
   initials: string
 }) {
   return (
-    <div className="flex min-w-[12rem] items-center gap-4">
+    <div className="flex min-w-[9.6rem] items-center gap-4">
       {avatar ? (
         <img
           src={avatar}
@@ -47,7 +47,7 @@ function CustomerNameCell({
         />
       ) : (
         <span
-          className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[rgba(163,148,255,0.2)] text-[11px] font-bold text-[#a394ff]"
+          className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[rgba(163,148,255,0.2)] text-[8.8px] font-bold text-[#a394ff]"
           aria-hidden
         >
           {initials}
@@ -57,7 +57,7 @@ function CustomerNameCell({
         <p className="truncate text-sm font-semibold leading-5 text-white" title={name}>
           {name}
         </p>
-        <p className="truncate text-[10px] leading-3 text-white/40" title={email}>
+        <p className="truncate text-[8px] leading-3 text-white/40" title={email}>
           {email}
         </p>
       </div>
@@ -108,23 +108,23 @@ export function CustomersCatalogTable({
         ),
       },
       {
-        id: 'ltv',
+        id: 'totalPaid',
         header: t('admin.customers.columns.ltv'),
         cell: (row) => (
           <span className="text-sm font-medium text-white">
-            {row.ltv == null
+            {row.totalSpend == null
               ? unavailable
-              : formatCustomerMoney(row.ltv, locale)}
+              : formatCustomerMoney(row.totalSpend, locale)}
           </span>
         ),
       },
       {
-        id: 'lastVisit',
+        id: 'lastOrder',
         header: t('admin.customers.columns.lastVisit'),
         cell: (row) =>
-          row.lastVisitAt ? (
-            <time dateTime={row.lastVisitAt} className="text-sm text-white/60">
-              {formatCustomerDate(row.lastVisitAt, locale)}
+          row.lastOrderAt ? (
+            <time dateTime={row.lastOrderAt} className="text-sm text-white/60">
+              {formatCustomerDate(row.lastOrderAt, locale)}
             </time>
           ) : (
             <span className="text-sm text-white/40">{unavailable}</span>
@@ -147,7 +147,7 @@ export function CustomersCatalogTable({
             )}
             aria-label={t('admin.customers.actionAria', { name: row.name })}
           >
-            <ChevronRight size={16} aria-hidden />
+            <ChevronRight size={13} aria-hidden />
           </button>
         ),
       },
@@ -168,11 +168,11 @@ export function CustomersCatalogTable({
       emptyDescription={emptyDescription}
       emptyAction={emptyAction}
       aria-label={t('admin.customers.tableAria')}
-      className="rounded-[2rem]"
+      className="rounded-[1.6rem]"
       footer={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p
-            className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/30"
+            className="text-[8px] font-bold uppercase tracking-[0.08em] text-white/30"
             aria-live="polite"
           >
             {t('admin.customers.showing', {

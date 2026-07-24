@@ -183,7 +183,7 @@ export function FormulaSpecsDrawer({
             >
               {drawer.submitting ? (
                 <span className="inline-flex items-center gap-2">
-                  <Loader2 size={14} className="animate-spin" aria-hidden />
+                  <Loader2 size={11} className="animate-spin" aria-hidden />
                   {t('admin.products.formula.saving')}
                 </span>
               ) : (
@@ -222,7 +222,7 @@ export function FormulaSpecsDrawer({
           >
             {/* Visual Identity Gallery */}
             <section className="space-y-3">
-              <h3 className="admin-label text-[10px] tracking-[0.2em] text-white/30">
+              <h3 className="admin-label text-[8px] tracking-[0.2em] text-white/30">
                 {t('admin.products.formula.gallery')}
               </h3>
               <div className="grid grid-cols-3 gap-3">
@@ -241,7 +241,7 @@ export function FormulaSpecsDrawer({
                       aria-label={t('admin.products.formula.removeImage')}
                       onClick={() => drawer.removeExistingImage(url)}
                     >
-                      <X size={12} aria-hidden />
+                      <X size={10} aria-hidden />
                     </button>
                   </div>
                 ))}
@@ -260,7 +260,7 @@ export function FormulaSpecsDrawer({
                       aria-label={t('admin.products.formula.removeImage')}
                       onClick={() => drawer.removeNewImage(index)}
                     >
-                      <X size={12} aria-hidden />
+                      <X size={10} aria-hidden />
                     </button>
                   </div>
                 ))}
@@ -269,12 +269,12 @@ export function FormulaSpecsDrawer({
                     className={cn(
                       'flex aspect-square cursor-pointer flex-col items-center justify-center gap-2',
                       'rounded-2xl border border-dashed border-white/20 bg-white/[0.03]',
-                      'text-center text-[10px] font-bold uppercase tracking-[0.12em] text-white/45',
+                      'text-center text-[8px] font-bold uppercase tracking-[0.12em] text-white/45',
                       'hover:bg-white/[0.06]',
                       focusRingClasses,
                     )}
                   >
-                    <ImagePlus size={20} aria-hidden />
+                    <ImagePlus size={16} aria-hidden />
                     {t('admin.products.formula.uploadAsset')}
                     <input
                       type="file"
@@ -340,7 +340,7 @@ export function FormulaSpecsDrawer({
 
             {/* Clinical configuration */}
             <section className="space-y-4">
-              <h3 className="admin-label text-[10px] tracking-[0.2em] text-white/30">
+              <h3 className="admin-label text-[8px] tracking-[0.2em] text-white/30">
                 {t('admin.products.formula.clinical')}
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -490,7 +490,7 @@ export function FormulaSpecsDrawer({
                   maxLength={2000}
                   className={cn(
                     fieldClass,
-                    'min-h-[5rem] resize-y',
+                    'min-h-[4rem] resize-y',
                     drawer.errors[field] && 'border-support-error',
                   )}
                   placeholder={t(`admin.products.formula.${placeholderKey}`)}
@@ -525,7 +525,7 @@ export function FormulaSpecsDrawer({
                     aria-label={t('admin.products.formula.removeCatalog')}
                     onClick={drawer.clearCatalog}
                   >
-                    <Trash2 size={16} aria-hidden />
+                    <Trash2 size={13} aria-hidden />
                   </button>
                 </div>
               ) : null}
@@ -540,20 +540,20 @@ export function FormulaSpecsDrawer({
                     aria-label={t('admin.products.formula.removeCatalog')}
                     onClick={() => drawer.setCatalog(null)}
                   >
-                    <Trash2 size={16} aria-hidden />
+                    <Trash2 size={13} aria-hidden />
                   </button>
                 </div>
               ) : (
                 <label
                   className={cn(
-                    'flex min-h-[5.5rem] cursor-pointer flex-col items-center justify-center gap-2',
+                    'flex min-h-[4.4rem] cursor-pointer flex-col items-center justify-center gap-2',
                     'rounded-2xl border border-dashed border-white/20 bg-white/[0.03]',
-                    'text-[10px] font-bold uppercase tracking-[0.12em] text-white/45',
+                    'text-[8px] font-bold uppercase tracking-[0.12em] text-white/45',
                     'hover:bg-white/[0.06]',
                     focusRingClasses,
                   )}
                 >
-                  <Upload size={18} aria-hidden />
+                  <Upload size={14} aria-hidden />
                   {t('admin.products.formula.uploadFile')}
                   <input
                     type="file"
@@ -625,7 +625,7 @@ export function FormulaSpecsDrawer({
             >
               {drawer.archiving ? (
                 <span className="inline-flex items-center gap-2">
-                  <Loader2 size={14} className="animate-spin" aria-hidden />
+                  <Loader2 size={11} className="animate-spin" aria-hidden />
                   {t('admin.products.formula.archiving')}
                 </span>
               ) : (

@@ -25,9 +25,12 @@ export function DashboardTopProductsCard({
   const locale = i18n.language
 
   return (
-    <GlassCard className="flex flex-col gap-6 rounded-[var(--admin-radius-lg)]">
+    <GlassCard
+      strong
+      className="flex min-w-0 flex-1 flex-col gap-6 rounded-[var(--admin-radius-2xl)]"
+    >
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-primary-text">
+        <h2 className="text-[14.4px] leading-7 font-bold text-white">
           {t('admin.dashboard.topProducts.title')}
         </h2>
         <Link
@@ -60,7 +63,7 @@ export function DashboardTopProductsCard({
         <ul className="space-y-4">
           {products.map((product) => (
             <li key={product.id} className="flex items-center gap-4">
-              <div className="admin-glass flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl p-2">
+              <div className="admin-glass flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl p-[7.2px]">
                 <img
                   src={resolveProductImageUrl(product.image)}
                   alt=""

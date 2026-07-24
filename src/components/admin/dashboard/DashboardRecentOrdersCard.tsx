@@ -27,9 +27,12 @@ export function DashboardRecentOrdersCard({
   const locale = i18n.language
 
   return (
-    <GlassCard className="flex flex-col gap-6 rounded-[var(--admin-radius-lg)]">
+    <GlassCard
+      strong
+      className="flex min-w-0 flex-1 flex-col gap-6 rounded-[var(--admin-radius-2xl)]"
+    >
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-primary-text">
+        <h2 className="text-[14.4px] leading-7 font-bold text-white">
           {t('admin.dashboard.recentOrders.title')}
         </h2>
         <Link
@@ -80,7 +83,7 @@ export function DashboardRecentOrdersCard({
               <StatusBadge tone={orderStatusTone(order.status)}>
                 {order.status}
               </StatusBadge>
-              <p className="min-w-[4.5rem] text-end text-sm font-semibold tabular-nums text-accent">
+              <p className="min-w-[3.6rem] text-end text-sm font-semibold tabular-nums text-accent">
                 {formatDashboardMoney(order.totalAmount, locale)}
               </p>
             </li>

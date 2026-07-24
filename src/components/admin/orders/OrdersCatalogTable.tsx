@@ -1,5 +1,5 @@
 // src/components/admin/orders/OrdersCatalogTable.tsx
-import { MoreHorizontal } from 'lucide-react'
+import { Truck } from 'lucide-react'
 import { useMemo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { AdminOrderRow } from '../../../types/adminOrders'
@@ -7,12 +7,12 @@ import {
   formatAdminOrderDate,
   formatAdminOrderMoney,
   orderStatusBadgeTone,
-  paymentStatusBadgeTone,
 } from '../../../utils/adminOrdersFormat'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { DataTable, type DataTableColumn } from '../ui/DataTable'
 import { StatusBadge } from '../ui/StatusBadge'
+import { OrderRowActionsMenu } from './OrderRowActionsMenu'
 
 interface OrdersCatalogTableProps {
   orders: readonly AdminOrderRow[]
@@ -26,26 +26,41 @@ interface OrdersCatalogTableProps {
   totalPages: number
   onPageChange: (page: number) => void
   onOpenOrder?: (orderId: string) => void
+  /** Opens the order drawer focused on the Assign panel. */
+  onAssignOrder?: (orderId: string) => void
+  onCancelOrder?: (order: AdminOrderRow) => void
 }
 
 function CustomerCell({
   name,
+  email,
   initials,
 }: {
   name: string
+  email: string | null
   initials: string
 }) {
   return (
-    <div className="flex min-w-[10rem] items-center gap-3">
+    <div className="flex min-w-[8rem] items-center gap-3">
       <span
-        className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[rgb(97_95_255_/_0.2)] text-[10px] font-bold text-[#a3b3ff]"
+        className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[rgb(97_95_255_/_0.2)] text-[8px] font-bold text-[#a3b3ff]"
         aria-hidden
       >
         {initials}
       </span>
-      <span className="truncate text-sm font-medium text-[#e2e2e2]" title={name}>
-        {name}
-      </span>
+      <div className="min-w-0 flex flex-col">
+        <span className="truncate text-sm font-medium text-[#e2e2e2]" title={name}>
+          {name}
+        </span>
+        {email ? (
+          <span
+            className="truncate text-xs leading-5 text-white/45"
+            title={email}
+          >
+            {email}
+          </span>
+        ) : null}
+      </div>
     </div>
   )
 }
@@ -62,6 +77,8 @@ export function OrdersCatalogTable({
   totalPages,
   onPageChange,
   onOpenOrder,
+  onAssignOrder,
+  onCancelOrder,
 }: OrdersCatalogTableProps) {
   const { t, i18n } = useTranslation()
   const locale = i18n.language
@@ -93,23 +110,46 @@ export function OrdersCatalogTable({
         id: 'customer',
         header: t('admin.orders.columns.customer'),
         cell: (row) => (
-          <CustomerCell name={row.customerName} initials={row.customerInitials} />
+          <CustomerCell
+            name={row.customerName}
+            email={row.customerEmail}
+            initials={row.customerInitials}
+          />
         ),
       },
       {
-        id: 'payment',
-        header: t('admin.orders.columns.paymentStatus'),
-        headerClassName: 'text-center',
-        className: 'text-center',
+        id: 'carrier',
+        header: t('admin.orders.columns.carrier'),
+        cell: (row) =>
+          row.hasCommittedCarrier && row.carrierName ? (
+            <span className="inline-flex items-center gap-1.5 text-sm text-white/80">
+              <Truck size={13} className="text-[#a394ff]" aria-hidden />
+              {row.carrierName}
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onAssignOrder?.(row.id)}
+              aria-label={t('admin.orders.carrierCell.assignAria', {
+                id: row.orderNumber,
+              })}
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-full border border-[#a394ff]/30 bg-[rgba(163,148,255,0.1)]',
+                'px-3 py-1 text-xs font-semibold text-[#a394ff] transition-colors hover:bg-[rgba(163,148,255,0.18)]',
+                focusRingClasses,
+              )}
+            >
+              {t('admin.orders.carrierCell.assign')}
+            </button>
+          ),
+      },
+      {
+        id: 'tracking',
+        header: t('admin.orders.columns.tracking'),
         cell: (row) => (
-          <StatusBadge
-            tone={paymentStatusBadgeTone(row.paymentStatus)}
-            className="border border-current/20 text-[10px] font-bold tracking-[0.05em]"
-          >
-            {t(`admin.orders.paymentStatus.${row.paymentStatus}`, {
-              defaultValue: row.paymentStatusLabel,
-            })}
-          </StatusBadge>
+          <span className="truncate text-sm text-white/60">
+            {row.trackingLabel ?? t('admin.orders.carrierCell.unassigned')}
+          </span>
         ),
       },
       {
@@ -121,7 +161,7 @@ export function OrdersCatalogTable({
           <StatusBadge
             tone={orderStatusBadgeTone(row.orderStatus)}
             className={cn(
-              'border border-current/20 text-[10px] font-bold tracking-[0.05em]',
+              'border border-current/20 text-[8px] font-bold tracking-[0.05em]',
               row.orderStatus === 'delivered' &&
                 'shadow-[0_0_10px_0_rgba(52,211,153,0.1)]',
             )}
@@ -154,22 +194,15 @@ export function OrdersCatalogTable({
         headerClassName: 'text-center',
         className: 'text-center',
         cell: (row) => (
-          <button
-            type="button"
-            onClick={() => onOpenOrder?.(row.id)}
-            className={cn(
-              'inline-flex rounded-lg p-2 text-white/70',
-              'transition-colors hover:bg-white/10 hover:text-white',
-              focusRingClasses,
-            )}
-            aria-label={t('admin.orders.actionAria', { id: row.orderNumber })}
-          >
-            <MoreHorizontal size={24} aria-hidden />
-          </button>
+          <OrderRowActionsMenu
+            order={row}
+            onOpenOrder={(orderId) => onOpenOrder?.(orderId)}
+            onCancelOrder={(order) => onCancelOrder?.(order)}
+          />
         ),
       },
     ],
-    [locale, onOpenOrder, t],
+    [locale, onOpenOrder, onAssignOrder, onCancelOrder, t],
   )
 
   const canGoPrev = currentPage > 1
@@ -185,11 +218,11 @@ export function OrdersCatalogTable({
       emptyDescription={emptyDescription}
       emptyAction={emptyAction}
       aria-label={t('admin.orders.tableAria')}
-      className="rounded-[2rem]"
+      className="rounded-[1.6rem]"
       footer={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p
-            className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/30"
+            className="text-[8px] font-bold uppercase tracking-[0.08em] text-white/30"
             aria-live="polite"
           >
             {t('admin.orders.showing', {

@@ -3,6 +3,7 @@ import { apiRequest } from '../../lib/api'
 import type {
   AdminCustomersListParams,
   ApiAdminCustomer,
+  ApiAdminCustomerStats,
 } from '../../types/adminCustomers'
 
 function toQuery(params: AdminCustomersListParams): string {
@@ -23,6 +24,15 @@ function toQuery(params: AdminCustomersListParams): string {
   }
   const query = search.toString()
   return query ? `?${query}` : ''
+}
+
+/** GET /api/v1/users/stats — Total Customers + Average LTV. */
+export function getAdminCustomerStats(options?: { signal?: AbortSignal }) {
+  return apiRequest<ApiAdminCustomerStats>('/users/stats', {
+    method: 'GET',
+    auth: true,
+    signal: options?.signal,
+  })
 }
 
 /** GET /api/v1/users — admin users/customers list. */

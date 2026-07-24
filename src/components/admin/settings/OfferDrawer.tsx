@@ -23,7 +23,7 @@ interface OfferDrawerProps {
 }
 
 const fieldClass = cn(
-  'w-full rounded-xl border border-white/10 bg-white/5 px-[17px] py-[13px]',
+  'w-full rounded-xl border border-white/10 bg-white/5 px-[13.6px] py-[10.4px]',
   'text-sm text-white placeholder:text-white/40',
   'focus:outline-none focus:ring-2 focus:ring-accent/40',
   'disabled:cursor-not-allowed disabled:opacity-60',
@@ -90,7 +90,7 @@ export function OfferDrawer({
       >
         {drawer.submitting ? (
           <>
-            <Loader2 size={16} className="animate-spin" aria-hidden />
+            <Loader2 size={13} className="animate-spin" aria-hidden />
             {t('admin.settings.offers.drawer.saving')}
           </>
         ) : (
@@ -105,7 +105,7 @@ export function OfferDrawer({
       title={title}
       description={t('admin.settings.offers.drawer.subtitle')}
       onClose={handleClose}
-      width="formula"
+      width="settings"
       footer={footer}
     >
       {drawer.loading ? (
@@ -275,7 +275,7 @@ export function OfferDrawer({
                 <p className="text-sm font-semibold text-white">
                   {t('admin.settings.offers.drawer.active')}
                 </p>
-                <p className="text-[10px] text-white/40">
+                <p className="text-[8px] text-white/40">
                   {t('admin.settings.offers.drawer.activeHint')}
                 </p>
               </div>

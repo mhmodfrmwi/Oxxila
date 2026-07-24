@@ -23,11 +23,11 @@ export function DashboardKpiGrid({ kpis, loading = false }: DashboardKpiGridProp
 
   if (loading || !kpis) {
     return (
-      <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="flex w-full flex-col gap-6 sm:flex-row sm:flex-wrap xl:flex-nowrap">
         {Array.from({ length: 4 }).map((_, index) => (
           <div
             key={index}
-            className="admin-glass flex min-h-[9.5rem] flex-col gap-3 rounded-[var(--admin-radius-lg)] p-6"
+            className="admin-glass flex min-h-[var(--admin-kpi-min-height)] min-w-0 flex-1 flex-col gap-3 rounded-[var(--admin-radius-lg)] p-[var(--admin-card-pad-md)] sm:basis-[calc(50%-0.6rem)] xl:basis-0"
             aria-hidden
           >
             <Skeleton className="h-3 w-24" />
@@ -41,28 +41,32 @@ export function DashboardKpiGrid({ kpis, loading = false }: DashboardKpiGridProp
 
   return (
     <section
-      className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4"
+      className="flex w-full flex-col gap-6 sm:flex-row sm:flex-wrap xl:flex-nowrap"
       aria-label={t('admin.dashboard.kpis.ariaLabel')}
     >
       <StatCard
+        className="min-w-0 flex-1 sm:basis-[calc(50%-0.6rem)] xl:basis-0"
         label={t('admin.dashboard.kpis.totalRevenue')}
         value={formatDashboardMoney(kpis.totalRevenue.value, locale)}
         trend={formatTrendLabel(kpis.totalRevenue.trend, locale)}
         trendTone={trendTone(kpis.totalRevenue.trend)}
       />
       <StatCard
+        className="min-w-0 flex-1 sm:basis-[calc(50%-0.6rem)] xl:basis-0"
         label={t('admin.dashboard.kpis.orders')}
         value={formatDashboardNumber(kpis.orders.value, locale)}
         trend={formatTrendLabel(kpis.orders.trend, locale)}
         trendTone={trendTone(kpis.orders.trend)}
       />
       <StatCard
+        className="min-w-0 flex-1 sm:basis-[calc(50%-0.6rem)] xl:basis-0"
         label={t('admin.dashboard.kpis.conversionRate')}
         value={formatDashboardPercent(kpis.conversionRate.value, locale)}
         trend={formatTrendLabel(kpis.conversionRate.trend, locale)}
         trendTone={trendTone(kpis.conversionRate.trend)}
       />
       <StatCard
+        className="min-w-0 flex-1 sm:basis-[calc(50%-0.6rem)] xl:basis-0"
         label={t('admin.dashboard.kpis.abandonedCart')}
         value={formatDashboardPercent(kpis.abandonedCart.value, locale)}
         trend={formatTrendLabel(kpis.abandonedCart.trend, locale)}

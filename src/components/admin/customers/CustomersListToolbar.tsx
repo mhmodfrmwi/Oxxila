@@ -21,7 +21,7 @@ export function CustomersListToolbar({
     <label className="relative block w-full sm:w-[var(--admin-search-width)]">
       <span className="sr-only">{t('admin.customers.searchLabel')}</span>
       <Search
-        size={18}
+        size={19}
         className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-white/45"
         aria-hidden
       />

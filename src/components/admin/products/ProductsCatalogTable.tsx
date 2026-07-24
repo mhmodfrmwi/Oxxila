@@ -42,16 +42,16 @@ function ProductThumbnail({ src, name }: { src: string | null; name: string }) {
         <img
           src={src!}
           alt=""
-          className="size-full rounded-[0.7rem] object-cover"
+          className="size-full rounded-[0.56rem] object-cover"
           onError={() => setFailed(true)}
         />
       ) : (
         <div
-          className="flex size-full items-center justify-center rounded-[0.7rem] bg-white/5 text-white/25"
+          className="flex size-full items-center justify-center rounded-[0.56rem] bg-white/5 text-white/25"
           aria-hidden
           title={name}
         >
-          <ImageOff size={18} strokeWidth={1.5} />
+          <ImageOff size={14} strokeWidth={1.5} />
         </div>
       )}
     </div>
@@ -80,7 +80,7 @@ export function ProductsCatalogTable({
         id: 'details',
         header: t('admin.products.columns.details'),
         cell: (row) => (
-          <div className="flex min-w-[14rem] max-w-[22rem] items-center gap-4">
+          <div className="flex min-w-[11.2rem] max-w-[17.6rem] items-center gap-4">
             <ProductThumbnail src={row.image} name={row.name} />
             <div className="min-w-0">
               <p
@@ -89,7 +89,7 @@ export function ProductsCatalogTable({
               >
                 {row.name}
               </p>
-              <p className="mt-0.5 text-[10px] uppercase tracking-[0.08em] text-white/30">
+              <p className="mt-0.5 text-[8px] uppercase tracking-[0.08em] text-white/30">
                 {row.sku
                   ? t('admin.products.sku', { sku: row.sku })
                   : t('admin.products.skuUnavailable')}
@@ -105,7 +105,7 @@ export function ProductsCatalogTable({
           row.categoryName ? (
             <StatusBadge
               tone={categoryBadgeTone(row.categoryId)}
-              className="max-w-[10rem] truncate"
+              className="max-w-[8rem] truncate"
               title={row.categoryName}
             >
               {row.categoryName}
@@ -164,9 +164,9 @@ export function ProductsCatalogTable({
             >
               <span>{label}</span>
               {positive ? (
-                <TrendingUp size={12} aria-hidden />
+                <TrendingUp size={10} aria-hidden />
               ) : negative ? (
-                <TrendingDown size={12} aria-hidden />
+                <TrendingDown size={10} aria-hidden />
               ) : null}
             </div>
           )
@@ -188,7 +188,7 @@ export function ProductsCatalogTable({
             aria-label={t('admin.products.editAria', { name: row.name })}
             onClick={() => onEditProduct?.(row.id)}
           >
-            <Pencil size={16} aria-hidden />
+            <Pencil size={13} aria-hidden />
           </button>
         ),
       },
@@ -209,11 +209,12 @@ export function ProductsCatalogTable({
       emptyDescription={emptyDescription}
       emptyAction={emptyAction}
       aria-label={t('admin.products.tableAria')}
+      density="spacious"
       className="rounded-[var(--admin-radius-xl)]"
       footer={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p
-            className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/30"
+            className="text-[8px] font-bold uppercase tracking-[0.08em] text-white/30"
             aria-live="polite"
           >
             {t('admin.products.showing', {
@@ -228,7 +229,7 @@ export function ProductsCatalogTable({
               onClick={() => onPageChange(currentPage - 1)}
               className={cn(
                 'rounded-lg border border-border-subtle bg-white/5 px-4 py-2',
-                'text-[10px] font-bold uppercase tracking-[0.08em] text-white/30',
+                'text-[8px] font-bold uppercase tracking-[0.08em] text-white/30',
                 'transition-colors enabled:hover:bg-white/10 enabled:hover:text-primary-text',
                 'disabled:pointer-events-none disabled:opacity-50',
                 focusRingClasses,
@@ -242,7 +243,7 @@ export function ProductsCatalogTable({
               onClick={() => onPageChange(currentPage + 1)}
               className={cn(
                 'rounded-lg border border-accent/30 bg-accent/20 px-4 py-2',
-                'text-[10px] font-bold uppercase tracking-[0.08em] text-accent',
+                'text-[8px] font-bold uppercase tracking-[0.08em] text-accent',
                 'transition-colors enabled:hover:bg-accent/30',
                 'disabled:pointer-events-none disabled:opacity-50',
                 focusRingClasses,

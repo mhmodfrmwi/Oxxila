@@ -24,7 +24,7 @@ function NavItemLink({ item }: { item: AdminNavItem }) {
           'flex w-full items-center gap-3 rounded-xl transition-colors',
           focusRingClasses,
           isActive
-            ? 'border border-[rgb(163_148_255_/_0.2)] bg-[rgb(163_148_255_/_0.1)] px-[17px] py-[13px] text-accent'
+            ? 'border border-[rgb(163_148_255_/_0.2)] bg-[rgb(163_148_255_/_0.1)] px-[13.6px] py-[10.4px] text-accent'
             : 'px-4 py-3 text-white/60 hover:bg-white/[0.04] hover:text-white/80',
         )
       }
@@ -51,9 +51,8 @@ interface AdminSidebarProps {
 }
 
 /**
- * Figma Component 50 — full-viewport admin sidebar.
- * Specs: 264px wide, glass bg, 32px brand pad, 16px nav pad / 8px gaps,
- * settings card pinned to bottom.
+ * Figma Component 50 — Fixed-width sidebar (~264.29px via --admin-sidebar-width).
+ * Main content offset is separate (--admin-main-offset: 256, Settings shell).
  */
 export function AdminSidebar({ className }: AdminSidebarProps) {
   const { t } = useTranslation()
@@ -62,7 +61,7 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
     <aside
       className={cn(
         'flex h-dvh w-[var(--admin-sidebar-width)] shrink-0 flex-col',
-        'border-e border-white/10 bg-white/5 backdrop-blur-[12px]',
+        'border-e border-white/10 bg-white/5 backdrop-blur-[9.6px]',
         className,
       )}
       aria-label={t('admin.nav.ariaLabel')}
@@ -77,12 +76,12 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
         ))}
       </nav>
 
-      <div className="shrink-0 border-t border-white/10 px-6 pt-[25px] pb-6">
+      <div className="shrink-0 border-t border-white/10 px-6 pt-[20px] pb-6">
         <NavLink
           to={ADMIN_SETTINGS_NAV.to}
           className={({ isActive }) =>
             cn(
-              'flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-[13px]',
+              'flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-[10.4px]',
               'transition-colors hover:bg-white/[0.08]',
               focusRingClasses,
               isActive && 'border-[rgb(163_148_255_/_0.35)] bg-[rgb(163_148_255_/_0.1)]',
@@ -92,9 +91,9 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
           <img
             src={logoSettings}
             alt=""
-            width={34}
-            height={35}
-            className="h-[35px] w-[34.286px] shrink-0 object-contain"
+            width={27}
+            height={28}
+            className="h-[28px] w-[27.429px] shrink-0 object-contain"
             aria-hidden
           />
           <span className="min-w-0 flex-1 text-sm leading-5 font-semibold text-white">

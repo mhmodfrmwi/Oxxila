@@ -9,15 +9,17 @@ import { CustomersSegmentTabs } from '../../components/admin/customers/Customers
 import { CustomersStatsRow } from '../../components/admin/customers/CustomersStatsRow'
 import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { Button } from '../../components/ui/Button'
+import { useAdminCustomerStats } from '../../hooks/useAdminCustomerStats'
 import { useAdminCustomers } from '../../hooks/useAdminCustomers'
 
 /**
- * Customer Intelligence — list + read-only details drawer (Phase 4A/4B).
- * Figma: Customers `937:18907` / Patient Intelligence drawer `941:44197`.
+ * Customer Intelligence — list + detail drawer.
+ * KPIs: GET /users/stats (Total Customers + Average LTV only).
  */
 export function AdminCustomersPage() {
   const { t } = useTranslation()
   const list = useAdminCustomers()
+  const stats = useAdminCustomerStats()
   const [drawerCustomerId, setDrawerCustomerId] = useState<string | null>(null)
 
   const openDrawer = useCallback((customerId: string) => {
@@ -36,16 +38,12 @@ export function AdminCustomersPage() {
   const totalCount = list.pagination?.totalDocuments ?? list.customers.length
   const showingCount = list.customers.length
 
-  const emptyTitle = list.segmentUnsupported
-    ? t('admin.customers.segmentUnavailableTitle')
-    : list.hasActiveFilters
-      ? t('admin.customers.emptyFilteredTitle')
-      : t('admin.customers.emptyTitle')
-  const emptyDescription = list.segmentUnsupported
-    ? t('admin.customers.segmentUnavailableDescription')
-    : list.hasActiveFilters
-      ? t('admin.customers.emptyFilteredDescription')
-      : t('admin.customers.emptyDescription')
+  const emptyTitle = list.hasActiveFilters
+    ? t('admin.customers.emptyFilteredTitle')
+    : t('admin.customers.emptyTitle')
+  const emptyDescription = list.hasActiveFilters
+    ? t('admin.customers.emptyFilteredDescription')
+    : t('admin.customers.emptyDescription')
 
   return (
     <>
@@ -62,8 +60,8 @@ export function AdminCustomersPage() {
       />
 
       <CustomersStatsRow
-        totalCustomers={list.pagination?.totalDocuments ?? null}
-        loading={list.loading && list.customers.length === 0}
+        stats={stats.stats}
+        loading={stats.loading && !stats.stats}
       />
 
       <CustomersSegmentTabs
@@ -78,7 +76,14 @@ export function AdminCustomersPage() {
           title={t('admin.customers.loadErrorTitle')}
           description={list.error ?? t('admin.customers.loadErrorDescription')}
           action={
-            <Button type="button" variant="outline" onClick={list.reload}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                list.reload()
+                stats.reload()
+              }}
+            >
               {t('admin.customers.retry')}
             </Button>
           }

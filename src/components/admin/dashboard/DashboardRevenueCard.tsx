@@ -34,7 +34,8 @@ export function DashboardRevenueCard({
   return (
     <GlassCard
       padding="lg"
-      className="flex min-h-[28rem] flex-col gap-8 rounded-[var(--admin-radius-xl)] lg:col-span-2"
+      strong
+      className="flex min-h-[22.4rem] w-full min-w-0 flex-col gap-8 rounded-[var(--admin-radius-xl)] lg:w-[min(var(--admin-settings-main-width),calc(100%-var(--admin-rail-width)-1.6rem))] lg:shrink-0"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">

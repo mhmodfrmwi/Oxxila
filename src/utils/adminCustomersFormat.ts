@@ -3,10 +3,12 @@ import type {
   AdminCustomerAddress,
   AdminCustomerDetail,
   AdminCustomerRow,
+  AdminCustomerStats,
   AdminCustomersListParams,
   AdminCustomersSegmentTab,
   ApiAdminCustomer,
   ApiAdminCustomerAddress,
+  ApiAdminCustomerStats,
 } from '../types/adminCustomers'
 import {
   formatDashboardDate,
@@ -32,13 +34,6 @@ export function formatUnavailableMetric(): string {
   return '—'
 }
 
-/** Tabs without a matching list filter on GET /users. */
-export function isUnsupportedCustomerSegment(
-  tab: AdminCustomersSegmentTab,
-): boolean {
-  return tab === 'vip' || tab === 'frequent'
-}
-
 export function segmentTabToListParams(
   tab: AdminCustomersSegmentTab,
 ): Pick<AdminCustomersListParams, 'role' | 'active'> {
@@ -51,12 +46,53 @@ export function segmentTabToListParams(
   return base
 }
 
+function resolveSpend(user: ApiAdminCustomer): number | null {
+  const spend = user.totalSpend ?? user.totalPaid
+  if (spend == null || !Number.isFinite(Number(spend))) return null
+  return Number(spend)
+}
+
+export function mapApiCustomerStats(
+  raw: ApiAdminCustomerStats | null | undefined,
+): AdminCustomerStats | null {
+  if (!raw) return null
+  const total = raw.totalCustomers
+  const ltv = raw.averageLtv
+  return {
+    totalCustomers: {
+      value: Number(total?.value ?? 0),
+      trend:
+        total?.trend == null || !Number.isFinite(Number(total.trend))
+          ? null
+          : Number(total.trend),
+      trendLabel: total?.trendLabel?.trim() || null,
+      newThisMonth:
+        total?.newThisMonth == null || !Number.isFinite(Number(total.newThisMonth))
+          ? null
+          : Number(total.newThisMonth),
+    },
+    averageLtv: {
+      value: Number(ltv?.value ?? 0),
+      trend:
+        ltv?.trend == null || !Number.isFinite(Number(ltv.trend))
+          ? null
+          : Number(ltv.trend),
+      trendLabel: ltv?.trendLabel?.trim() || null,
+    },
+  }
+}
+
 export function mapApiCustomerToAdminRow(user: ApiAdminCustomer): AdminCustomerRow {
   const id = String(user._id)
   const name = user.name?.trim() || '—'
   const email = user.email?.trim() || '—'
   const phone = user.phone?.trim() || null
   const avatar = user.avatar?.trim() || null
+  const orders =
+    user.orders == null || !Number.isFinite(Number(user.orders))
+      ? null
+      : Number(user.orders)
+  const lastOrder = user.lastOrder?.trim() || null
 
   return {
     id,
@@ -68,9 +104,9 @@ export function mapApiCustomerToAdminRow(user: ApiAdminCustomer): AdminCustomerR
     active: user.active !== false,
     role: user.role ?? 'user',
     createdAt: user.createdAt ?? '',
-    ordersCount: null,
-    ltv: null,
-    lastVisitAt: null,
+    ordersCount: orders,
+    totalSpend: resolveSpend(user),
+    lastOrderAt: lastOrder,
   }
 }
 
@@ -98,6 +134,10 @@ export function mapApiCustomerToAdminDetail(user: ApiAdminCustomer): AdminCustom
   const email = user.email?.trim() || null
   const phone = user.phone?.trim() || null
   const avatar = user.avatar?.trim() || null
+  const orders =
+    user.orders == null || !Number.isFinite(Number(user.orders))
+      ? null
+      : Number(user.orders)
 
   return {
     id,
@@ -111,7 +151,9 @@ export function mapApiCustomerToAdminDetail(user: ApiAdminCustomer): AdminCustom
     storeCreditBalance: Number(user.storeCreditBalance ?? 0),
     createdAt: user.createdAt ?? null,
     addresses: (user.addresses ?? []).map(mapAddress),
-    totalSpend: null,
+    ordersCount: orders,
+    totalSpend: resolveSpend(user),
+    lastOrderAt: user.lastOrder?.trim() || null,
   }
 }
 
