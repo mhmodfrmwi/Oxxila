@@ -4,6 +4,7 @@ import {
   ADMIN_DASHBOARD_PATH,
   ADMIN_ORDERS_PATH,
   ADMIN_PRODUCTS_PATH,
+  ADMIN_RETURNS_PATH,
   ADMIN_REVIEWS_PATH,
   ADMIN_SETTINGS_PATH,
   ADMIN_SHIPPING_PATH,
@@ -12,6 +13,7 @@ import iconCustomers from '../../../assets/admin/icon-customers.svg'
 import iconDashboard from '../../../assets/admin/icon-dashboard.svg'
 import iconOrders from '../../../assets/admin/icon-orders.svg'
 import iconProducts from '../../../assets/admin/icon-products.svg'
+import iconReturns from '../../../assets/admin/icon-returns.svg'
 import iconReviews from '../../../assets/admin/icon-reviews.svg'
 import iconShipping from '../../../assets/admin/icon-shipping.svg'
 
@@ -69,6 +71,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     labelKey: 'admin.nav.shipping',
     to: ADMIN_SHIPPING_PATH,
     iconSrc: iconShipping,
+    iconSize: 24,
+  },
+  {
+    id: 'returns',
+    labelKey: 'admin.nav.returns',
+    to: ADMIN_RETURNS_PATH,
+    iconSrc: iconReturns,
     iconSize: 24,
   },
 ]

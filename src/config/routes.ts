@@ -82,4 +82,5 @@ export const ADMIN_ORDERS_PATH = `${ADMIN_PATH}/orders`
 export const ADMIN_CUSTOMERS_PATH = `${ADMIN_PATH}/customers`
 export const ADMIN_REVIEWS_PATH = `${ADMIN_PATH}/reviews`
 export const ADMIN_SHIPPING_PATH = `${ADMIN_PATH}/shipping`
+export const ADMIN_RETURNS_PATH = `${ADMIN_PATH}/returns`
 export const ADMIN_SETTINGS_PATH = `${ADMIN_PATH}/settings`

@@ -5,6 +5,7 @@ import {
   ADMIN_ORDERS_PATH,
   ADMIN_PATH,
   ADMIN_PRODUCTS_PATH,
+  ADMIN_RETURNS_PATH,
   ADMIN_REVIEWS_PATH,
   ADMIN_SETTINGS_PATH,
   ADMIN_SHIPPING_PATH,
@@ -23,6 +24,7 @@ export type AdminScreenId =
   | 'customers'
   | 'reviews'
   | 'shipping'
+  | 'returns'
   | 'settings'
   | 'default'
 
@@ -71,6 +73,7 @@ export function resolveAdminPageShell(pathname: string): AdminPageShell {
   if (path.startsWith(ADMIN_CUSTOMERS_PATH)) return withId('customers')
   if (path.startsWith(ADMIN_REVIEWS_PATH)) return withId('reviews')
   if (path.startsWith(ADMIN_SHIPPING_PATH)) return withId('shipping')
+  if (path.startsWith(ADMIN_RETURNS_PATH)) return withId('returns')
   if (path.startsWith(ADMIN_SETTINGS_PATH)) return withId('settings')
   return withId('default')
 }

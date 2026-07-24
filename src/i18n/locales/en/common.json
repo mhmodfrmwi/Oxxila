@@ -1037,6 +1037,7 @@
       "customers": "Customers",
       "reviews": "Reviews",
       "shipping": "Shipping",
+      "returns": "Returns",
       "settings": "Oxxila Settings"
     },
     "foundation": {
@@ -1410,6 +1411,86 @@
           "productRequired": "Select a product",
           "addressRequired": "Provide a saved address or governorate + address line"
         }
+      }
+    },
+    "returns": {
+      "title": "Return Requests",
+      "subtitle": "Review return requests, logistics, and refund status.",
+      "statusFilterAria": "Filter returns by status",
+      "tabs": {
+        "all": "All",
+        "pending": "Pending",
+        "approved": "Approved",
+        "picked_up": "Picked up",
+        "received": "Received",
+        "refunded": "Refunded",
+        "rejected": "Rejected"
+      },
+      "columns": {
+        "id": "ID",
+        "user": "User",
+        "order": "Order",
+        "amount": "Amount",
+        "status": "Status"
+      },
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "picked_up": "Picked up",
+        "received": "Received",
+        "refunded": "Refunded",
+        "rejected": "Rejected"
+      },
+      "reason": {
+        "damaged_item": "Damaged item",
+        "wrong_product": "Wrong product",
+        "allergic_reaction": "Allergic / skin reaction",
+        "expired_product": "Expired product",
+        "changed_mind": "Changed mind",
+        "other": "Other"
+      },
+      "logisticsHandler": {
+        "bosta": "Bosta",
+        "internal": "Internal"
+      },
+      "unknownOrder": "—",
+      "tableAria": "Return requests list",
+      "paginationAria": "Return requests pagination",
+      "showing": "Showing {{showing}} of {{total}} return requests",
+      "prev": "Previous",
+      "next": "Next",
+      "emptyTitle": "No return requests yet",
+      "emptyDescription": "Return requests will appear here once customers submit them.",
+      "emptyFilteredTitle": "No matching return requests",
+      "emptyFilteredDescription": "Try a different status filter.",
+      "clearFilters": "Clear filters",
+      "loadErrorTitle": "Unable to load return requests",
+      "loadErrorDescription": "Please try again in a moment.",
+      "retry": "Retry",
+      "details": {
+        "title": "Return {{id}}",
+        "emptySelectionTitle": "No return selected",
+        "emptySelectionDescription": "Select a return request from the list to see its details.",
+        "emptyTitle": "Return not found",
+        "emptyDescription": "This return request could not be loaded.",
+        "loadErrorTitle": "Unable to load return",
+        "refundAmount": "Refund amount",
+        "order": "Order",
+        "reason": "Reason",
+        "customer": "Customer",
+        "note": "Customer note",
+        "adminNote": "Admin note",
+        "logistics": "Logistics",
+        "handler": "Handler",
+        "dropOff": "Drop-off warehouse",
+        "tracking": "Bosta tracking number",
+        "bostaState": "Bosta status",
+        "pickupAddress": "Pickup address",
+        "items": "Items",
+        "itemsEmpty": "No items on this return",
+        "proofImages": "Proof images",
+        "proofEmpty": "No proof images submitted",
+        "proofLink": "Photo {{index}}"
       }
     },
     "customers": {

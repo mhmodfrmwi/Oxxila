@@ -1037,6 +1037,7 @@
       "customers": "العملاء",
       "reviews": "المراجعات",
       "shipping": "الشحن",
+      "returns": "المرتجعات",
       "settings": "إعدادات أوكسيلا"
     },
     "foundation": {
@@ -1416,6 +1417,86 @@
           "productRequired": "اختر منتجًا",
           "addressRequired": "أدخل عنوانًا محفوظًا أو محافظة وعنوانًا تفصيليًا"
         }
+      }
+    },
+    "returns": {
+      "title": "طلبات الإرجاع",
+      "subtitle": "راجع طلبات الإرجاع واللوجستيات وحالة الاسترداد.",
+      "statusFilterAria": "تصفية المرتجعات حسب الحالة",
+      "tabs": {
+        "all": "الكل",
+        "pending": "قيد المراجعة",
+        "approved": "تمت الموافقة",
+        "picked_up": "تم الاستلام",
+        "received": "تم الاستلام بالمستودع",
+        "refunded": "تم الاسترداد",
+        "rejected": "مرفوض"
+      },
+      "columns": {
+        "id": "المعرف",
+        "user": "العميل",
+        "order": "الطلب",
+        "amount": "المبلغ",
+        "status": "الحالة"
+      },
+      "status": {
+        "pending": "قيد المراجعة",
+        "approved": "تمت الموافقة",
+        "picked_up": "تم الاستلام",
+        "received": "تم الاستلام بالمستودع",
+        "refunded": "تم الاسترداد",
+        "rejected": "مرفوض"
+      },
+      "reason": {
+        "damaged_item": "منتج تالف",
+        "wrong_product": "منتج خاطئ",
+        "allergic_reaction": "تفاعل تحسسي / جلدي",
+        "expired_product": "منتج منتهي الصلاحية",
+        "changed_mind": "تغيير الرأي",
+        "other": "أخرى"
+      },
+      "logisticsHandler": {
+        "bosta": "بوسطة",
+        "internal": "داخلي"
+      },
+      "unknownOrder": "—",
+      "tableAria": "قائمة طلبات الإرجاع",
+      "paginationAria": "صفحات طلبات الإرجاع",
+      "showing": "عرض {{showing}} من {{total}} طلب إرجاع",
+      "prev": "السابق",
+      "next": "التالي",
+      "emptyTitle": "لا توجد طلبات إرجاع بعد",
+      "emptyDescription": "ستظهر طلبات الإرجاع هنا بمجرد أن يقدمها العملاء.",
+      "emptyFilteredTitle": "لا توجد طلبات إرجاع مطابقة",
+      "emptyFilteredDescription": "جرّب فلتر حالة مختلف.",
+      "clearFilters": "مسح الفلاتر",
+      "loadErrorTitle": "تعذر تحميل طلبات الإرجاع",
+      "loadErrorDescription": "يرجى المحاولة مرة أخرى بعد قليل.",
+      "retry": "إعادة المحاولة",
+      "details": {
+        "title": "إرجاع {{id}}",
+        "emptySelectionTitle": "لم يتم اختيار إرجاع",
+        "emptySelectionDescription": "اختر طلب إرجاع من القائمة لعرض تفاصيله.",
+        "emptyTitle": "الإرجاع غير موجود",
+        "emptyDescription": "تعذر تحميل طلب الإرجاع هذا.",
+        "loadErrorTitle": "تعذر تحميل الإرجاع",
+        "refundAmount": "مبلغ الاسترداد",
+        "order": "الطلب",
+        "reason": "السبب",
+        "customer": "العميل",
+        "note": "ملاحظة العميل",
+        "adminNote": "ملاحظة الإدارة",
+        "logistics": "اللوجستيات",
+        "handler": "الجهة المسؤولة",
+        "dropOff": "مستودع التسليم",
+        "tracking": "رقم تتبع بوسطة",
+        "bostaState": "حالة بوسطة",
+        "pickupAddress": "عنوان الاستلام",
+        "items": "العناصر",
+        "itemsEmpty": "لا توجد عناصر في هذا الإرجاع",
+        "proofImages": "صور الإثبات",
+        "proofEmpty": "لم يتم إرسال صور إثبات",
+        "proofLink": "صورة {{index}}"
       }
     },
     "customers": {

@@ -1,0 +1,141 @@
+// src/utils/adminReturnsFormat.ts
+import type { StatusBadgeTone } from '../components/admin/ui/StatusBadge'
+import type {
+  AdminReturnDetail,
+  AdminReturnRow,
+  AdminReturnsStatusTab,
+  AdminReturnStatus,
+  ApiAdminReturn,
+} from '../types/adminReturns'
+import {
+  formatDashboardDate,
+  formatDashboardMoney,
+  formatOrderId,
+} from './adminDashboardFormat'
+
+export function formatAdminReturnMoney(value: number, locale = 'en'): string {
+  return formatDashboardMoney(value, locale)
+}
+
+export function formatAdminReturnDate(value: string, locale = 'en'): string {
+  return formatDashboardDate(value, locale)
+}
+
+/** Short return reference, e.g. `#RT-4F21`. */
+export function formatReturnShortId(id: string): string {
+  const cleaned = id.replace(/[^a-zA-Z0-9]/g, '')
+  const short = (cleaned.slice(-4) || id.slice(-4)).toUpperCase()
+  return `#RT-${short}`
+}
+
+/** Short order reference reusing the Orders admin convention, e.g. `#OX-4F21`. */
+export function formatReturnOrderLabel(orderId: string): string {
+  return formatOrderId(orderId)
+}
+
+export function returnStatusBadgeTone(status: AdminReturnStatus): StatusBadgeTone {
+  switch (status) {
+    case 'refunded':
+      return 'success'
+    case 'approved':
+    case 'picked_up':
+    case 'received':
+      return 'info'
+    case 'pending':
+      return 'warning'
+    case 'rejected':
+      return 'danger'
+    default:
+      return 'neutral'
+  }
+}
+
+export function statusTabToRefundStatus(
+  tab: AdminReturnsStatusTab,
+): AdminReturnStatus | undefined {
+  if (tab === 'all') return undefined
+  return tab
+}
+
+function resolveUser(returnRequest: ApiAdminReturn) {
+  const user = returnRequest.user
+  return user && typeof user === 'object' ? user : null
+}
+
+function resolveOrderId(returnRequest: ApiAdminReturn): string | null {
+  const order = returnRequest.order
+  if (!order) return null
+  if (typeof order === 'string') return order
+  return order._id ?? null
+}
+
+export function mapApiReturnToRow(returnRequest: ApiAdminReturn): AdminReturnRow {
+  const id = String(returnRequest._id)
+  const user = resolveUser(returnRequest)
+  const orderId = resolveOrderId(returnRequest)
+
+  return {
+    id,
+    shortId: formatReturnShortId(id),
+    createdAt: returnRequest.createdAt,
+    userName: user?.name?.trim() || '—',
+    userEmail: user?.email?.trim() || null,
+    orderId,
+    orderShortLabel: orderId ? formatReturnOrderLabel(orderId) : null,
+    refundAmount: returnRequest.refundAmount,
+    refundStatus: returnRequest.refundStatus,
+  }
+}
+
+function resolveDropOffLocationName(returnRequest: ApiAdminReturn): string | null {
+  if (returnRequest.dropOffSnapshot?.locationName?.trim()) {
+    return returnRequest.dropOffSnapshot.locationName.trim()
+  }
+  const dropOffPickup = returnRequest.dropOffPickup
+  if (dropOffPickup && typeof dropOffPickup === 'object') {
+    return dropOffPickup.locationName?.trim() || null
+  }
+  return null
+}
+
+export function mapApiReturnToDetail(returnRequest: ApiAdminReturn): AdminReturnDetail {
+  const id = String(returnRequest._id)
+  const user = resolveUser(returnRequest)
+  const orderId = resolveOrderId(returnRequest)
+  const pickupAddress = returnRequest.pickupAddress
+
+  return {
+    id,
+    shortId: formatReturnShortId(id),
+    createdAt: returnRequest.createdAt,
+    refundStatus: returnRequest.refundStatus,
+    refundAmount: returnRequest.refundAmount,
+    reason: returnRequest.reason,
+    note: returnRequest.note?.trim() || '',
+    adminNote: returnRequest.adminNote?.trim() || null,
+    userName: user?.name?.trim() || '—',
+    userEmail: user?.email?.trim() || null,
+    userPhone: user?.phone?.trim() || null,
+    orderId,
+    orderShortLabel: orderId ? formatReturnOrderLabel(orderId) : null,
+    logisticsHandler: returnRequest.logisticsHandler ?? null,
+    dropOffLocationName: resolveDropOffLocationName(returnRequest),
+    bostaTrackingNumber: returnRequest.bostaTrackingNumber?.trim() || null,
+    bostaStateLabel: returnRequest.bostaStateLabel?.trim() || null,
+    pickupAddress: pickupAddress
+      ? {
+          firstLine: pickupAddress.firstLine,
+          secondLine: pickupAddress.secondLine?.trim() || null,
+          city: pickupAddress.city,
+          governorateName: pickupAddress.governorateName,
+        }
+      : null,
+    items: (returnRequest.items ?? []).map((item) => ({
+      orderItemId: item.orderItemId,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+    })),
+    proofImages: (returnRequest.proofImages ?? []).map((image) => ({ url: image.url })),
+  }
+}

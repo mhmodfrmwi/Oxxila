@@ -28,6 +28,10 @@ interface DataTableProps<T> {
   density?: 'default' | 'spacious'
   /** Accessible name for the table region. */
   'aria-label'?: string
+  /** Makes rows clickable (e.g. select a row into a split-view detail panel). */
+  onRowClick?: (row: T) => void
+  /** Row id (via `getRowId`) that should render as selected/highlighted. */
+  selectedRowId?: string | null
 }
 
 const densityPad = {
@@ -49,6 +53,8 @@ export function DataTable<T>({
   className,
   density = 'default',
   'aria-label': ariaLabel,
+  onRowClick,
+  selectedRowId = null,
 }: DataTableProps<T>) {
   const showEmpty = !loading && rows.length === 0
   const headerPad = densityPad[density].header
@@ -108,25 +114,35 @@ export function DataTable<T>({
               ))}
 
             {!loading &&
-              rows.map((row) => (
-                <tr
-                  key={getRowId(row)}
-                  className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.03]"
-                >
-                  {columns.map((column) => (
-                    <td
-                      key={column.id}
-                      className={cn(
-                        'align-middle text-primary-text',
-                        cellPad,
-                        column.className,
-                      )}
-                    >
-                      {column.cell(row)}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              rows.map((row) => {
+                const rowId = getRowId(row)
+                const isSelected = selectedRowId != null && rowId === selectedRowId
+                return (
+                  <tr
+                    key={rowId}
+                    onClick={onRowClick ? () => onRowClick(row) : undefined}
+                    aria-selected={onRowClick ? isSelected : undefined}
+                    className={cn(
+                      'border-b border-white/5 last:border-b-0 hover:bg-white/[0.03]',
+                      onRowClick && 'cursor-pointer',
+                      isSelected && 'bg-white/[0.06]',
+                    )}
+                  >
+                    {columns.map((column) => (
+                      <td
+                        key={column.id}
+                        className={cn(
+                          'align-middle text-primary-text',
+                          cellPad,
+                          column.className,
+                        )}
+                      >
+                        {column.cell(row)}
+                      </td>
+                    ))}
+                  </tr>
+                )
+              })}
           </tbody>
         </table>
       </div>

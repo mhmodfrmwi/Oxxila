@@ -1,0 +1,293 @@
+// src/components/admin/returns/ReturnDetailsPanel.tsx
+import { ExternalLink, MapPin, PackageX, Truck } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { useAdminReturnDetail } from '../../../hooks/useAdminReturnDetail'
+import { cn } from '../../../lib/cn'
+import {
+  formatAdminReturnDate,
+  formatAdminReturnMoney,
+  returnStatusBadgeTone,
+} from '../../../utils/adminReturnsFormat'
+import { Button } from '../../ui/Button'
+import { EmptyState } from '../ui/EmptyState'
+import { GlassCard } from '../ui/GlassCard'
+import { Skeleton } from '../ui/Skeleton'
+import { StatusBadge } from '../ui/StatusBadge'
+
+interface ReturnDetailsPanelProps {
+  returnId: string | null
+  className?: string
+}
+
+function FieldLabel({ children }: { children: string }) {
+  return (
+    <p className="text-[8px] uppercase leading-[12px] tracking-[-0.4px] text-white/30">
+      {children}
+    </p>
+  )
+}
+
+function DetailsSkeleton() {
+  return (
+    <div className="flex flex-col gap-6" aria-busy="true" aria-live="polite">
+      <div className="flex items-center gap-3">
+        <Skeleton className="size-10 rounded-2xl" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-5 w-28" />
+          <Skeleton className="h-3 w-20" />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <Skeleton className="h-12 w-full rounded-xl" />
+        <Skeleton className="h-12 w-full rounded-xl" />
+      </div>
+      <Skeleton className="h-20 w-full rounded-xl" />
+      <Skeleton className="h-24 w-full rounded-xl" />
+    </div>
+  )
+}
+
+export function ReturnDetailsPanel({ returnId, className }: ReturnDetailsPanelProps) {
+  const { t, i18n } = useTranslation()
+  const locale = i18n.language
+  const { returnDetail, loading, error, reload } = useAdminReturnDetail({ returnId })
+
+  if (!returnId) {
+    return (
+      <GlassCard
+        strong
+        padding="none"
+        className={cn('flex min-h-[24rem] items-center justify-center rounded-[var(--admin-radius-xl)]', className)}
+      >
+        <EmptyState
+          bare
+          icon={<PackageX size={28} aria-hidden />}
+          title={t('admin.returns.details.emptySelectionTitle')}
+          description={t('admin.returns.details.emptySelectionDescription')}
+        />
+      </GlassCard>
+    )
+  }
+
+  return (
+    <GlassCard
+      strong
+      padding="none"
+      className={cn('flex min-h-[24rem] flex-col rounded-[var(--admin-radius-xl)] p-6', className)}
+    >
+      {loading && !returnDetail ? <DetailsSkeleton /> : null}
+
+      {!loading && error ? (
+        <EmptyState
+          bare
+          title={t('admin.returns.details.loadErrorTitle')}
+          description={error}
+          action={
+            <Button type="button" variant="outline" onClick={reload}>
+              {t('admin.returns.retry')}
+            </Button>
+          }
+        />
+      ) : null}
+
+      {!loading && !error && !returnDetail ? (
+        <EmptyState
+          bare
+          title={t('admin.returns.details.emptyTitle')}
+          description={t('admin.returns.details.emptyDescription')}
+        />
+      ) : null}
+
+      {returnDetail && !error ? (
+        <div className={cn('flex flex-col gap-6', loading && 'opacity-60')}>
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="truncate text-lg font-bold leading-6 text-white">
+                {t('admin.returns.details.title', { id: returnDetail.shortId })}
+              </h3>
+              <p className="text-xs leading-4 text-white/40">
+                {formatAdminReturnDate(returnDetail.createdAt, locale)}
+              </p>
+            </div>
+            <StatusBadge
+              tone={returnStatusBadgeTone(returnDetail.refundStatus)}
+              className="shrink-0 border border-current/20 px-2.5 py-1 text-[9px] font-bold tracking-[0.05em]"
+            >
+              {t(`admin.returns.status.${returnDetail.refundStatus}`)}
+            </StatusBadge>
+          </div>
+
+          <GlassCard
+            padding="none"
+            className="grid grid-cols-2 gap-4 rounded-2xl border border-white/10 bg-white/5 p-4"
+          >
+            <div className="min-w-0">
+              <FieldLabel>{t('admin.returns.details.refundAmount')}</FieldLabel>
+              <p className="truncate text-base font-bold leading-6 text-accent">
+                {formatAdminReturnMoney(returnDetail.refundAmount, locale)}
+              </p>
+            </div>
+            <div className="min-w-0">
+              <FieldLabel>{t('admin.returns.details.order')}</FieldLabel>
+              <p className="truncate text-sm font-medium leading-5 text-white">
+                {returnDetail.orderShortLabel ?? t('admin.returns.unknownOrder')}
+              </p>
+            </div>
+            <div className="min-w-0">
+              <FieldLabel>{t('admin.returns.details.reason')}</FieldLabel>
+              <p className="truncate text-sm font-medium leading-5 text-white">
+                {t(`admin.returns.reason.${returnDetail.reason}`)}
+              </p>
+            </div>
+            <div className="min-w-0">
+              <FieldLabel>{t('admin.returns.details.customer')}</FieldLabel>
+              <p
+                className="truncate text-sm font-medium leading-5 text-white"
+                title={returnDetail.userEmail ?? undefined}
+              >
+                {returnDetail.userName}
+              </p>
+            </div>
+          </GlassCard>
+
+          {returnDetail.note ? (
+            <div className="flex flex-col gap-1.5">
+              <FieldLabel>{t('admin.returns.details.note')}</FieldLabel>
+              <p className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm leading-5 text-white/80">
+                {returnDetail.note}
+              </p>
+            </div>
+          ) : null}
+
+          {returnDetail.adminNote ? (
+            <div className="flex flex-col gap-1.5">
+              <FieldLabel>{t('admin.returns.details.adminNote')}</FieldLabel>
+              <p className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm leading-5 text-white/80">
+                {returnDetail.adminNote}
+              </p>
+            </div>
+          ) : null}
+
+          {returnDetail.logisticsHandler ? (
+            <section className="flex flex-col gap-3" aria-labelledby="return-logistics-heading">
+              <div className="flex items-center gap-2">
+                <Truck size={13} className="text-[#a394ff]" aria-hidden />
+                <h4 id="return-logistics-heading" className="text-sm font-bold leading-5 text-white">
+                  {t('admin.returns.details.logistics')}
+                </h4>
+              </div>
+              <GlassCard
+                padding="none"
+                className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+              >
+                <div className="flex flex-wrap gap-4">
+                  <div className="min-w-0">
+                    <FieldLabel>{t('admin.returns.details.handler')}</FieldLabel>
+                    <p className="text-sm font-medium leading-5 text-white">
+                      {t(`admin.returns.logisticsHandler.${returnDetail.logisticsHandler}`)}
+                    </p>
+                  </div>
+                  {returnDetail.dropOffLocationName ? (
+                    <div className="min-w-0">
+                      <FieldLabel>{t('admin.returns.details.dropOff')}</FieldLabel>
+                      <p className="truncate text-sm font-medium leading-5 text-white">
+                        {returnDetail.dropOffLocationName}
+                      </p>
+                    </div>
+                  ) : null}
+                  {returnDetail.bostaTrackingNumber ? (
+                    <div className="min-w-0">
+                      <FieldLabel>{t('admin.returns.details.tracking')}</FieldLabel>
+                      <p className="truncate text-sm font-medium leading-5 text-white">
+                        {returnDetail.bostaTrackingNumber}
+                      </p>
+                    </div>
+                  ) : null}
+                  {returnDetail.bostaStateLabel ? (
+                    <div className="min-w-0">
+                      <FieldLabel>{t('admin.returns.details.bostaState')}</FieldLabel>
+                      <p className="truncate text-sm font-medium leading-5 text-white">
+                        {returnDetail.bostaStateLabel}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+              </GlassCard>
+            </section>
+          ) : null}
+
+          {returnDetail.pickupAddress ? (
+            <section className="flex flex-col gap-3" aria-labelledby="return-pickup-heading">
+              <div className="flex items-center gap-2">
+                <MapPin size={13} className="text-[#a394ff]" aria-hidden />
+                <h4 id="return-pickup-heading" className="text-sm font-bold leading-5 text-white">
+                  {t('admin.returns.details.pickupAddress')}
+                </h4>
+              </div>
+              <p className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm leading-5 text-white/80">
+                {[
+                  returnDetail.pickupAddress.firstLine,
+                  returnDetail.pickupAddress.secondLine,
+                  returnDetail.pickupAddress.city,
+                  returnDetail.pickupAddress.governorateName,
+                ]
+                  .filter(Boolean)
+                  .join(', ')}
+              </p>
+            </section>
+          ) : null}
+
+          <section className="flex flex-col gap-3" aria-labelledby="return-items-heading">
+            <h4 id="return-items-heading" className="text-sm font-bold leading-5 text-white">
+              {t('admin.returns.details.items')}
+            </h4>
+            {returnDetail.items.length === 0 ? (
+              <EmptyState bare className="py-6" title={t('admin.returns.details.itemsEmpty')} />
+            ) : (
+              <ul className="flex flex-col gap-2">
+                {returnDetail.items.map((item, index) => (
+                  <li
+                    key={`${item.orderItemId}-${index}`}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5"
+                  >
+                    <span className="min-w-0 truncate text-sm font-medium text-white">
+                      {item.name} × {item.quantity}
+                    </span>
+                    <span className="shrink-0 text-sm font-semibold text-white/70">
+                      {formatAdminReturnMoney(item.price * item.quantity, locale)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section className="flex flex-col gap-3" aria-labelledby="return-proof-heading">
+            <h4 id="return-proof-heading" className="text-sm font-bold leading-5 text-white">
+              {t('admin.returns.details.proofImages')}
+            </h4>
+            {returnDetail.proofImages.length === 0 ? (
+              <EmptyState bare className="py-6" title={t('admin.returns.details.proofEmpty')} />
+            ) : (
+              <ul className="flex flex-wrap gap-2">
+                {returnDetail.proofImages.map((image, index) => (
+                  <li key={`${image.url}-${index}`}>
+                    <a
+                      href={image.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-[#a394ff] transition-colors hover:bg-white/10"
+                    >
+                      {t('admin.returns.details.proofLink', { index: index + 1 })}
+                      <ExternalLink size={11} aria-hidden />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+      ) : null}
+    </GlassCard>
+  )
+}

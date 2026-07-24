@@ -164,6 +164,11 @@ const AdminShippingPage = lazy(() =>
     default: module.AdminShippingPage,
   })),
 )
+const AdminReturnsPage = lazy(() =>
+  import('./pages/admin/AdminReturnsPage').then((module) => ({
+    default: module.AdminReturnsPage,
+  })),
+)
 const AdminSettingsPage = lazy(() =>
   import('./pages/admin/AdminSettingsPage').then((module) => ({
     default: module.AdminSettingsPage,
@@ -222,6 +227,7 @@ export default function App() {
           <Route path="customers" element={<AdminCustomersPage />} />
           <Route path="reviews" element={<AdminReviewsPage />} />
           <Route path="shipping" element={<AdminShippingPage />} />
+          <Route path="returns" element={<AdminReturnsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
       </Routes>
