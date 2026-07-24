@@ -21,8 +21,8 @@ function isAbortError(error: unknown): boolean {
 }
 
 /**
- * Cart Recovery — no backend API today.
- * Hook shape is ready for a real GET; UI stays stable.
+ * Cart Recovery — GET /payments/cart-recovery?period=30.
+ * Falls back to placeholder metrics on error so the UI stays stable.
  */
 export function useCartRecovery() {
   const [state, setState] = useState<AsyncState>({

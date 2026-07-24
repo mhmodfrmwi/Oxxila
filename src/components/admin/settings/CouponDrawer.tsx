@@ -23,7 +23,7 @@ interface CouponDrawerProps {
 }
 
 const fieldClass = cn(
-  'w-full rounded-xl border border-white/10 bg-white/5 px-[17px] py-[13px]',
+  'w-full rounded-xl border border-white/10 bg-white/5 px-[13.6px] py-[10.4px]',
   'text-sm text-white placeholder:text-white/40',
   'focus:outline-none focus:ring-2 focus:ring-accent/40',
   'disabled:cursor-not-allowed disabled:opacity-60',
@@ -90,7 +90,7 @@ export function CouponDrawer({
       >
         {drawer.submitting ? (
           <>
-            <Loader2 size={16} className="animate-spin" aria-hidden />
+            <Loader2 size={13} className="animate-spin" aria-hidden />
             {t('admin.settings.coupons.drawer.saving')}
           </>
         ) : (
@@ -105,7 +105,7 @@ export function CouponDrawer({
       title={title}
       description={t('admin.settings.coupons.drawer.subtitle')}
       onClose={handleClose}
-      width="formula"
+      width="settings"
       footer={footer}
     >
       {drawer.loading ? (
@@ -167,14 +167,19 @@ export function CouponDrawer({
               {t('admin.settings.coupons.drawer.discountType')}
             </p>
             <div className="mt-2 flex gap-2">
-              {(['percentage', 'fixed'] as const).map((type) => {
+              {(['percentage', 'fixed', 'freeShipping'] as const).map((type) => {
                 const active = drawer.values.discountType === type
                 return (
                   <button
                     key={type}
                     type="button"
                     disabled={drawer.submitting}
-                    onClick={() => drawer.setField('discountType', type)}
+                    onClick={() => {
+                      drawer.setField('discountType', type)
+                      if (type === 'freeShipping') {
+                        drawer.setField('discountValue', '0')
+                      }
+                    }}
                     className={cn(
                       'rounded-full border px-4 py-1.5 text-xs font-medium transition-colors',
                       focusRingClasses,
@@ -192,24 +197,26 @@ export function CouponDrawer({
             <FieldError message={drawer.errors.discountType} />
           </div>
 
-          <div>
-            <label className={labelClass} htmlFor={`${formId}-value`}>
-              {t('admin.settings.coupons.drawer.discountValue')}
-            </label>
-            <input
-              id={`${formId}-value`}
-              type="number"
-              min={0}
-              step="any"
-              value={drawer.values.discountValue}
-              disabled={drawer.submitting}
-              onChange={(event) =>
-                drawer.setField('discountValue', event.target.value)
-              }
-              className={cn(fieldClass, 'mt-2')}
-            />
-            <FieldError message={drawer.errors.discountValue} />
-          </div>
+          {drawer.values.discountType !== 'freeShipping' ? (
+            <div>
+              <label className={labelClass} htmlFor={`${formId}-value`}>
+                {t('admin.settings.coupons.drawer.discountValue')}
+              </label>
+              <input
+                id={`${formId}-value`}
+                type="number"
+                min={0}
+                step="any"
+                value={drawer.values.discountValue}
+                disabled={drawer.submitting}
+                onChange={(event) =>
+                  drawer.setField('discountValue', event.target.value)
+                }
+                className={cn(fieldClass, 'mt-2')}
+              />
+              <FieldError message={drawer.errors.discountValue} />
+            </div>
+          ) : null}
 
           <div>
             <label className={labelClass} htmlFor={`${formId}-maxUsage`}>
@@ -274,7 +281,7 @@ export function CouponDrawer({
                 <p className="text-sm font-semibold text-white">
                   {t('admin.settings.coupons.drawer.active')}
                 </p>
-                <p className="text-[10px] text-white/40">
+                <p className="text-[8px] text-white/40">
                   {t('admin.settings.coupons.drawer.activeHint')}
                 </p>
               </div>

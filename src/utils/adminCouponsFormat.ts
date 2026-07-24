@@ -14,6 +14,7 @@ export function formatCouponDiscount(
   value: number,
   locale = 'en',
 ): string {
+  if (type === 'freeShipping') return 'Free Shipping'
   if (type === 'percentage') return `${value}% OFF`
   return `${formatDashboardMoney(value, locale)} Credit`
 }
@@ -119,14 +120,19 @@ export function validateCouponForm(
   if (mode === 'create' || values.discountType) {
     if (
       values.discountType !== 'percentage' &&
-      values.discountType !== 'fixed'
+      values.discountType !== 'fixed' &&
+      values.discountType !== 'freeShipping'
     ) {
-      errors.discountType = 'Discount type must be percentage or fixed'
+      errors.discountType = 'Discount type must be percentage, fixed, or free shipping'
     }
   }
 
+  // Free shipping always zeroes discountValue server-side — skip validation.
   const discountRaw = values.discountValue.trim()
-  if (mode === 'create' || discountRaw !== '') {
+  if (
+    values.discountType !== 'freeShipping' &&
+    (mode === 'create' || discountRaw !== '')
+  ) {
     if (discountRaw === '') {
       errors.discountValue = 'Discount value is required'
     } else {
@@ -181,7 +187,8 @@ export function formValuesToCreatePayload(
   const payload: AdminCouponCreatePayload = {
     code: values.code.trim().toUpperCase(),
     discountType: values.discountType,
-    discountValue: Number(values.discountValue),
+    discountValue:
+      values.discountType === 'freeShipping' ? 0 : Number(values.discountValue),
   }
 
   const maxUsageRaw = values.maxUsage.trim()

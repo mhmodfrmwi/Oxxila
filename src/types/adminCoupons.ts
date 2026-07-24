@@ -1,6 +1,6 @@
 // src/types/adminCoupons.ts
 
-export type AdminCouponDiscountType = 'percentage' | 'fixed'
+export type AdminCouponDiscountType = 'percentage' | 'fixed' | 'freeShipping'
 
 /** Raw coupon from /api/v1/coupons. */
 export interface ApiAdminCoupon {

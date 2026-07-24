@@ -25,8 +25,8 @@ function RecoveryDonutPlaceholder({
   rateLabel: string
   recoveredLabel: string
 }) {
-  const size = 160
-  const stroke = 12
+  const size = 128 // 160 × 0.8
+  const stroke = 9.6 // 12 × 0.8
   const radius = (size - stroke) / 2
   const circumference = 2 * Math.PI * radius
 
@@ -64,8 +64,8 @@ function RecoveryDonutPlaceholder({
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <p className="text-[30px] font-bold leading-9 text-white">{PLACEHOLDER}</p>
-        <p className="text-[10px] font-normal uppercase tracking-[0.1em] text-white/40">
+        <p className="text-[24px] font-bold leading-9 text-white">{PLACEHOLDER}</p>
+        <p className="text-[8px] font-normal uppercase tracking-[0.1em] text-white/40">
           {recoveredLabel}
         </p>
       </div>
@@ -80,8 +80,8 @@ function RecoveryDonut({
   percent: number
   recoveredLabel: string
 }) {
-  const size = 160
-  const stroke = 12
+  const size = 128 // 160 × 0.8
+  const stroke = 9.6 // 12 × 0.8
   const radius = (size - stroke) / 2
   const circumference = 2 * Math.PI * radius
   const clamped = Math.min(Math.max(percent, 0), 100)
@@ -117,14 +117,14 @@ function RecoveryDonut({
           strokeWidth={stroke}
           strokeDasharray={`${dash} ${circumference - dash}`}
           strokeLinecap="round"
-          className="drop-shadow-[0_0_12px_rgba(163,148,255,0.35)]"
+          className="drop-shadow-[0_0_9.6px_rgba(163,148,255,0.35)]"
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <p className="text-[30px] font-bold leading-9 text-white">
+        <p className="text-[24px] font-bold leading-9 text-white">
           {Math.round(clamped)}%
         </p>
-        <p className="text-[10px] font-normal uppercase tracking-[0.1em] text-white/40">
+        <p className="text-[8px] font-normal uppercase tracking-[0.1em] text-white/40">
           {recoveredLabel}
         </p>
       </div>
@@ -204,7 +204,7 @@ function RecoveryBody({
           title={t('admin.settings.recovery.automateSoon')}
           className={cn(
             'mt-2 flex w-full items-center justify-center rounded-2xl',
-            'border border-white/10 bg-white/5 px-4 py-[13px]',
+            'border border-white/10 bg-white/5 px-4 py-[10.4px]',
             'text-xs font-bold text-white',
             'cursor-not-allowed opacity-50',
             focusRingClasses,
@@ -219,7 +219,7 @@ function RecoveryBody({
 
 /**
  * Cart Recovery — Figma Settings `941:24676`.
- * No dedicated API yet: metrics render as —. Ready for future wiring.
+ * Wired to GET /payments/cart-recovery; renders — while loading/on error.
  */
 export function CartRecoveryCard() {
   const { t, i18n } = useTranslation()
@@ -230,13 +230,14 @@ export function CartRecoveryCard() {
 
   return (
     <GlassCard
-      padding="none"
-      className="relative min-h-[31.25rem] overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/5 p-8"
+      padding="lg"
+      strong
+      className="relative min-h-[25rem] w-full overflow-hidden rounded-[var(--admin-radius-xl)]"
       aria-label={t('admin.settings.recovery.aria')}
       aria-busy={loading || undefined}
     >
       <div
-        className="pointer-events-none absolute -bottom-10 -end-10 size-48 rounded-full bg-[rgba(163,148,255,0.1)] blur-[32px]"
+        className="pointer-events-none absolute -bottom-10 -end-10 size-48 rounded-full bg-[rgba(163,148,255,0.1)] blur-[25.6px]"
         aria-hidden
       />
 
@@ -249,7 +250,7 @@ export function CartRecoveryCard() {
         </p>
       </div>
 
-      <div className="relative flex min-h-[22rem] flex-col">
+      <div className="relative flex min-h-[17.6rem] flex-col">
         {loading ? (
           <div
             className="flex flex-1 flex-col items-center gap-6 py-6"
