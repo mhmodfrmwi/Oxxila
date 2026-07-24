@@ -3,16 +3,12 @@ import { Eye, Flag } from 'lucide-react'
 import { useMemo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StarDisplay } from '../../product/reviews/StarDisplay'
-import type { AdminReviewRow } from '../../../types/adminReviews'
+import type { AdminReviewRow, AdminReviewsApiTab } from '../../../types/adminReviews'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { DataTable, type DataTableColumn } from '../ui/DataTable'
 import { StatusBadge } from '../ui/StatusBadge'
-import {
-  reviewModerationBadgeTone,
-} from '../../../utils/adminReviewsFormat'
 import { ReviewsStatusTabs } from './ReviewsStatusTabs'
-import type { AdminReviewsStatusTab } from '../../../types/adminReviews'
 
 interface ReviewsCatalogTableProps {
   reviews: readonly AdminReviewRow[]
@@ -24,10 +20,12 @@ interface ReviewsCatalogTableProps {
   totalCount: number
   currentPage: number
   totalPages: number
-  statusTab: AdminReviewsStatusTab
-  onStatusTabChange: (tab: AdminReviewsStatusTab) => void
+  statusTab: AdminReviewsApiTab
+  onStatusTabChange: (tab: AdminReviewsApiTab) => void
   onPageChange: (page: number) => void
   onOpenReview?: (reviewId: string) => void
+  onToggleVisibility?: (reviewId: string, isVisible: boolean) => void
+  onToggleFlag?: (reviewId: string, isFlagged: boolean) => void
 }
 
 function ReviewerCell({
@@ -42,7 +40,7 @@ function ReviewerCell({
   subtitle: string
 }) {
   return (
-    <div className="flex min-w-[10rem] items-center gap-3">
+    <div className="flex min-w-[8rem] items-center gap-3">
       {avatar ? (
         <img
           src={avatar}
@@ -51,7 +49,7 @@ function ReviewerCell({
         />
       ) : (
         <span
-          className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[rgba(163,148,255,0.2)] text-[11px] font-bold text-[#a394ff]"
+          className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[rgba(163,148,255,0.2)] text-[8.8px] font-bold text-[#a394ff]"
           aria-hidden
         >
           {initials}
@@ -61,7 +59,7 @@ function ReviewerCell({
         <p className="truncate text-sm font-semibold text-white" title={name}>
           {name}
         </p>
-        <p className="truncate text-[10px] font-medium uppercase tracking-[0.08em] text-white/35">
+        <p className="truncate text-[8px] font-medium uppercase tracking-[0.08em] text-white/35">
           {subtitle}
         </p>
       </div>
@@ -69,25 +67,29 @@ function ReviewerCell({
   )
 }
 
-/** Read-only visibility switch matching Figma (no approve/hide mutation in Phase 5A). */
+/** Visibility toggle switch — PATCH /reviews/:id/visibility. */
 function VisibilitySwitch({
   checked,
   label,
+  onToggle,
 }: {
   checked: boolean
   label: string
+  onToggle?: () => void
 }) {
   return (
-    <span
+    <button
+      type="button"
+      onClick={onToggle}
       className={cn(
-        'relative inline-flex h-5 w-9 shrink-0 cursor-not-allowed rounded-full border',
+        'relative inline-flex h-5 w-9 shrink-0 rounded-full border transition-colors',
         checked
           ? 'border-support-success/40 bg-support-success'
           : 'border-white/15 bg-white/15',
+        focusRingClasses,
       )}
       role="switch"
       aria-checked={checked}
-      aria-disabled="true"
       aria-label={label}
       title={label}
     >
@@ -98,7 +100,7 @@ function VisibilitySwitch({
         )}
         aria-hidden
       />
-    </span>
+    </button>
   )
 }
 
@@ -116,6 +118,8 @@ export function ReviewsCatalogTable({
   onStatusTabChange,
   onPageChange,
   onOpenReview,
+  onToggleVisibility,
+  onToggleFlag,
 }: ReviewsCatalogTableProps) {
   const { t } = useTranslation()
 
@@ -150,7 +154,7 @@ export function ReviewsCatalogTable({
             className="flex items-center"
             aria-label={t('admin.reviews.ratingAria', { rating: row.rating })}
           >
-            <StarDisplay rating={row.rating} size={14} />
+            <StarDisplay rating={row.rating} size={11} />
           </div>
         ),
       },
@@ -159,7 +163,7 @@ export function ReviewsCatalogTable({
         header: t('admin.reviews.columns.feedback'),
         cell: (row) => (
           <p
-            className="max-w-[16rem] truncate text-sm text-white/55"
+            className="max-w-[12.8rem] truncate text-sm text-white/55"
             title={row.feedback}
           >
             {row.feedback}
@@ -175,13 +179,14 @@ export function ReviewsCatalogTable({
               checked={row.isVisible}
               label={
                 row.isVisible
-                  ? t('admin.reviews.visibility.approved')
-                  : t('admin.reviews.visibility.pending')
+                  ? t('admin.reviews.visibility.visible')
+                  : t('admin.reviews.visibility.hidden')
               }
+              onToggle={() => onToggleVisibility?.(row.id, !row.isVisible)}
             />
-            {row.moderationBadge ? (
-              <StatusBadge tone={reviewModerationBadgeTone(row.moderationStatus)}>
-                {row.moderationBadge}
+            {row.isFlagged ? (
+              <StatusBadge tone="danger">
+                {t('admin.reviews.flagged')}
               </StatusBadge>
             ) : null}
           </div>
@@ -205,27 +210,36 @@ export function ReviewsCatalogTable({
               )}
               aria-label={t('admin.reviews.viewAria', { id: row.id })}
             >
-              <Eye size={14} aria-hidden />
+              <Eye size={11} aria-hidden />
             </button>
             <button
               type="button"
-              disabled
+              onClick={() => onToggleFlag?.(row.id, !row.isFlagged)}
               className={cn(
-                'inline-flex size-8 items-center justify-center rounded-full',
-                'border border-white/10 bg-white/5 text-white/40',
-                'cursor-not-allowed opacity-50',
+                'inline-flex size-8 items-center justify-center rounded-full border transition-colors',
+                row.isFlagged
+                  ? 'border-support-error/30 bg-support-error/10 text-support-error hover:bg-support-error/20'
+                  : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white',
                 focusRingClasses,
               )}
-              aria-label={t('admin.reviews.flagAria', { id: row.id })}
-              title={t('admin.reviews.flagSoon')}
+              aria-label={
+                row.isFlagged
+                  ? t('admin.reviews.unflagAria', { id: row.id })
+                  : t('admin.reviews.flagAria', { id: row.id })
+              }
+              title={
+                row.isFlagged
+                  ? t('admin.reviews.details.unflag')
+                  : t('admin.reviews.details.flag')
+              }
             >
-              <Flag size={14} aria-hidden />
+              <Flag size={11} aria-hidden fill={row.isFlagged ? 'currentColor' : 'none'} />
             </button>
           </div>
         ),
       },
     ],
-    [onOpenReview, t],
+    [onOpenReview, onToggleFlag, onToggleVisibility, t],
   )
 
   const canGoPrev = currentPage > 1
@@ -241,7 +255,7 @@ export function ReviewsCatalogTable({
       emptyDescription={emptyDescription}
       emptyAction={emptyAction}
       aria-label={t('admin.reviews.tableAria')}
-      className="rounded-[2rem]"
+      className="rounded-[1.6rem]"
       toolbar={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-bold text-white">
@@ -257,7 +271,7 @@ export function ReviewsCatalogTable({
       footer={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p
-            className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/30"
+            className="text-[8px] font-bold uppercase tracking-[0.08em] text-white/30"
             aria-live="polite"
           >
             {t('admin.reviews.showing', {

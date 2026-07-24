@@ -1,19 +1,19 @@
 // src/components/admin/reviews/ReviewsStatusTabs.tsx
 import { useTranslation } from 'react-i18next'
-import type { AdminReviewsStatusTab } from '../../../types/adminReviews'
+import type { AdminReviewsApiTab } from '../../../types/adminReviews'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
 
-const TABS: readonly AdminReviewsStatusTab[] = [
+const TABS: readonly AdminReviewsApiTab[] = [
   'all',
-  'pending',
-  'approved',
-  'reported',
+  'visible',
+  'hidden',
+  'flagged',
 ] as const
 
 interface ReviewsStatusTabsProps {
-  active: AdminReviewsStatusTab
-  onChange: (tab: AdminReviewsStatusTab) => void
+  active: AdminReviewsApiTab
+  onChange: (tab: AdminReviewsApiTab) => void
   disabled?: boolean
 }
 

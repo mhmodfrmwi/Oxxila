@@ -3,19 +3,24 @@ import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
 import { ReviewDetailsDrawer } from '../../components/admin/reviews/ReviewDetailsDrawer'
+import { ReviewsAverageRatingCard } from '../../components/admin/reviews/ReviewsAverageRatingCard'
 import { ReviewsCatalogTable } from '../../components/admin/reviews/ReviewsCatalogTable'
+import { ReviewsFlaggedQueueCard } from '../../components/admin/reviews/ReviewsFlaggedQueueCard'
 import { ReviewsListToolbar } from '../../components/admin/reviews/ReviewsListToolbar'
+import { ReviewsSentimentCard } from '../../components/admin/reviews/ReviewsSentimentCard'
 import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { Button } from '../../components/ui/Button'
 import { useAdminReviews } from '../../hooks/useAdminReviews'
+import { useAdminReviewsOverview } from '../../hooks/useAdminReviewsOverview'
 
 /**
- * Reviews & Reputation — list + read-only details drawer (Phase 5A/5B).
- * Figma: Reviews Management `937:21276` (no dedicated drawer frame — eye opens detail).
+ * Reviews & Reputation — overview widgets + list + details drawer.
+ * Contract: FRONTEND_ADMIN_DASHBOARD.md §5 (isFlagged only, no resolve/moderationStatus).
  */
 export function AdminReviewsPage() {
   const { t } = useTranslation()
   const list = useAdminReviews()
+  const overview = useAdminReviewsOverview()
   const [drawerReviewId, setDrawerReviewId] = useState<string | null>(null)
 
   const openDrawer = useCallback((reviewId: string) => {
@@ -25,6 +30,31 @@ export function AdminReviewsPage() {
   const closeDrawer = useCallback(() => {
     setDrawerReviewId(null)
   }, [])
+
+  const handleToggleVisibility = useCallback(
+    (reviewId: string, isVisible: boolean) => {
+      void list.patchVisibility(reviewId, isVisible)
+    },
+    [list],
+  )
+
+  const handleToggleFlag = useCallback(
+    (reviewId: string, isFlagged: boolean) => {
+      void list.patchFlag(reviewId, isFlagged)
+      overview.reloadFlaggedQueue()
+    },
+    [list, overview],
+  )
+
+  const handleReviewMutatedInDrawer = useCallback(
+    (reviewId: string, patch: { isVisible?: boolean; isFlagged?: boolean }) => {
+      list.updateReviewLocally(reviewId, patch)
+      if (patch.isFlagged !== undefined) {
+        overview.reloadFlaggedQueue()
+      }
+    },
+    [list, overview],
+  )
 
   const failed = Boolean(list.error) && !list.loading && list.reviews.length === 0
   const staleError = Boolean(list.error) && list.reviews.length > 0
@@ -53,6 +83,21 @@ export function AdminReviewsPage() {
           />
         }
       />
+
+      <div className="flex w-full flex-col gap-[var(--admin-content-gap-tight)] lg:flex-row lg:items-stretch">
+        <ReviewsAverageRatingCard
+          data={overview.averageRating}
+          loading={overview.loading}
+        />
+        <ReviewsSentimentCard data={overview.sentiment} loading={overview.loading} />
+        <ReviewsFlaggedQueueCard
+          data={overview.flaggedQueue}
+          loading={overview.loading}
+          queueLoading={overview.queueLoading}
+          onPageChange={overview.setQueuePage}
+          onOpenReview={openDrawer}
+        />
+      </div>
 
       {failed ? (
         <EmptyState
@@ -95,6 +140,8 @@ export function AdminReviewsPage() {
             onStatusTabChange={list.setStatusTab}
             onPageChange={list.setPage}
             onOpenReview={openDrawer}
+            onToggleVisibility={handleToggleVisibility}
+            onToggleFlag={handleToggleFlag}
           />
         </>
       )}
@@ -103,6 +150,7 @@ export function AdminReviewsPage() {
         open={Boolean(drawerReviewId)}
         reviewId={drawerReviewId}
         onClose={closeDrawer}
+        onReviewMutated={handleReviewMutatedInDrawer}
       />
     </>
   )

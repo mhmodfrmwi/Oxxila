@@ -1,15 +1,12 @@
 // src/components/admin/reviews/ReviewDetailsDrawer.tsx
 import { EyeOff, Flag, ThumbsUp } from 'lucide-react'
+import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useReviewDetailsDrawer } from '../../../hooks/useReviewDetailsDrawer'
+import { useToast } from '../../../context/ToastContext'
 import { cn } from '../../../lib/cn'
 import { StarDisplay } from '../../product/reviews/StarDisplay'
-import {
-  formatReviewDate,
-  formatReviewMoney,
-  hasReviewModerationDetails,
-  reviewModerationBadgeTone,
-} from '../../../utils/adminReviewsFormat'
+import { formatReviewDate, formatReviewMoney } from '../../../utils/adminReviewsFormat'
 import { Button } from '../../ui/Button'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { Drawer } from '../ui/Drawer'
@@ -22,6 +19,8 @@ interface ReviewDetailsDrawerProps {
   open: boolean
   reviewId: string | null
   onClose: () => void
+  /** Notifies the Reviews list/overview to reflect the same isVisible/isFlagged change. */
+  onReviewMutated?: (id: string, patch: { isVisible?: boolean; isFlagged?: boolean }) => void
 }
 
 function ReviewDetailsSkeleton() {
@@ -46,7 +45,7 @@ function ReviewDetailsSkeleton() {
 function DetailField({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <p className="text-[10px] uppercase leading-[15px] tracking-[0.1em] text-white/30">
+      <p className="text-[8px] uppercase leading-[12px] tracking-[0.1em] text-white/30">
         {label}
       </p>
       <p className="truncate text-sm font-medium leading-5 text-white" title={value}>
@@ -60,22 +59,62 @@ export function ReviewDetailsDrawer({
   open,
   reviewId,
   onClose,
+  onReviewMutated,
 }: ReviewDetailsDrawerProps) {
   const { t, i18n } = useTranslation()
+  const toast = useToast()
   const locale = i18n.language
-  const { review, loading, error, reload } = useReviewDetailsDrawer({
-    open,
-    reviewId,
-  })
+  const { review, loading, error, reload, mutating, approve, hide, flag, unflag } =
+    useReviewDetailsDrawer({ open, reviewId, onReviewMutated })
   const unavailable = '—'
 
   const visibilityLabel = review
     ? review.isVisible
-      ? t('admin.reviews.visibility.approved')
-      : t('admin.reviews.visibility.pending')
+      ? t('admin.reviews.visibility.visible')
+      : t('admin.reviews.visibility.hidden')
     : null
 
-  const showModeration = review ? hasReviewModerationDetails(review) : false
+  const handleApprove = useCallback(async () => {
+    const result = await approve(t('admin.reviews.details.actionError'))
+    if (!result) return
+    if (result.ok) {
+      toast.success(t('admin.reviews.details.approveSuccess'))
+    } else {
+      toast.error(result.message)
+    }
+  }, [approve, t, toast])
+
+  const handleHide = useCallback(async () => {
+    const result = await hide(t('admin.reviews.details.actionError'))
+    if (!result) return
+    if (result.ok) {
+      toast.success(t('admin.reviews.details.hideSuccess'))
+    } else {
+      toast.error(result.message)
+    }
+  }, [hide, t, toast])
+
+  const handleFlag = useCallback(async () => {
+    const result = await flag(t('admin.reviews.details.actionError'))
+    if (!result) return
+    if (result.ok) {
+      toast.success(t('admin.reviews.details.flagSuccess'))
+    } else {
+      toast.error(result.message)
+    }
+  }, [flag, t, toast])
+
+  const handleUnflag = useCallback(async () => {
+    const result = await unflag(t('admin.reviews.details.actionError'))
+    if (!result) return
+    if (result.ok) {
+      toast.success(t('admin.reviews.details.unflagSuccess'))
+    } else {
+      toast.error(result.message)
+    }
+  }, [unflag, t, toast])
+
+  const busy = mutating !== null
 
   const footer =
     review && !loading && !error ? (
@@ -83,46 +122,53 @@ export function ReviewDetailsDrawer({
         <div className="flex gap-3">
           <button
             type="button"
-            disabled
-            title={t('admin.reviews.details.approveSoon')}
+            disabled={busy || review.isVisible}
+            onClick={handleApprove}
             className={cn(
               'inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3',
               'text-sm font-medium text-white',
-              'cursor-not-allowed opacity-50',
+              'transition-colors hover:bg-white/10',
+              'disabled:cursor-not-allowed disabled:opacity-50',
               focusRingClasses,
             )}
           >
-            <ThumbsUp size={16} aria-hidden />
+            <ThumbsUp size={13} aria-hidden />
             {t('admin.reviews.details.approve')}
           </button>
           <button
             type="button"
-            disabled
-            title={t('admin.reviews.details.hideSoon')}
+            disabled={busy || !review.isVisible}
+            onClick={handleHide}
             className={cn(
               'inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3',
               'text-sm font-medium text-white',
-              'cursor-not-allowed opacity-50',
+              'transition-colors hover:bg-white/10',
+              'disabled:cursor-not-allowed disabled:opacity-50',
               focusRingClasses,
             )}
           >
-            <EyeOff size={16} aria-hidden />
+            <EyeOff size={13} aria-hidden />
             {t('admin.reviews.details.hide')}
           </button>
         </div>
         <button
           type="button"
-          disabled
-          title={t('admin.reviews.flagSoon')}
+          disabled={busy}
+          onClick={review.isFlagged ? handleUnflag : handleFlag}
           className={cn(
-            'inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[rgba(255,100,103,0.2)] bg-[rgba(255,100,103,0.1)] px-4 py-3',
-            'text-sm font-medium text-[#ff6467]',
-            'cursor-not-allowed opacity-50',
+            'inline-flex w-full items-center justify-center gap-2 rounded-2xl border px-4 py-3',
+            'text-sm font-medium',
+            'transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+            review.isFlagged
+              ? 'border-white/10 bg-white/5 text-white hover:bg-white/10'
+              : 'border-[rgba(255,100,103,0.2)] bg-[rgba(255,100,103,0.1)] text-[#ff6467] hover:bg-[rgba(255,100,103,0.18)]',
             focusRingClasses,
           )}
         >
-          <Flag size={16} aria-hidden />
-          {t('admin.reviews.details.flag')}
+          <Flag size={13} aria-hidden fill={review.isFlagged ? 'currentColor' : 'none'} />
+          {review.isFlagged
+            ? t('admin.reviews.details.unflag')
+            : t('admin.reviews.details.flag')}
         </button>
       </div>
     ) : undefined
@@ -261,7 +307,7 @@ export function ReviewDetailsDrawer({
                 className="flex items-center gap-2"
                 aria-label={t('admin.reviews.ratingAria', { rating: review.rating })}
               >
-                <StarDisplay rating={review.rating} size={16} />
+                <StarDisplay rating={review.rating} size={13} />
                 <span className="text-sm font-medium text-white/70">
                   {review.rating}/5
                 </span>
@@ -295,82 +341,22 @@ export function ReviewDetailsDrawer({
                 }
               />
               <div className="min-w-0">
-                <p className="text-[10px] uppercase leading-[15px] tracking-[0.1em] text-white/30">
+                <p className="text-[8px] uppercase leading-[12px] tracking-[0.1em] text-white/30">
                   {t('admin.reviews.details.status')}
                 </p>
                 <div className="mt-1 flex flex-wrap gap-2">
-                  <StatusBadge
-                    tone={review.isVisible ? 'success' : 'neutral'}
-                  >
+                  <StatusBadge tone={review.isVisible ? 'success' : 'neutral'}>
                     {visibilityLabel}
                   </StatusBadge>
-                  {review.moderationBadge ? (
-                    <StatusBadge
-                      tone={reviewModerationBadgeTone(review.moderationStatus)}
-                    >
-                      {review.moderationBadge}
+                  {review.isFlagged ? (
+                    <StatusBadge tone="danger">
+                      {t('admin.reviews.flagged')}
                     </StatusBadge>
                   ) : null}
                 </div>
               </div>
             </GlassCard>
           </section>
-
-          {showModeration ? (
-            <section aria-labelledby="review-moderation-heading">
-              <h3
-                id="review-moderation-heading"
-                className="mb-3 text-sm font-bold leading-5 text-white"
-              >
-                {t('admin.reviews.details.moderation')}
-              </h3>
-              <GlassCard
-                className="grid gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 sm:grid-cols-2"
-                padding="none"
-              >
-                <DetailField
-                  label={t('admin.reviews.details.flagReason')}
-                  value={
-                    review.flagReason
-                      ? t(`admin.reviews.details.flagReasons.${review.flagReason}` as const)
-                      : unavailable
-                  }
-                />
-                <DetailField
-                  label={t('admin.reviews.details.flaggedAt')}
-                  value={
-                    review.flaggedAt
-                      ? formatReviewDate(review.flaggedAt, locale)
-                      : unavailable
-                  }
-                />
-                <DetailField
-                  label={t('admin.reviews.details.flaggedBy')}
-                  value={review.flaggedByName ?? unavailable}
-                />
-                <DetailField
-                  label={t('admin.reviews.details.resolvedAt')}
-                  value={
-                    review.resolvedAt
-                      ? formatReviewDate(review.resolvedAt, locale)
-                      : unavailable
-                  }
-                />
-                <DetailField
-                  label={t('admin.reviews.details.resolvedBy')}
-                  value={review.resolvedByName ?? unavailable}
-                />
-                <div className="min-w-0 sm:col-span-2">
-                  <p className="text-[10px] uppercase leading-[15px] tracking-[0.1em] text-white/30">
-                    {t('admin.reviews.details.resolvedNote')}
-                  </p>
-                  <p className="mt-1 text-sm leading-5 text-white/70">
-                    {review.resolvedNote ?? unavailable}
-                  </p>
-                </div>
-              </GlassCard>
-            </section>
-          ) : null}
         </div>
       ) : null}
     </Drawer>

@@ -20,8 +20,9 @@ export function ReviewsListToolbar({
   return (
     <label className="relative block w-full sm:w-[var(--admin-search-width)]">
       <span className="sr-only">{t('admin.reviews.searchLabel')}</span>
+      {/* Figma Reviews: search icon 16×16 */}
       <Search
-        size={18}
+        size={13}
         className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-white/45"
         aria-hidden
       />
@@ -32,7 +33,7 @@ export function ReviewsListToolbar({
         onChange={(event) => onKeywordChange(event.target.value)}
         placeholder={t('admin.reviews.searchPlaceholder')}
         className={cn(
-          'h-[var(--admin-search-height)] w-full rounded-full border border-white/10 bg-white/5 pe-5 ps-12',
+          'h-[var(--admin-search-height)] w-full rounded-full border border-white/10 bg-white/5 pe-5 ps-11',
           'text-sm text-primary-text placeholder:text-white/50',
           'shadow-[inset_0_2px_4px_1px_rgba(0,0,0,0.05)]',
           'transition-colors hover:bg-white/[0.07]',

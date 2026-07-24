@@ -1,18 +1,20 @@
 // src/hooks/useAdminReviews.ts
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getAdminReviews } from '../api/admin/reviews'
+import {
+  getAdminReviews,
+  updateAdminReviewFlag,
+  updateAdminReviewVisibility,
+} from '../api/admin/reviews'
+import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
 import type { ApiPagination } from '../lib/api'
 import type {
   AdminReviewRow,
+  AdminReviewsApiTab,
   AdminReviewsListParams,
-  AdminReviewsStatusTab,
 } from '../types/adminReviews'
-import {
-  mapApiReviewToAdminRow,
-  statusTabToApiTab,
-} from '../utils/adminReviewsFormat'
+import { mapApiReviewToAdminRow } from '../utils/adminReviewsFormat'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_LIMIT = 10
@@ -21,7 +23,7 @@ const SEARCH_DEBOUNCE_MS = 300
 
 export interface AdminReviewsFilters {
   keyword: string
-  statusTab: AdminReviewsStatusTab
+  statusTab: AdminReviewsApiTab
   page: number
   limit: number
   sort: string
@@ -59,6 +61,7 @@ function isAbortError(error: unknown): boolean {
 
 export function useAdminReviews(options?: UseAdminReviewsOptions) {
   const { t } = useTranslation()
+  const toast = useToast()
   const [filters, setFilters] = useState<AdminReviewsFilters>(() =>
     normalizeFilters(options?.initialFilters),
   )
@@ -80,12 +83,11 @@ export function useAdminReviews(options?: UseAdminReviewsOptions) {
   }, [filters.keyword])
 
   const queryParams = useMemo<AdminReviewsListParams>(() => {
-    const tab = statusTabToApiTab(filters.statusTab)
     return {
       page: filters.page,
       limit: filters.limit,
       sort: filters.sort,
-      tab,
+      tab: filters.statusTab,
       ...(debouncedKeyword ? { keyword: debouncedKeyword } : {}),
     }
   }, [
@@ -155,7 +157,7 @@ export function useAdminReviews(options?: UseAdminReviewsOptions) {
     setFilters((previous) => ({ ...previous, keyword, page: 1 }))
   }, [])
 
-  const setStatusTab = useCallback((statusTab: AdminReviewsStatusTab) => {
+  const setStatusTab = useCallback((statusTab: AdminReviewsApiTab) => {
     setFilters((previous) => ({ ...previous, statusTab, page: 1 }))
   }, [])
 
@@ -176,6 +178,63 @@ export function useAdminReviews(options?: UseAdminReviewsOptions) {
     setReloadToken((token) => token + 1)
   }, [])
 
+  const patchRow = useCallback((id: string, patch: Partial<AdminReviewRow>) => {
+    setState((previous) => ({
+      ...previous,
+      reviews: previous.reviews.map((row) =>
+        row.id === id ? { ...row, ...patch } : row,
+      ),
+    }))
+  }, [])
+
+  const patchVisibility = useCallback(
+    async (id: string, isVisible: boolean) => {
+      const previousRow = state.reviews.find((row) => row.id === id)
+      if (!previousRow) return
+      patchRow(id, { isVisible })
+      try {
+        await updateAdminReviewVisibility(id, isVisible)
+        toast.success(
+          isVisible
+            ? t('admin.reviews.visibilityApprovedToast')
+            : t('admin.reviews.visibilityHiddenToast'),
+        )
+      } catch (error) {
+        patchRow(id, { isVisible: previousRow.isVisible })
+        toast.error(
+          error instanceof ApiError
+            ? error.message
+            : t('admin.reviews.visibilityToggleError'),
+        )
+      }
+    },
+    [patchRow, state.reviews, t, toast],
+  )
+
+  const patchFlag = useCallback(
+    async (id: string, isFlagged: boolean) => {
+      const previousRow = state.reviews.find((row) => row.id === id)
+      if (!previousRow) return
+      patchRow(id, { isFlagged })
+      try {
+        await updateAdminReviewFlag(id, isFlagged)
+        toast.success(
+          isFlagged
+            ? t('admin.reviews.flagUpdatedToast')
+            : t('admin.reviews.unflagUpdatedToast'),
+        )
+      } catch (error) {
+        patchRow(id, { isFlagged: previousRow.isFlagged })
+        toast.error(
+          error instanceof ApiError
+            ? error.message
+            : t('admin.reviews.flagToggleError'),
+        )
+      }
+    },
+    [patchRow, state.reviews, t, toast],
+  )
+
   const hasActiveFilters = Boolean(
     debouncedKeyword || filters.statusTab !== 'all',
   )
@@ -190,5 +249,8 @@ export function useAdminReviews(options?: UseAdminReviewsOptions) {
     setPage,
     clearFilters,
     reload,
+    patchVisibility,
+    patchFlag,
+    updateReviewLocally: patchRow,
   }
 }
