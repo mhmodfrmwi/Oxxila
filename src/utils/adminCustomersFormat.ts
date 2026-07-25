@@ -1,11 +1,15 @@
 // src/utils/adminCustomersFormat.ts
 import type {
   AdminCustomerAddress,
+  AdminCustomerCreateFields,
   AdminCustomerDetail,
+  AdminCustomerFormErrors,
+  AdminCustomerFormValues,
   AdminCustomerRow,
   AdminCustomerStats,
   AdminCustomersListParams,
   AdminCustomersSegmentTab,
+  AdminCustomerUpdateFields,
   ApiAdminCustomer,
   ApiAdminCustomerAddress,
   ApiAdminCustomerStats,
@@ -14,9 +18,14 @@ import {
   formatDashboardDate,
   formatDashboardMoney,
   formatDashboardNumber,
-  resolveDashboardLocale,
 } from './adminDashboardFormat'
 import { customerInitials } from './adminOrdersFormat'
+
+export const ADMIN_CUSTOMER_NAME_MIN = 2
+export const ADMIN_CUSTOMER_NAME_MAX = 60
+export const ADMIN_CUSTOMER_PASSWORD_MIN = 8
+export const ADMIN_CUSTOMER_PASSWORD_MAX = 128
+export const ADMIN_CUSTOMER_PHONE_MAX = 30
 
 export function formatCustomerCount(value: number, locale = 'en'): string {
   return formatDashboardNumber(value, locale)
@@ -67,7 +76,8 @@ export function mapApiCustomerStats(
           : Number(total.trend),
       trendLabel: total?.trendLabel?.trim() || null,
       newThisMonth:
-        total?.newThisMonth == null || !Number.isFinite(Number(total.newThisMonth))
+        total?.newThisMonth == null ||
+        !Number.isFinite(Number(total.newThisMonth))
           ? null
           : Number(total.newThisMonth),
     },
@@ -119,7 +129,10 @@ function formatAddressLine(address: ApiAdminCustomerAddress): string {
   return parts.join(', ') || '—'
 }
 
-function mapAddress(address: ApiAdminCustomerAddress, index: number): AdminCustomerAddress {
+function mapAddress(
+  address: ApiAdminCustomerAddress,
+  index: number,
+): AdminCustomerAddress {
   return {
     id: address._id ? String(address._id) : `address-${index}`,
     label: address.label?.trim() || null,
@@ -128,7 +141,9 @@ function mapAddress(address: ApiAdminCustomerAddress, index: number): AdminCusto
   }
 }
 
-export function mapApiCustomerToAdminDetail(user: ApiAdminCustomer): AdminCustomerDetail {
+export function mapApiCustomerToAdminDetail(
+  user: ApiAdminCustomer,
+): AdminCustomerDetail {
   const id = String(user._id)
   const name = user.name?.trim() || '—'
   const email = user.email?.trim() || null
@@ -157,6 +172,114 @@ export function mapApiCustomerToAdminDetail(user: ApiAdminCustomer): AdminCustom
   }
 }
 
-export function formatCount(value: number, locale = 'en'): string {
-  return new Intl.NumberFormat(resolveDashboardLocale(locale)).format(value)
+export function emptyCustomerFormValues(): AdminCustomerFormValues {
+  return {
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    active: true,
+  }
 }
+
+export function customerToFormValues(
+  customer: AdminCustomerRow | AdminCustomerDetail,
+): AdminCustomerFormValues {
+  return {
+    name: customer.name === '—' ? '' : customer.name,
+    email: !customer.email || customer.email === '—' ? '' : customer.email,
+    phone: customer.phone ?? '',
+    password: '',
+    active: customer.active,
+  }
+}
+
+export function formValuesToCreateFields(
+  values: AdminCustomerFormValues,
+): AdminCustomerCreateFields {
+  const phone = values.phone.trim()
+  return {
+    name: values.name.trim(),
+    email: values.email.trim(),
+    password: values.password,
+    role: 'user',
+    active: values.active,
+    ...(phone ? { phone } : {}),
+  }
+}
+
+export function formValuesToUpdateFields(
+  values: AdminCustomerFormValues,
+): AdminCustomerUpdateFields {
+  const phone = values.phone.trim()
+  return {
+    name: values.name.trim(),
+    email: values.email.trim(),
+    active: values.active,
+    phone: phone || '',
+  }
+}
+
+type TranslateFn = (key: string, options?: Record<string, unknown>) => string
+
+/** Client validation aligned with user.validator.js. */
+export function validateCustomerForm(
+  values: AdminCustomerFormValues,
+  mode: 'create' | 'edit',
+  t: TranslateFn,
+): AdminCustomerFormErrors {
+  const errors: AdminCustomerFormErrors = {}
+  const name = values.name.trim()
+  const email = values.email.trim()
+  const phone = values.phone.trim()
+
+  if (!name) {
+    errors.name = t('admin.customers.drawer.validation.nameRequired')
+  } else if (
+    name.length < ADMIN_CUSTOMER_NAME_MIN ||
+    name.length > ADMIN_CUSTOMER_NAME_MAX
+  ) {
+    errors.name = t('admin.customers.drawer.validation.nameLength', {
+      min: ADMIN_CUSTOMER_NAME_MIN,
+      max: ADMIN_CUSTOMER_NAME_MAX,
+    })
+  }
+
+  if (!email) {
+    errors.email = t('admin.customers.drawer.validation.emailRequired')
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = t('admin.customers.drawer.validation.emailInvalid')
+  }
+
+  if (phone && phone.length > ADMIN_CUSTOMER_PHONE_MAX) {
+    errors.phone = t('admin.customers.drawer.validation.phoneMax', {
+      max: ADMIN_CUSTOMER_PHONE_MAX,
+    })
+  }
+
+  if (mode === 'create') {
+    const passwordError = validateCustomerPassword(values.password, t)
+    if (passwordError) errors.password = passwordError
+  }
+
+  return errors
+}
+
+export function validateCustomerPassword(
+  password: string,
+  t: TranslateFn,
+): string | null {
+  if (!password) return t('admin.customers.password.validation.required')
+  if (
+    password.length < ADMIN_CUSTOMER_PASSWORD_MIN ||
+    password.length > ADMIN_CUSTOMER_PASSWORD_MAX
+  ) {
+    return t('admin.customers.password.validation.length', {
+      min: ADMIN_CUSTOMER_PASSWORD_MIN,
+      max: ADMIN_CUSTOMER_PASSWORD_MAX,
+    })
+  }
+  return null
+}
+
+export { formatCount } from './adminOrdersFormat'

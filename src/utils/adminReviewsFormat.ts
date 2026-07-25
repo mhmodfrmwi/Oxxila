@@ -15,7 +15,6 @@ import {
   formatDashboardDate,
   formatDashboardMoney,
   formatRelativeTime,
-  resolveDashboardLocale,
 } from './adminDashboardFormat'
 import { customerInitials } from './adminOrdersFormat'
 
@@ -27,9 +26,7 @@ export function formatReviewRelativeTime(value: string, locale = 'en'): string {
   return formatRelativeTime(value, locale)
 }
 
-export function formatCount(value: number, locale = 'en'): string {
-  return new Intl.NumberFormat(resolveDashboardLocale(locale)).format(value)
-}
+export { formatCount } from './adminOrdersFormat'
 
 export function formatReviewMoney(value: number, locale = 'en'): string {
   return formatDashboardMoney(value, locale)

@@ -18,7 +18,6 @@ import {
   ORDER_CONFIRMATION_PATH,
   PAYMENT_PATH,
   PAYMENT_CALLBACK_PATH,
-  PAYMENT_CALLBACK_PREVIEW_PATH,
   PRODUCTS_PATH,
   REGISTER_PATH,
   RESET_PASSWORD_PATH,
@@ -82,11 +81,6 @@ const PaymentPage = lazy(() =>
 const PaymentCallbackPage = lazy(() =>
   import('./pages/PaymentCallbackPage').then((module) => ({
     default: module.PaymentCallbackPage,
-  })),
-)
-const PaymentCallbackPreviewPage = lazy(() =>
-  import('./pages/PaymentCallbackPreviewPage').then((module) => ({
-    default: module.PaymentCallbackPreviewPage,
   })),
 )
 const OrderConfirmationPage = lazy(() =>
@@ -153,6 +147,26 @@ const AdminProductsPage = lazy(() =>
     default: module.AdminProductsPage,
   })),
 )
+const AdminCategoriesPage = lazy(() =>
+  import('./pages/admin/AdminCategoriesPage').then((module) => ({
+    default: module.AdminCategoriesPage,
+  })),
+)
+const AdminBrandsPage = lazy(() =>
+  import('./pages/admin/AdminBrandsPage').then((module) => ({
+    default: module.AdminBrandsPage,
+  })),
+)
+const AdminSubcategoriesPage = lazy(() =>
+  import('./pages/admin/AdminSubcategoriesPage').then((module) => ({
+    default: module.AdminSubcategoriesPage,
+  })),
+)
+const AdminFaqsPage = lazy(() =>
+  import('./pages/admin/AdminFaqsPage').then((module) => ({
+    default: module.AdminFaqsPage,
+  })),
+)
 const AdminOrdersPage = lazy(() =>
   import('./pages/admin/AdminOrdersPage').then((module) => ({
     default: module.AdminOrdersPage,
@@ -201,7 +215,6 @@ export default function App() {
         />
         <Route path={CHECKOUT_PATH} element={<CheckoutPage />} />
         <Route path={PAYMENT_PATH} element={<PaymentPage />} />
-        <Route path={PAYMENT_CALLBACK_PREVIEW_PATH} element={<PaymentCallbackPreviewPage />} />
         <Route path={PAYMENT_CALLBACK_PATH} element={<PaymentCallbackPage />} />
         <Route path={`${ORDER_CONFIRMATION_PATH}/:orderId`} element={<OrderConfirmationPage />} />
         <Route path={`${TRACK_ORDER_PATH}/:orderId`} element={<TrackOrderPage />} />
@@ -232,6 +245,10 @@ export default function App() {
         >
           <Route index element={<AdminDashboardPage />} />
           <Route path="products" element={<AdminProductsPage />} />
+          <Route path="categories" element={<AdminCategoriesPage />} />
+          <Route path="brands" element={<AdminBrandsPage />} />
+          <Route path="subcategories" element={<AdminSubcategoriesPage />} />
+          <Route path="faqs" element={<AdminFaqsPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="customers" element={<AdminCustomersPage />} />
           <Route path="reviews" element={<AdminReviewsPage />} />

@@ -317,6 +317,7 @@ export function BannerDrawer({
               type="button"
               role="switch"
               aria-checked={drawer.values.isActive}
+              aria-label={t('admin.settings.banners.drawer.active')}
               disabled={drawer.submitting}
               onClick={() =>
                 drawer.setField('isActive', !drawer.values.isActive)

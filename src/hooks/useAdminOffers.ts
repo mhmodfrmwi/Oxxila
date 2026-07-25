@@ -2,7 +2,8 @@
 import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getAdminOffers } from '../api/admin/offers'
+import { deleteAdminOffer, getAdminOffers } from '../api/admin/offers'
+import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
 import type { ApiPagination } from '../lib/api'
 import type {
@@ -22,9 +23,12 @@ interface AsyncState {
 }
 
 export function useAdminOffers() {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const toast = useToast()
   const locale = i18n.language
   const [page, setPageState] = useState(DEFAULT_PAGE)
+  const [deletingOfferId, setDeletingOfferId] = useState<string | null>(null)
+  const deletingOfferIdRef = useRef<string | null>(null)
   const [state, setState] = useState<AsyncState>({
     offers: [],
     pagination: null,
@@ -123,14 +127,40 @@ export function useAdminOffers() {
     })
   }, [])
 
+  /** Rethrows so the confirm dialog can surface a translated message inline. */
+  const deleteOffer = useCallback(
+    async (offerId: string) => {
+      if (deletingOfferIdRef.current) return
+      deletingOfferIdRef.current = offerId
+      setDeletingOfferId(offerId)
+
+      try {
+        await deleteAdminOffer(offerId)
+        setState((previous) => ({
+          ...previous,
+          offers: previous.offers.filter((row) => row.id !== offerId),
+        }))
+        // Refetch the current page so pagination totals stay accurate.
+        reload()
+        toast.success(t('admin.settings.offers.delete.success'))
+      } finally {
+        deletingOfferIdRef.current = null
+        setDeletingOfferId(null)
+      }
+    },
+    [reload, t, toast],
+  )
+
   return {
     offers: state.offers,
     pagination: state.pagination,
     loading: state.loading,
     error: state.error,
     page,
+    deletingOfferId,
     setPage,
     reload,
     upsertOffer,
+    deleteOffer,
   }
 }

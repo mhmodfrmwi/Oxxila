@@ -62,6 +62,18 @@ export function createAdminCoupon(
   })
 }
 
+/** DELETE /api/v1/coupons/:id */
+export function deleteAdminCoupon(
+  couponId: string,
+  options?: { signal?: AbortSignal },
+) {
+  return apiRequest<null>(`/coupons/${encodeURIComponent(couponId)}`, {
+    method: 'DELETE',
+    auth: true,
+    signal: options?.signal,
+  })
+}
+
 /** PUT /api/v1/coupons/:id */
 export function updateAdminCoupon(
   couponId: string,

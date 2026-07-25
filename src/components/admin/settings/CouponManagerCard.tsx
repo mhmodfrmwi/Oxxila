@@ -1,5 +1,5 @@
 // src/components/admin/settings/CouponManagerCard.tsx
-import { Pencil } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAdminCoupons } from '../../../hooks/useAdminCoupons'
@@ -12,6 +12,7 @@ import { DataTable, type DataTableColumn } from '../ui/DataTable'
 import { EmptyState } from '../ui/EmptyState'
 import { StatusBadge } from '../ui/StatusBadge'
 import { CouponDrawer } from './CouponDrawer'
+import { DeleteCouponDialog } from './DeleteCouponDialog'
 
 /**
  * Coupon Manager — list + create/edit drawer (Phase 7C).
@@ -25,13 +26,16 @@ export function CouponManagerCard() {
     loading,
     error,
     page,
+    deletingCouponId,
     setPage,
     reload,
     upsertCoupon,
+    deleteCoupon,
   } = useAdminCoupons()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerMode, setDrawerMode] = useState<CouponDrawerMode>('create')
   const [editCouponId, setEditCouponId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<AdminCouponRow | null>(null)
 
   const openCreate = useCallback(() => {
     setDrawerMode('create')
@@ -59,6 +63,14 @@ export function CouponManagerCard() {
     },
     [drawerMode, reload, upsertCoupon],
   )
+
+  const openDelete = useCallback((coupon: AdminCouponRow) => {
+    setDeleteTarget(coupon)
+  }, [])
+
+  const closeDelete = useCallback(() => {
+    setDeleteTarget(null)
+  }, [])
 
   const columns = useMemo<DataTableColumn<AdminCouponRow>[]>(
     () => [
@@ -109,22 +121,40 @@ export function CouponManagerCard() {
         headerClassName: 'text-end',
         className: 'text-end',
         cell: (row) => (
-          <button
-            type="button"
-            onClick={() => openEdit(row.id)}
-            className={cn(
-              'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
-              'transition-colors hover:bg-white/10 hover:text-white',
-              focusRingClasses,
-            )}
-            aria-label={t('admin.settings.coupons.editAria', { code: row.code })}
-          >
-            <Pencil size={13} aria-hidden />
-          </button>
+          <div className="inline-flex items-center justify-end gap-1">
+            <button
+              type="button"
+              onClick={() => openEdit(row.id)}
+              className={cn(
+                'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
+                'transition-colors hover:bg-white/10 hover:text-white',
+                focusRingClasses,
+              )}
+              aria-label={t('admin.settings.coupons.editAria', { code: row.code })}
+            >
+              <Pencil size={13} aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={() => openDelete(row)}
+              disabled={deletingCouponId === row.id}
+              className={cn(
+                'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
+                'transition-colors hover:bg-support-error/10 hover:text-support-error',
+                'disabled:pointer-events-none disabled:opacity-40',
+                focusRingClasses,
+              )}
+              aria-label={t('admin.settings.coupons.deleteAria', {
+                code: row.code,
+              })}
+            >
+              <Trash2 size={13} aria-hidden />
+            </button>
+          </div>
         ),
       },
     ],
-    [openEdit, t],
+    [deletingCouponId, openDelete, openEdit, t],
   )
 
   const failed = Boolean(error) && !loading && coupons.length === 0
@@ -230,6 +260,16 @@ export function CouponManagerCard() {
         couponId={editCouponId}
         onClose={closeDrawer}
         onSaved={handleSaved}
+      />
+
+      <DeleteCouponDialog
+        open={Boolean(deleteTarget)}
+        coupon={deleteTarget}
+        submitting={
+          deleteTarget != null && deletingCouponId === deleteTarget.id
+        }
+        onClose={closeDelete}
+        onConfirm={deleteCoupon}
       />
     </>
   )

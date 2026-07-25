@@ -29,6 +29,7 @@ export interface AdminProductRow {
   inventoryProgress: number
   price: number
   soldCount: number
+  isBestSeller: boolean
   /** Period-over-period performance is not provided by the list API yet. */
   performancePercent: number | null
 }

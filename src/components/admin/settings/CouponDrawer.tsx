@@ -289,6 +289,7 @@ export function CouponDrawer({
                 type="button"
                 role="switch"
                 aria-checked={drawer.values.isActive}
+                aria-label={t('admin.settings.coupons.drawer.active')}
                 disabled={drawer.submitting}
                 onClick={() =>
                   drawer.setField('isActive', !drawer.values.isActive)

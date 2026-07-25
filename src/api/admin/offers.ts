@@ -78,3 +78,15 @@ export function updateAdminOffer(
     },
   )
 }
+
+/** DELETE /api/v1/offers/:id */
+export function deleteAdminOffer(
+  offerId: string,
+  options?: { signal?: AbortSignal },
+) {
+  return apiRequest<null>(`/offers/${encodeURIComponent(offerId)}`, {
+    method: 'DELETE',
+    auth: true,
+    signal: options?.signal,
+  })
+}

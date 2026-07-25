@@ -163,8 +163,56 @@ export function getTrackOrderStatusSteps(order: ApiOrder): OrderStatusDisplaySte
   })
 }
 
-export function canCancelOrder(order: ApiOrder) {
+/** Matches backend USER_CANCELLABLE_STATUSES for buyer cancel. */
+export function canCancelOrder(order: Pick<ApiOrder, 'orderStatus'>) {
   return order.orderStatus === 'pending' || order.orderStatus === 'processing'
+}
+
+export type OrderStatusBadgeTone =
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'info'
+  | 'neutral'
+
+/** Visual tone for storefront order-status chips. */
+export function orderStatusBadgeTone(
+  status: string,
+): OrderStatusBadgeTone {
+  switch (status) {
+    case 'delivered':
+      return 'success'
+    case 'cancelled':
+    case 'returned':
+    case 'partially_returned':
+      return 'danger'
+    case 'shipped':
+    case 'out_for_delivery':
+      return 'info'
+    case 'failed_attempt':
+      return 'warning'
+    case 'pending':
+    case 'confirmed':
+    case 'processing':
+      return 'warning'
+    default:
+      return 'neutral'
+  }
+}
+
+export function paymentStatusBadgeTone(
+  status: string,
+): OrderStatusBadgeTone {
+  switch (status) {
+    case 'paid':
+      return 'success'
+    case 'refunded':
+      return 'info'
+    case 'pending':
+      return 'warning'
+    default:
+      return 'neutral'
+  }
 }
 
 export function formatOrderReferenceId(order: ApiOrder) {

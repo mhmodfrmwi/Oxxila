@@ -285,6 +285,7 @@ export function CarrierDrawer({
             type="button"
             role="switch"
             aria-checked={form.values.isActive}
+            aria-label={t('admin.shipping.carriers.drawer.active')}
             disabled={form.submitting}
             onClick={() => form.setField('isActive', !form.values.isActive)}
             className={cn(

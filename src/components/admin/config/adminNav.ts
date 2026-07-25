@@ -1,21 +1,29 @@
 // src/components/admin/config/adminNav.ts
 import {
+  ADMIN_BRANDS_PATH,
+  ADMIN_CATEGORIES_PATH,
   ADMIN_CUSTOMERS_PATH,
   ADMIN_DASHBOARD_PATH,
+  ADMIN_FAQS_PATH,
   ADMIN_ORDERS_PATH,
   ADMIN_PRODUCTS_PATH,
   ADMIN_RETURNS_PATH,
   ADMIN_REVIEWS_PATH,
   ADMIN_SETTINGS_PATH,
   ADMIN_SHIPPING_PATH,
+  ADMIN_SUBCATEGORIES_PATH,
 } from '../../../config/routes'
+import iconBrands from '../../../assets/admin/icon-brands.svg'
+import iconCategories from '../../../assets/admin/icon-categories.svg'
 import iconCustomers from '../../../assets/admin/icon-customers.svg'
 import iconDashboard from '../../../assets/admin/icon-dashboard.svg'
+import iconFaqs from '../../../assets/admin/icon-faqs.svg'
 import iconOrders from '../../../assets/admin/icon-orders.svg'
 import iconProducts from '../../../assets/admin/icon-products.svg'
 import iconReturns from '../../../assets/admin/icon-returns.svg'
 import iconReviews from '../../../assets/admin/icon-reviews.svg'
 import iconShipping from '../../../assets/admin/icon-shipping.svg'
+import iconSubcategories from '../../../assets/admin/icon-subcategories.svg'
 
 export interface AdminNavItem {
   id: string
@@ -28,6 +36,42 @@ export interface AdminNavItem {
   /** Exact match for dashboard root; prefix match for nested routes. */
   end?: boolean
 }
+
+/**
+ * Catalog modules kept in-repo and still routed, but omitted from the
+ * sidebar so the nav matches the approved Figma. Re-add to ADMIN_NAV_ITEMS
+ * to show them again.
+ */
+export const ADMIN_NAV_ITEMS_HIDDEN_FROM_SIDEBAR: readonly AdminNavItem[] = [
+  {
+    id: 'categories',
+    labelKey: 'admin.nav.categories',
+    to: ADMIN_CATEGORIES_PATH,
+    iconSrc: iconCategories,
+    iconSize: 24,
+  },
+  {
+    id: 'brands',
+    labelKey: 'admin.nav.brands',
+    to: ADMIN_BRANDS_PATH,
+    iconSrc: iconBrands,
+    iconSize: 24,
+  },
+  {
+    id: 'subcategories',
+    labelKey: 'admin.nav.subcategories',
+    to: ADMIN_SUBCATEGORIES_PATH,
+    iconSrc: iconSubcategories,
+    iconSize: 24,
+  },
+  {
+    id: 'faqs',
+    labelKey: 'admin.nav.faqs',
+    to: ADMIN_FAQS_PATH,
+    iconSrc: iconFaqs,
+    iconSize: 24,
+  },
+]
 
 export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
   {

@@ -13,6 +13,23 @@ export type AdminOrderStatus =
   | 'delivered'
   | 'cancelled'
 
+/**
+ * Statuses accepted by PATCH /api/v1/orders/:id/status
+ * (`updateOrderStatusValidator` isIn list).
+ */
+export const ADMIN_ORDER_STATUSES = [
+  'pending',
+  'confirmed',
+  'processing',
+  'shipped',
+  'out_for_delivery',
+  'failed_attempt',
+  'returned',
+  'partially_returned',
+  'delivered',
+  'cancelled',
+] as const satisfies readonly AdminOrderStatus[]
+
 /** Payment statuses from the Order model. */
 export type AdminPaymentStatus = 'pending' | 'paid' | 'refunded'
 

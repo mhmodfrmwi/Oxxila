@@ -32,7 +32,10 @@ export interface ApiOrderTracking {
 
 export interface ApiOrder {
   _id: string
-  items: ApiOrderItem[]
+  /** Present on detail responses; list responses may omit heavy item payloads. */
+  items?: ApiOrderItem[]
+  /** Enriched on list responses when `items` is projected out. */
+  itemCount?: number
   shippingAddress: ApiOrderShippingAddress
   shipping: {
     methodName: string

@@ -277,6 +277,8 @@ function RowShell({
   deleting: boolean
   children: ReactNode
 }) {
+  const { t } = useTranslation()
+
   return (
     <div
       className={cn(
@@ -292,6 +294,7 @@ function RowShell({
       <button
         type="button"
         disabled={deleting}
+        aria-label={t('admin.shipping.zones.deleteRow')}
         onClick={(event) => {
           event.stopPropagation()
           onDelete()

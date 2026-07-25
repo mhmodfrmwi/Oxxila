@@ -1,7 +1,12 @@
 // src/components/admin/customers/CustomerDetailsDrawer.tsx
+import { KeyRound, Loader2, Pencil, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useCustomerDetailsDrawer } from '../../../hooks/useCustomerDetailsDrawer'
 import { cn } from '../../../lib/cn'
+import type {
+  AdminCustomerDetail,
+  AdminCustomerRow,
+} from '../../../types/adminCustomers'
 import {
   formatCustomerDate,
   formatCustomerMoney,
@@ -17,7 +22,33 @@ import { Skeleton } from '../ui/Skeleton'
 interface CustomerDetailsDrawerProps {
   open: boolean
   customerId: string | null
+  togglingCustomerId?: string | null
   onClose: () => void
+  onEdit?: (customer: AdminCustomerRow) => void
+  onDelete?: (customer: AdminCustomerRow) => void
+  onChangePassword?: (customer: AdminCustomerRow) => void
+  onToggleActive?: (
+    customerId: string,
+    active: boolean,
+    seed: AdminCustomerRow,
+  ) => void | Promise<void>
+}
+
+function detailToRow(customer: AdminCustomerDetail): AdminCustomerRow {
+  return {
+    id: customer.id,
+    name: customer.name,
+    email: customer.email ?? '—',
+    phone: customer.phone,
+    avatar: customer.avatar,
+    initials: customer.initials,
+    active: customer.active,
+    role: customer.role,
+    createdAt: customer.createdAt ?? '',
+    ordersCount: customer.ordersCount,
+    totalSpend: customer.totalSpend,
+    lastOrderAt: customer.lastOrderAt,
+  }
 }
 
 function CustomerDetailsSkeleton() {
@@ -54,7 +85,12 @@ function DetailField({ label, value }: { label: string; value: string }) {
 export function CustomerDetailsDrawer({
   open,
   customerId,
+  togglingCustomerId = null,
   onClose,
+  onEdit,
+  onDelete,
+  onChangePassword,
+  onToggleActive,
 }: CustomerDetailsDrawerProps) {
   const { t, i18n } = useTranslation()
   const locale = i18n.language
@@ -63,6 +99,7 @@ export function CustomerDetailsDrawer({
     customerId,
   })
   const unavailable = formatUnavailableMetric()
+  const toggling = Boolean(customer && togglingCustomerId === customer.id)
 
   const statusLabel = customer
     ? customer.active
@@ -70,50 +107,106 @@ export function CustomerDetailsDrawer({
       : t('admin.customers.details.statusInactive')
     : null
 
+  const handleToggleActive = () => {
+    if (!customer || toggling) return
+    void (async () => {
+      await onToggleActive?.(customer.id, !customer.active, detailToRow(customer))
+      reload()
+    })()
+  }
+
   const footer =
     customer && !loading && !error ? (
-      <div className="flex gap-4">
-        <button
-          type="button"
-          disabled
-          title={t('admin.customers.details.blockSoon')}
-          className={cn(
-            'inline-flex flex-1 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-[13.6px]',
-            'text-sm font-bold text-white',
-            'cursor-not-allowed opacity-50',
-            focusRingClasses,
-          )}
-        >
-          {t('admin.customers.details.blockUser')}
-        </button>
-        {customer.email ? (
-          <a
-            href={`mailto:${customer.email}`}
-            className={cn(
-              'inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-[13.6px]',
-              'bg-gradient-to-r from-[#a394ff] to-[#8e7dff] text-sm font-bold text-white',
-              'shadow-[0_10px_15px_-3px_rgba(163,148,255,0.2),0_4px_6px_-4px_rgba(163,148,255,0.2)]',
-              'transition-opacity hover:opacity-95',
-              focusRingClasses,
-            )}
-          >
-            {t('admin.customers.details.contact')}
-          </a>
-        ) : (
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-3">
           <button
             type="button"
-            disabled
-            title={t('admin.customers.details.contactUnavailable')}
+            disabled={toggling}
+            onClick={handleToggleActive}
             className={cn(
-              'inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-[13.6px]',
-              'bg-gradient-to-r from-[#a394ff] to-[#8e7dff] text-sm font-bold text-white',
-              'cursor-not-allowed opacity-50',
+              'inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border px-4 py-[13.6px]',
+              'text-sm font-bold',
+              customer.active
+                ? 'border-support-error/40 bg-support-error/10 text-support-error'
+                : 'border-accent/40 bg-accent/10 text-accent',
+              'disabled:cursor-not-allowed disabled:opacity-50',
               focusRingClasses,
             )}
           >
-            {t('admin.customers.details.contact')}
+            {toggling ? (
+              <Loader2 size={14} className="animate-spin" aria-hidden />
+            ) : null}
+            {customer.active
+              ? t('admin.customers.details.blockUser')
+              : t('admin.customers.details.activateUser')}
           </button>
-        )}
+          {customer.email ? (
+            <a
+              href={`mailto:${customer.email}`}
+              className={cn(
+                'inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-[13.6px]',
+                'bg-gradient-to-r from-[#a394ff] to-[#8e7dff] text-sm font-bold text-white',
+                'shadow-[0_10px_15px_-3px_rgba(163,148,255,0.2),0_4px_6px_-4px_rgba(163,148,255,0.2)]',
+                'transition-opacity hover:opacity-95',
+                focusRingClasses,
+              )}
+            >
+              {t('admin.customers.details.contact')}
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              title={t('admin.customers.details.contactUnavailable')}
+              className={cn(
+                'inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-[13.6px]',
+                'bg-gradient-to-r from-[#a394ff] to-[#8e7dff] text-sm font-bold text-white',
+                'cursor-not-allowed opacity-50',
+                focusRingClasses,
+              )}
+            >
+              {t('admin.customers.details.contact')}
+            </button>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => onEdit?.(detailToRow(customer))}
+            className={cn(
+              'inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5',
+              'text-xs font-semibold text-white/80 hover:bg-white/10',
+              focusRingClasses,
+            )}
+          >
+            <Pencil size={12} aria-hidden />
+            {t('admin.customers.details.edit')}
+          </button>
+          <button
+            type="button"
+            onClick={() => onChangePassword?.(detailToRow(customer))}
+            className={cn(
+              'inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5',
+              'text-xs font-semibold text-white/80 hover:bg-white/10',
+              focusRingClasses,
+            )}
+          >
+            <KeyRound size={12} aria-hidden />
+            {t('admin.customers.details.password')}
+          </button>
+          <button
+            type="button"
+            onClick={() => onDelete?.(detailToRow(customer))}
+            className={cn(
+              'inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-support-error/30 bg-support-error/10 px-3 py-2.5',
+              'text-xs font-semibold text-support-error hover:bg-support-error/15',
+              focusRingClasses,
+            )}
+          >
+            <Trash2 size={12} aria-hidden />
+            {t('admin.customers.details.delete')}
+          </button>
+        </div>
       </div>
     ) : undefined
 

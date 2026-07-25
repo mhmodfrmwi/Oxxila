@@ -9,9 +9,11 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   addToCart as addToCartRequest,
   applyCoupon as applyCouponRequest,
+  clearCart as clearCartRequest,
   getCart,
   removeCartItem as removeCartItemRequest,
   removeCoupon as removeCouponRequest,
@@ -29,9 +31,11 @@ interface CartContextValue {
   loadError: string | null
   updatingItemId: string | null
   couponLoading: boolean
+  clearingCart: boolean
   addToCart: (productId: string, quantity?: number) => Promise<void>
   updateCartItem: (itemId: string, quantity: number) => Promise<void>
   removeCartItem: (itemId: string) => Promise<void>
+  clearCart: () => Promise<void>
   applyCoupon: (code: string) => Promise<void>
   removeCoupon: () => Promise<void>
   refreshCart: () => Promise<void>
@@ -45,6 +49,7 @@ function resolveLoadError(error: unknown): string {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation()
   const { isAuthenticated, user } = useAuth()
   const userId = user?.id ?? null
   const toast = useToast()
@@ -53,19 +58,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [updatingItemId, setUpdatingItemId] = useState<string | null>(null)
   const [couponLoading, setCouponLoading] = useState(false)
+  const [clearingCart, setClearingCart] = useState(false)
   const updatingItemIdRef = useRef<string | null>(null)
+  const clearingCartRef = useRef(false)
 
-  const clearCartState = useCallback(() => {
+  /** Drop user-scoped client state without deleting the customer's server cart. */
+  const resetCartState = useCallback(() => {
     setCart(null)
     setLoadError(null)
     setUpdatingItemId(null)
     updatingItemIdRef.current = null
     setCouponLoading(false)
+    setClearingCart(false)
+    clearingCartRef.current = false
   }, [])
 
   const refreshCart = useCallback(async () => {
     if (!isAuthenticated) {
-      clearCartState()
+      resetCartState()
       setLoading(false)
       return
     }
@@ -78,7 +88,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setLoadError(null)
     } catch (error) {
       if (error instanceof ApiError && error.statusCode === 401) {
-        clearCartState()
+        resetCartState()
       } else {
         setCart(null)
         setLoadError(resolveLoadError(error))
@@ -86,17 +96,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false)
     }
-  }, [clearCartState, isAuthenticated])
+  }, [resetCartState, isAuthenticated])
 
   useEffect(() => {
     if (!isAuthenticated || !userId) {
-      clearCartState()
+      resetCartState()
       setLoading(false)
       return
     }
 
     // Never show a previous user's cart while the next session loads.
-    clearCartState()
+    resetCartState()
     setLoading(true)
 
     let cancelled = false
@@ -111,7 +121,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         if (cancelled) return
         if (error instanceof ApiError && error.statusCode === 401) {
-          clearCartState()
+          resetCartState()
         } else {
           setCart(null)
           setLoadError(resolveLoadError(error))
@@ -126,7 +136,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [clearCartState, isAuthenticated, userId])
+  }, [resetCartState, isAuthenticated, userId])
 
   const addToCart = useCallback(async (productId: string, quantity = 1) => {
     try {
@@ -192,6 +202,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [toast])
 
+  const clearCart = useCallback(async () => {
+    if (clearingCartRef.current) return
+
+    clearingCartRef.current = true
+    setClearingCart(true)
+    try {
+      await clearCartRequest()
+      // The DELETE response has no cart payload; fetch the canonical empty cart
+      // so totals, checkout summaries, and the navbar badge share one state.
+      await refreshCart()
+      toast.success(t('cart.clear.success'))
+    } finally {
+      clearingCartRef.current = false
+      setClearingCart(false)
+    }
+  }, [refreshCart, t, toast])
+
   const applyCoupon = useCallback(async (code: string) => {
     setCouponLoading(true)
     try {
@@ -243,9 +270,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       loadError: resolvedLoadError,
       updatingItemId,
       couponLoading,
+      clearingCart,
       addToCart,
       updateCartItem,
       removeCartItem,
+      clearCart,
       applyCoupon,
       removeCoupon,
       refreshCart,
@@ -257,9 +286,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       resolvedLoadError,
       updatingItemId,
       couponLoading,
+      clearingCart,
       addToCart,
       updateCartItem,
       removeCartItem,
+      clearCart,
       applyCoupon,
       removeCoupon,
       refreshCart,

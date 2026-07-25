@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import oxxilaLogo from '../../assets/Oxxila.svg'
+import { DOCS_PATH } from '../../config/routes'
 import { Button } from '../ui/Button'
 
 export function AboutAuthenticityCtaSection() {
@@ -28,7 +29,14 @@ export function AboutAuthenticityCtaSection() {
               variant="primary"
               pill
               className="min-w-[12rem] px-8"
-              onClick={() => navigate('/authenticity')}
+              onClick={() => {
+                const target = document.getElementById('about-quality-title')
+                if (target) {
+                  target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  return
+                }
+                navigate(`${DOCS_PATH}#about-quality-title`)
+              }}
             >
               {t('about.cta.button')}
             </Button>

@@ -103,3 +103,18 @@ export interface DashboardRevenueParams {
   period?: number
   interval?: RevenueInterval
 }
+
+/** GET /api/v1/payments/summary — only fields the backend returns. */
+export interface DashboardPaymentSummary {
+  collected: number
+  refunded: number
+  net: number
+  collectionRate: number
+  orderCount: number
+  refundCount: number
+  periodDays: number
+}
+
+export interface DashboardPaymentSummaryParams {
+  period?: number
+}

@@ -79,8 +79,33 @@ export function getPaymentSessionStatus(sessionId: string) {
   }>(`/orders/payment-session/${sessionId}`, { auth: true })
 }
 
-export function getMyOrder(orderId: string) {
-  return apiRequest<ApiOrder>(`/orders/my-orders/${orderId}`, { auth: true })
+export interface GetMyOrdersParams {
+  page?: number
+  limit?: number
+  sort?: string
+}
+
+export function getMyOrders(
+  params: GetMyOrdersParams = {},
+  options?: { signal?: AbortSignal },
+) {
+  const search = new URLSearchParams()
+  if (params.page) search.set('page', String(params.page))
+  if (params.limit) search.set('limit', String(params.limit))
+  if (params.sort) search.set('sort', params.sort)
+  const query = search.toString()
+  return apiRequest<ApiOrder[]>(`/orders/my-orders${query ? `?${query}` : ''}`, {
+    method: 'GET',
+    auth: true,
+    signal: options?.signal,
+  })
+}
+
+export function getMyOrder(orderId: string, options?: { signal?: AbortSignal }) {
+  return apiRequest<ApiOrder>(`/orders/my-orders/${orderId}`, {
+    auth: true,
+    signal: options?.signal,
+  })
 }
 
 export function cancelMyOrder(orderId: string, reason?: string) {

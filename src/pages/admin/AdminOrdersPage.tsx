@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
 import { B2BOrderDrawer } from '../../components/admin/orders/B2BOrderDrawer'
 import { CancelOrderDialog } from '../../components/admin/orders/CancelOrderDialog'
+import { ChangeOrderStatusDialog } from '../../components/admin/orders/ChangeOrderStatusDialog'
 import { OrderDetailsDrawer } from '../../components/admin/orders/OrderDetailsDrawer'
 import { OrdersCatalogTable } from '../../components/admin/orders/OrdersCatalogTable'
 import { OrdersListToolbar } from '../../components/admin/orders/OrdersListToolbar'
@@ -17,7 +18,7 @@ import { cn } from '../../lib/cn'
 import type { AdminOrderRow } from '../../types/adminOrders'
 
 /**
- * Orders Management — list + details drawer, Assign Carrier, B2B create, cancel.
+ * Orders Management — list + details drawer, status update, Assign Carrier, B2B create, cancel.
  */
 export function AdminOrdersPage() {
   const { t } = useTranslation()
@@ -25,6 +26,7 @@ export function AdminOrdersPage() {
   const [drawerOrderId, setDrawerOrderId] = useState<string | null>(null)
   const [b2bDrawerOpen, setB2bDrawerOpen] = useState(false)
   const [cancelTarget, setCancelTarget] = useState<AdminOrderRow | null>(null)
+  const [statusTarget, setStatusTarget] = useState<AdminOrderRow | null>(null)
 
   const openDrawer = useCallback((orderId: string) => {
     setDrawerOrderId(orderId)
@@ -50,6 +52,19 @@ export function AdminOrdersPage() {
 
   const handleCancelled = useCallback(() => {
     setCancelTarget(null)
+    list.reload()
+  }, [list])
+
+  const handleChangeStatusFromMenu = useCallback((order: AdminOrderRow) => {
+    setStatusTarget(order)
+  }, [])
+
+  const handleStatusClosed = useCallback(() => {
+    setStatusTarget(null)
+  }, [])
+
+  const handleStatusUpdated = useCallback(() => {
+    setStatusTarget(null)
     list.reload()
   }, [list])
 
@@ -150,6 +165,7 @@ export function AdminOrdersPage() {
             onOpenOrder={openDrawer}
             onAssignOrder={openDrawer}
             onCancelOrder={handleCancelFromMenu}
+            onChangeStatus={handleChangeStatusFromMenu}
           />
         </>
       )}
@@ -174,6 +190,16 @@ export function AdminOrdersPage() {
         orderNumber={cancelTarget?.orderNumber ?? null}
         onClose={handleCancelClosed}
         onCancelled={handleCancelled}
+      />
+
+      <ChangeOrderStatusDialog
+        key={statusTarget?.id ?? 'table-status'}
+        open={Boolean(statusTarget)}
+        orderId={statusTarget?.id ?? null}
+        orderNumber={statusTarget?.orderNumber ?? null}
+        currentStatus={statusTarget?.orderStatus ?? null}
+        onClose={handleStatusClosed}
+        onUpdated={handleStatusUpdated}
       />
     </>
   )

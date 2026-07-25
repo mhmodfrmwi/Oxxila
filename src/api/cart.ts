@@ -39,6 +39,13 @@ export function removeCartItem(itemId: string) {
   })
 }
 
+export function clearCart() {
+  return apiRequest('/cart', {
+    method: 'DELETE',
+    auth: true,
+  })
+}
+
 export function applyCoupon(code: string) {
   return apiRequest<ApiCart>('/cart/coupon', {
     method: 'POST',

@@ -1,7 +1,10 @@
 // src/components/admin/config/adminPageShell.ts
 import {
+  ADMIN_BRANDS_PATH,
+  ADMIN_CATEGORIES_PATH,
   ADMIN_CUSTOMERS_PATH,
   ADMIN_DASHBOARD_PATH,
+  ADMIN_FAQS_PATH,
   ADMIN_ORDERS_PATH,
   ADMIN_PATH,
   ADMIN_PRODUCTS_PATH,
@@ -9,6 +12,7 @@ import {
   ADMIN_REVIEWS_PATH,
   ADMIN_SETTINGS_PATH,
   ADMIN_SHIPPING_PATH,
+  ADMIN_SUBCATEGORIES_PATH,
 } from '../../../config/routes'
 
 /**
@@ -20,6 +24,10 @@ import {
 export type AdminScreenId =
   | 'dashboard'
   | 'products'
+  | 'categories'
+  | 'brands'
+  | 'subcategories'
+  | 'faqs'
   | 'orders'
   | 'customers'
   | 'reviews'
@@ -69,6 +77,10 @@ export function resolveAdminPageShell(pathname: string): AdminPageShell {
 
   if (path === ADMIN_PATH || path === ADMIN_DASHBOARD_PATH) return withId('dashboard')
   if (path.startsWith(ADMIN_PRODUCTS_PATH)) return withId('products')
+  if (path.startsWith(ADMIN_CATEGORIES_PATH)) return withId('categories')
+  if (path.startsWith(ADMIN_BRANDS_PATH)) return withId('brands')
+  if (path.startsWith(ADMIN_SUBCATEGORIES_PATH)) return withId('subcategories')
+  if (path.startsWith(ADMIN_FAQS_PATH)) return withId('faqs')
   if (path.startsWith(ADMIN_ORDERS_PATH)) return withId('orders')
   if (path.startsWith(ADMIN_CUSTOMERS_PATH)) return withId('customers')
   if (path.startsWith(ADMIN_REVIEWS_PATH)) return withId('reviews')

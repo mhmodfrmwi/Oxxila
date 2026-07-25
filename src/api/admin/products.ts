@@ -233,3 +233,14 @@ export function archiveProduct(id: string) {
     body: { isActive: false },
   })
 }
+
+/** PATCH /api/v1/products/:id/best-seller — flips `isBestSeller` on the server. */
+export function toggleAdminProductBestSeller(id: string) {
+  return apiRequest<{ isBestSeller: boolean }>(
+    `/products/${encodeURIComponent(id)}/best-seller`,
+    {
+      method: 'PATCH',
+      auth: true,
+    },
+  )
+}

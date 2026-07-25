@@ -109,3 +109,33 @@ export interface AdminCustomersListParams {
   /** Account active flag (`active=true|false`). */
   active?: boolean
 }
+
+/** Fields accepted by POST /api/v1/users (customers always use role `user`). */
+export interface AdminCustomerCreateFields {
+  name: string
+  email: string
+  password: string
+  phone?: string
+  role: 'user'
+  active?: boolean
+}
+
+/** Fields accepted by PUT /api/v1/users/:id (password/role stripped server-side). */
+export interface AdminCustomerUpdateFields {
+  name?: string
+  email?: string
+  phone?: string
+  active?: boolean
+}
+
+export interface AdminCustomerFormValues {
+  name: string
+  email: string
+  phone: string
+  password: string
+  active: boolean
+}
+
+export type AdminCustomerFormErrors = Partial<
+  Record<keyof AdminCustomerFormValues, string>
+>

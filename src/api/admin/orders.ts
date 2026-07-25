@@ -3,6 +3,7 @@ import { apiRequest } from '../../lib/api'
 import type {
   ApiAdminOrder,
   AdminB2BOrderPayload,
+  AdminOrderStatus,
   AdminOrdersListParams,
 } from '../../types/adminOrders'
 
@@ -65,6 +66,40 @@ export function cancelAdminOrder(orderId: string, reason?: string) {
       method: 'PATCH',
       auth: true,
       body: trimmed ? { reason: trimmed } : {},
+    },
+  )
+}
+
+/** PATCH /api/v1/orders/:id/status — admin fulfillment status update. */
+export function updateAdminOrderStatus(
+  orderId: string,
+  orderStatus: AdminOrderStatus,
+) {
+  return apiRequest<ApiAdminOrder>(
+    `/orders/${encodeURIComponent(orderId)}/status`,
+    {
+      method: 'PATCH',
+      auth: true,
+      body: { orderStatus },
+    },
+  )
+}
+
+/** Response payload from POST /api/v1/orders/:id/refund. */
+export interface AdminOrderRefundResult {
+  order: ApiAdminOrder
+  gatewayRefundId: string | null
+  stripeRefundId: string | null
+}
+
+/** POST /api/v1/orders/:id/refund — full Stripe/Paymob refund for a paid card order. */
+export function refundAdminOrder(orderId: string) {
+  return apiRequest<AdminOrderRefundResult>(
+    `/orders/${encodeURIComponent(orderId)}/refund`,
+    {
+      method: 'POST',
+      auth: true,
+      body: {},
     },
   )
 }

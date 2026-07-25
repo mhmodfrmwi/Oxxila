@@ -86,6 +86,7 @@ export function mapApiProductToAdminRow(product: AdminProductSource): AdminProdu
     inventoryProgress: resolveInventoryProgress(stock),
     price: resolveProductListPrice(product),
     soldCount: product.soldCount ?? 0,
+    isBestSeller: Boolean(product.isBestSeller),
     /** Backend list API has no period-over-period performance metric. */
     performancePercent: null,
   }

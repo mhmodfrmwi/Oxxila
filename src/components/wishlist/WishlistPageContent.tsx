@@ -1,6 +1,6 @@
 // src/components/wishlist/WishlistPageContent.tsx
 import { ArrowLeft, Heart } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate } from 'react-router-dom'
 import { LOGIN_PATH, MY_ACCOUNT_PATH, SHOP_PATH } from '../../config/routes'
@@ -13,6 +13,7 @@ import { Footer } from '../landing/footer/Footer'
 import { ProductCard } from '../shop/recommended/ProductCard'
 import { Button } from '../ui/Button'
 import { focusRingClasses } from '../ui/interactionStyles'
+import { ClearWishlistDialog } from './ClearWishlistDialog'
 
 function WishlistSkeleton() {
   return (
@@ -51,9 +52,13 @@ function WishlistEmptyState() {
 export function WishlistPageContent() {
   const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
-  const { items, loading, error } = useWishlist()
+  const { items, itemCount, loading, error, clearingWishlist, clearWishlist } =
+    useWishlist()
+  const [clearDialogOpen, setClearDialogOpen] = useState(false)
+  const [clearError, setClearError] = useState<string | null>(null)
 
   const products = useMemo(() => mapWishlistItemsToRecommended(items), [items])
+  const hasItems = products.length > 0
 
   if (!isAuthenticated) {
     return <Navigate to={LOGIN_PATH} replace />
@@ -70,13 +75,36 @@ export function WishlistPageContent() {
           {t('wishlist.back')}
         </Link>
 
-        <h1 className="wishlist-title">{t('wishlist.title')}</h1>
+        <header className="wishlist-header">
+          <div>
+            <h1 className="wishlist-title">{t('wishlist.title')}</h1>
+            {hasItems && !loading && !error ? (
+              <p className="wishlist-count">
+                {t('wishlist.itemCount', { count: itemCount })}
+              </p>
+            ) : null}
+          </div>
+          {hasItems && !loading && !error ? (
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={clearingWishlist}
+              onClick={() => {
+                setClearError(null)
+                setClearDialogOpen(true)
+              }}
+              className="text-support-error hover:bg-support-error/10 hover:text-support-error"
+            >
+              {t('wishlist.clear.action')}
+            </Button>
+          ) : null}
+        </header>
 
         {loading ? (
           <WishlistSkeleton />
         ) : error ? (
           <FormMessage message={error} />
-        ) : products.length === 0 ? (
+        ) : !hasItems ? (
           <WishlistEmptyState />
         ) : (
           <ul className="wishlist-grid">
@@ -88,6 +116,19 @@ export function WishlistPageContent() {
           </ul>
         )}
       </div>
+
+      <ClearWishlistDialog
+        open={clearDialogOpen && hasItems}
+        itemCount={itemCount}
+        submitting={clearingWishlist}
+        error={clearError}
+        onError={setClearError}
+        onClose={() => setClearDialogOpen(false)}
+        onConfirm={async () => {
+          await clearWishlist()
+          setClearDialogOpen(false)
+        }}
+      />
 
       <Footer />
     </>

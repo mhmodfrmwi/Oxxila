@@ -29,6 +29,7 @@ interface OrdersCatalogTableProps {
   /** Opens the order drawer focused on the Assign panel. */
   onAssignOrder?: (orderId: string) => void
   onCancelOrder?: (order: AdminOrderRow) => void
+  onChangeStatus?: (order: AdminOrderRow) => void
 }
 
 function CustomerCell({
@@ -79,6 +80,7 @@ export function OrdersCatalogTable({
   onOpenOrder,
   onAssignOrder,
   onCancelOrder,
+  onChangeStatus,
 }: OrdersCatalogTableProps) {
   const { t, i18n } = useTranslation()
   const locale = i18n.language
@@ -198,11 +200,12 @@ export function OrdersCatalogTable({
             order={row}
             onOpenOrder={(orderId) => onOpenOrder?.(orderId)}
             onCancelOrder={(order) => onCancelOrder?.(order)}
+            onChangeStatus={(order) => onChangeStatus?.(order)}
           />
         ),
       },
     ],
-    [locale, onOpenOrder, onAssignOrder, onCancelOrder, t],
+    [locale, onOpenOrder, onAssignOrder, onCancelOrder, onChangeStatus, t],
   )
 
   const canGoPrev = currentPage > 1

@@ -13,12 +13,14 @@ interface OrderRowActionsMenuProps {
   order: AdminOrderRow
   onOpenOrder: (orderId: string) => void
   onCancelOrder: (order: AdminOrderRow) => void
+  onChangeStatus: (order: AdminOrderRow) => void
 }
 
 export function OrderRowActionsMenu({
   order,
   onOpenOrder,
   onCancelOrder,
+  onChangeStatus,
 }: OrderRowActionsMenuProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
@@ -88,6 +90,21 @@ export function OrderRowActionsMenu({
             }}
           >
             {t('admin.orders.menu.viewDetails')}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className={cn(
+              'block w-full px-3 py-2 text-start text-xs font-medium text-white/80',
+              'hover:bg-white/10 hover:text-white',
+              focusRingClasses,
+            )}
+            onClick={() => {
+              setOpen(false)
+              onChangeStatus(order)
+            }}
+          >
+            {t('admin.orders.menu.changeStatus')}
           </button>
           {hasReturnRequests ? (
             <Link

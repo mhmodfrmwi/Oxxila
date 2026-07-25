@@ -21,6 +21,7 @@ import { CartEmptyState } from './CartEmptyState'
 import { CartItemRow } from './CartItemRow'
 import { CartPageSkeleton } from './CartPageSkeleton'
 import { CartShippingBar } from './CartShippingBar'
+import { ClearCartDialog } from './ClearCartDialog'
 import { OrderSummaryCard } from './OrderSummaryCard'
 
 export function CartPageContent() {
@@ -34,8 +35,10 @@ export function CartPageContent() {
     loadError,
     updatingItemId,
     couponLoading,
+    clearingCart,
     updateCartItem,
     removeCartItem,
+    clearCart,
     applyCoupon,
     removeCoupon,
     refreshCart,
@@ -45,6 +48,8 @@ export function CartPageContent() {
   const { products: buyAgainProducts, loading: buyAgainLoading } = useBuyAgainProducts()
   const [selectedOverrides, setSelectedOverrides] = useState<Record<string, boolean>>({})
   const [actionError, setActionError] = useState<string | null>(null)
+  const [clearDialogOpen, setClearDialogOpen] = useState(false)
+  const [clearError, setClearError] = useState<string | null>(null)
 
   const items = useMemo(() => cart?.items ?? [], [cart?.items])
   const hasItems = items.length > 0
@@ -110,12 +115,28 @@ export function CartPageContent() {
           </div>
         ) : (
           <>
-            <header className="mb-5 sm:mb-6">
-              <Heading variant="page" className="mb-2">
-                {t('cart.title')}
-              </Heading>
+            <header className="mb-5 flex flex-wrap items-start justify-between gap-3 sm:mb-6">
+              <div>
+                <Heading variant="page" className="mb-2">
+                  {t('cart.title')}
+                </Heading>
+                {hasItems && (
+                  <p className="text-sm text-secondary-text">{itemCountLabel}</p>
+                )}
+              </div>
               {hasItems && (
-                <p className="text-sm text-secondary-text">{itemCountLabel}</p>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={clearingCart}
+                  onClick={() => {
+                    setClearError(null)
+                    setClearDialogOpen(true)
+                  }}
+                  className="text-support-error hover:bg-support-error/10 hover:text-support-error"
+                >
+                  {t('cart.clear.action')}
+                </Button>
               )}
             </header>
 
@@ -204,6 +225,21 @@ export function CartPageContent() {
           )}
         </ContentSection>
       )}
+
+      <ClearCartDialog
+        open={clearDialogOpen && hasItems}
+        itemCount={itemCount}
+        subtotal={cart?.subtotal ?? 0}
+        submitting={clearingCart}
+        error={clearError}
+        onError={setClearError}
+        onClose={() => setClearDialogOpen(false)}
+        onConfirm={async () => {
+          await clearCart()
+          setSelectedOverrides({})
+          setClearDialogOpen(false)
+        }}
+      />
 
       <Footer />
     </>

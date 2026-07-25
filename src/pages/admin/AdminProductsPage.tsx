@@ -171,6 +171,8 @@ export function AdminProductsPage() {
             totalPages={totalPages}
             onPageChange={catalog.setPage}
             onEditProduct={openEdit}
+            togglingBestSellerId={catalog.togglingBestSellerId}
+            onToggleBestSeller={(productId) => void catalog.toggleBestSeller(productId)}
           />
         </div>
       )}

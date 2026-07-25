@@ -38,9 +38,33 @@
   text-underline-offset: 0.2em;
 }
 
+/* —— Header —— */
+.wishlist-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .wishlist-header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .wishlist-header {
+    margin-bottom: 2.25rem;
+  }
+}
+
 /* —— Page title —— */
 .wishlist-title {
-  margin: 0 0 1.75rem;
+  margin: 0;
   font-family: var(--font-family-serif, var(--font-family-base));
   font-size: clamp(2.5rem, 5.5vw, 3rem);
   font-weight: var(--font-weight-medium);
@@ -49,10 +73,11 @@
   color: var(--primary-text);
 }
 
-@media (min-width: 1024px) {
-  .wishlist-title {
-    margin-bottom: 2.25rem;
-  }
+.wishlist-count {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  color: var(--secondary-text);
 }
 
 /* —— Grid —— */

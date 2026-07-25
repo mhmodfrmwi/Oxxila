@@ -1,7 +1,14 @@
 // src/hooks/useAdminCustomers.ts
 import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { getAdminCustomers } from '../api/admin/customers'
+import { useTranslation } from 'react-i18next'
+import {
+  activateAdminCustomer,
+  deactivateAdminCustomer,
+  deleteAdminCustomer,
+  getAdminCustomers,
+} from '../api/admin/customers'
+import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
 import type { ApiPagination } from '../lib/api'
 import type {
@@ -50,11 +57,41 @@ function normalizeFilters(
   }
 }
 
+function resolveMutationError(
+  error: unknown,
+  t: (key: string) => string,
+  prefix: 'delete' | 'activate' | 'deactivate',
+): string {
+  const statusCode = error instanceof ApiError ? error.statusCode : undefined
+  switch (statusCode) {
+    case 400:
+      return t(`admin.customers.${prefix}.errors.badRequest`)
+    case 401:
+      return t(`admin.customers.${prefix}.errors.unauthorized`)
+    case 403:
+      return t(`admin.customers.${prefix}.errors.forbidden`)
+    case 404:
+      return t(`admin.customers.${prefix}.errors.notFound`)
+    case 409:
+      return t(`admin.customers.${prefix}.errors.conflict`)
+    case 500:
+      return t(`admin.customers.${prefix}.errors.server`)
+    default:
+      return statusCode && statusCode >= 500
+        ? t(`admin.customers.${prefix}.errors.server`)
+        : t(`admin.customers.${prefix}.errors.unknown`)
+  }
+}
+
 export function useAdminCustomers(options?: UseAdminCustomersOptions) {
+  const { t } = useTranslation()
+  const toast = useToast()
   const [filters, setFilters] = useState<AdminCustomersFilters>(() =>
     normalizeFilters(options?.initialFilters),
   )
-  const [debouncedKeyword, setDebouncedKeyword] = useState(filters.keyword.trim())
+  const [debouncedKeyword, setDebouncedKeyword] = useState(
+    filters.keyword.trim(),
+  )
   const [state, setState] = useState<AsyncListState>({
     customers: [],
     pagination: null,
@@ -62,6 +99,14 @@ export function useAdminCustomers(options?: UseAdminCustomersOptions) {
     error: null,
   })
   const [reloadToken, setReloadToken] = useState(0)
+  const [deletingCustomerId, setDeletingCustomerId] = useState<string | null>(
+    null,
+  )
+  const [togglingCustomerId, setTogglingCustomerId] = useState<string | null>(
+    null,
+  )
+  const deletingRef = useRef<string | null>(null)
+  const togglingRef = useRef<string | null>(null)
   const requestIdRef = useRef(0)
 
   useEffect(() => {
@@ -117,7 +162,8 @@ export function useAdminCustomers(options?: UseAdminCustomersOptions) {
           error: null,
         })
       } catch (error) {
-        if (controller.signal.aborted || requestId !== requestIdRef.current) return
+        if (controller.signal.aborted || requestId !== requestIdRef.current)
+          return
         if (isAbortError(error)) return
         setState((previous) => ({
           ...previous,
@@ -125,7 +171,7 @@ export function useAdminCustomers(options?: UseAdminCustomersOptions) {
           error:
             error instanceof ApiError
               ? error.message
-              : 'Unable to load customers.',
+              : t('admin.customers.loadErrorDescription'),
           ...(previous.customers.length === 0
             ? { customers: [], pagination: null }
             : {}),
@@ -137,7 +183,7 @@ export function useAdminCustomers(options?: UseAdminCustomersOptions) {
     return () => {
       controller.abort()
     }
-  }, [filters.limit, filters.page, queryParams, reloadToken])
+  }, [filters.limit, filters.page, queryParams, reloadToken, t])
 
   const setKeyword = useCallback((keyword: string) => {
     setFilters((previous) => ({ ...previous, keyword, page: 1 }))
@@ -164,6 +210,122 @@ export function useAdminCustomers(options?: UseAdminCustomersOptions) {
     setReloadToken((token) => token + 1)
   }, [])
 
+  const upsertCustomer = useCallback((customer: AdminCustomerRow) => {
+    setState((previous) => {
+      const index = previous.customers.findIndex((row) => row.id === customer.id)
+      if (index === -1) {
+        return {
+          ...previous,
+          customers: [customer, ...previous.customers],
+        }
+      }
+      const next = [...previous.customers]
+      next[index] = customer
+      return { ...previous, customers: next }
+    })
+  }, [])
+
+  const deleteCustomer = useCallback(
+    async (customerId: string) => {
+      if (deletingRef.current) return
+      deletingRef.current = customerId
+      setDeletingCustomerId(customerId)
+      try {
+        await deleteAdminCustomer(customerId)
+        setState((previous) => ({
+          ...previous,
+          customers: previous.customers.filter((row) => row.id !== customerId),
+        }))
+        reload()
+        toast.success(t('admin.customers.delete.success'))
+      } finally {
+        deletingRef.current = null
+        setDeletingCustomerId(null)
+      }
+    },
+    [reload, t, toast],
+  )
+
+  const setCustomerActive = useCallback(
+    async (
+      customerId: string,
+      active: boolean,
+      seed?: AdminCustomerRow | null,
+    ) => {
+      if (togglingRef.current === customerId) return
+      const previousRow =
+        state.customers.find((row) => row.id === customerId) ?? seed ?? null
+      if (!previousRow) return
+
+      togglingRef.current = customerId
+      setTogglingCustomerId(customerId)
+
+      setState((previous) => ({
+        ...previous,
+        customers: previous.customers.map((row) =>
+          row.id === customerId ? { ...row, active } : row,
+        ),
+      }))
+
+      try {
+        const response = active
+          ? await activateAdminCustomer(customerId)
+          : await deactivateAdminCustomer(customerId)
+
+        if (response.data) {
+          upsertCustomer(
+            mapApiCustomerToAdminRow({
+              ...response.data,
+              orders: previousRow.ordersCount ?? response.data.orders,
+              totalPaid: previousRow.totalSpend ?? response.data.totalPaid,
+              totalSpend: previousRow.totalSpend ?? response.data.totalSpend,
+              lastOrder: previousRow.lastOrderAt ?? response.data.lastOrder,
+            }),
+          )
+        }
+
+        // Inactive tab should drop activated users; all tab keeps both.
+        if (filters.segmentTab === 'inactive' && active) {
+          setState((previous) => ({
+            ...previous,
+            customers: previous.customers.filter(
+              (row) => row.id !== customerId,
+            ),
+          }))
+        }
+
+        toast.success(
+          active
+            ? t('admin.customers.activate.success')
+            : t('admin.customers.deactivate.success'),
+        )
+        reload()
+      } catch (error) {
+        setState((previous) => ({
+          ...previous,
+          customers: previous.customers.map((row) =>
+            row.id === customerId
+              ? { ...row, active: previousRow.active }
+              : row,
+          ),
+        }))
+        toast.error(
+          resolveMutationError(
+            error,
+            t,
+            active ? 'activate' : 'deactivate',
+          ),
+        )
+      } finally {
+        if (togglingRef.current === customerId) {
+          togglingRef.current = null
+          setTogglingCustomerId(null)
+        }
+      }
+    },
+    [filters.segmentTab, reload, state.customers, t, toast, upsertCustomer],
+  )
+
   const hasActiveFilters = Boolean(
     debouncedKeyword || filters.segmentTab !== 'all',
   )
@@ -173,10 +335,15 @@ export function useAdminCustomers(options?: UseAdminCustomersOptions) {
     filters,
     debouncedKeyword,
     hasActiveFilters,
+    deletingCustomerId,
+    togglingCustomerId,
     setKeyword,
     setSegmentTab,
     setPage,
     clearFilters,
     reload,
+    upsertCustomer,
+    deleteCustomer,
+    setCustomerActive,
   }
 }

@@ -11,6 +11,7 @@ import type {
 import {
   formatDashboardDate,
   formatDashboardMoney,
+  formatDashboardNumber,
   formatOrderId,
   resolveDashboardLocale,
 } from './adminDashboardFormat'
@@ -104,6 +105,20 @@ export function canAdminCancelOrder(status: AdminOrderStatus): boolean {
   return status !== 'delivered' && status !== 'cancelled'
 }
 
+/**
+ * Admin order refund eligibility — mirrors backend `processCardOrderRefund`:
+ * paid card orders with Stripe or Paymob only.
+ */
+export function canAdminRefundOrder(order: {
+  paymentMethod: 'cod' | 'card' | null
+  paymentProvider: 'stripe' | 'paymob' | null
+  paymentStatus: AdminPaymentStatus
+}): boolean {
+  if (order.paymentStatus !== 'paid') return false
+  if (order.paymentMethod !== 'card') return false
+  return order.paymentProvider === 'stripe' || order.paymentProvider === 'paymob'
+}
+
 /** Committed carrier means a real assignment exists, not just a draft shipment doc. */
 export function hasCommittedCarrier(order: ApiAdminOrder): boolean {
   const shipment = order.shipment
@@ -159,7 +174,7 @@ export function startOfDayIso(dateInput: string): string | undefined {
 }
 
 export function formatCount(value: number, locale = 'en'): string {
-  return new Intl.NumberFormat(resolveDashboardLocale(locale)).format(value)
+  return formatDashboardNumber(value, locale)
 }
 
 function formatPaymentSummary(order: ApiAdminOrder): string {

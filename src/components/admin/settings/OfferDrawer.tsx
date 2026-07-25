@@ -283,6 +283,7 @@ export function OfferDrawer({
                 type="button"
                 role="switch"
                 aria-checked={drawer.values.isActive}
+                aria-label={t('admin.settings.offers.drawer.active')}
                 disabled={drawer.submitting}
                 onClick={() =>
                   drawer.setField('isActive', !drawer.values.isActive)

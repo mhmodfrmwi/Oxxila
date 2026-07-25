@@ -2,6 +2,7 @@
 import {
   ChevronDown,
   FileText,
+  RefreshCw,
   RotateCcw,
   Truck,
   User,
@@ -17,9 +18,11 @@ import { cn } from '../../../lib/cn'
 import type { ApiAdminOrderTrackingStep } from '../../../types/adminOrders'
 import {
   canAdminCancelOrder,
+  canAdminRefundOrder,
   formatAdminOrderDateTime,
   formatAdminOrderMoney,
   formatOrderCustomerSubtitle,
+  orderStatusBadgeTone,
 } from '../../../utils/adminOrdersFormat'
 import { Button } from '../../ui/Button'
 import { focusRingClasses } from '../../ui/interactionStyles'
@@ -27,8 +30,11 @@ import { Drawer } from '../ui/Drawer'
 import { EmptyState } from '../ui/EmptyState'
 import { GlassCard } from '../ui/GlassCard'
 import { Skeleton } from '../ui/Skeleton'
+import { StatusBadge } from '../ui/StatusBadge'
 import { CancelOrderDialog } from './CancelOrderDialog'
+import { ChangeOrderStatusDialog } from './ChangeOrderStatusDialog'
 import { OrderAssignPanel } from './OrderAssignPanel'
+import { RefundOrderDialog } from './RefundOrderDialog'
 
 interface OrderDetailsDrawerProps {
   open: boolean
@@ -115,6 +121,8 @@ export function OrderDetailsDrawer({
   const locale = i18n.language
   const { order, loading, error, reload } = useOrderDetailsDrawer({ open, orderId })
   const [cancelOpen, setCancelOpen] = useState(false)
+  const [refundOpen, setRefundOpen] = useState(false)
+  const [statusOpen, setStatusOpen] = useState(false)
 
   const handleOrderUpdated = useCallback(() => {
     reload()
@@ -136,7 +144,20 @@ export function OrderDetailsDrawer({
     onOrderChanged?.()
   }, [onOrderChanged, reload])
 
+  const handleRefunded = useCallback(() => {
+    setRefundOpen(false)
+    reload()
+    onOrderChanged?.()
+  }, [onOrderChanged, reload])
+
+  const handleStatusUpdated = useCallback(() => {
+    setStatusOpen(false)
+    reload()
+    onOrderChanged?.()
+  }, [onOrderChanged, reload])
+
   const canCancel = order ? canAdminCancelOrder(order.orderStatus) : false
+  const canRefund = order ? canAdminRefundOrder(order) : false
   // Milestone 3 — orders already tied to a return request deep-link into Returns Management.
   const hasReturnRequests = order
     ? order.orderStatus === 'returned' || order.orderStatus === 'partially_returned'
@@ -156,6 +177,21 @@ export function OrderDetailsDrawer({
           </span>
         </div>
         <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setStatusOpen(true)}
+            className={cn(
+              'inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm font-medium text-accent',
+              'transition-colors hover:bg-accent/18',
+              focusRingClasses,
+            )}
+            aria-label={t('admin.orders.changeStatus.actionAria', {
+              id: order.orderNumber,
+            })}
+          >
+            <RefreshCw size={13} aria-hidden />
+            {t('admin.orders.changeStatus.action')}
+          </button>
           <button
             type="button"
             disabled
@@ -181,21 +217,20 @@ export function OrderDetailsDrawer({
               <RotateCcw size={13} aria-hidden />
               {t('admin.orders.details.viewReturns')}
             </Link>
-          ) : (
+          ) : canRefund ? (
             <button
               type="button"
-              disabled
-              title={t('admin.orders.details.refundSoon')}
+              onClick={() => setRefundOpen(true)}
               className={cn(
                 'inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[rgba(255,100,103,0.2)] bg-[rgba(255,100,103,0.1)] px-4 py-3 text-sm font-medium text-[#ff6467]',
-                'cursor-not-allowed opacity-50',
+                'transition-colors hover:bg-[rgba(255,100,103,0.18)]',
                 focusRingClasses,
               )}
             >
               <RotateCcw size={13} aria-hidden />
               {t('admin.orders.details.refund')}
             </button>
-          )}
+          ) : null}
           <button
             type="button"
             disabled={!canCancel}
@@ -262,10 +297,17 @@ export function OrderDetailsDrawer({
               <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(163,148,255,0.2)] text-[#a394ff]">
                 <User size={19} aria-hidden />
               </span>
-              <div className="min-w-0">
-                <p className="truncate text-base font-bold leading-6 text-white">
-                  {order.customerName}
-                </p>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="truncate text-base font-bold leading-6 text-white">
+                    {order.customerName}
+                  </p>
+                  <StatusBadge tone={orderStatusBadgeTone(order.orderStatus)}>
+                    {t(`admin.orders.orderStatus.${order.orderStatus}`, {
+                      defaultValue: order.orderStatusLabel,
+                    })}
+                  </StatusBadge>
+                </div>
                 <p className="truncate text-xs leading-4 text-white/40">
                   {formatOrderCustomerSubtitle(order)}
                   {typeof order.userOrdersCount === 'number'
@@ -454,6 +496,24 @@ export function OrderDetailsDrawer({
       orderNumber={order?.orderNumber ?? null}
       onClose={() => setCancelOpen(false)}
       onCancelled={handleCancelled}
+    />
+
+    <ChangeOrderStatusDialog
+      key={order ? `status-${order.id}` : 'change-status'}
+      open={statusOpen}
+      orderId={order?.id ?? null}
+      orderNumber={order?.orderNumber ?? null}
+      currentStatus={order?.orderStatus ?? null}
+      onClose={() => setStatusOpen(false)}
+      onUpdated={handleStatusUpdated}
+    />
+
+    <RefundOrderDialog
+      key={order ? `refund-${order.id}` : 'refund-order'}
+      open={refundOpen}
+      order={order}
+      onClose={() => setRefundOpen(false)}
+      onRefunded={handleRefunded}
     />
     </>
   )

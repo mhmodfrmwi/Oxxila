@@ -1,8 +1,13 @@
 // src/hooks/useAdminProducts.ts
 import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getCategories } from '../api/catalog'
-import { getAdminProducts } from '../api/admin/products'
+import {
+  getAdminProducts,
+  toggleAdminProductBestSeller,
+} from '../api/admin/products'
+import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
 import type { ApiPagination } from '../lib/api'
 import type { ApiCategory } from '../types/catalog'
@@ -45,7 +50,35 @@ function normalizeFilters(
   }
 }
 
+function resolveBestSellerError(error: unknown, t: (key: string) => string): string {
+  if (error instanceof ApiError) {
+    const backendMessage = error.message?.trim()
+    if (backendMessage) return backendMessage
+
+    switch (error.statusCode) {
+      case 400:
+        return t('admin.products.bestSeller.errors.badRequest')
+      case 401:
+        return t('admin.products.bestSeller.errors.unauthorized')
+      case 403:
+        return t('admin.products.bestSeller.errors.forbidden')
+      case 404:
+        return t('admin.products.bestSeller.errors.notFound')
+      case 409:
+        return t('admin.products.bestSeller.errors.conflict')
+      case 500:
+        return t('admin.products.bestSeller.errors.server')
+      default:
+        return t('admin.products.bestSeller.errors.unknown')
+    }
+  }
+
+  return t('admin.products.bestSeller.errors.unknown')
+}
+
 export function useAdminProducts(options?: UseAdminProductsOptions) {
+  const { t } = useTranslation()
+  const toast = useToast()
   const [filters, setFilters] = useState<AdminProductsFilters>(() =>
     normalizeFilters(options?.initialFilters),
   )
@@ -59,7 +92,11 @@ export function useAdminProducts(options?: UseAdminProductsOptions) {
   const [categories, setCategories] = useState<ApiCategory[]>([])
   const [categoriesLoading, setCategoriesLoading] = useState(true)
   const [reloadToken, setReloadToken] = useState(0)
+  const [togglingBestSellerId, setTogglingBestSellerId] = useState<string | null>(
+    null,
+  )
   const requestIdRef = useRef(0)
+  const togglingBestSellerIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -177,6 +214,52 @@ export function useAdminProducts(options?: UseAdminProductsOptions) {
     setReloadToken((token) => token + 1)
   }, [])
 
+  const patchRow = useCallback((id: string, patch: Partial<AdminProductRow>) => {
+    setState((previous) => ({
+      ...previous,
+      products: previous.products.map((row) =>
+        row.id === id ? { ...row, ...patch } : row,
+      ),
+    }))
+  }, [])
+
+  const toggleBestSeller = useCallback(
+    async (id: string) => {
+      if (togglingBestSellerIdRef.current === id) return
+
+      const previousRow = state.products.find((row) => row.id === id)
+      if (!previousRow) return
+
+      const nextValue = !previousRow.isBestSeller
+      togglingBestSellerIdRef.current = id
+      setTogglingBestSellerId(id)
+      patchRow(id, { isBestSeller: nextValue })
+
+      try {
+        const response = await toggleAdminProductBestSeller(id)
+        const confirmed =
+          typeof response.data?.isBestSeller === 'boolean'
+            ? response.data.isBestSeller
+            : nextValue
+        patchRow(id, { isBestSeller: confirmed })
+        toast.success(
+          confirmed
+            ? t('admin.products.bestSeller.onSuccess')
+            : t('admin.products.bestSeller.offSuccess'),
+        )
+      } catch (error) {
+        patchRow(id, { isBestSeller: previousRow.isBestSeller })
+        toast.error(resolveBestSellerError(error, t))
+      } finally {
+        if (togglingBestSellerIdRef.current === id) {
+          togglingBestSellerIdRef.current = null
+          setTogglingBestSellerId(null)
+        }
+      }
+    },
+    [patchRow, state.products, t, toast],
+  )
+
   const hasActiveFilters = Boolean(debouncedKeyword || filters.category)
 
   return {
@@ -186,10 +269,12 @@ export function useAdminProducts(options?: UseAdminProductsOptions) {
     categories,
     categoriesLoading,
     hasActiveFilters,
+    togglingBestSellerId,
     setKeyword,
     setCategory,
     setPage,
     clearFilters,
     reload,
+    toggleBestSeller,
   }
 }

@@ -1,5 +1,5 @@
 // src/components/admin/settings/OffersManagerCard.tsx
-import { Pencil } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAdminOffers } from '../../../hooks/useAdminOffers'
@@ -10,6 +10,7 @@ import { Button } from '../../ui/Button'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { DataTable, type DataTableColumn } from '../ui/DataTable'
 import { EmptyState } from '../ui/EmptyState'
+import { DeleteOfferDialog } from './DeleteOfferDialog'
 import { OfferDrawer } from './OfferDrawer'
 
 /**
@@ -24,13 +25,16 @@ export function OffersManagerCard() {
     loading,
     error,
     page,
+    deletingOfferId,
     setPage,
     reload,
     upsertOffer,
+    deleteOffer,
   } = useAdminOffers()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerMode, setDrawerMode] = useState<OfferDrawerMode>('create')
   const [editOfferId, setEditOfferId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<AdminOfferRow | null>(null)
 
   const openCreate = useCallback(() => {
     setDrawerMode('create')
@@ -47,6 +51,14 @@ export function OffersManagerCard() {
   const closeDrawer = useCallback(() => {
     setDrawerOpen(false)
     setEditOfferId(null)
+  }, [])
+
+  const openDelete = useCallback((offer: AdminOfferRow) => {
+    setDeleteTarget(offer)
+  }, [])
+
+  const closeDelete = useCallback(() => {
+    setDeleteTarget(null)
   }, [])
 
   const handleSaved = useCallback(
@@ -118,24 +130,42 @@ export function OffersManagerCard() {
         headerClassName: 'text-end',
         className: 'text-end',
         cell: (row) => (
-          <button
-            type="button"
-            onClick={() => openEdit(row.id)}
-            className={cn(
-              'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
-              'transition-colors hover:bg-white/10 hover:text-white',
-              focusRingClasses,
-            )}
-            aria-label={t('admin.settings.offers.editAria', {
-              name: row.productName,
-            })}
-          >
-            <Pencil size={13} aria-hidden />
-          </button>
+          <div className="inline-flex items-center justify-end gap-1">
+            <button
+              type="button"
+              onClick={() => openEdit(row.id)}
+              className={cn(
+                'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
+                'transition-colors hover:bg-white/10 hover:text-white',
+                focusRingClasses,
+              )}
+              aria-label={t('admin.settings.offers.editAria', {
+                name: row.productName,
+              })}
+            >
+              <Pencil size={13} aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={() => openDelete(row)}
+              disabled={deletingOfferId === row.id}
+              className={cn(
+                'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
+                'transition-colors hover:bg-support-error/10 hover:text-support-error',
+                'disabled:pointer-events-none disabled:opacity-40',
+                focusRingClasses,
+              )}
+              aria-label={t('admin.settings.offers.deleteAria', {
+                name: row.productName,
+              })}
+            >
+              <Trash2 size={13} aria-hidden />
+            </button>
+          </div>
         ),
       },
     ],
-    [openEdit, t],
+    [deletingOfferId, openDelete, openEdit, t],
   )
 
   const failed = Boolean(error) && !loading && offers.length === 0
@@ -241,6 +271,14 @@ export function OffersManagerCard() {
         offerId={editOfferId}
         onClose={closeDrawer}
         onSaved={handleSaved}
+      />
+
+      <DeleteOfferDialog
+        open={Boolean(deleteTarget)}
+        offer={deleteTarget}
+        submitting={deleteTarget != null && deletingOfferId === deleteTarget.id}
+        onClose={closeDelete}
+        onConfirm={deleteOffer}
       />
     </>
   )

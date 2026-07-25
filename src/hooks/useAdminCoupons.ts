@@ -2,7 +2,8 @@
 import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getAdminCoupons } from '../api/admin/coupons'
+import { deleteAdminCoupon, getAdminCoupons } from '../api/admin/coupons'
+import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
 import type { ApiPagination } from '../lib/api'
 import type {
@@ -23,9 +24,12 @@ interface AsyncState {
 }
 
 export function useAdminCoupons() {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const toast = useToast()
   const locale = i18n.language
   const [page, setPageState] = useState(DEFAULT_PAGE)
+  const [deletingCouponId, setDeletingCouponId] = useState<string | null>(null)
+  const deletingCouponIdRef = useRef<string | null>(null)
   const [state, setState] = useState<AsyncState>({
     coupons: [],
     pagination: null,
@@ -128,14 +132,40 @@ export function useAdminCoupons() {
     [],
   )
 
+  /** Rethrows so the confirm dialog can surface a translated message inline. */
+  const deleteCoupon = useCallback(
+    async (couponId: string) => {
+      if (deletingCouponIdRef.current) return
+      deletingCouponIdRef.current = couponId
+      setDeletingCouponId(couponId)
+
+      try {
+        await deleteAdminCoupon(couponId)
+        setState((previous) => ({
+          ...previous,
+          coupons: previous.coupons.filter((row) => row.id !== couponId),
+        }))
+        // Refetch the current page so pagination totals stay accurate.
+        reload()
+        toast.success(t('admin.settings.coupons.delete.success'))
+      } finally {
+        deletingCouponIdRef.current = null
+        setDeletingCouponId(null)
+      }
+    },
+    [reload, t, toast],
+  )
+
   return {
     coupons: state.coupons,
     pagination: state.pagination,
     loading: state.loading,
     error: state.error,
     page,
+    deletingCouponId,
     setPage,
     reload,
     upsertCoupon,
+    deleteCoupon,
   }
 }

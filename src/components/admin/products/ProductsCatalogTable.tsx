@@ -26,6 +26,50 @@ interface ProductsCatalogTableProps {
   totalPages: number
   onPageChange: (page: number) => void
   onEditProduct?: (productId: string) => void
+  togglingBestSellerId?: string | null
+  onToggleBestSeller?: (productId: string) => void
+}
+
+/** Best-seller switch — PATCH /products/:id/best-seller. */
+function BestSellerSwitch({
+  checked,
+  label,
+  disabled,
+  onToggle,
+}: {
+  checked: boolean
+  label: string
+  disabled?: boolean
+  onToggle?: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      disabled={disabled}
+      className={cn(
+        'relative inline-flex h-5 w-9 shrink-0 rounded-full border transition-colors',
+        checked
+          ? 'border-accent/40 bg-accent'
+          : 'border-white/15 bg-white/15',
+        'disabled:pointer-events-none disabled:opacity-50',
+        focusRingClasses,
+      )}
+      role="switch"
+      aria-checked={checked}
+      aria-busy={disabled || undefined}
+      aria-label={label}
+      title={label}
+    >
+      <span
+        className={cn(
+          'absolute top-0.5 start-0.5 size-4 rounded-full bg-white shadow transition-transform',
+          checked && 'translate-x-4 rtl:-translate-x-4',
+        )}
+        aria-hidden
+      />
+    </button>
+  )
 }
 
 function ProductThumbnail({ src, name }: { src: string | null; name: string }) {
@@ -70,6 +114,8 @@ export function ProductsCatalogTable({
   totalPages,
   onPageChange,
   onEditProduct,
+  togglingBestSellerId = null,
+  onToggleBestSeller,
 }: ProductsCatalogTableProps) {
   const { t, i18n } = useTranslation()
   const locale = i18n.language
@@ -137,6 +183,32 @@ export function ProductsCatalogTable({
         ),
       },
       {
+        id: 'bestSeller',
+        header: t('admin.products.columns.bestSeller'),
+        cell: (row) => {
+          const busy = togglingBestSellerId === row.id
+          return (
+            <div className="flex items-center gap-2">
+              <BestSellerSwitch
+                checked={row.isBestSeller}
+                disabled={busy || loading}
+                label={
+                  row.isBestSeller
+                    ? t('admin.products.bestSeller.toggleOffAria', { name: row.name })
+                    : t('admin.products.bestSeller.toggleOnAria', { name: row.name })
+                }
+                onToggle={() => onToggleBestSeller?.(row.id)}
+              />
+              <StatusBadge tone={row.isBestSeller ? 'accent' : 'neutral'}>
+                {row.isBestSeller
+                  ? t('admin.products.bestSeller.on')
+                  : t('admin.products.bestSeller.off')}
+              </StatusBadge>
+            </div>
+          )
+        },
+      },
+      {
         id: 'performance',
         header: t('admin.products.columns.performance'),
         cell: (row) => {
@@ -193,7 +265,7 @@ export function ProductsCatalogTable({
         ),
       },
     ],
-    [locale, onEditProduct, t],
+    [loading, locale, onEditProduct, onToggleBestSeller, t, togglingBestSellerId],
   )
 
   const canGoPrev = currentPage > 1

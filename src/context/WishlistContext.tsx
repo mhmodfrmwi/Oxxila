@@ -9,25 +9,29 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   addToWishlist as addToWishlistRequest,
+  clearWishlist as clearWishlistRequest,
   getWishlist,
   removeFromWishlist as removeFromWishlistRequest,
 } from '../api/wishlist'
-import { useAuth } from './AuthContext'
-import { useToast } from './ToastContext'
 import { ApiError } from '../lib/api'
 import type { WishlistItem } from '../types/wishlist'
+import { useAuth } from './AuthContext'
+import { useToast } from './ToastContext'
 
 interface WishlistContextValue {
   items: WishlistItem[]
   itemCount: number
   loading: boolean
+  clearingWishlist: boolean
   error: string | null
   pendingProductId: string | null
   isWishlisted: (productId: string) => boolean
   toggleWishlist: (productId: string) => Promise<void>
   removeItem: (productId: string) => Promise<void>
+  clearWishlist: () => Promise<void>
   refreshWishlist: () => Promise<void>
 }
 
@@ -54,15 +58,18 @@ function clearWishlistState(
 }
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation()
   const { isAuthenticated, user } = useAuth()
   const userId = user?.id ?? null
   const toast = useToast()
   const [items, setItems] = useState<WishlistItem[]>([])
   const [loading, setLoading] = useState(false)
+  const [clearingWishlist, setClearingWishlist] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pendingProductId, setPendingProductId] = useState<string | null>(null)
   const [optimisticAddedIds, setOptimisticAddedIds] = useState<string[]>([])
   const fetchGenerationRef = useRef(0)
+  const clearingWishlistRef = useRef(false)
 
   const refreshWishlist = useCallback(async () => {
     if (!isAuthenticated || !userId) {
@@ -233,27 +240,57 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     ],
   )
 
+  const clearWishlist = useCallback(async () => {
+    if (!isAuthenticated) {
+      toast.error(
+        t('wishlist.signInRequired'),
+        t('wishlist.signInRequiredDetail'),
+      )
+      throw new ApiError('Unauthorized', 401)
+    }
+    if (clearingWishlistRef.current) return
+
+    clearingWishlistRef.current = true
+    setClearingWishlist(true)
+    try {
+      await clearWishlistRequest()
+      // DELETE has no wishlist payload — empty local state so page + badge update.
+      setItems([])
+      setOptimisticAddedIds([])
+      setPendingProductId(null)
+      setError(null)
+      toast.success(t('wishlist.clear.success'))
+    } finally {
+      clearingWishlistRef.current = false
+      setClearingWishlist(false)
+    }
+  }, [isAuthenticated, t, toast])
+
   const value = useMemo(
     () => ({
       items: resolvedItems,
       itemCount: resolvedItems.length,
       loading: isAuthenticated ? loading : false,
+      clearingWishlist,
       error: isAuthenticated ? error : null,
       pendingProductId,
       isWishlisted,
       toggleWishlist,
       removeItem,
+      clearWishlist,
       refreshWishlist,
     }),
     [
       resolvedItems,
       isAuthenticated,
       loading,
+      clearingWishlist,
       error,
       pendingProductId,
       isWishlisted,
       toggleWishlist,
       removeItem,
+      clearWishlist,
       refreshWishlist,
     ],
   )
