@@ -6,19 +6,27 @@ import type { AdminCarrierRow } from '../../../types/adminShipping'
 import {
   carrierInitials,
   carrierStatusBadgeTone,
+  type AdminCarrierTypeFilter,
 } from '../../../utils/adminShippingFormat'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { DataTable, type DataTableColumn } from '../ui/DataTable'
 import { StatusBadge } from '../ui/StatusBadge'
+import { CarrierTypeTabs } from './CarrierTypeTabs'
+import { ShippingListToolbar } from './ShippingListToolbar'
 
 interface CourierCompaniesTableProps {
   carriers: readonly AdminCarrierRow[]
   loading?: boolean
+  keyword: string
+  typeFilter: AdminCarrierTypeFilter
   emptyTitle: string
   emptyDescription?: string
   emptyAction?: ReactNode
   deletingId?: string | null
+  filtersDisabled?: boolean
+  onKeywordChange: (value: string) => void
+  onTypeFilterChange: (value: AdminCarrierTypeFilter) => void
   onAdd: () => void
   onEdit: (carrier: AdminCarrierRow) => void
   onDelete: (carrier: AdminCarrierRow) => void
@@ -61,10 +69,15 @@ function CompanyCell({
 export function CourierCompaniesTable({
   carriers,
   loading = false,
+  keyword,
+  typeFilter,
   emptyTitle,
   emptyDescription,
   emptyAction,
   deletingId = null,
+  filtersDisabled = false,
+  onKeywordChange,
+  onTypeFilterChange,
   onAdd,
   onEdit,
   onDelete,
@@ -193,24 +206,43 @@ export function CourierCompaniesTable({
       aria-label={t('admin.shipping.carriers.tableAria')}
       className="rounded-[1.6rem]"
       toolbar={
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">
-            {t('admin.shipping.carriers.title')}
-          </h3>
-          <button
-            type="button"
-            onClick={onAdd}
-            className={cn(
-              'inline-flex items-center gap-2 rounded-xl border border-[#a394ff]/20',
-              'bg-[rgba(163,148,255,0.1)] px-5 py-2.5',
-              'text-xs font-bold uppercase tracking-[0.1em] text-[#a394ff]',
-              'transition-colors hover:bg-[rgba(163,148,255,0.18)]',
-              focusRingClasses,
-            )}
-          >
-            <Plus size={13} aria-hidden />
-            {t('admin.shipping.carriers.addCompany')}
-          </button>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">
+                {t('admin.shipping.carriers.title')}
+              </h3>
+              <p className="mt-1 text-sm text-white/40">
+                {t('admin.shipping.carriers.subtitle')}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onAdd}
+              className={cn(
+                'inline-flex items-center gap-2 rounded-xl border border-[#a394ff]/20',
+                'bg-[rgba(163,148,255,0.1)] px-5 py-2.5',
+                'text-xs font-bold uppercase tracking-[0.1em] text-[#a394ff]',
+                'transition-colors hover:bg-[rgba(163,148,255,0.18)]',
+                focusRingClasses,
+              )}
+            >
+              <Plus size={13} aria-hidden />
+              {t('admin.shipping.carriers.addCompany')}
+            </button>
+          </div>
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <CarrierTypeTabs
+              active={typeFilter}
+              onChange={onTypeFilterChange}
+              disabled={filtersDisabled}
+            />
+            <ShippingListToolbar
+              keyword={keyword}
+              onKeywordChange={onKeywordChange}
+              disabled={filtersDisabled}
+            />
+          </div>
         </div>
       }
     />

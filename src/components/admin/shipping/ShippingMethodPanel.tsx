@@ -65,7 +65,7 @@ function MethodToggle({
   )
 }
 
-function MethodRow({
+function MethodCard({
   method,
   updating,
   onToggle,
@@ -78,12 +78,19 @@ function MethodRow({
   const key = methodCopyKey(method.type)
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-white/5 p-4">
+    <div
+      className={cn(
+        'flex min-w-0 items-center justify-between gap-3 rounded-2xl border p-4',
+        method.isEnabled
+          ? 'border-[#a394ff]/25 bg-[rgba(163,148,255,0.08)]'
+          : 'border-white/5 bg-white/5',
+      )}
+    >
       <div className="min-w-0">
         <p className="text-sm font-semibold text-white">
           {t(`admin.shipping.method.types.${key}.label`)}
         </p>
-        <p className="text-[8px] text-white/40">
+        <p className="mt-0.5 text-xs text-white/40">
           {t(`admin.shipping.method.types.${key}.hint`)}
         </p>
       </div>
@@ -113,9 +120,14 @@ export function ShippingMethodPanel() {
       aria-label={t('admin.shipping.method.panelAria')}
       aria-busy={loading || undefined}
     >
-      <h3 className="font-[family-name:var(--admin-font-display)] text-lg font-normal text-white">
-        {t('admin.shipping.method.title')}
-      </h3>
+      <div>
+        <h3 className="font-[family-name:var(--admin-font-display)] text-lg font-normal text-white">
+          {t('admin.shipping.method.title')}
+        </h3>
+        <p className="mt-1 text-sm text-white/40">
+          {t('admin.shipping.method.subtitle')}
+        </p>
+      </div>
 
       {staleError ? (
         <p
@@ -127,7 +139,10 @@ export function ShippingMethodPanel() {
       ) : null}
 
       {loading && methods.length === 0 ? (
-        <div className="flex flex-col gap-6" aria-busy="true">
+        <div
+          className="grid grid-cols-1 gap-[var(--admin-content-gap-tight)] md:grid-cols-3"
+          aria-busy="true"
+        >
           <Skeleton className="h-[4.6rem] w-full rounded-2xl" />
           <Skeleton className="h-[4.6rem] w-full rounded-2xl" />
           <Skeleton className="h-[4.6rem] w-full rounded-2xl" />
@@ -149,9 +164,9 @@ export function ShippingMethodPanel() {
       ) : null}
 
       {methods.length > 0 ? (
-        <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 gap-[var(--admin-content-gap-tight)] md:grid-cols-3">
           {methods.map((method) => (
-            <MethodRow
+            <MethodCard
               key={method.type}
               method={method}
               updating={updatingType === method.type}

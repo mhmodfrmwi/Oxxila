@@ -1,6 +1,6 @@
 // src/components/admin/shipping/CarrierDrawer.tsx
-import { Loader2 } from 'lucide-react'
-import { useId } from 'react'
+import { ChevronDown, Loader2 } from 'lucide-react'
+import { useCallback, useEffect, useId, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCarrierCoverage } from '../../../hooks/useCarrierCoverage'
 import {
@@ -31,7 +31,11 @@ const fieldClass = cn(
 
 const labelClass = 'block text-xs font-medium leading-4 text-white/60'
 
-const CARRIER_TYPES: AdminCarrierType[] = ['known', 'internal', 'api']
+/** Types offered in the drawer selector. API carriers remain supported when loaded from the backend. */
+const SELECTABLE_CARRIER_TYPES: Exclude<AdminCarrierType, 'api'>[] = [
+  'known',
+  'internal',
+]
 
 function FieldError({ message }: { message?: string }) {
   if (!message) return null
@@ -48,35 +52,46 @@ export function CarrierDrawer({
   const { t } = useTranslation()
   const formId = useId()
 
+  const isApiCarrier =
+    (mode === 'edit' && carrier?.type === 'api') || false
+
+  const coverage = useCarrierCoverage({
+    carrierId: mode === 'edit' && carrier ? carrier.id : null,
+    enabled: open && !isApiCarrier,
+  })
+  const coverageRef = useRef(coverage)
+  useEffect(() => {
+    coverageRef.current = coverage
+  })
+
+  const handleSaved = useCallback(
+    (row: AdminCarrierRow) => {
+      void (async () => {
+        if (
+          mode === 'create' &&
+          row.type !== 'api' &&
+          coverageRef.current.hasPendingSelection
+        ) {
+          await coverageRef.current.saveForCarrier(row.id)
+        }
+        onSaved(row)
+        if (mode === 'create') onClose()
+      })()
+    },
+    [mode, onClose, onSaved],
+  )
+
   const form = useCarrierForm({
     open,
     mode,
     carrier,
-    onSaved: (row) => {
-      onSaved(row)
-      if (mode === 'create') onClose()
-    },
+    onSaved: handleSaved,
   })
-
-  const coverageEnabled = open && mode === 'edit' && Boolean(carrier)
-  const coverage = useCarrierCoverage({
-    carrierId: carrier?.id ?? null,
-    enabled: coverageEnabled,
-  })
-
-  const groupedCoverage = coverage.options.reduce<
-    Record<string, { countryName: string; items: typeof coverage.options }>
-  >((groups, option) => {
-    const group = groups[option.countryId] ?? {
-      countryName: option.countryName,
-      items: [],
-    }
-    group.items.push(option)
-    groups[option.countryId] = group
-    return groups
-  }, {})
 
   const showBostaPickups = mode === 'edit' && carrier?.type === 'api'
+  const showCoverage = form.values.type !== 'api'
+  const countrySelected = Boolean(coverage.selectedCountryId)
+  const governoratesDisabled = !countrySelected || coverage.governoratesLoading
 
   const title =
     mode === 'create'
@@ -175,50 +190,54 @@ export function CarrierDrawer({
 
         <div>
           <p className={labelClass}>{t('admin.shipping.carriers.drawer.type')}</p>
-          <div className="mt-2 flex gap-2">
-            {CARRIER_TYPES.map((type) => {
-              const active = form.values.type === type
-              return (
-                <button
-                  key={type}
-                  type="button"
-                  disabled={form.submitting || mode === 'edit'}
-                  title={
-                    mode === 'edit'
-                      ? t('admin.shipping.carriers.drawer.immutableHint')
-                      : undefined
-                  }
-                  onClick={() => form.setType(type)}
-                  className={cn(
-                    'rounded-full border px-4 py-1.5 text-xs font-medium transition-colors',
-                    focusRingClasses,
-                    active
-                      ? 'border-[#a394ff]/40 bg-[rgba(163,148,255,0.15)] text-[#a394ff]'
-                      : 'border-white/10 bg-white/5 text-white/50 hover:text-white/80',
-                    (form.submitting || mode === 'edit') &&
-                      'cursor-not-allowed opacity-70',
-                  )}
-                >
-                  {t(`admin.shipping.method.types.${type}.label`)}
-                </button>
-              )
-            })}
-          </div>
+          {mode === 'edit' && form.values.type === 'api' ? (
+            <div className="mt-2">
+              <span
+                className={cn(
+                  'inline-flex rounded-full border border-[#a394ff]/40 bg-[rgba(163,148,255,0.15)]',
+                  'px-4 py-1.5 text-xs font-medium text-[#a394ff]',
+                  'cursor-not-allowed opacity-70',
+                )}
+                title={t('admin.shipping.carriers.drawer.immutableHint')}
+              >
+                {t('admin.shipping.method.types.api.label')}
+              </span>
+            </div>
+          ) : (
+            <div className="mt-2 flex gap-2">
+              {SELECTABLE_CARRIER_TYPES.map((type) => {
+                const active = form.values.type === type
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    disabled={form.submitting || mode === 'edit'}
+                    title={
+                      mode === 'edit'
+                        ? t('admin.shipping.carriers.drawer.immutableHint')
+                        : undefined
+                    }
+                    onClick={() => form.setType(type)}
+                    className={cn(
+                      'rounded-full border px-4 py-1.5 text-xs font-medium transition-colors',
+                      focusRingClasses,
+                      active
+                        ? 'border-[#a394ff]/40 bg-[rgba(163,148,255,0.15)] text-[#a394ff]'
+                        : 'border-white/10 bg-white/5 text-white/50 hover:text-white/80',
+                      (form.submitting || mode === 'edit') &&
+                        'cursor-not-allowed opacity-70',
+                    )}
+                  >
+                    {t(`admin.shipping.method.types.${type}.label`)}
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {form.values.type === 'api' ? (
           <>
-            <div>
-              <label className={labelClass}>
-                {t('admin.shipping.carriers.drawer.apiProvider')}
-              </label>
-              <input
-                type="text"
-                value="Bosta"
-                disabled
-                className={cn(fieldClass, 'mt-2 opacity-70')}
-              />
-            </div>
             <div>
               <label className={labelClass} htmlFor={`${formId}-apiKey`}>
                 {t('admin.shipping.carriers.drawer.apiKey')}
@@ -272,6 +291,151 @@ export function CarrierDrawer({
           </div>
         )}
 
+        {showCoverage ? (
+          <>
+            <div>
+              <label className={labelClass} htmlFor={`${formId}-country`}>
+                {t('admin.shipping.carriers.drawer.country')}
+              </label>
+              <div className="relative mt-2">
+                <select
+                  id={`${formId}-country`}
+                  value={coverage.selectedCountryId}
+                  disabled={
+                    form.submitting ||
+                    coverage.loading ||
+                    coverage.countries.length === 0
+                  }
+                  onChange={(event) =>
+                    coverage.setSelectedCountryId(event.target.value)
+                  }
+                  className={cn(fieldClass, 'appearance-none pe-10')}
+                >
+                  <option value="">
+                    {t('admin.shipping.carriers.drawer.countryPlaceholder')}
+                  </option>
+                  {coverage.countries.map((country) => (
+                    <option key={country.id} value={country.id}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  size={16}
+                  className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 text-white/40"
+                  aria-hidden
+                />
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                'flex flex-col gap-3',
+                governoratesDisabled && 'opacity-60',
+              )}
+              aria-disabled={governoratesDisabled}
+            >
+              <p className="text-xs font-bold uppercase leading-4 text-[#9ca3af]">
+                {t('admin.shipping.carriers.drawer.coveredGovernorates')}
+              </p>
+
+              {coverage.error ? (
+                <p className="text-xs text-support-error" role="alert">
+                  {coverage.error}
+                </p>
+              ) : null}
+
+              {coverage.loading || coverage.governoratesLoading ? (
+                <p className="text-xs text-white/40">
+                  {t('admin.shipping.carriers.drawer.coverageLoading')}
+                </p>
+              ) : null}
+
+              {!coverage.loading && coverage.countries.length === 0 ? (
+                <EmptyState
+                  bare
+                  className="py-4"
+                  title={t('admin.shipping.carriers.drawer.coverageEmpty')}
+                />
+              ) : null}
+
+              {!coverage.loading &&
+              coverage.countries.length > 0 &&
+              !countrySelected ? (
+                <p className="text-xs text-white/40">
+                  {t('admin.shipping.carriers.drawer.selectCountryFirst')}
+                </p>
+              ) : null}
+
+              {!coverage.loading &&
+              !coverage.governoratesLoading &&
+              countrySelected &&
+              coverage.governorates.length === 0 ? (
+                <EmptyState
+                  bare
+                  className="py-4"
+                  title={t('admin.shipping.carriers.drawer.coverageEmpty')}
+                />
+              ) : null}
+
+              {!coverage.loading &&
+              !coverage.governoratesLoading &&
+              coverage.governorates.length > 0 ? (
+                <div className="flex max-h-64 flex-wrap gap-1.5 overflow-y-auto pe-1">
+                  {coverage.governorates.map((option) => {
+                    const active = coverage.selectedIds.has(option.id)
+                    return (
+                      <button
+                        key={option.id}
+                        type="button"
+                        disabled={form.submitting || governoratesDisabled}
+                        onClick={() => coverage.toggle(option.id)}
+                        className={cn(
+                          'rounded-md border px-[13px] py-[7px] text-xs transition-colors',
+                          focusRingClasses,
+                          active
+                            ? 'border-[rgba(130,115,255,0.5)] bg-[rgba(130,115,255,0.2)] text-[#8273ff]'
+                            : 'border-[#2a2a3d] bg-[#1d1d2b] text-[#9ca3af] hover:text-white/80',
+                          (form.submitting || governoratesDisabled) &&
+                            'cursor-not-allowed',
+                        )}
+                      >
+                        {option.name}
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : null}
+
+              {mode === 'edit' && carrier ? (
+                <>
+                  {coverage.saveError ? (
+                    <p className="text-xs text-support-error" role="alert">
+                      {coverage.saveError}
+                    </p>
+                  ) : null}
+                  <button
+                    type="button"
+                    disabled={!coverage.dirty || coverage.saving || form.submitting}
+                    onClick={() => void coverage.save()}
+                    className={cn(
+                      'inline-flex w-fit items-center gap-2 rounded-xl border border-[#a394ff]/20 bg-[rgba(163,148,255,0.1)] px-4 py-2',
+                      'text-xs font-bold uppercase text-[#a394ff]',
+                      'disabled:cursor-not-allowed disabled:opacity-50',
+                      focusRingClasses,
+                    )}
+                  >
+                    {coverage.saving ? (
+                      <Loader2 size={12} className="animate-spin" aria-hidden />
+                    ) : null}
+                    {t('admin.shipping.carriers.drawer.coverageSave')}
+                  </button>
+                </>
+              ) : null}
+            </div>
+          </>
+        ) : null}
+
         <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
           <div>
             <p className="text-sm font-semibold text-white">
@@ -305,94 +469,6 @@ export function CarrierDrawer({
           </button>
         </div>
       </form>
-
-      {mode === 'edit' && carrier ? (
-        <div className="mt-6 flex flex-col gap-4 border-t border-white/10 pt-6">
-          <div>
-            <h4 className="text-sm font-bold text-white">
-              {t('admin.shipping.carriers.drawer.coverageTitle')}
-            </h4>
-            <p className="text-[8px] text-white/40">
-              {t('admin.shipping.carriers.drawer.coverageHint')}
-            </p>
-          </div>
-
-          {coverage.error ? (
-            <p className="text-xs text-support-error" role="alert">
-              {coverage.error}
-            </p>
-          ) : null}
-          {coverage.saveError ? (
-            <p className="text-xs text-support-error" role="alert">
-              {coverage.saveError}
-            </p>
-          ) : null}
-
-          {coverage.loading ? (
-            <p className="text-xs text-white/40">
-              {t('admin.shipping.carriers.drawer.coverageLoading')}
-            </p>
-          ) : null}
-
-          {!coverage.loading && coverage.options.length === 0 ? (
-            <EmptyState
-              bare
-              className="py-4"
-              title={t('admin.shipping.carriers.drawer.coverageEmpty')}
-            />
-          ) : null}
-
-          {!coverage.loading && coverage.options.length > 0 ? (
-            <div className="flex max-h-56 flex-col gap-3 overflow-y-auto pe-1">
-              {Object.entries(groupedCoverage).map(([countryId, group]) => (
-                <div key={countryId}>
-                  <p className="mb-1.5 text-[8px] font-semibold uppercase tracking-[0.1em] text-white/30">
-                    {group.countryName}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {group.items.map((option) => {
-                      const active = coverage.selectedIds.has(option.id)
-                      return (
-                        <button
-                          key={option.id}
-                          type="button"
-                          onClick={() => coverage.toggle(option.id)}
-                          className={cn(
-                            'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
-                            focusRingClasses,
-                            active
-                              ? 'border-[#a394ff]/40 bg-[rgba(163,148,255,0.15)] text-[#a394ff]'
-                              : 'border-white/10 bg-white/5 text-white/50 hover:text-white/80',
-                          )}
-                        >
-                          {option.name}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : null}
-
-          <button
-            type="button"
-            disabled={!coverage.dirty || coverage.saving}
-            onClick={() => void coverage.save()}
-            className={cn(
-              'inline-flex w-fit items-center gap-2 rounded-xl border border-[#a394ff]/20 bg-[rgba(163,148,255,0.1)] px-4 py-2',
-              'text-xs font-bold uppercase text-[#a394ff]',
-              'disabled:cursor-not-allowed disabled:opacity-50',
-              focusRingClasses,
-            )}
-          >
-            {coverage.saving ? (
-              <Loader2 size={12} className="animate-spin" aria-hidden />
-            ) : null}
-            {t('admin.shipping.carriers.drawer.coverageSave')}
-          </button>
-        </div>
-      ) : null}
 
       {showBostaPickups && carrier ? (
         <div className="mt-6 border-t border-white/10 pt-6">

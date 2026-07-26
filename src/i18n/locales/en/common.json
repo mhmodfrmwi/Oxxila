@@ -1682,7 +1682,32 @@
         "archiveTitle": "Archive formulation?",
         "archiveDescription": "This hides the product from the active catalog.",
         "archiveBody": "Archived formulas are set inactive and leave the Products list.",
-        "archiveConfirm": "Archive"
+        "archiveConfirm": "Archive",
+        "tabsAria": "Formula specs sections",
+        "tabs": {
+          "details": "Details",
+          "faq": "FAQ Questions"
+        },
+        "faq": {
+          "question": "Question",
+          "answer": "Answer",
+          "questionPlaceholder": "write product question...",
+          "answerPlaceholder": "write answer...",
+          "previous": "Previous Questions",
+          "previousAria": "Previous product FAQ questions",
+          "empty": "No FAQ questions yet for this formulation.",
+          "add": "Add Question",
+          "adding": "Adding…",
+          "createSuccess": "FAQ question added",
+          "createFailed": "Unable to add FAQ question",
+          "loadError": "Unable to load FAQ questions.",
+          "saveProductFirstTitle": "Save formulation first",
+          "saveProductFirst": "Create and save the product before adding FAQ questions.",
+          "questionRequired": "Question is required",
+          "answerRequired": "Answer is required",
+          "questionTooLong": "Question cannot exceed {{max}} characters",
+          "answerTooLong": "Answer cannot exceed {{max}} characters"
+        }
       }
     },
     "orders": {
@@ -1827,6 +1852,18 @@
         "title": "Order {{id}}",
         "titleFallback": "Order details",
         "subtitle": "Details & Tracking",
+        "customer": "Customer",
+        "orderLabel": "Order",
+        "zone": "Zone",
+        "total": "Total",
+        "orderStatus": "Order Status",
+        "progressAria": "Order progress",
+        "progress": {
+          "orderPlaced": "Order Placed",
+          "pickedUp": "Picked Up",
+          "onTheWay": "On The Way",
+          "delivered": "Delivered"
+        },
         "payment": "Payment",
         "contact": "Contact",
         "shipping": "Shipping",
@@ -1851,7 +1888,7 @@
           "subtitle": "No carrier assigned yet — assign directly, no confirm step needed.",
           "loadError": "Unable to load assign options",
           "noCarriers": "No active carriers match this order's shipping method settings.",
-          "packageSize": "Package size",
+          "packageSize": "Package Size",
           "sizes": {
             "SMALL": "Small",
             "MEDIUM": "Medium",
@@ -1859,15 +1896,19 @@
             "XLARGE": "Extra large"
           },
           "carrier": "Carrier",
+          "carrierPlaceholder": "Select a carrier",
           "disabledCoverage": "Does not cover this governorate",
           "disabledPickups": "No pickup locations configured",
           "disabledDistrict": "District not covered by Bosta",
-          "pickup": "Pickup location",
+          "pickup": "Pickup location (required)",
           "pickupPlaceholder": "Select a pickup location",
-          "driverName": "Driver name",
-          "driverPhone": "Driver phone",
+          "driverName": "Driver Name",
+          "driverNamePlaceholder": "Driver Name",
+          "driverPhone": "Driver Phone",
+          "driverPhonePlaceholder": "Driver Phone",
           "trackingNumber": "Tracking number (optional)",
-          "notes": "Notes (optional)",
+          "notes": "Notes",
+          "notesPlaceholder": "Your Notes",
           "submit": "Assign Carrier",
           "submitting": "Assigning…",
           "success": "Carrier assigned successfully",
@@ -2350,7 +2391,7 @@
     },
     "shipping": {
       "title": "Shipping Management",
-      "subtitle": "Manage shipping methods, courier companies, zones, and Bosta pickups.",
+      "subtitle": "Configure methods, carriers, and delivery zones.",
       "searchLabel": "Search carriers",
       "searchPlaceholder": "Filter carriers by name or code...",
       "clearFilters": "Clear filters",
@@ -2359,8 +2400,16 @@
       "retry": "Retry",
       "carriers": {
         "title": "Courier Companies",
+        "subtitle": "API, known, and internal carriers available for assignment.",
         "addCompany": "Add Company",
         "tableAria": "Courier companies list",
+        "typeFilterAria": "Filter carriers by type",
+        "typeTabs": {
+          "all": "All",
+          "api": "API",
+          "known": "Known",
+          "internal": "Internal"
+        },
         "active": "Active",
         "inactive": "Inactive",
         "bosta": "Bosta (API)",
@@ -2377,7 +2426,7 @@
         "emptyTitle": "No courier companies yet",
         "emptyDescription": "Add a known, internal, or Bosta carrier to get started.",
         "emptyFilteredTitle": "No matching carriers",
-        "emptyFilteredDescription": "Try a different search.",
+        "emptyFilteredDescription": "Try a different type filter or search.",
         "loadErrorTitle": "Unable to load carriers",
         "deleteTitle": "Delete carrier",
         "deleteDescription": "Delete {{name}}?",
@@ -2409,6 +2458,10 @@
           "updateSuccess": "Carrier updated successfully",
           "coverageTitle": "Coverage",
           "coverageHint": "Select governorates this carrier delivers to.",
+          "country": "Country",
+          "countryPlaceholder": "Select country",
+          "coveredGovernorates": "Select covered governorates",
+          "selectCountryFirst": "Select a country to see its governorates.",
           "coverageLoading": "Loading governorates…",
           "coverageEmpty": "Add a country and governorate in Zone Manager first.",
           "coverageSave": "Save coverage"
@@ -2416,6 +2469,7 @@
       },
       "method": {
         "title": "Shipping Methods",
+        "subtitle": "Enable the delivery channels customers can choose at checkout.",
         "panelAria": "Shipping method settings",
         "loadErrorTitle": "Unable to load shipping methods",
         "types": {
@@ -2516,6 +2570,22 @@
         "configureSoon": "Gateway configuration is not available from this card yet.",
         "enable": "Enable",
         "enabling": "Enabling…",
+        "disable": "Disable",
+        "disableAria": "Disable {{name}}",
+        "toggle": {
+          "enabled": "{{name}} is now connected & live",
+          "disabled": "{{name}} is now disabled",
+          "errorTitle": "Unable to update payment method",
+          "errors": {
+            "badRequest": "The payment method could not be updated with these values.",
+            "unauthorized": "Please log in again to update payment methods.",
+            "forbidden": "You do not have permission to update payment methods.",
+            "notFound": "This payment method no longer exists.",
+            "server": "The server could not update this payment method. Try again.",
+            "network": "Network error. Check your connection and try again.",
+            "unknown": "Something went wrong. Please try again."
+          }
+        },
         "emptyTitle": "No payment gateways",
         "emptyDescription": "Connected gateways will appear here.",
         "loadErrorTitle": "Unable to load payment gateways"

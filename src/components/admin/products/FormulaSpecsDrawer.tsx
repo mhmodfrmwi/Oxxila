@@ -13,6 +13,7 @@ import {
   useFormulaSpecsDrawer,
   type FormulaSpecsMode,
 } from '../../../hooks/useFormulaSpecsDrawer'
+import { useFormulaSpecsFaqs } from '../../../hooks/useFormulaSpecsFaqs'
 import type { ApiCategory, ApiProduct } from '../../../types/catalog'
 import {
   ADMIN_PRODUCT_CONCERNS,
@@ -25,6 +26,9 @@ import { focusRingClasses } from '../../ui/interactionStyles'
 import { Dialog } from '../ui/Dialog'
 import { Drawer } from '../ui/Drawer'
 import { Skeleton } from '../ui/Skeleton'
+import { FormulaSpecsFaqPanel } from './FormulaSpecsFaqPanel'
+
+type FormulaSpecsTab = 'details' | 'faq'
 
 interface FormulaSpecsDrawerProps {
   open: boolean
@@ -53,7 +57,7 @@ const fieldClass = cn(
   'focus:outline-none focus:ring-2 focus:ring-accent/40',
 )
 
-const labelClass = 'block text-sm font-medium text-primary-text'
+const labelClass = 'block text-xs font-medium leading-4 text-white/60'
 
 export function FormulaSpecsDrawer({
   open,
@@ -67,8 +71,10 @@ export function FormulaSpecsDrawer({
   const { t } = useTranslation()
   const toast = useToast()
   const formId = useId()
+  const tabsId = useId()
   const [discardOpen, setDiscardOpen] = useState(false)
   const [archiveOpen, setArchiveOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<FormulaSpecsTab>('details')
 
   const drawer = useFormulaSpecsDrawer({
     open,
@@ -88,6 +94,16 @@ export function FormulaSpecsDrawer({
     },
   })
 
+  const faqs = useFormulaSpecsFaqs({
+    open,
+    productId,
+    productName: drawer.values.name || null,
+  })
+
+  useEffect(() => {
+    if (!open) setActiveTab('details')
+  }, [open])
+
   const { subcategories, loading: subLoading } = useSubCategories(
     drawer.values.category || undefined,
     open && Boolean(drawer.values.category),
@@ -104,13 +120,22 @@ export function FormulaSpecsDrawer({
   }, [drawer.values.category, drawer.values.subCategory, subcategories, subLoading])
 
   const requestClose = useCallback(() => {
-    if (drawer.submitting || drawer.archiving) return
-    if (drawer.dirty) {
+    if (drawer.submitting || drawer.archiving || faqs.submitting) return
+    const faqDirty = Boolean(faqs.question.trim() || faqs.answer.trim())
+    if (drawer.dirty || faqDirty) {
       setDiscardOpen(true)
       return
     }
     onClose()
-  }, [drawer.submitting, drawer.archiving, drawer.dirty, onClose])
+  }, [
+    drawer.submitting,
+    drawer.archiving,
+    drawer.dirty,
+    faqs.submitting,
+    faqs.question,
+    faqs.answer,
+    onClose,
+  ])
 
   const handleDrawerClose = useCallback(() => {
     if (discardOpen || archiveOpen) return
@@ -140,7 +165,18 @@ export function FormulaSpecsDrawer({
         ? t('admin.products.formula.refNew')
         : t('admin.products.formula.refUnavailable')
 
-  const busy = drawer.submitting || drawer.archiving
+  const busy = drawer.submitting || drawer.archiving || faqs.submitting
+  const showDetailsFooter = activeTab === 'details' && !drawer.loadError
+  const showFaqFooter = activeTab === 'faq' && !drawer.loadError && faqs.canCreate
+
+  const handleFaqSubmit = async () => {
+    const ok = await faqs.submit()
+    if (ok) {
+      toast.success(t('admin.products.formula.faq.createSuccess'))
+    }
+  }
+
+  const faqFormId = `${formId}-faq`
 
   return (
     <>
@@ -151,46 +187,70 @@ export function FormulaSpecsDrawer({
         onClose={handleDrawerClose}
         width="formula"
         footer={
-          <div className="flex items-center gap-3">
-            {mode === 'edit' ? (
+          showDetailsFooter ? (
+            <div className="flex items-center gap-3">
+              {mode === 'edit' ? (
+                <button
+                  type="button"
+                  disabled={busy || drawer.loadingProduct}
+                  onClick={() => setArchiveOpen(true)}
+                  className={cn(
+                    'min-h-11 flex-1 rounded-xl border border-border-subtle bg-white/5 px-4',
+                    'text-xs font-bold uppercase tracking-[0.12em] text-primary-text',
+                    'hover:bg-white/10 disabled:pointer-events-none disabled:opacity-50',
+                    focusRingClasses,
+                  )}
+                >
+                  {t('admin.products.formula.archive')}
+                </button>
+              ) : (
+                <div className="flex-1" />
+              )}
               <button
-                type="button"
-                disabled={busy || drawer.loadingProduct}
-                onClick={() => setArchiveOpen(true)}
+                type="submit"
+                form={formId}
+                disabled={busy || drawer.loadingProduct || Boolean(drawer.loadError)}
                 className={cn(
-                  'min-h-11 flex-1 rounded-xl border border-border-subtle bg-white/5 px-4',
-                  'text-xs font-bold uppercase tracking-[0.12em] text-primary-text',
-                  'hover:bg-white/10 disabled:pointer-events-none disabled:opacity-50',
+                  'min-h-11 flex-[1.4] rounded-xl px-4',
+                  'bg-gradient-to-r from-accent to-[#7c69ff] text-xs font-bold uppercase tracking-[0.12em] text-white',
+                  'shadow-[0_8px_20px_rgb(163_148_255_/_0.28)]',
+                  'disabled:pointer-events-none disabled:opacity-50',
                   focusRingClasses,
                 )}
               >
-                {t('admin.products.formula.archive')}
+                {drawer.submitting ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 size={11} className="animate-spin" aria-hidden />
+                    {t('admin.products.formula.saving')}
+                  </span>
+                ) : (
+                  t('admin.products.formula.save')
+                )}
               </button>
-            ) : (
-              <div className="flex-1" />
-            )}
+            </div>
+          ) : showFaqFooter ? (
             <button
               type="submit"
-              form={formId}
-              disabled={busy || drawer.loadingProduct || Boolean(drawer.loadError)}
+              form={faqFormId}
+              disabled={faqs.submitting}
               className={cn(
-                'min-h-11 flex-[1.4] rounded-xl px-4',
+                'flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4',
                 'bg-gradient-to-r from-accent to-[#7c69ff] text-xs font-bold uppercase tracking-[0.12em] text-white',
                 'shadow-[0_8px_20px_rgb(163_148_255_/_0.28)]',
                 'disabled:pointer-events-none disabled:opacity-50',
                 focusRingClasses,
               )}
             >
-              {drawer.submitting ? (
+              {faqs.submitting ? (
                 <span className="inline-flex items-center gap-2">
                   <Loader2 size={11} className="animate-spin" aria-hidden />
-                  {t('admin.products.formula.saving')}
+                  {t('admin.products.formula.faq.adding')}
                 </span>
               ) : (
-                t('admin.products.formula.save')
+                t('admin.products.formula.faq.add')
               )}
             </button>
-          </div>
+          ) : undefined
         }
       >
         {drawer.loadingProduct ? (
@@ -212,6 +272,48 @@ export function FormulaSpecsDrawer({
             </Button>
           </div>
         ) : (
+          <div className="space-y-8">
+            <div
+              className="flex gap-2"
+              role="tablist"
+              aria-label={t('admin.products.formula.tabsAria')}
+            >
+              {(
+                [
+                  ['details', 'admin.products.formula.tabs.details'],
+                  ['faq', 'admin.products.formula.tabs.faq'],
+                ] as const
+              ).map(([tab, labelKey]) => {
+                const isActive = activeTab === tab
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    role="tab"
+                    id={`${tabsId}-${tab}`}
+                    aria-selected={isActive}
+                    aria-controls={`${tabsId}-panel-${tab}`}
+                    onClick={() => setActiveTab(tab)}
+                    className={cn(
+                      'rounded-lg px-4 py-[7px] text-xs font-semibold leading-4 transition-colors',
+                      focusRingClasses,
+                      isActive
+                        ? 'border border-white/10 bg-white/10 text-white'
+                        : 'bg-white/5 text-white/40 hover:text-white/60',
+                    )}
+                  >
+                    {t(labelKey)}
+                  </button>
+                )
+              })}
+            </div>
+
+            <div
+              id={`${tabsId}-panel-details`}
+              role="tabpanel"
+              aria-labelledby={`${tabsId}-details`}
+              hidden={activeTab !== 'details'}
+            >
           <form
             id={formId}
             className="space-y-8"
@@ -574,6 +676,35 @@ export function FormulaSpecsDrawer({
               ) : null}
             </section>
           </form>
+            </div>
+
+            <div
+              id={`${tabsId}-panel-faq`}
+              role="tabpanel"
+              aria-labelledby={`${tabsId}-faq`}
+              hidden={activeTab !== 'faq'}
+            >
+              <FormulaSpecsFaqPanel
+                formId={faqFormId}
+                faqs={faqs.faqs}
+                loading={faqs.loading}
+                loadError={faqs.loadError}
+                question={faqs.question}
+                answer={faqs.answer}
+                errors={faqs.errors}
+                submitting={faqs.submitting}
+                submitError={faqs.submitError}
+                expandedId={faqs.expandedId}
+                canCreate={faqs.canCreate}
+                onQuestionChange={faqs.setQuestion}
+                onAnswerChange={faqs.setAnswer}
+                onToggleExpanded={faqs.toggleExpanded}
+                onSubmit={() => {
+                  void handleFaqSubmit()
+                }}
+              />
+            </div>
+          </div>
         )}
       </Drawer>
 

@@ -1688,7 +1688,32 @@
         "archiveTitle": "أرشفة التركيبة؟",
         "archiveDescription": "سيؤدي ذلك إلى إخفاء المنتج من الكتالوج النشط.",
         "archiveBody": "التركيبات المؤرشفة تُعطَّل وتغادر قائمة المنتجات.",
-        "archiveConfirm": "أرشفة"
+        "archiveConfirm": "أرشفة",
+        "tabsAria": "أقسام مواصفات التركيبة",
+        "tabs": {
+          "details": "التفاصيل",
+          "faq": "أسئلة شائعة"
+        },
+        "faq": {
+          "question": "السؤال",
+          "answer": "الإجابة",
+          "questionPlaceholder": "اكتب سؤال المنتج...",
+          "answerPlaceholder": "اكتب الإجابة...",
+          "previous": "الأسئلة السابقة",
+          "previousAria": "أسئلة المنتج الشائعة السابقة",
+          "empty": "لا توجد أسئلة شائعة بعد لهذه التركيبة.",
+          "add": "إضافة سؤال",
+          "adding": "جارٍ الإضافة…",
+          "createSuccess": "تمت إضافة السؤال الشائع",
+          "createFailed": "تعذر إضافة السؤال الشائع",
+          "loadError": "تعذر تحميل الأسئلة الشائعة.",
+          "saveProductFirstTitle": "احفظ التركيبة أولاً",
+          "saveProductFirst": "أنشئ المنتج واحفظه قبل إضافة الأسئلة الشائعة.",
+          "questionRequired": "السؤال مطلوب",
+          "answerRequired": "الإجابة مطلوبة",
+          "questionTooLong": "لا يمكن أن يتجاوز السؤال {{max}} حرفًا",
+          "answerTooLong": "لا يمكن أن تتجاوز الإجابة {{max}} حرفًا"
+        }
       }
     },
     "orders": {
@@ -1833,6 +1858,18 @@
         "title": "طلب {{id}}",
         "titleFallback": "تفاصيل الطلب",
         "subtitle": "التفاصيل والتتبع",
+        "customer": "العميل",
+        "orderLabel": "طلب",
+        "zone": "المنطقة",
+        "total": "الإجمالي",
+        "orderStatus": "حالة الطلب",
+        "progressAria": "تقدم الطلب",
+        "progress": {
+          "orderPlaced": "تم الطلب",
+          "pickedUp": "تم الاستلام",
+          "onTheWay": "في الطريق",
+          "delivered": "تم التسليم"
+        },
         "payment": "الدفع",
         "contact": "التواصل",
         "shipping": "الشحن",
@@ -1865,15 +1902,19 @@
             "XLARGE": "كبير جدًا"
           },
           "carrier": "شركة الشحن",
+          "carrierPlaceholder": "اختر شركة شحن",
           "disabledCoverage": "لا تغطي هذه المحافظة",
           "disabledPickups": "لا توجد مواقع استلام مهيأة",
           "disabledDistrict": "المنطقة غير مغطاة من Bosta",
-          "pickup": "موقع الاستلام",
+          "pickup": "موقع الاستلام (مطلوب)",
           "pickupPlaceholder": "اختر موقع الاستلام",
           "driverName": "اسم السائق",
+          "driverNamePlaceholder": "اسم السائق",
           "driverPhone": "هاتف السائق",
+          "driverPhonePlaceholder": "هاتف السائق",
           "trackingNumber": "رقم التتبع (اختياري)",
-          "notes": "ملاحظات (اختياري)",
+          "notes": "ملاحظات",
+          "notesPlaceholder": "ملاحظاتك",
           "submit": "تعيين شركة الشحن",
           "submitting": "جارٍ التعيين…",
           "success": "تم تعيين شركة الشحن بنجاح",
@@ -2364,7 +2405,7 @@
     },
     "shipping": {
       "title": "إدارة الشحن",
-      "subtitle": "إدارة طرق الشحن وشركات الشحن والمناطق ونقاط استلام Bosta.",
+      "subtitle": "ضبط طرق الشحن وشركات التوصيل ومناطق التغطية.",
       "searchLabel": "البحث في شركات الشحن",
       "searchPlaceholder": "تصفية الشركات بالاسم أو الكود...",
       "clearFilters": "مسح الفلاتر",
@@ -2373,8 +2414,16 @@
       "retry": "إعادة المحاولة",
       "carriers": {
         "title": "شركات الشحن",
+        "subtitle": "شركات API والمعروفة والداخلية المتاحة للتعيين.",
         "addCompany": "إضافة شركة",
         "tableAria": "قائمة شركات الشحن",
+        "typeFilterAria": "تصفية الشركات حسب النوع",
+        "typeTabs": {
+          "all": "الكل",
+          "api": "API",
+          "known": "معروفة",
+          "internal": "داخلية"
+        },
         "active": "نشط",
         "inactive": "غير نشط",
         "bosta": "Bosta (API)",
@@ -2391,7 +2440,7 @@
         "emptyTitle": "لا توجد شركات شحن بعد",
         "emptyDescription": "أضف شركة معروفة أو داخلية أو Bosta للبدء.",
         "emptyFilteredTitle": "لا توجد شركات مطابقة",
-        "emptyFilteredDescription": "جرّب بحثًا مختلفًا.",
+        "emptyFilteredDescription": "جرّب نوعًا أو بحثًا مختلفًا.",
         "loadErrorTitle": "تعذّر تحميل شركات الشحن",
         "deleteTitle": "حذف شركة الشحن",
         "deleteDescription": "هل تريد حذف {{name}}؟",
@@ -2423,6 +2472,10 @@
           "updateSuccess": "تم تحديث شركة الشحن بنجاح",
           "coverageTitle": "التغطية",
           "coverageHint": "اختر المحافظات التي تغطيها هذه الشركة.",
+          "country": "الدولة",
+          "countryPlaceholder": "اختر الدولة",
+          "coveredGovernorates": "اختر المحافظات المغطاة",
+          "selectCountryFirst": "اختر دولة لعرض محافظاتها.",
           "coverageLoading": "جارٍ تحميل المحافظات…",
           "coverageEmpty": "أضف دولة ومحافظة في مدير المناطق أولاً.",
           "coverageSave": "حفظ التغطية"
@@ -2430,6 +2483,7 @@
       },
       "method": {
         "title": "طرق الشحن",
+        "subtitle": "تفعيل قنوات التوصيل المتاحة للعملاء عند الدفع.",
         "panelAria": "إعدادات طريقة الشحن",
         "loadErrorTitle": "تعذّر تحميل طرق الشحن",
         "types": {
@@ -2530,6 +2584,22 @@
         "configureSoon": "إعداد البوابة غير متاح من هذه البطاقة بعد.",
         "enable": "تفعيل",
         "enabling": "جارٍ التفعيل…",
+        "disable": "تعطيل",
+        "disableAria": "تعطيل {{name}}",
+        "toggle": {
+          "enabled": "{{name}} متصل ويعمل الآن",
+          "disabled": "تم تعطيل {{name}}",
+          "errorTitle": "تعذّر تحديث طريقة الدفع",
+          "errors": {
+            "badRequest": "تعذّر تحديث طريقة الدفع بهذه القيم.",
+            "unauthorized": "يُرجى تسجيل الدخول مرة أخرى لتحديث طرق الدفع.",
+            "forbidden": "ليست لديك صلاحية تحديث طرق الدفع.",
+            "notFound": "طريقة الدفع هذه غير موجودة.",
+            "server": "تعذّر على الخادم تحديث طريقة الدفع. حاول مرة أخرى.",
+            "network": "خطأ في الشبكة. تحقّق من اتصالك وحاول مرة أخرى.",
+            "unknown": "حدث خطأ ما. يُرجى المحاولة مرة أخرى."
+          }
+        },
         "emptyTitle": "لا توجد بوابات دفع",
         "emptyDescription": "ستظهر البوابات المتصلة هنا.",
         "loadErrorTitle": "تعذّر تحميل بوابات الدفع"

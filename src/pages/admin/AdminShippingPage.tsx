@@ -6,7 +6,6 @@ import { deleteAdminCarrier } from '../../api/admin/carriers'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
 import { CarrierDrawer } from '../../components/admin/shipping/CarrierDrawer'
 import { CourierCompaniesTable } from '../../components/admin/shipping/CourierCompaniesTable'
-import { ShippingListToolbar } from '../../components/admin/shipping/ShippingListToolbar'
 import { ShippingMethodPanel } from '../../components/admin/shipping/ShippingMethodPanel'
 import { ZoneManager } from '../../components/admin/shipping/ZoneManager'
 import { Dialog } from '../../components/admin/ui/Dialog'
@@ -19,8 +18,7 @@ import { ApiError } from '../../lib/api'
 import type { AdminCarrierRow } from '../../types/adminShipping'
 
 /**
- * Shipping Management — Shipping Methods, Courier Companies (CRUD + coverage),
- * Zone Manager (countries/governorates/districts), and Bosta pickups.
+ * Shipping Management — Methods → Carriers → Zones.
  * Carrier assignment to orders lives on the Orders page, not here.
  */
 export function AdminShippingPage() {
@@ -100,13 +98,6 @@ export function AdminShippingPage() {
       <AdminPageHeader
         title={t('admin.shipping.title')}
         subtitle={t('admin.shipping.subtitle')}
-        actions={
-          <ShippingListToolbar
-            keyword={list.keyword}
-            onKeywordChange={list.setKeyword}
-            disabled={list.loading && list.allCarriers.length === 0}
-          />
-        }
       />
 
       {carriersFailed ? (
@@ -120,45 +111,46 @@ export function AdminShippingPage() {
           }
         />
       ) : (
-        <div className="flex w-full flex-col gap-[30.4px] xl:flex-row xl:items-start">
-          <div className="flex w-full min-w-0 flex-col gap-[var(--admin-content-gap-tight)] xl:w-[836.272px] xl:max-w-[calc(100%-1.9rem)] xl:shrink-0">
-            {list.error && list.allCarriers.length > 0 ? (
-              <p
-                className="rounded-xl border border-support-error/30 bg-support-error/10 px-4 py-3 text-sm text-support-error"
-                role="alert"
-              >
-                {list.error}
-              </p>
-            ) : null}
+        <div className="flex w-full flex-col gap-[var(--admin-content-gap)]">
+          <ShippingMethodPanel />
 
-            <CourierCompaniesTable
-              carriers={list.carriers}
-              loading={list.loading}
-              emptyTitle={emptyTitle}
-              emptyDescription={emptyDescription}
-              emptyAction={
-                list.hasActiveFilters ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={list.clearFilters}
-                  >
-                    {t('admin.shipping.clearFilters')}
-                  </Button>
-                ) : undefined
-              }
-              deletingId={deleting ? deleteTarget?.id ?? null : null}
-              onAdd={openCreate}
-              onEdit={openEdit}
-              onDelete={setDeleteTarget}
-            />
+          {list.error && list.allCarriers.length > 0 ? (
+            <p
+              className="rounded-xl border border-support-error/30 bg-support-error/10 px-4 py-3 text-sm text-support-error"
+              role="alert"
+            >
+              {list.error}
+            </p>
+          ) : null}
 
-            <ZoneManager />
-          </div>
+          <CourierCompaniesTable
+            carriers={list.carriers}
+            loading={list.loading}
+            keyword={list.keyword}
+            typeFilter={list.typeFilter}
+            emptyTitle={emptyTitle}
+            emptyDescription={emptyDescription}
+            emptyAction={
+              list.hasActiveFilters ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={list.clearFilters}
+                >
+                  {t('admin.shipping.clearFilters')}
+                </Button>
+              ) : undefined
+            }
+            deletingId={deleting ? deleteTarget?.id ?? null : null}
+            filtersDisabled={list.loading && list.allCarriers.length === 0}
+            onKeywordChange={list.setKeyword}
+            onTypeFilterChange={list.setTypeFilter}
+            onAdd={openCreate}
+            onEdit={openEdit}
+            onDelete={setDeleteTarget}
+          />
 
-          <div className="w-full min-w-0 flex-1">
-            <ShippingMethodPanel />
-          </div>
+          <ZoneManager />
         </div>
       )}
 

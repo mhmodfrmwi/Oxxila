@@ -201,6 +201,13 @@ export function mapApiOrderToAdminDetail(order: ApiAdminOrder): AdminOrderDetail
     order.tracking?.carrierName?.trim() ||
     '—'
 
+  const address = order.shippingAddress
+  const zoneParts = [
+    address?.governorateName?.trim(),
+    address?.districtName?.trim(),
+  ].filter(Boolean)
+  const zoneLabel = zoneParts.length > 0 ? zoneParts.join(' / ') : null
+
   return {
     id,
     orderNumber: formatAdminOrderNumber(id),
@@ -226,7 +233,19 @@ export function mapApiOrderToAdminDetail(order: ApiAdminOrder): AdminOrderDetail
     carrierName: order.shipment?.carrierName?.trim() || null,
     carrierType: order.shipment?.carrierType ?? null,
     hasAssignedCarrier: hasCommittedCarrier(order),
+    zoneLabel,
   }
+}
+
+/** Figma Order Details drawer phases — derived from shipment assignment only. */
+export type OrderDetailsPhase = 'assign' | 'tracking' | 'apiAssigned'
+
+export function resolveOrderDetailsPhase(
+  order: Pick<AdminOrderDetail, 'hasAssignedCarrier' | 'carrierType'>,
+): OrderDetailsPhase {
+  if (!order.hasAssignedCarrier) return 'assign'
+  if (order.carrierType === 'api') return 'apiAssigned'
+  return 'tracking'
 }
 
 /** Customer card subtitle from real fields only (no invented membership/order counts). */

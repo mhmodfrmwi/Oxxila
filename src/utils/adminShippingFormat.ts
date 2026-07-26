@@ -5,6 +5,7 @@ import type {
   AdminCarrierFormValues,
   AdminCarrierPickupRow,
   AdminCarrierRow,
+  AdminCarrierType,
   AdminCountryRow,
   AdminDistrictRow,
   AdminGovernorateRow,
@@ -62,6 +63,16 @@ export function filterCarriersByKeyword(
       carrier.name.toLowerCase().includes(q) ||
       carrier.code.toLowerCase().includes(q),
   )
+}
+
+export type AdminCarrierTypeFilter = 'all' | AdminCarrierType
+
+export function filterCarriersByType(
+  carriers: readonly AdminCarrierRow[],
+  typeFilter: AdminCarrierTypeFilter,
+): AdminCarrierRow[] {
+  if (typeFilter === 'all') return [...carriers]
+  return carriers.filter((carrier) => carrier.type === typeFilter)
 }
 
 export function emptyCarrierFormValues(): AdminCarrierFormValues {

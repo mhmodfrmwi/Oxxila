@@ -179,6 +179,8 @@ export interface AdminOrderDetail {
   carrierName: string | null
   carrierType: 'api' | 'known' | 'internal' | null
   hasAssignedCarrier: boolean
+  /** `governorate / district` from shippingAddress when available. */
+  zoneLabel: string | null
   /** Fetched separately via GET /users/:id — nice-to-have, not always loaded. */
   userOrdersCount?: number | null
 }

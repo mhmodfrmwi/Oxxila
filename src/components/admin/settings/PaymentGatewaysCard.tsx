@@ -2,7 +2,8 @@
 import {
   Banknote,
   CreditCard,
-  Plus,
+  Loader2,
+  PowerOff,
   Wallet,
   type LucideIcon,
 } from 'lucide-react'
@@ -18,7 +19,6 @@ import { focusRingClasses } from '../../ui/interactionStyles'
 import { EmptyState } from '../ui/EmptyState'
 import { GlassCard } from '../ui/GlassCard'
 import { Skeleton } from '../ui/Skeleton'
-import { StatusBadge } from '../ui/StatusBadge'
 
 const GATEWAY_ICONS: Record<AdminPaymentGatewayCode, LucideIcon> = {
   stripe: CreditCard,
@@ -28,69 +28,101 @@ const GATEWAY_ICONS: Record<AdminPaymentGatewayCode, LucideIcon> = {
 
 function GatewayRow({
   gateway,
-  enabling,
+  mutating,
   onEnable,
+  onDisable,
 }: {
   gateway: AdminPaymentGatewayRow
-  enabling: boolean
+  mutating: boolean
   onEnable: (code: AdminPaymentGatewayCode) => void
+  onDisable: (code: AdminPaymentGatewayCode) => void
 }) {
   const { t } = useTranslation()
   const Icon = GATEWAY_ICONS[gateway.code] ?? CreditCard
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 p-[13.6px]">
+    <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 p-[17px]">
       <div className="flex min-w-0 items-center gap-4">
-        <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white">
+        <span
+          className={cn(
+            'inline-flex size-12 shrink-0 items-center justify-center rounded-xl',
+            gateway.isEnabled ? 'bg-white/10 text-white' : 'bg-white/5 text-white/40',
+          )}
+        >
           <Icon size={19} aria-hidden />
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold leading-5 text-white">
+          <p
+            className={cn(
+              'truncate text-sm font-bold leading-5',
+              gateway.isEnabled ? 'text-white' : 'text-white/40',
+            )}
+          >
             {gateway.name}
           </p>
           {gateway.isEnabled ? (
-            <p className="text-[8px] font-semibold uppercase leading-[12px] text-[#00d492]">
+            <p className="text-[10px] font-semibold uppercase leading-[15px] text-[#00d492]">
               {t('admin.settings.payments.connected')}
             </p>
           ) : (
-            <StatusBadge
-              tone="neutral"
-              className="mt-0.5 border border-current/20 px-2 py-0.5 text-[7.2px] font-semibold"
-            >
+            <p className="text-[10px] font-normal uppercase leading-[15px] text-white/40">
               {t('admin.settings.payments.disconnected')}
-            </StatusBadge>
+            </p>
           )}
         </div>
       </div>
 
       {gateway.isEnabled ? (
-        <button
-          type="button"
-          disabled
-          title={t('admin.settings.payments.configureSoon')}
-          className={cn(
-            'shrink-0 rounded-xl border border-white/10 bg-white/5 px-[13.6px] py-[7.2px]',
-            'text-[8px] font-bold uppercase text-white',
-            'cursor-not-allowed opacity-50',
-            focusRingClasses,
-          )}
-        >
-          {t('admin.settings.payments.configure')}
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            disabled
+            title={t('admin.settings.payments.configureSoon')}
+            className={cn(
+              'shrink-0 rounded-xl border border-white/10 bg-white/5 px-[17px] py-[9px]',
+              'text-[10px] font-bold uppercase text-white',
+              'cursor-not-allowed opacity-50',
+              focusRingClasses,
+            )}
+          >
+            {t('admin.settings.payments.configure')}
+          </button>
+          <button
+            type="button"
+            disabled={mutating}
+            onClick={() => onDisable(gateway.code)}
+            title={t('admin.settings.payments.disable')}
+            aria-label={t('admin.settings.payments.disableAria', {
+              name: gateway.name,
+            })}
+            className={cn(
+              'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
+              'transition-colors hover:bg-support-error/10 hover:text-support-error',
+              'disabled:pointer-events-none disabled:opacity-40',
+              focusRingClasses,
+            )}
+          >
+            {mutating ? (
+              <Loader2 size={13} className="animate-spin" aria-hidden />
+            ) : (
+              <PowerOff size={13} aria-hidden />
+            )}
+          </button>
+        </div>
       ) : (
         <button
           type="button"
-          disabled={enabling}
+          disabled={mutating}
           onClick={() => onEnable(gateway.code)}
           className={cn(
-            'shrink-0 rounded-xl border border-white/10 bg-white/5 px-[13.6px] py-[7.2px]',
-            'text-[8px] font-bold uppercase text-white',
-            'transition-colors hover:bg-white/10',
+            'shrink-0 rounded-xl border border-[rgba(163,148,255,0.2)] bg-[rgba(163,148,255,0.2)]',
+            'px-[17px] py-[9px] text-[10px] font-bold uppercase text-[#a394ff]',
+            'transition-colors hover:bg-[rgba(163,148,255,0.28)]',
             'disabled:cursor-not-allowed disabled:opacity-50',
             focusRingClasses,
           )}
         >
-          {enabling
+          {mutating
             ? t('admin.settings.payments.enabling')
             : t('admin.settings.payments.enable')}
         </button>
@@ -100,14 +132,20 @@ function GatewayRow({
 }
 
 /**
- * Payment Gateways card — list from GET /payments/gateways (Phase 7B).
- * Configure disabled (no credentials API). Enable uses PATCH isEnabled.
- * New Payment deferred.
+ * Payment Gateways card — Figma Enable/Configure layout + compact Disable.
+ * Configure stays disabled (no credentials API). Enable/Disable use PATCH isEnabled.
  */
 export function PaymentGatewaysCard() {
   const { t } = useTranslation()
-  const { gateways, loading, error, enablingCode, reload, enableGateway } =
-    usePaymentGateways()
+  const {
+    gateways,
+    loading,
+    error,
+    mutatingCode,
+    reload,
+    enableGateway,
+    disableGateway,
+  } = usePaymentGateways()
 
   const failed = Boolean(error) && !loading && gateways.length === 0
   const staleError = Boolean(error) && gateways.length > 0
@@ -121,27 +159,11 @@ export function PaymentGatewaysCard() {
       aria-label={t('admin.settings.payments.aria')}
       aria-busy={loading || undefined}
     >
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
-          <CreditCard size={19} className="text-[#a394ff]" aria-hidden />
-          <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">
-            {t('admin.settings.payments.title')}
-          </h3>
-        </div>
-        <button
-          type="button"
-          disabled
-          title={t('admin.settings.payments.newPaymentSoon')}
-          className={cn(
-            'inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#a394ff] to-[#8274d6]',
-            'px-5 py-2.5 text-sm font-semibold text-white',
-            'cursor-not-allowed opacity-50 shadow-[0_0_10px_rgba(163,148,255,0.3)]',
-            focusRingClasses,
-          )}
-        >
-          <Plus size={13} aria-hidden />
-          {t('admin.settings.payments.newPayment')}
-        </button>
+      <div className="mb-8 flex items-center gap-2">
+        <CreditCard size={19} className="text-[#a394ff]" aria-hidden />
+        <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">
+          {t('admin.settings.payments.title')}
+        </h3>
       </div>
 
       {staleError ? (
@@ -190,15 +212,14 @@ export function PaymentGatewaysCard() {
       ) : null}
 
       {gateways.length > 0 ? (
-        <div
-          className={cn('flex flex-col gap-4', loading && 'opacity-60')}
-        >
+        <div className={cn('flex flex-col gap-4', loading && 'opacity-60')}>
           {gateways.map((gateway) => (
             <GatewayRow
               key={gateway.id}
               gateway={gateway}
-              enabling={enablingCode === gateway.code}
-              onEnable={enableGateway}
+              mutating={mutatingCode === gateway.code}
+              onEnable={(code) => void enableGateway(code)}
+              onDisable={(code) => void disableGateway(code)}
             />
           ))}
         </div>

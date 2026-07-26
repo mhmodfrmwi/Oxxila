@@ -6,6 +6,8 @@ import { ApiError } from '../lib/api'
 import type { AdminCarrierRow } from '../types/adminShipping'
 import {
   filterCarriersByKeyword,
+  filterCarriersByType,
+  type AdminCarrierTypeFilter,
   mapApiCarrierToAdminRow,
 } from '../utils/adminShippingFormat'
 
@@ -15,6 +17,7 @@ const SEARCH_DEBOUNCE_MS = 300
 export function useAdminShipping() {
   const [keyword, setKeywordState] = useState('')
   const [debouncedKeyword, setDebouncedKeyword] = useState('')
+  const [typeFilter, setTypeFilterState] = useState<AdminCarrierTypeFilter>('all')
   const [carriers, setCarriers] = useState<AdminCarrierRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -58,8 +61,13 @@ export function useAdminShipping() {
     setKeywordState(value)
   }, [])
 
+  const setTypeFilter = useCallback((value: AdminCarrierTypeFilter) => {
+    setTypeFilterState(value)
+  }, [])
+
   const clearFilters = useCallback(() => {
     setKeywordState('')
+    setTypeFilterState('all')
   }, [])
 
   const reload = useCallback(() => {
@@ -79,12 +87,12 @@ export function useAdminShipping() {
     setCarriers((previous) => previous.filter((carrier) => carrier.id !== id))
   }, [])
 
-  const visibleCarriers = useMemo(
-    () => filterCarriersByKeyword(carriers, debouncedKeyword),
-    [carriers, debouncedKeyword],
-  )
+  const visibleCarriers = useMemo(() => {
+    const byType = filterCarriersByType(carriers, typeFilter)
+    return filterCarriersByKeyword(byType, debouncedKeyword)
+  }, [carriers, debouncedKeyword, typeFilter])
 
-  const hasActiveFilters = Boolean(debouncedKeyword)
+  const hasActiveFilters = Boolean(debouncedKeyword) || typeFilter !== 'all'
 
   return {
     carriers: visibleCarriers,
@@ -92,8 +100,10 @@ export function useAdminShipping() {
     loading,
     error,
     keyword,
+    typeFilter,
     hasActiveFilters,
     setKeyword,
+    setTypeFilter,
     clearFilters,
     reload,
     upsertCarrier,

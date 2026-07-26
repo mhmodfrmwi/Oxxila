@@ -1,10 +1,12 @@
 // src/hooks/usePaymentGateways.ts
 import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   getAdminPaymentGateways,
   updateAdminPaymentGateway,
 } from '../api/admin/paymentGateways'
+import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
 import type {
   AdminPaymentGatewayCode,
@@ -21,22 +23,57 @@ function mapGateway(gateway: ApiAdminPaymentGateway): AdminPaymentGatewayRow {
   }
 }
 
+function resolveToggleError(error: unknown, t: (key: string) => string): string {
+  if (error instanceof ApiError) {
+    const backendMessage = error.message?.trim()
+    if (backendMessage) return backendMessage
+
+    switch (error.statusCode) {
+      case 400:
+        return t('admin.settings.payments.toggle.errors.badRequest')
+      case 401:
+        return t('admin.settings.payments.toggle.errors.unauthorized')
+      case 403:
+        return t('admin.settings.payments.toggle.errors.forbidden')
+      case 404:
+        return t('admin.settings.payments.toggle.errors.notFound')
+      case 500:
+        return t('admin.settings.payments.toggle.errors.server')
+      default:
+        return t('admin.settings.payments.toggle.errors.unknown')
+    }
+  }
+
+  return t('admin.settings.payments.toggle.errors.network')
+}
+
 interface PaymentGatewaysState {
   gateways: AdminPaymentGatewayRow[]
   loading: boolean
   error: string | null
-  enablingCode: AdminPaymentGatewayCode | null
+  mutatingCode: AdminPaymentGatewayCode | null
 }
 
+/**
+ * Payment gateways list + enable/disable via PATCH /payments/gateways/:code.
+ */
 export function usePaymentGateways() {
+  const { t } = useTranslation()
+  const toast = useToast()
   const [state, setState] = useState<PaymentGatewaysState>({
     gateways: [],
     loading: true,
     error: null,
-    enablingCode: null,
+    mutatingCode: null,
   })
   const [reloadToken, setReloadToken] = useState(0)
   const requestIdRef = useRef(0)
+  const gatewaysRef = useRef<AdminPaymentGatewayRow[]>([])
+  const mutatingCodeRef = useRef<AdminPaymentGatewayCode | null>(null)
+
+  useEffect(() => {
+    gatewaysRef.current = state.gateways
+  }, [state.gateways])
 
   const reload = useCallback(() => {
     setReloadToken((token) => token + 1)
@@ -85,40 +122,82 @@ export function usePaymentGateways() {
     }
   }, [reloadToken])
 
-  const enableGateway = useCallback(async (code: AdminPaymentGatewayCode) => {
-    setState((previous) => ({ ...previous, enablingCode: code }))
-    try {
-      const response = await updateAdminPaymentGateway(code, true)
-      const updated = response.data
-      if (!updated) {
-        throw new ApiError(response.message || 'Unable to enable gateway.')
-      }
-      const row = mapGateway(updated)
+  const setGatewayEnabled = useCallback(
+    async (code: AdminPaymentGatewayCode, nextEnabled: boolean) => {
+      if (mutatingCodeRef.current) return false
+      mutatingCodeRef.current = code
+
+      const snapshot = gatewaysRef.current
+      const target = snapshot.find((gateway) => gateway.code === code)
+
       setState((previous) => ({
         ...previous,
-        enablingCode: null,
+        mutatingCode: code,
         gateways: previous.gateways.map((gateway) =>
-          gateway.code === code ? row : gateway,
+          gateway.code === code
+            ? { ...gateway, isEnabled: nextEnabled }
+            : gateway,
         ),
       }))
-    } catch (error) {
-      setState((previous) => ({
-        ...previous,
-        enablingCode: null,
-        error:
-          error instanceof ApiError
-            ? error.message
-            : 'Unable to enable payment gateway.',
-      }))
-    }
-  }, [])
+
+      try {
+        const response = await updateAdminPaymentGateway(code, nextEnabled)
+        const updated = response.data
+        setState((previous) => ({
+          ...previous,
+          mutatingCode: null,
+          gateways: previous.gateways.map((gateway) =>
+            gateway.code === code
+              ? updated
+                ? mapGateway(updated)
+                : { ...gateway, isEnabled: nextEnabled }
+              : gateway,
+          ),
+        }))
+        toast.success(
+          t(
+            nextEnabled
+              ? 'admin.settings.payments.toggle.enabled'
+              : 'admin.settings.payments.toggle.disabled',
+            { name: target?.name ?? code },
+          ),
+        )
+        return true
+      } catch (error) {
+        setState((previous) => ({
+          ...previous,
+          mutatingCode: null,
+          gateways: snapshot.length > 0 ? snapshot : previous.gateways,
+        }))
+        toast.error(
+          t('admin.settings.payments.toggle.errorTitle'),
+          resolveToggleError(error, t),
+        )
+        return false
+      } finally {
+        mutatingCodeRef.current = null
+      }
+    },
+    [t, toast],
+  )
+
+  const enableGateway = useCallback(
+    (code: AdminPaymentGatewayCode) => setGatewayEnabled(code, true),
+    [setGatewayEnabled],
+  )
+
+  const disableGateway = useCallback(
+    (code: AdminPaymentGatewayCode) => setGatewayEnabled(code, false),
+    [setGatewayEnabled],
+  )
 
   return {
     gateways: state.gateways,
     loading: state.loading,
     error: state.error,
-    enablingCode: state.enablingCode,
+    mutatingCode: state.mutatingCode,
     reload,
     enableGateway,
+    disableGateway,
   }
 }
