@@ -1,5 +1,5 @@
 // src/components/admin/returns/ReturnDetailsPanel.tsx
-import { ExternalLink, Loader2, MapPin, PackageX, Truck } from 'lucide-react'
+import { Loader2, MapPin, PackageX, Truck } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAdminReturnDetail } from '../../../hooks/useAdminReturnDetail'
@@ -23,6 +23,7 @@ import { StatusBadge } from '../ui/StatusBadge'
 import { ApproveReturnDialog } from './ApproveReturnDialog'
 import { RefundReturnDialog } from './RefundReturnDialog'
 import { RejectReturnDialog } from './RejectReturnDialog'
+import { ReturnProofImages } from './ReturnProofImages'
 
 interface ReturnDetailsPanelProps {
   returnId: string | null
@@ -394,25 +395,7 @@ export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDet
             <h4 id="return-proof-heading" className="text-sm font-bold leading-5 text-white">
               {t('admin.returns.details.proofImages')}
             </h4>
-            {returnDetail.proofImages.length === 0 ? (
-              <EmptyState bare className="py-6" title={t('admin.returns.details.proofEmpty')} />
-            ) : (
-              <ul className="flex flex-wrap gap-2">
-                {returnDetail.proofImages.map((image, index) => (
-                  <li key={`${image.url}-${index}`}>
-                    <a
-                      href={image.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-[#a394ff] transition-colors hover:bg-white/10"
-                    >
-                      {t('admin.returns.details.proofLink', { index: index + 1 })}
-                      <ExternalLink size={11} aria-hidden />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <ReturnProofImages images={returnDetail.proofImages} />
           </section>
 
           <ReturnActionsFooter

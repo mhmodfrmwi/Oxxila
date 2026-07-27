@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
-import { HOME_PATH } from '../../config/routes'
 import { ApiError } from '../../lib/api'
 import { getOAuthErrorMessage, getOAuthSearchParams } from '../../utils/oauth'
 import { consumeOAuthError } from '../../utils/oauthBootstrap'
+import { resolvePostLoginPath } from '../../utils/postLoginRedirect'
 import {
   hasFieldErrors,
   validateLoginFields,
@@ -35,8 +35,12 @@ export function LoginForm() {
   const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
-  const { login, isAuthenticated } = useAuth()
+  const { login, isAuthenticated, user } = useAuth()
   const toast = useToast()
+  const returnTo =
+    typeof (location.state as { from?: unknown } | null)?.from === 'string'
+      ? (location.state as { from: string }).from
+      : null
   const [oauthError] = useState(() => readOAuthError(location.state))
   const [error, setError] = useState(() =>
     (location.state as { sessionExpired?: boolean } | null)?.sessionExpired
@@ -53,9 +57,9 @@ export function LoginForm() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(HOME_PATH, { replace: true })
+      navigate(resolvePostLoginPath(user?.role, returnTo), { replace: true })
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, navigate, returnTo, user?.role])
 
   useEffect(() => {
     const state = location.state as {
@@ -86,7 +90,7 @@ export function LoginForm() {
     try {
       const nextUser = await login({ email, password })
       toast.success(t('auth.login.successTitle'), t('auth.login.welcomeBack', { name: nextUser.name }))
-      navigate(HOME_PATH, { replace: true })
+      navigate(resolvePostLoginPath(nextUser.role, returnTo), { replace: true })
     } catch (err) {
       const message =
         err instanceof ApiError ? err.message : t('auth.login.failedFallback')

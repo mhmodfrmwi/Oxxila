@@ -7,6 +7,7 @@ import {
   type UseOrderAssignReturn,
 } from '../../../hooks/useOrderAssign'
 import { cn } from '../../../lib/cn'
+import { Select } from '../ui/Select'
 import { Skeleton } from '../ui/Skeleton'
 
 interface OrderAssignPanelProps {
@@ -77,36 +78,34 @@ export function OrderAssignPanel({ assign, orderStatusLabel }: OrderAssignPanelP
         <label className={labelClass} htmlFor={`${formId}-size`}>
           {t('admin.orders.details.assign.packageSize')}
         </label>
-        <select
+        <Select
           id={`${formId}-size`}
           value={assign.form.size}
           disabled={assign.submitting}
-          onChange={(event) =>
-            assign.setField('size', event.target.value as (typeof SIZES)[number])
+          onValueChange={(next) =>
+            assign.setField('size', next as (typeof SIZES)[number])
           }
-          className={cn(fieldClass, 'mt-2')}
-        >
-          {SIZES.map((size) => (
-            <option key={size} value={size}>
-              {t(`admin.orders.details.assign.sizes.${size}`)}
-            </option>
-          ))}
-        </select>
+          triggerClassName="mt-2"
+          options={SIZES.map((size) => ({
+            value: size,
+            label: t(`admin.orders.details.assign.sizes.${size}`),
+          }))}
+        />
       </div>
 
       <div>
         <label className={labelClass} htmlFor={`${formId}-order-status`}>
           {t('admin.orders.details.orderStatus')}
         </label>
-        <select
+        <Select
           id={`${formId}-order-status`}
           disabled
           value={orderStatusLabel}
-          className={cn(fieldClass, 'mt-2')}
+          onValueChange={() => {}}
+          triggerClassName="mt-2"
           aria-label={t('admin.orders.details.orderStatus')}
-        >
-          <option value={orderStatusLabel}>{orderStatusLabel}</option>
-        </select>
+          options={[{ value: orderStatusLabel, label: orderStatusLabel }]}
+        />
       </div>
 
       <div>
@@ -118,28 +117,25 @@ export function OrderAssignPanel({ assign, orderStatusLabel }: OrderAssignPanelP
             {t('admin.orders.details.assign.noCarriers')}
           </p>
         ) : (
-          <select
+          <Select
             id={`${formId}-carrier`}
             value={assign.form.carrierId}
             disabled={assign.submitting}
-            onChange={(event) => assign.selectCarrier(event.target.value)}
-            className={cn(fieldClass, 'mt-2')}
-          >
-            <option value="">{t('admin.orders.details.assign.carrierPlaceholder')}</option>
-            {assign.carriers.map((carrier) => {
-              const disabledReason = carrierDisabledReason(
-                carrier,
-                assign.districtCovered,
-              )
-              return (
-                <option
-                  key={carrier._id}
-                  value={carrier._id}
-                  disabled={Boolean(disabledReason)}
-                >
-                  {carrier.name}
-                  {disabledReason
-                    ? ` — ${t(
+            onValueChange={(next) => assign.selectCarrier(next)}
+            triggerClassName="mt-2"
+            placeholder={t('admin.orders.details.assign.carrierPlaceholder')}
+            options={[
+              { value: '', label: t('admin.orders.details.assign.carrierPlaceholder') },
+              ...assign.carriers.map((carrier) => {
+                const disabledReason = carrierDisabledReason(
+                  carrier,
+                  assign.districtCovered,
+                )
+                return {
+                  value: carrier._id,
+                  disabled: Boolean(disabledReason),
+                  label: disabledReason
+                    ? `${carrier.name} — ${t(
                         `admin.orders.details.assign.disabled${
                           disabledReason === 'coverage'
                             ? 'Coverage'
@@ -148,11 +144,11 @@ export function OrderAssignPanel({ assign, orderStatusLabel }: OrderAssignPanelP
                               : 'District'
                         }`,
                       )}`
-                    : ''}
-                </option>
-              )
-            })}
-          </select>
+                    : carrier.name,
+                }
+              }),
+            ]}
+          />
         )}
         <FieldError message={assign.formErrors.carrierId} />
       </div>
@@ -162,21 +158,21 @@ export function OrderAssignPanel({ assign, orderStatusLabel }: OrderAssignPanelP
           <label className={labelClass} htmlFor={`${formId}-pickup`}>
             {t('admin.orders.details.assign.pickup')}
           </label>
-          <select
+          <Select
             id={`${formId}-pickup`}
             value={assign.form.pickupId}
             disabled={assign.submitting}
-            onChange={(event) => assign.setField('pickupId', event.target.value)}
-            className={cn(fieldClass, 'mt-2')}
-          >
-            <option value="">{t('admin.orders.details.assign.pickupPlaceholder')}</option>
-            {assign.pickupOptions.map((pickup) => (
-              <option key={pickup._id} value={pickup._id}>
-                {pickup.locationName}
-                {pickup.isDefault ? ' ★' : ''}
-              </option>
-            ))}
-          </select>
+            onValueChange={(next) => assign.setField('pickupId', next)}
+            triggerClassName="mt-2"
+            placeholder={t('admin.orders.details.assign.pickupPlaceholder')}
+            options={[
+              { value: '', label: t('admin.orders.details.assign.pickupPlaceholder') },
+              ...assign.pickupOptions.map((pickup) => ({
+                value: pickup._id,
+                label: `${pickup.locationName}${pickup.isDefault ? ' ★' : ''}`,
+              })),
+            ]}
+          />
           <FieldError message={assign.formErrors.pickupId} />
         </div>
       ) : null}

@@ -12,6 +12,7 @@ import type { AdminSubcategoryRow } from '../../../types/adminSubcategories'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { Drawer } from '../ui/Drawer'
 import { EmptyState } from '../ui/EmptyState'
+import { Select } from '../ui/Select'
 import { Skeleton } from '../ui/Skeleton'
 
 interface SubcategoryDrawerProps {
@@ -234,24 +235,22 @@ export function SubcategoryDrawer({
             <label className={labelClass} htmlFor={`${formId}-category`}>
               {t('admin.subcategories.drawer.category')}
             </label>
-            <select
+            <Select
               id={`${formId}-category`}
               value={drawer.values.category}
               disabled={drawer.submitting}
-              onChange={(event) =>
-                drawer.setField('category', event.target.value)
-              }
-              className={cn(fieldClass, 'mt-2')}
-            >
-              <option value="">
-                {t('admin.subcategories.drawer.selectCategory')}
-              </option>
-              {drawer.categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+              onValueChange={(next) => drawer.setField('category', next)}
+              triggerClassName="mt-2"
+              aria-invalid={Boolean(drawer.errors.category)}
+              placeholder={t('admin.subcategories.drawer.selectCategory')}
+              options={[
+                { value: '', label: t('admin.subcategories.drawer.selectCategory') },
+                ...drawer.categories.map((category) => ({
+                  value: category.id,
+                  label: category.name,
+                })),
+              ]}
+            />
             <p className="mt-1 text-[8px] text-white/40">
               {t('admin.subcategories.drawer.categoryRequired')}
             </p>

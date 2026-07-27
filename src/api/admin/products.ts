@@ -21,6 +21,7 @@ function toQuery(params: AdminProductsListParams): string {
     ['isBundle', params.isBundle],
     ['priceMin', params.priceMin],
     ['priceMax', params.priceMax],
+    ['period', params.period],
   ]
   for (const [key, value] of entries) {
     if (value === undefined || value === '') continue

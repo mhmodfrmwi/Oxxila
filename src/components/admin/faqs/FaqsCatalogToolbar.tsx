@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/cn'
 import type { AdminFaqProductOption } from '../../../types/adminFaqs'
 import { focusRingClasses } from '../../ui/interactionStyles'
+import { Select } from '../ui/Select'
 
 interface FaqsCatalogToolbarProps {
   keyword: string
@@ -51,26 +52,22 @@ export function FaqsCatalogToolbar({
         />
       </label>
 
-      <label className="relative block w-full sm:w-[15rem]">
-        <span className="sr-only">{t('admin.faqs.filterProductLabel')}</span>
-        <select
+      <div className="relative block w-full sm:w-[15rem]">
+        <Select
+          size="toolbar"
           value={product}
+          onValueChange={onProductChange}
           disabled={disabled || productsLoading}
-          onChange={(event) => onProductChange(event.target.value)}
-          className={cn(
-            'admin-glass h-[43.2px] w-full appearance-none rounded-2xl px-5 text-sm text-primary-text',
-            'disabled:cursor-not-allowed disabled:opacity-60',
-            focusRingClasses,
-          )}
-        >
-          <option value="">{t('admin.faqs.filterProductAll')}</option>
-          {products.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-      </label>
+          aria-label={t('admin.faqs.filterProductLabel')}
+          options={[
+            { value: '', label: t('admin.faqs.filterProductAll') },
+            ...products.map((item) => ({
+              value: item.id,
+              label: item.name,
+            })),
+          ]}
+        />
+      </div>
     </div>
   )
 }

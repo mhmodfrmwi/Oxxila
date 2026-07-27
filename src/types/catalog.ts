@@ -33,6 +33,11 @@ export interface ApiProduct {
   ratingsAverage: number
   ratingsQuantity: number
   soldCount?: number
+  /**
+   * Period-over-period units-sold trend (%) from GET /products (`period` query, default 30).
+   * Present on list responses only — not on single-product GET.
+   */
+  performance?: number
   brand?: ApiBrand
   category?: { _id: string; name: string; slug: string }
   description?: string

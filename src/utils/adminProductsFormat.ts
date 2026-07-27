@@ -87,8 +87,10 @@ export function mapApiProductToAdminRow(product: AdminProductSource): AdminProdu
     price: resolveProductListPrice(product),
     soldCount: product.soldCount ?? 0,
     isBestSeller: Boolean(product.isBestSeller),
-    /** Backend list API has no period-over-period performance metric. */
-    performancePercent: null,
+    performancePercent:
+      typeof product.performance === 'number' && Number.isFinite(product.performance)
+        ? product.performance
+        : null,
   }
 }
 

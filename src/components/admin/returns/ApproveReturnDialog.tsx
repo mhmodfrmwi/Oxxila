@@ -11,6 +11,7 @@ import type { ApiAdminCarrier, ApiCarrierPickup } from '../../../types/adminShip
 import { Button } from '../../ui/Button'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { Dialog } from '../ui/Dialog'
+import { Select } from '../ui/Select'
 
 interface ApproveReturnDialogProps {
   open: boolean
@@ -26,13 +27,6 @@ const HANDLERS = ['internal', 'bosta'] as const
 function isBostaApiCarrier(carrier: ApiAdminCarrier): boolean {
   return carrier.type === 'api' && carrier.apiProvider === 'bosta' && carrier.isActive !== false
 }
-
-const selectClass = cn(
-  'mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-[13.6px] py-[10.4px]',
-  'text-sm text-white',
-  'focus:outline-none focus:ring-2 focus:ring-accent/40',
-  'disabled:cursor-not-allowed disabled:opacity-60',
-)
 
 const labelClass = 'block text-xs font-medium leading-4 text-white/60'
 
@@ -225,24 +219,25 @@ export function ApproveReturnDialog({
                   {t('admin.returns.actions.approve.noCarriers')}
                 </p>
               ) : (
-                <select
+                <Select
                   id={`${formId}-carrier`}
                   value={carrierId}
                   disabled={submitting}
-                  onChange={(event) => {
-                    setCarrierId(event.target.value)
+                  onValueChange={(next) => {
+                    setCarrierId(next)
                     setDropOffPickupId('')
                     setFormError(null)
                   }}
-                  className={selectClass}
-                >
-                  <option value="">{t('admin.returns.actions.approve.carrierPlaceholder')}</option>
-                  {carriers.map((carrier) => (
-                    <option key={carrier._id} value={carrier._id}>
-                      {carrier.name}
-                    </option>
-                  ))}
-                </select>
+                  triggerClassName="mt-2"
+                  placeholder={t('admin.returns.actions.approve.carrierPlaceholder')}
+                  options={[
+                    { value: '', label: t('admin.returns.actions.approve.carrierPlaceholder') },
+                    ...carriers.map((carrier) => ({
+                      value: carrier._id,
+                      label: carrier.name ?? carrier._id,
+                    })),
+                  ]}
+                />
               )}
             </div>
 
@@ -262,24 +257,24 @@ export function ApproveReturnDialog({
                     {t('admin.returns.actions.approve.noPickups')}
                   </p>
                 ) : (
-                  <select
+                  <Select
                     id={`${formId}-pickup`}
                     value={dropOffPickupId}
                     disabled={submitting}
-                    onChange={(event) => {
-                      setDropOffPickupId(event.target.value)
+                    onValueChange={(next) => {
+                      setDropOffPickupId(next)
                       setFormError(null)
                     }}
-                    className={selectClass}
-                  >
-                    <option value="">{t('admin.returns.actions.approve.pickupPlaceholder')}</option>
-                    {pickups.map((pickup) => (
-                      <option key={pickup._id} value={pickup._id}>
-                        {pickup.locationName}
-                        {pickup.isDefault ? ' \u2605' : ''}
-                      </option>
-                    ))}
-                  </select>
+                    triggerClassName="mt-2"
+                    placeholder={t('admin.returns.actions.approve.pickupPlaceholder')}
+                    options={[
+                      { value: '', label: t('admin.returns.actions.approve.pickupPlaceholder') },
+                      ...pickups.map((pickup) => ({
+                        value: pickup._id,
+                        label: `${pickup.locationName}${pickup.isDefault ? ' \u2605' : ''}`,
+                      })),
+                    ]}
+                  />
                 )}
               </div>
             ) : null}

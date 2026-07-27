@@ -1167,8 +1167,16 @@
         "left": "{{count}} left",
         "left_one": "{{count}} left",
         "left_other": "{{count}} left",
+        "threshold": "Threshold {{count}}",
+        "thresholdLabel": "Low Stock Threshold",
         "emptyTitle": "Stock looks healthy",
-        "emptyDescription": "Products at or below the threshold will appear here."
+        "emptyDescription": "Products at or below the threshold will appear here.",
+        "errorTitle": "Unable to load low stock alerts",
+        "status": {
+          "low": "Low stock",
+          "critical": "Critical",
+          "outOfStock": "Out of stock"
+        }
       },
       "recentOrders": {
         "title": "Recent Orders",
@@ -1706,7 +1714,17 @@
           "questionRequired": "Question is required",
           "answerRequired": "Answer is required",
           "questionTooLong": "Question cannot exceed {{max}} characters",
-          "answerTooLong": "Answer cannot exceed {{max}} characters"
+          "answerTooLong": "Answer cannot exceed {{max}} characters",
+          "expandAria": "Expand answer for {{question}}",
+          "collapseAria": "Collapse answer for {{question}}",
+          "editAria": "Edit FAQ {{question}}",
+          "editTitle": "Edit FAQ question",
+          "editDescription": "Update the question and answer for this formulation.",
+          "editCancel": "Cancel",
+          "editSave": "Save changes",
+          "editSaving": "Saving…",
+          "updateSuccess": "FAQ question updated",
+          "updateFailed": "Unable to update FAQ question"
         }
       }
     },
@@ -2057,7 +2075,13 @@
         "itemsEmpty": "No items on this return",
         "proofImages": "Proof images",
         "proofEmpty": "No proof images submitted",
-        "proofLink": "Photo {{index}}"
+        "proofLink": "Photo {{index}}",
+        "proofOpenAria": "Open proof photo {{index}}",
+        "proofPreviewTitle": "Proof photo {{current}} of {{total}}",
+        "proofPreviewClose": "Close proof preview",
+        "proofPreviewPrevious": "Previous proof photo",
+        "proofPreviewNext": "Next proof photo",
+        "proofPreviewError": "Unable to load image"
       },
       "actions": {
         "sectionAria": "Return actions",
@@ -2500,8 +2524,8 @@
         "countriesEmpty": "No countries yet.",
         "governoratesEmpty": "No governorates yet.",
         "districtsEmpty": "No districts yet.",
-        "selectCountryFirst": "Select a country to see its governorates.",
-        "selectGovernorateFirst": "Select a governorate to see its districts.",
+        "selectCountryFirst": "Select a country to view its governorates.",
+        "selectGovernorateFirst": "Select a governorate to view its districts.",
         "covered": "Covered",
         "closed": "Closed",
         "bostaCovered": "Bosta covered",

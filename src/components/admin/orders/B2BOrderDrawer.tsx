@@ -14,6 +14,7 @@ import type { ApiProduct } from '../../../types/catalog'
 import { customerInitials } from '../../../utils/adminOrdersFormat'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { Drawer } from '../ui/Drawer'
+import { Select } from '../ui/Select'
 
 interface B2BOrderDrawerProps {
   open: boolean
@@ -427,20 +428,20 @@ export function B2BOrderDrawer({ open, onClose, onCreated }: B2BOrderDrawerProps
               ) : drawer.savedAddresses.length === 0 ? (
                 <p className="text-xs text-white/40">{t('admin.orders.b2b.savedAddressEmpty')}</p>
               ) : (
-                <select
+                <Select
                   value={drawer.selectedAddressId}
-                  onChange={(event) => drawer.setSelectedAddressId(event.target.value)}
-                  className={fieldClass}
-                >
-                  <option value="">{t('admin.orders.b2b.savedAddress')}</option>
-                  {drawer.savedAddresses.map((address) => (
-                    <option key={address._id} value={address._id}>
-                      {[address.label, address.governorate?.name, address.district?.name, address.addressLine]
+                  onValueChange={(next) => drawer.setSelectedAddressId(next)}
+                  placeholder={t('admin.orders.b2b.savedAddress')}
+                  options={[
+                    { value: '', label: t('admin.orders.b2b.savedAddress') },
+                    ...drawer.savedAddresses.map((address) => ({
+                      value: address._id ?? '',
+                      label: [address.label, address.governorate?.name, address.district?.name, address.addressLine]
                         .filter(Boolean)
-                        .join(' • ')}
-                    </option>
-                  ))}
-                </select>
+                        .join(' • '),
+                    })),
+                  ]}
+                />
               )}
             </div>
           ) : (
@@ -450,37 +451,39 @@ export function B2BOrderDrawer({ open, onClose, onCreated }: B2BOrderDrawerProps
                   <label className="text-[8px] uppercase text-white/30">
                     {t('admin.orders.b2b.governorate')}
                   </label>
-                  <select
+                  <Select
                     value={drawer.governorateId}
-                    onChange={(event) => drawer.setGovernorateId(event.target.value)}
-                    className={cn(fieldClass, 'mt-1')}
-                  >
-                    <option value="">{t('admin.orders.b2b.governoratePlaceholder')}</option>
-                    {drawer.governorates.map((gov) => (
-                      <option key={gov._id} value={gov._id}>
-                        {gov.name}
-                      </option>
-                    ))}
-                  </select>
+                    onValueChange={(next) => drawer.setGovernorateId(next)}
+                    triggerClassName="mt-1"
+                    placeholder={t('admin.orders.b2b.governoratePlaceholder')}
+                    options={[
+                      { value: '', label: t('admin.orders.b2b.governoratePlaceholder') },
+                      ...drawer.governorates.map((gov) => ({
+                        value: gov._id,
+                        label: gov.name,
+                      })),
+                    ]}
+                  />
                 </div>
                 {drawer.hasDistricts ? (
                   <div className="flex-1">
                     <label className="text-[8px] uppercase text-white/30">
                       {t('admin.orders.b2b.district')}
                     </label>
-                    <select
+                    <Select
                       value={drawer.districtId}
                       disabled={!drawer.governorateId || drawer.zonesLoading}
-                      onChange={(event) => drawer.setDistrictId(event.target.value)}
-                      className={cn(fieldClass, 'mt-1')}
-                    >
-                      <option value="">{t('admin.orders.b2b.districtPlaceholder')}</option>
-                      {drawer.districts.map((district) => (
-                        <option key={district._id} value={district._id}>
-                          {district.name}
-                        </option>
-                      ))}
-                    </select>
+                      onValueChange={(next) => drawer.setDistrictId(next)}
+                      triggerClassName="mt-1"
+                      placeholder={t('admin.orders.b2b.districtPlaceholder')}
+                      options={[
+                        { value: '', label: t('admin.orders.b2b.districtPlaceholder') },
+                        ...drawer.districts.map((district) => ({
+                          value: district._id,
+                          label: district.name,
+                        })),
+                      ]}
+                    />
                   </div>
                 ) : null}
               </div>

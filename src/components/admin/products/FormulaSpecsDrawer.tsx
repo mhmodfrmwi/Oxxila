@@ -25,6 +25,7 @@ import { Button } from '../../ui/Button'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { Dialog } from '../ui/Dialog'
 import { Drawer } from '../ui/Drawer'
+import { Select } from '../ui/Select'
 import { Skeleton } from '../ui/Skeleton'
 import { FormulaSpecsFaqPanel } from './FormulaSpecsFaqPanel'
 
@@ -173,6 +174,13 @@ export function FormulaSpecsDrawer({
     const ok = await faqs.submit()
     if (ok) {
       toast.success(t('admin.products.formula.faq.createSuccess'))
+    }
+  }
+
+  const handleFaqEditSubmit = async () => {
+    const ok = await faqs.submitEdit()
+    if (ok) {
+      toast.success(t('admin.products.formula.faq.updateSuccess'))
     }
   }
 
@@ -490,23 +498,24 @@ export function FormulaSpecsDrawer({
                   <label htmlFor={`${formId}-category`} className={labelClass}>
                     {t('admin.products.formula.category')}
                   </label>
-                  <select
+                  <Select
                     id={`${formId}-category`}
-                    className={cn(fieldClass, drawer.errors.category && 'border-support-error')}
                     value={drawer.values.category}
-                    onChange={(event) => {
-                      drawer.setField('category', event.target.value)
+                    onValueChange={(next) => {
+                      drawer.setField('category', next)
                       drawer.setField('subCategory', '')
                     }}
-                    aria-invalid={drawer.errors.category ? true : undefined}
-                  >
-                    <option value="">{t('admin.products.formula.selectCategory')}</option>
-                    {categories.map((category) => (
-                      <option key={category._id} value={category._id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
+                    aria-invalid={Boolean(drawer.errors.category)}
+                    triggerClassName={drawer.errors.category ? 'border-support-error' : undefined}
+                    placeholder={t('admin.products.formula.selectCategory')}
+                    options={[
+                      { value: '', label: t('admin.products.formula.selectCategory') },
+                      ...categories.map((category) => ({
+                        value: category._id,
+                        label: category.name,
+                      })),
+                    ]}
+                  />
                   {drawer.errors.category ? (
                     <p className="text-xs text-support-error" role="alert">
                       {drawer.errors.category}
@@ -517,28 +526,33 @@ export function FormulaSpecsDrawer({
                   <label htmlFor={`${formId}-subCategory`} className={labelClass}>
                     {t('admin.products.formula.subCategory')}
                   </label>
-                  <select
+                  <Select
                     id={`${formId}-subCategory`}
-                    className={cn(
-                      fieldClass,
-                      drawer.errors.subCategory && 'border-support-error',
-                    )}
                     value={drawer.values.subCategory}
                     disabled={!drawer.values.category || subLoading}
-                    onChange={(event) => drawer.setField('subCategory', event.target.value)}
-                    aria-invalid={drawer.errors.subCategory ? true : undefined}
-                  >
-                    <option value="">
-                      {subLoading
+                    onValueChange={(next) => drawer.setField('subCategory', next)}
+                    aria-invalid={Boolean(drawer.errors.subCategory)}
+                    triggerClassName={
+                      drawer.errors.subCategory ? 'border-support-error' : undefined
+                    }
+                    placeholder={
+                      subLoading
                         ? t('admin.products.formula.loadingSubcategories')
-                        : t('admin.products.formula.selectSubCategory')}
-                    </option>
-                    {subcategories.map((item) => (
-                      <option key={item._id} value={item._id}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </select>
+                        : t('admin.products.formula.selectSubCategory')
+                    }
+                    options={[
+                      {
+                        value: '',
+                        label: subLoading
+                          ? t('admin.products.formula.loadingSubcategories')
+                          : t('admin.products.formula.selectSubCategory'),
+                      },
+                      ...subcategories.map((item) => ({
+                        value: item._id,
+                        label: item.name,
+                      })),
+                    ]}
+                  />
                   {drawer.errors.subCategory ? (
                     <p className="text-xs text-support-error" role="alert">
                       {drawer.errors.subCategory}
@@ -696,9 +710,22 @@ export function FormulaSpecsDrawer({
                 submitError={faqs.submitError}
                 expandedId={faqs.expandedId}
                 canCreate={faqs.canCreate}
+                editingFaq={faqs.editingFaq}
+                editQuestion={faqs.editQuestion}
+                editAnswer={faqs.editAnswer}
+                editErrors={faqs.editErrors}
+                editSubmitting={faqs.editSubmitting}
+                editSubmitError={faqs.editSubmitError}
                 onQuestionChange={faqs.setQuestion}
                 onAnswerChange={faqs.setAnswer}
                 onToggleExpanded={faqs.toggleExpanded}
+                onOpenEdit={faqs.openEdit}
+                onCloseEdit={faqs.closeEdit}
+                onEditQuestionChange={faqs.setEditQuestion}
+                onEditAnswerChange={faqs.setEditAnswer}
+                onSubmitEdit={() => {
+                  void handleFaqEditSubmit()
+                }}
                 onSubmit={() => {
                   void handleFaqSubmit()
                 }}

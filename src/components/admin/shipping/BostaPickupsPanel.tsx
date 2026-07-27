@@ -17,6 +17,7 @@ import {
 } from '../../../utils/adminShippingFormat'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { EmptyState } from '../ui/EmptyState'
+import { Select } from '../ui/Select'
 import { Skeleton } from '../ui/Skeleton'
 
 interface BostaPickupsPanelProps {
@@ -176,27 +177,30 @@ function PickupAddForm({
           <label className={labelClass} htmlFor={`${formId}-city`}>
             {t('admin.shipping.pickups.form.city')}
           </label>
-          <select
+          <Select
             id={`${formId}-city`}
             value={selectedCityKey}
             disabled={citiesLoading}
-            onChange={(event) => handleCityChange(event.target.value)}
-            className={cn(fieldClass, 'mt-1')}
-          >
-            <option value="">
-              {citiesLoading
+            onValueChange={(next) => handleCityChange(next)}
+            triggerClassName="mt-1"
+            placeholder={
+              citiesLoading
                 ? t('admin.shipping.pickups.form.loadingCities')
-                : t('admin.shipping.pickups.form.selectCity')}
-            </option>
-            {cities.map((city) => {
-              const key = String(city.id ?? city._id ?? '')
-              return (
-                <option key={key} value={key}>
-                  {city.name ?? key}
-                </option>
-              )
-            })}
-          </select>
+                : t('admin.shipping.pickups.form.selectCity')
+            }
+            options={[
+              {
+                value: '',
+                label: citiesLoading
+                  ? t('admin.shipping.pickups.form.loadingCities')
+                  : t('admin.shipping.pickups.form.selectCity'),
+              },
+              ...cities.map((city) => {
+                const key = String(city.id ?? city._id ?? '')
+                return { value: key, label: city.name ?? key }
+              }),
+            ]}
+          />
           <FieldError message={errors.city} />
         </div>
 
@@ -204,23 +208,21 @@ function PickupAddForm({
           <label className={labelClass} htmlFor={`${formId}-district`}>
             {t('admin.shipping.pickups.form.district')}
           </label>
-          <select
+          <Select
             id={`${formId}-district`}
             value={values.districtId}
             disabled={!selectedCity}
-            onChange={(event) => handleDistrictChange(event.target.value)}
-            className={cn(fieldClass, 'mt-1')}
-          >
-            <option value="">{t('admin.shipping.pickups.form.selectDistrict')}</option>
-            {(selectedCity?.districts ?? []).map((district) => {
-              const key = String(district.id ?? district._id ?? '')
-              return (
-                <option key={key} value={key}>
-                  {district.name ?? key}
-                </option>
-              )
-            })}
-          </select>
+            onValueChange={(next) => handleDistrictChange(next)}
+            triggerClassName="mt-1"
+            placeholder={t('admin.shipping.pickups.form.selectDistrict')}
+            options={[
+              { value: '', label: t('admin.shipping.pickups.form.selectDistrict') },
+              ...(selectedCity?.districts ?? []).map((district) => {
+                const key = String(district.id ?? district._id ?? '')
+                return { value: key, label: district.name ?? key }
+              }),
+            ]}
+          />
           <FieldError message={errors.districtId ?? errors.zoneId} />
         </div>
       </div>
@@ -301,10 +303,6 @@ export function BostaPickupsPanel({ carrierId, onAdded }: BostaPickupsPanelProps
     error,
     syncing,
     syncPickups,
-    syncingZones,
-    syncZones,
-    syncingCoverage,
-    syncCoverage,
     mutatingId,
     setDefault,
     removePickup,
@@ -323,18 +321,16 @@ export function BostaPickupsPanel({ carrierId, onAdded }: BostaPickupsPanelProps
     onAdded?.()
   }, [onAdded])
 
-  const anySyncing = syncing || syncingZones || syncingCoverage
-
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <h4 className="text-sm font-bold text-white">
           {t('admin.shipping.pickups.title')}
         </h4>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <button
             type="button"
-            disabled={anySyncing}
+            disabled={syncing}
             onClick={() => void syncPickups()}
             className={cn(
               'inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5',
@@ -345,42 +341,6 @@ export function BostaPickupsPanel({ carrierId, onAdded }: BostaPickupsPanelProps
           >
             <RefreshCw size={11} className={cn(syncing && 'animate-spin')} aria-hidden />
             {t('admin.shipping.pickups.sync')}
-          </button>
-          <button
-            type="button"
-            disabled={anySyncing}
-            onClick={() => void syncZones()}
-            className={cn(
-              'inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5',
-              'text-[8px] font-bold uppercase tracking-[0.08em] text-white/70',
-              'hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60',
-              focusRingClasses,
-            )}
-          >
-            <RefreshCw
-              size={11}
-              className={cn(syncingZones && 'animate-spin')}
-              aria-hidden
-            />
-            {t('admin.shipping.pickups.syncZones')}
-          </button>
-          <button
-            type="button"
-            disabled={anySyncing}
-            onClick={() => void syncCoverage()}
-            className={cn(
-              'inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5',
-              'text-[8px] font-bold uppercase tracking-[0.08em] text-white/70',
-              'hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60',
-              focusRingClasses,
-            )}
-          >
-            <RefreshCw
-              size={11}
-              className={cn(syncingCoverage && 'animate-spin')}
-              aria-hidden
-            />
-            {t('admin.shipping.pickups.syncCoverage')}
           </button>
           <button
             type="button"

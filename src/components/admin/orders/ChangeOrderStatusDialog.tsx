@@ -5,15 +5,14 @@ import { useTranslation } from 'react-i18next'
 import { updateAdminOrderStatus } from '../../../api/admin/orders'
 import { useToast } from '../../../context/ToastContext'
 import { ApiError } from '../../../lib/api'
-import { cn } from '../../../lib/cn'
 import {
   ADMIN_ORDER_STATUSES,
   type AdminOrderStatus,
 } from '../../../types/adminOrders'
 import { orderStatusBadgeTone } from '../../../utils/adminOrdersFormat'
 import { Button } from '../../ui/Button'
-import { focusRingClasses } from '../../ui/interactionStyles'
 import { Dialog } from '../ui/Dialog'
+import { Select } from '../ui/Select'
 import { StatusBadge } from '../ui/StatusBadge'
 
 interface ChangeOrderStatusDialogProps {
@@ -173,33 +172,28 @@ export function ChangeOrderStatusDialog({
           <label className="block text-xs font-medium text-secondary-text" htmlFor={selectId}>
             {t('admin.orders.changeStatus.newStatus')}
           </label>
-          <select
+          <Select
             id={selectId}
             value={nextStatus}
             disabled={submitting}
-            onChange={(event) => {
-              setNextStatus(event.target.value as AdminOrderStatus | '')
+            onValueChange={(next) => {
+              setNextStatus(next as AdminOrderStatus | '')
               setError(null)
             }}
-            className={cn(
-              'mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5',
-              'text-sm text-primary-text',
-              'disabled:cursor-not-allowed disabled:opacity-60',
-              focusRingClasses,
-            )}
-          >
-            <option value="">
-              {t('admin.orders.changeStatus.selectStatus')}
-            </option>
-            {ADMIN_ORDER_STATUSES.map((status) => (
-              <option key={status} value={status} disabled={status === currentStatus}>
-                {t(`admin.orders.orderStatus.${status}`)}
-                {status === currentStatus
-                  ? ` (${t('admin.orders.changeStatus.currentOption')})`
-                  : ''}
-              </option>
-            ))}
-          </select>
+            triggerClassName="mt-2"
+            placeholder={t('admin.orders.changeStatus.selectStatus')}
+            options={[
+              { value: '', label: t('admin.orders.changeStatus.selectStatus') },
+              ...ADMIN_ORDER_STATUSES.map((status) => ({
+                value: status,
+                disabled: status === currentStatus,
+                label:
+                  status === currentStatus
+                    ? `${t(`admin.orders.orderStatus.${status}`)} (${t('admin.orders.changeStatus.currentOption')})`
+                    : t(`admin.orders.orderStatus.${status}`),
+              })),
+            ]}
+          />
           <p className="mt-1 text-[8px] text-white/40">
             {t('admin.orders.changeStatus.hint')}
           </p>

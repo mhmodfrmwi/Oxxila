@@ -58,6 +58,16 @@ export function useZoneManager() {
   const governoratesRequestId = useRef(0)
   const districtsRequestId = useRef(0)
   const [countriesReloadToken, setCountriesReloadToken] = useState(0)
+  const selectedCountryIdRef = useRef<string | null>(null)
+  const selectedGovernorateIdRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    selectedCountryIdRef.current = selectedCountryId
+  }, [selectedCountryId])
+
+  useEffect(() => {
+    selectedGovernorateIdRef.current = selectedGovernorateId
+  }, [selectedGovernorateId])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -72,11 +82,24 @@ export function useZoneManager() {
         const rows = (response.data ?? []).map(mapApiCountryToRow)
         setCountries(rows)
         setCountriesLoading(false)
-        setSelectedCountryId((previous) =>
-          previous && rows.some((row) => row.id === previous)
-            ? previous
-            : rows[0]?.id ?? null,
-        )
+
+        // Never auto-select a country — only keep a prior user selection if it
+        // still exists after refetch; otherwise clear nested selection.
+        const previousCountryId = selectedCountryIdRef.current
+        const nextCountryId =
+          previousCountryId && rows.some((row) => row.id === previousCountryId)
+            ? previousCountryId
+            : null
+
+        if (nextCountryId !== previousCountryId) {
+          setSelectedGovernorateId(null)
+          setGovernorates([])
+          setDistricts([])
+          setDistrictsError(null)
+        }
+
+        selectedCountryIdRef.current = nextCountryId
+        setSelectedCountryId(nextCountryId)
       } catch (err) {
         if (controller.signal.aborted || requestId !== countriesRequestId.current) return
         if (isAbortError(err)) return
@@ -95,10 +118,22 @@ export function useZoneManager() {
   useEffect(() => {
     if (!selectedCountryId) {
       setGovernorates([])
+      setGovernoratesLoading(false)
+      setGovernoratesError(null)
+      setSelectedGovernorateId(null)
+      setDistricts([])
+      setDistrictsLoading(false)
+      setDistrictsError(null)
       return
     }
+
     const controller = new AbortController()
     const requestId = ++governoratesRequestId.current
+    // Country changed — clear child selection immediately so districts never show
+    // from a previous country's governorate while the new list loads.
+    setSelectedGovernorateId(null)
+    setDistricts([])
+    setDistrictsError(null)
     setGovernoratesLoading(true)
     setGovernoratesError(null)
 
@@ -108,14 +143,8 @@ export function useZoneManager() {
           signal: controller.signal,
         })
         if (requestId !== governoratesRequestId.current) return
-        const rows = (response.data ?? []).map(mapApiGovernorateToRow)
-        setGovernorates(rows)
+        setGovernorates((response.data ?? []).map(mapApiGovernorateToRow))
         setGovernoratesLoading(false)
-        setSelectedGovernorateId((previous) =>
-          previous && rows.some((row) => row.id === previous)
-            ? previous
-            : rows[0]?.id ?? null,
-        )
       } catch (err) {
         if (controller.signal.aborted || requestId !== governoratesRequestId.current)
           return
@@ -135,10 +164,14 @@ export function useZoneManager() {
   useEffect(() => {
     if (!selectedGovernorateId) {
       setDistricts([])
+      setDistrictsLoading(false)
+      setDistrictsError(null)
       return
     }
+
     const controller = new AbortController()
     const requestId = ++districtsRequestId.current
+    setDistricts([])
     setDistrictsLoading(true)
     setDistrictsError(null)
 
@@ -171,13 +204,26 @@ export function useZoneManager() {
   }, [])
 
   const selectCountry = useCallback((id: string) => {
+    if (selectedCountryIdRef.current === id) {
+      // Same country: still clear child selection so districts stay empty until
+      // a governorate is chosen again.
+      setSelectedGovernorateId(null)
+      setDistricts([])
+      setDistrictsError(null)
+      return
+    }
     setSelectedCountryId(id)
     setSelectedGovernorateId(null)
+    setGovernorates([])
     setDistricts([])
+    setDistrictsError(null)
   }, [])
 
   const selectGovernorate = useCallback((id: string) => {
+    if (selectedGovernorateIdRef.current === id) return
     setSelectedGovernorateId(id)
+    setDistricts([])
+    setDistrictsError(null)
   }, [])
 
   const addCountry = useCallback(async (payload: CreateCountryPayload) => {
@@ -189,6 +235,9 @@ export function useZoneManager() {
       if (!created) throw new ApiError(response.message || 'Unable to add country.')
       const row = mapApiCountryToRow(created)
       setCountries((previous) => [...previous, row])
+      setSelectedGovernorateId(null)
+      setGovernorates([])
+      setDistricts([])
       setSelectedCountryId(row.id)
       setCountryMutating(false)
       return true
@@ -234,7 +283,13 @@ export function useZoneManager() {
       await deleteAdminCountry(id)
       setCountries((previous) => previous.filter((country) => country.id !== id))
       setCountryMutating(false)
-      setSelectedCountryId((previous) => (previous === id ? null : previous))
+      if (selectedCountryIdRef.current === id) {
+        selectedCountryIdRef.current = null
+        setSelectedCountryId(null)
+        setSelectedGovernorateId(null)
+        setGovernorates([])
+        setDistricts([])
+      }
       return true
     } catch (err) {
       setCountryMutating(false)
@@ -255,6 +310,7 @@ export function useZoneManager() {
         throw new ApiError(response.message || 'Unable to add governorate.')
       const row = mapApiGovernorateToRow(created)
       setGovernorates((previous) => [...previous, row])
+      setDistricts([])
       setSelectedGovernorateId(row.id)
       setGovernorateMutating(false)
       return true
@@ -300,7 +356,11 @@ export function useZoneManager() {
       await deleteAdminGovernorate(id)
       setGovernorates((previous) => previous.filter((gov) => gov.id !== id))
       setGovernorateMutating(false)
-      setSelectedGovernorateId((previous) => (previous === id ? null : previous))
+      if (selectedGovernorateIdRef.current === id) {
+        selectedGovernorateIdRef.current = null
+        setSelectedGovernorateId(null)
+        setDistricts([])
+      }
       return true
     } catch (err) {
       setGovernorateMutating(false)

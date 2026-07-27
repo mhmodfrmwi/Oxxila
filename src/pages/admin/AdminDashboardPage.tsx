@@ -1,10 +1,15 @@
 // src/pages/admin/AdminDashboardPage.tsx
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Search } from 'lucide-react'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
 import { DashboardKpiGrid } from '../../components/admin/dashboard/DashboardKpiGrid'
-import { DashboardLowStockCard } from '../../components/admin/dashboard/DashboardLowStockCard'
+import {
+  DashboardLowStockCard,
+  LOW_STOCK_THRESHOLD_DEFAULT,
+  LOW_STOCK_THRESHOLD_MAX,
+  LOW_STOCK_THRESHOLD_MIN,
+} from '../../components/admin/dashboard/DashboardLowStockCard'
 import { DashboardRecentOrdersCard } from '../../components/admin/dashboard/DashboardRecentOrdersCard'
 import { DashboardRevenueCard } from '../../components/admin/dashboard/DashboardRevenueCard'
 import { DashboardSegmentCard } from '../../components/admin/dashboard/DashboardSegmentCard'
@@ -12,6 +17,7 @@ import { DashboardTopProductsCard } from '../../components/admin/dashboard/Dashb
 import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { Button } from '../../components/ui/Button'
 import { focusRingClasses } from '../../components/ui/interactionStyles'
+import { STORAGE_KEYS } from '../../config/storage'
 import {
   useAdminDashboardOverview,
   useAdminDashboardRevenue,
@@ -21,6 +27,22 @@ import type { RevenueInterval } from '../../types/adminDashboard'
 import { getDashboardLowStockAlerts } from '../../utils/adminDashboardFormat'
 
 const PERIOD_DAYS = 30
+const THRESHOLD_DEBOUNCE_MS = 300
+
+function readSessionThreshold(): number {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEYS.dashboardLowStockThreshold)
+    if (raw == null) return LOW_STOCK_THRESHOLD_DEFAULT
+    const parsed = Number.parseInt(raw, 10)
+    if (!Number.isFinite(parsed)) return LOW_STOCK_THRESHOLD_DEFAULT
+    return Math.min(
+      LOW_STOCK_THRESHOLD_MAX,
+      Math.max(LOW_STOCK_THRESHOLD_MIN, parsed),
+    )
+  } catch {
+    return LOW_STOCK_THRESHOLD_DEFAULT
+  }
+}
 
 /**
  * Executive Overview — Phase 1 dashboard.
@@ -30,8 +52,28 @@ export function AdminDashboardPage() {
   const { t } = useTranslation()
   const [interval, setInterval] = useState<RevenueInterval>('daily')
   const [searchQuery, setSearchQuery] = useState('')
+  const [thresholdInput, setThresholdInput] = useState(readSessionThreshold)
+  const [lowStockThreshold, setLowStockThreshold] = useState(thresholdInput)
 
-  const overview = useAdminDashboardOverview({ periodDays: PERIOD_DAYS })
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setLowStockThreshold(thresholdInput)
+      try {
+        sessionStorage.setItem(
+          STORAGE_KEYS.dashboardLowStockThreshold,
+          String(thresholdInput),
+        )
+      } catch {
+        // Session storage may be unavailable — keep in-memory state only.
+      }
+    }, THRESHOLD_DEBOUNCE_MS)
+    return () => window.clearTimeout(timer)
+  }, [thresholdInput])
+
+  const overview = useAdminDashboardOverview({
+    periodDays: PERIOD_DAYS,
+    lowStockThreshold,
+  })
   const revenue = useAdminDashboardRevenue({ periodDays: PERIOD_DAYS, interval })
 
   const firstName = overview.data?.greeting.firstName
@@ -50,10 +92,16 @@ export function AdminDashboardPage() {
 
   const filteredLowStock = useMemo(() => {
     // API returns `{ threshold, alertCount, items }` — not a bare array.
+    // Alerts come from backend `isAlert` / `isCritical` flags only.
     const items = getDashboardLowStockAlerts(overview.data?.lowStock)
     if (!query) return items
     return items.filter((item) => item.name.toLowerCase().includes(query))
   }, [overview.data?.lowStock, query])
+
+  const responseThreshold =
+    typeof overview.data?.lowStock?.threshold === 'number'
+      ? overview.data.lowStock.threshold
+      : null
 
   const filteredRecentOrders = useMemo(() => {
     const orders = overview.data?.recentOrders ?? []
@@ -136,7 +184,12 @@ export function AdminDashboardPage() {
             />
             <DashboardLowStockCard
               items={filteredLowStock}
+              threshold={responseThreshold}
+              thresholdValue={thresholdInput}
+              onThresholdChange={setThresholdInput}
               loading={overview.loading}
+              error={overview.error && !overview.data ? overview.error : null}
+              onRetry={() => void overview.reload()}
             />
             <DashboardRecentOrdersCard
               orders={filteredRecentOrders}

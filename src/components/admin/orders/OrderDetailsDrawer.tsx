@@ -17,6 +17,7 @@ import { focusRingClasses } from '../../ui/interactionStyles'
 import { Drawer } from '../ui/Drawer'
 import { EmptyState } from '../ui/EmptyState'
 import { GlassCard } from '../ui/GlassCard'
+import { Select } from '../ui/Select'
 import { Skeleton } from '../ui/Skeleton'
 import { StatusBadge } from '../ui/StatusBadge'
 import { CancelOrderDialog } from './CancelOrderDialog'
@@ -357,23 +358,21 @@ export function OrderDetailsDrawer({
                   <label className={labelClass} htmlFor={`${trackingFormId}-status`}>
                     {t('admin.orders.details.orderStatus')}
                   </label>
-                  <select
+                  <Select
                     id={`${trackingFormId}-status`}
                     value={assign.manualStatus}
                     disabled={assign.manualSubmitting}
-                    onChange={(event) =>
+                    onValueChange={(next) =>
                       assign.setManualStatus(
-                        event.target.value as (typeof MANUAL_STATUSES)[number],
+                        next as (typeof MANUAL_STATUSES)[number],
                       )
                     }
-                    className={cn(fieldClass, 'mt-2')}
-                  >
-                    {MANUAL_STATUSES.map((status) => (
-                      <option key={status} value={status}>
-                        {t(`admin.orders.orderStatus.${status}`)}
-                      </option>
-                    ))}
-                  </select>
+                    triggerClassName="mt-2"
+                    options={MANUAL_STATUSES.map((status) => ({
+                      value: status,
+                      label: t(`admin.orders.orderStatus.${status}`),
+                    }))}
+                  />
                 </div>
               </div>
             ) : null}

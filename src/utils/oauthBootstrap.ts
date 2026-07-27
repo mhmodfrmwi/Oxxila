@@ -12,6 +12,7 @@ import {
   OAUTH_FAILURE_PATH,
   parseOAuthUserFromToken,
 } from './oauth'
+import { resolvePostLoginPath } from './postLoginRedirect'
 
 const USER_KEY = STORAGE_KEYS.user
 const OAUTH_ERROR_KEY = STORAGE_KEYS.oauthError
@@ -31,7 +32,7 @@ export function bootstrapOAuthFromUrl(): void {
 
     localStorage.setItem(AUTH_TOKEN_KEY, accessToken)
     localStorage.setItem(USER_KEY, JSON.stringify(resolvedUser))
-    clearOAuthUrl(HOME_PATH)
+    clearOAuthUrl(resolvePostLoginPath(resolvedUser.role))
     return
   }
 

@@ -12,6 +12,7 @@ import type { AdminBannerLinkType, AdminBannerRow } from '../../../types/adminBa
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { Drawer } from '../ui/Drawer'
 import { EmptyState } from '../ui/EmptyState'
+import { Select } from '../ui/Select'
 import { Skeleton } from '../ui/Skeleton'
 
 interface BannerDrawerProps {
@@ -239,22 +240,22 @@ export function BannerDrawer({
               <label className={labelClass} htmlFor={`${formId}-linkId`}>
                 {t('admin.settings.banners.drawer.product')}
               </label>
-              <select
+              <Select
                 id={`${formId}-linkId`}
                 value={drawer.values.linkId}
                 disabled={drawer.submitting}
-                onChange={(event) => drawer.setField('linkId', event.target.value)}
-                className={cn(fieldClass, 'mt-2')}
-              >
-                <option value="">
-                  {t('admin.settings.banners.drawer.selectProduct')}
-                </option>
-                {drawer.products.map((product) => (
-                  <option key={product._id} value={product._id}>
-                    {product.name}
-                  </option>
-                ))}
-              </select>
+                onValueChange={(next) => drawer.setField('linkId', next)}
+                triggerClassName="mt-2"
+                aria-invalid={Boolean(drawer.errors.linkId)}
+                placeholder={t('admin.settings.banners.drawer.selectProduct')}
+                options={[
+                  { value: '', label: t('admin.settings.banners.drawer.selectProduct') },
+                  ...drawer.products.map((product) => ({
+                    value: product._id,
+                    label: product.name,
+                  })),
+                ]}
+              />
               <FieldError message={drawer.errors.linkId} />
             </div>
           ) : null}
@@ -264,22 +265,22 @@ export function BannerDrawer({
               <label className={labelClass} htmlFor={`${formId}-linkId`}>
                 {t('admin.settings.banners.drawer.category')}
               </label>
-              <select
+              <Select
                 id={`${formId}-linkId`}
                 value={drawer.values.linkId}
                 disabled={drawer.submitting}
-                onChange={(event) => drawer.setField('linkId', event.target.value)}
-                className={cn(fieldClass, 'mt-2')}
-              >
-                <option value="">
-                  {t('admin.settings.banners.drawer.selectCategory')}
-                </option>
-                {drawer.categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+                onValueChange={(next) => drawer.setField('linkId', next)}
+                triggerClassName="mt-2"
+                aria-invalid={Boolean(drawer.errors.linkId)}
+                placeholder={t('admin.settings.banners.drawer.selectCategory')}
+                options={[
+                  { value: '', label: t('admin.settings.banners.drawer.selectCategory') },
+                  ...drawer.categories.map((category) => ({
+                    value: category._id,
+                    label: category.name,
+                  })),
+                ]}
+              />
               <FieldError message={drawer.errors.linkId} />
             </div>
           ) : null}

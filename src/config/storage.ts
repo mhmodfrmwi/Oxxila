@@ -5,4 +5,6 @@ export const STORAGE_KEYS = {
   authToken: 'oxxila_access_token',
   user: 'oxxila_user',
   oauthError: 'oxxila_oauth_error',
+  /** Session-only dashboard low-stock threshold preference. */
+  dashboardLowStockThreshold: 'oxxila_dashboard_low_stock_threshold',
 } as const

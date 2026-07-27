@@ -215,11 +215,8 @@ export function ProductsCatalogTable({
           const label = formatPerformancePercent(row.performancePercent, locale)
           if (label == null || row.performancePercent == null) {
             return (
-              <span
-                className="text-sm text-secondary-text"
-                aria-label={t('admin.products.unavailable')}
-              >
-                —
+              <span className="text-sm text-secondary-text">
+                {t('admin.products.unavailable')}
               </span>
             )
           }

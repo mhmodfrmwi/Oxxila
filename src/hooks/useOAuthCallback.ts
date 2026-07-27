@@ -1,6 +1,5 @@
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { HOME_PATH } from '../config/routes'
 import { useAuth } from '../context/AuthContext'
 import {
   clearOAuthUrl,
@@ -10,6 +9,7 @@ import {
   OAUTH_FAILURE_PATH,
 } from '../utils/oauth'
 import { consumeOAuthError } from '../utils/oauthBootstrap'
+import { resolvePostLoginPath } from '../utils/postLoginRedirect'
 
 /** Fallback OAuth handler when bootstrap did not run (e.g. client-side navigation). */
 export function useOAuthCallback() {
@@ -31,9 +31,10 @@ export function useOAuthCallback() {
     if (accessToken) {
       handledRef.current = true
       setSession(accessToken, user)
-      clearOAuthUrl(HOME_PATH)
-      if (location.pathname !== HOME_PATH) {
-        navigate(HOME_PATH, { replace: true })
+      const nextPath = resolvePostLoginPath(user?.role)
+      clearOAuthUrl(nextPath)
+      if (location.pathname !== nextPath) {
+        navigate(nextPath, { replace: true })
       }
       return
     }
@@ -50,8 +51,8 @@ export function useOAuthCallback() {
       return
     }
 
-    if (location.pathname === HOME_PATH && (location.search || location.hash)) {
-      clearOAuthUrl(HOME_PATH)
+    if (location.search || location.hash) {
+      clearOAuthUrl(location.pathname || '/')
     }
   }, [
     accessToken,

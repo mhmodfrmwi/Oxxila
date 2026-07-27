@@ -1173,8 +1173,16 @@
         "left_zero": "متبقي {{count}}",
         "left_few": "متبقي {{count}}",
         "left_many": "متبقي {{count}}",
+        "threshold": "الحد {{count}}",
+        "thresholdLabel": "حد انخفاض المخزون",
         "emptyTitle": "المخزون في وضع جيد",
-        "emptyDescription": "ستظهر المنتجات عند أو دون الحد الأدنى هنا."
+        "emptyDescription": "ستظهر المنتجات عند أو دون الحد الأدنى هنا.",
+        "errorTitle": "تعذر تحميل تنبيهات انخفاض المخزون",
+        "status": {
+          "low": "مخزون منخفض",
+          "critical": "حرج",
+          "outOfStock": "نفد المخزون"
+        }
       },
       "recentOrders": {
         "title": "أحدث الطلبات",
@@ -1712,7 +1720,17 @@
           "questionRequired": "السؤال مطلوب",
           "answerRequired": "الإجابة مطلوبة",
           "questionTooLong": "لا يمكن أن يتجاوز السؤال {{max}} حرفًا",
-          "answerTooLong": "لا يمكن أن تتجاوز الإجابة {{max}} حرفًا"
+          "answerTooLong": "لا يمكن أن تتجاوز الإجابة {{max}} حرفًا",
+          "expandAria": "توسيع إجابة {{question}}",
+          "collapseAria": "طي إجابة {{question}}",
+          "editAria": "تعديل السؤال {{question}}",
+          "editTitle": "تعديل سؤال شائع",
+          "editDescription": "حدّث السؤال والإجابة لهذه التركيبة.",
+          "editCancel": "إلغاء",
+          "editSave": "حفظ التغييرات",
+          "editSaving": "جارٍ الحفظ…",
+          "updateSuccess": "تم تحديث السؤال الشائع",
+          "updateFailed": "تعذر تحديث السؤال الشائع"
         }
       }
     },
@@ -2063,7 +2081,13 @@
         "itemsEmpty": "لا توجد عناصر في هذا الإرجاع",
         "proofImages": "صور الإثبات",
         "proofEmpty": "لم يتم إرسال صور إثبات",
-        "proofLink": "صورة {{index}}"
+        "proofLink": "صورة {{index}}",
+        "proofOpenAria": "فتح صورة الإثبات {{index}}",
+        "proofPreviewTitle": "صورة إثبات {{current}} من {{total}}",
+        "proofPreviewClose": "إغلاق معاينة الإثبات",
+        "proofPreviewPrevious": "صورة الإثبات السابقة",
+        "proofPreviewNext": "صورة الإثبات التالية",
+        "proofPreviewError": "تعذّر تحميل الصورة"
       },
       "actions": {
         "sectionAria": "إجراءات الإرجاع",

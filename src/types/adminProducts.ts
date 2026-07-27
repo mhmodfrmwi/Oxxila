@@ -12,6 +12,8 @@ export interface AdminProductsListParams {
   isBundle?: boolean
   priceMin?: number
   priceMax?: number
+  /** Days for GET /products performance trend (backend default 30). */
+  period?: number
 }
 
 export type AdminProductInventoryStatus = 'in_stock' | 'low_stock' | 'out_of_stock'
@@ -30,7 +32,7 @@ export interface AdminProductRow {
   price: number
   soldCount: number
   isBestSeller: boolean
-  /** Period-over-period performance is not provided by the list API yet. */
+  /** Period-over-period units-sold trend (%) from list API `performance`. */
   performancePercent: number | null
 }
 

@@ -16,6 +16,7 @@ import {
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { Drawer } from '../ui/Drawer'
 import { EmptyState } from '../ui/EmptyState'
+import { Select } from '../ui/Select'
 import { Skeleton } from '../ui/Skeleton'
 
 interface FaqDrawerProps {
@@ -163,24 +164,22 @@ export function FaqDrawer({
               </>
             ) : (
               <>
-                <select
+                <Select
                   id={`${formId}-product`}
                   value={drawer.values.product}
                   disabled={drawer.submitting}
-                  onChange={(event) =>
-                    drawer.setField('product', event.target.value)
-                  }
-                  className={cn(fieldClass, 'mt-2')}
-                >
-                  <option value="">
-                    {t('admin.faqs.drawer.selectProduct')}
-                  </option>
-                  {drawer.products.map((product) => (
-                    <option key={product.id} value={product.id}>
-                      {product.name}
-                    </option>
-                  ))}
-                </select>
+                  onValueChange={(next) => drawer.setField('product', next)}
+                  triggerClassName="mt-2"
+                  aria-invalid={Boolean(drawer.errors.product)}
+                  placeholder={t('admin.faqs.drawer.selectProduct')}
+                  options={[
+                    { value: '', label: t('admin.faqs.drawer.selectProduct') },
+                    ...drawer.products.map((product) => ({
+                      value: product.id,
+                      label: product.name,
+                    })),
+                  ]}
+                />
                 <p className="mt-1 text-[8px] text-white/40">
                   {t('admin.faqs.drawer.productRequired')}
                 </p>

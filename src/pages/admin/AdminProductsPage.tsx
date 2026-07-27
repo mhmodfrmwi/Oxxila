@@ -20,33 +20,20 @@ export function AdminProductsPage() {
   const { t } = useTranslation()
   const catalog = useAdminProducts()
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [bulkOpen, setBulkOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerMode, setDrawerMode] = useState<FormulaSpecsMode>('create')
   const [editingId, setEditingId] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!bulkOpen && !filtersOpen) return
+    if (!filtersOpen) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
       if (drawerOpen) return
-      setBulkOpen(false)
       setFiltersOpen(false)
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [bulkOpen, filtersOpen, drawerOpen])
-
-  useEffect(() => {
-    if (!bulkOpen) return
-    const onPointerDown = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null
-      if (target?.closest('[data-admin-bulk-root]')) return
-      setBulkOpen(false)
-    }
-    document.addEventListener('mousedown', onPointerDown)
-    return () => document.removeEventListener('mousedown', onPointerDown)
-  }, [bulkOpen])
+  }, [filtersOpen, drawerOpen])
 
   const openCreate = useCallback(() => {
     setDrawerMode('create')
@@ -149,8 +136,6 @@ export function AdminProductsPage() {
             categoriesLoading={catalog.categoriesLoading}
             filtersOpen={filtersOpen}
             onFiltersOpenChange={setFiltersOpen}
-            bulkOpen={bulkOpen}
-            onBulkOpenChange={setBulkOpen}
           />
 
           <ProductsCatalogTable

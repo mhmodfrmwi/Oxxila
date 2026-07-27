@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/cn'
 import type { AdminCategoryRow } from '../../../types/adminCategories'
 import { focusRingClasses } from '../../ui/interactionStyles'
+import { Select } from '../ui/Select'
 
 interface SubcategoriesCatalogToolbarProps {
   keyword: string
@@ -51,30 +52,22 @@ export function SubcategoriesCatalogToolbar({
         />
       </label>
 
-      <label className="relative block w-full sm:w-[13rem]">
-        <span className="sr-only">
-          {t('admin.subcategories.filterCategoryLabel')}
-        </span>
-        <select
+      <div className="relative block w-full sm:w-[13rem]">
+        <Select
+          size="toolbar"
           value={category}
+          onValueChange={onCategoryChange}
           disabled={disabled || categoriesLoading}
-          onChange={(event) => onCategoryChange(event.target.value)}
-          className={cn(
-            'admin-glass h-[43.2px] w-full appearance-none rounded-2xl px-5 text-sm text-primary-text',
-            'disabled:cursor-not-allowed disabled:opacity-60',
-            focusRingClasses,
-          )}
-        >
-          <option value="">
-            {t('admin.subcategories.filterCategoryAll')}
-          </option>
-          {categories.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-      </label>
+          aria-label={t('admin.subcategories.filterCategoryLabel')}
+          options={[
+            { value: '', label: t('admin.subcategories.filterCategoryAll') },
+            ...categories.map((item) => ({
+              value: item.id,
+              label: item.name,
+            })),
+          ]}
+        />
+      </div>
     </div>
   )
 }

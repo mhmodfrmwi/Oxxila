@@ -2,7 +2,7 @@
 import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { createAdminFaq, getAdminProductFaqs } from '../api/admin/faqs'
+import { createAdminFaq, getAdminProductFaqs, updateAdminFaq } from '../api/admin/faqs'
 import { ApiError } from '../lib/api'
 import type { AdminFaqFormErrors, AdminFaqRow } from '../types/adminFaqs'
 import {
@@ -32,6 +32,12 @@ export function useFormulaSpecsFaqs({
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [editingFaq, setEditingFaq] = useState<AdminFaqRow | null>(null)
+  const [editQuestion, setEditQuestionState] = useState('')
+  const [editAnswer, setEditAnswerState] = useState('')
+  const [editErrors, setEditErrors] = useState<AdminFaqFormErrors>({})
+  const [editSubmitting, setEditSubmitting] = useState(false)
+  const [editSubmitError, setEditSubmitError] = useState<string | null>(null)
   const requestIdRef = useRef(0)
 
   const resetDraft = useCallback(() => {
@@ -41,12 +47,21 @@ export function useFormulaSpecsFaqs({
     setSubmitError(null)
   }, [])
 
+  const closeEdit = useCallback(() => {
+    setEditingFaq(null)
+    setEditQuestionState('')
+    setEditAnswerState('')
+    setEditErrors({})
+    setEditSubmitError(null)
+  }, [])
+
   useEffect(() => {
     if (!open) {
       setFaqs([])
       setLoading(false)
       setLoadError(null)
       setExpandedId(null)
+      closeEdit()
       resetDraft()
       return
     }
@@ -56,6 +71,7 @@ export function useFormulaSpecsFaqs({
       setLoading(false)
       setLoadError(null)
       setExpandedId(null)
+      closeEdit()
       resetDraft()
       return
     }
@@ -92,7 +108,7 @@ export function useFormulaSpecsFaqs({
     return () => {
       controller.abort()
     }
-  }, [open, productId, productName, resetDraft, t])
+  }, [closeEdit, open, productId, productName, resetDraft, t])
 
   const setQuestion = useCallback((value: string) => {
     setQuestionState(value)
@@ -119,6 +135,104 @@ export function useFormulaSpecsFaqs({
   const toggleExpanded = useCallback((faqId: string) => {
     setExpandedId((current) => (current === faqId ? null : faqId))
   }, [])
+
+  const openEdit = useCallback((faq: AdminFaqRow) => {
+    setEditingFaq(faq)
+    setEditQuestionState(faq.question)
+    setEditAnswerState(faq.answer)
+    setEditErrors({})
+    setEditSubmitError(null)
+  }, [])
+
+  const setEditQuestion = useCallback((value: string) => {
+    setEditQuestionState(value)
+    setEditErrors((previous) => {
+      if (!previous.question) return previous
+      const next = { ...previous }
+      delete next.question
+      return next
+    })
+    setEditSubmitError(null)
+  }, [])
+
+  const setEditAnswer = useCallback((value: string) => {
+    setEditAnswerState(value)
+    setEditErrors((previous) => {
+      if (!previous.answer) return previous
+      const next = { ...previous }
+      delete next.answer
+      return next
+    })
+    setEditSubmitError(null)
+  }, [])
+
+  const submitEdit = useCallback(async () => {
+    if (!editingFaq || !productId) return false
+
+    const nextErrors: AdminFaqFormErrors = {}
+    const trimmedQuestion = editQuestion.trim()
+    const trimmedAnswer = editAnswer.trim()
+
+    if (!trimmedQuestion) {
+      nextErrors.question = t('admin.products.formula.faq.questionRequired')
+    } else if (trimmedQuestion.length > ADMIN_FAQ_QUESTION_MAX) {
+      nextErrors.question = t('admin.products.formula.faq.questionTooLong', {
+        max: ADMIN_FAQ_QUESTION_MAX,
+      })
+    }
+
+    if (!trimmedAnswer) {
+      nextErrors.answer = t('admin.products.formula.faq.answerRequired')
+    } else if (trimmedAnswer.length > ADMIN_FAQ_ANSWER_MAX) {
+      nextErrors.answer = t('admin.products.formula.faq.answerTooLong', {
+        max: ADMIN_FAQ_ANSWER_MAX,
+      })
+    }
+
+    setEditErrors(nextErrors)
+    if (Object.keys(nextErrors).length > 0) return false
+
+    setEditSubmitting(true)
+    setEditSubmitError(null)
+    try {
+      const response = await updateAdminFaq(editingFaq.id, {
+        question: trimmedQuestion,
+        answer: trimmedAnswer,
+      })
+      const data = response.data
+      if (!data) {
+        throw new ApiError(
+          response.message || t('admin.products.formula.faq.updateFailed'),
+        )
+      }
+      const row = mapApiFaqToAdminRow(data, {
+        id: productId,
+        name: productName,
+      })
+      setFaqs((previous) =>
+        previous.map((faq) => (faq.id === row.id ? row : faq)),
+      )
+      closeEdit()
+      return true
+    } catch (error) {
+      setEditSubmitError(
+        error instanceof ApiError
+          ? error.message
+          : t('admin.products.formula.faq.updateFailed'),
+      )
+      return false
+    } finally {
+      setEditSubmitting(false)
+    }
+  }, [
+    closeEdit,
+    editAnswer,
+    editQuestion,
+    editingFaq,
+    productId,
+    productName,
+    t,
+  ])
 
   const submit = useCallback(async () => {
     if (!productId) {
@@ -194,9 +308,20 @@ export function useFormulaSpecsFaqs({
     submitError,
     expandedId,
     canCreate: Boolean(productId),
+    editingFaq,
+    editQuestion,
+    editAnswer,
+    editErrors,
+    editSubmitting,
+    editSubmitError,
     setQuestion,
     setAnswer,
     toggleExpanded,
+    openEdit,
+    closeEdit,
+    setEditQuestion,
+    setEditAnswer,
+    submitEdit,
     submit,
   }
 }

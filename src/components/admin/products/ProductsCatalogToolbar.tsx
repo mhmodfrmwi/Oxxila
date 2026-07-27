@@ -1,9 +1,10 @@
 // src/components/admin/products/ProductsCatalogToolbar.tsx
-import { ChevronDown, ListFilter, Search } from 'lucide-react'
+import { ListFilter, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { ApiCategory } from '../../../types/catalog'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
+import { Select } from '../ui/Select'
 
 interface ProductsCatalogToolbarProps {
   keyword: string
@@ -14,8 +15,6 @@ interface ProductsCatalogToolbarProps {
   categoriesLoading?: boolean
   filtersOpen: boolean
   onFiltersOpenChange: (open: boolean) => void
-  bulkOpen: boolean
-  onBulkOpenChange: (open: boolean) => void
 }
 
 /* Figma Products: search Fill h-54 rounded-16; filter hug h-54 rounded-16 */
@@ -36,8 +35,6 @@ export function ProductsCatalogToolbar({
   categoriesLoading = false,
   filtersOpen,
   onFiltersOpenChange,
-  bulkOpen,
-  onBulkOpenChange,
 }: ProductsCatalogToolbarProps) {
   const { t } = useTranslation()
 
@@ -76,34 +73,6 @@ export function ProductsCatalogToolbar({
             <ListFilter size={13} aria-hidden />
             {t('admin.products.filters')}
           </button>
-
-          <div className="relative" data-admin-bulk-root>
-            <button
-              type="button"
-              className={glassControlClass}
-              aria-expanded={bulkOpen}
-              aria-haspopup="menu"
-              id="admin-products-bulk-trigger"
-              onClick={() => onBulkOpenChange(!bulkOpen)}
-            >
-              {t('admin.products.bulkActions')}
-              <ChevronDown size={13} aria-hidden className="opacity-70" />
-            </button>
-
-            {bulkOpen && (
-              <div
-                role="menu"
-                aria-labelledby="admin-products-bulk-trigger"
-                className={cn(
-                  'admin-glass absolute end-0 z-20 mt-2 min-w-[9.6rem] rounded-xl p-1.5 shadow-lg',
-                )}
-              >
-                <p className="px-3 py-2 text-xs text-secondary-text" role="menuitem" tabIndex={-1}>
-                  {t('admin.products.bulkSoon')}
-                </p>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
@@ -114,22 +83,20 @@ export function ProductsCatalogToolbar({
         >
           <label className="flex min-w-[11.2rem] flex-1 flex-col gap-1.5">
             <span className="admin-label">{t('admin.products.filterCategory')}</span>
-            <select
+            <Select
+              size="toolbar"
               value={category}
-              onChange={(event) => onCategoryChange(event.target.value)}
+              onValueChange={onCategoryChange}
               disabled={categoriesLoading}
-              className={cn(
-                'rounded-xl border border-border-subtle bg-input px-3 py-2.5 text-sm text-primary-text',
-                focusRingClasses,
-              )}
-            >
-              <option value="">{t('admin.products.filterCategoryAll')}</option>
-              {categories.map((item) => (
-                <option key={item._id} value={item._id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
+              aria-label={t('admin.products.filterCategory')}
+              options={[
+                { value: '', label: t('admin.products.filterCategoryAll') },
+                ...categories.map((item) => ({
+                  value: item._id,
+                  label: item.name,
+                })),
+              ]}
+            />
           </label>
 
           {category ? (

@@ -131,6 +131,7 @@ export function useAdminProducts(options?: UseAdminProductsOptions) {
       page: filters.page,
       limit: filters.limit,
       sort: filters.sort,
+      period: 30,
       ...(debouncedKeyword ? { keyword: debouncedKeyword } : {}),
       ...(filters.category ? { category: filters.category } : {}),
     }),

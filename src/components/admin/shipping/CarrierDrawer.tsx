@@ -1,5 +1,5 @@
 // src/components/admin/shipping/CarrierDrawer.tsx
-import { ChevronDown, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useCallback, useEffect, useId, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCarrierCoverage } from '../../../hooks/useCarrierCoverage'
@@ -13,6 +13,7 @@ import { focusRingClasses } from '../../ui/interactionStyles'
 import { BostaPickupsPanel } from './BostaPickupsPanel'
 import { Drawer } from '../ui/Drawer'
 import { EmptyState } from '../ui/EmptyState'
+import { Select } from '../ui/Select'
 
 interface CarrierDrawerProps {
   open: boolean
@@ -297,35 +298,28 @@ export function CarrierDrawer({
               <label className={labelClass} htmlFor={`${formId}-country`}>
                 {t('admin.shipping.carriers.drawer.country')}
               </label>
-              <div className="relative mt-2">
-                <select
-                  id={`${formId}-country`}
-                  value={coverage.selectedCountryId}
-                  disabled={
-                    form.submitting ||
-                    coverage.loading ||
-                    coverage.countries.length === 0
-                  }
-                  onChange={(event) =>
-                    coverage.setSelectedCountryId(event.target.value)
-                  }
-                  className={cn(fieldClass, 'appearance-none pe-10')}
-                >
-                  <option value="">
-                    {t('admin.shipping.carriers.drawer.countryPlaceholder')}
-                  </option>
-                  {coverage.countries.map((country) => (
-                    <option key={country.id} value={country.id}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  size={16}
-                  className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 text-white/40"
-                  aria-hidden
-                />
-              </div>
+              <Select
+                id={`${formId}-country`}
+                value={coverage.selectedCountryId}
+                disabled={
+                  form.submitting ||
+                  coverage.loading ||
+                  coverage.countries.length === 0
+                }
+                onValueChange={(next) => coverage.setSelectedCountryId(next)}
+                triggerClassName="mt-2"
+                placeholder={t('admin.shipping.carriers.drawer.countryPlaceholder')}
+                options={[
+                  {
+                    value: '',
+                    label: t('admin.shipping.carriers.drawer.countryPlaceholder'),
+                  },
+                  ...coverage.countries.map((country) => ({
+                    value: country.id,
+                    label: country.name,
+                  })),
+                ]}
+              />
             </div>
 
             <div
