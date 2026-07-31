@@ -44,7 +44,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/v1': {
-        target: 'https://oxxila-api-01ced6342147.herokuapp.com',
+        target: 'https://dash.oxxilapharma.com',
         changeOrigin: true,
         secure: true,
       },

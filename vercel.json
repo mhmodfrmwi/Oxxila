@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/v1/:path*",
-      "destination": "https://oxxila-api-01ced6342147.herokuapp.com/api/v1/:path*"
+      "destination": "https://dash.oxxilapharma.com/api/v1/:path*"
     },
     {
       "source": "/(.*)",
