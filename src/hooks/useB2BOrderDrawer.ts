@@ -1,8 +1,7 @@
 // src/hooks/useB2BOrderDrawer.ts
 import { isAbortError } from '../lib/isAbortError'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { createAdminB2BOrder } from '../api/admin/orders'
-import { getAdminCustomers } from '../api/admin/customers'
 import {
   getShippingCountries,
   getShippingGovernorates,
@@ -12,9 +11,6 @@ import {
 } from '../api/shipping'
 import { ApiError } from '../lib/api'
 import type { ApiAdminOrder } from '../types/adminOrders'
-import type { ApiAdminCustomer } from '../types/adminCustomers'
-
-export type B2BAddressMode = 'saved' | 'manual'
 
 export interface B2BOrderLineItem {
   id: string
@@ -48,15 +44,10 @@ function emptyItem(): B2BOrderLineItem {
 }
 
 export function useB2BOrderDrawer({ open, onCreated }: UseB2BOrderDrawerOptions) {
-  const [customerQuery, setCustomerQuery] = useState('')
-  const [customerResults, setCustomerResults] = useState<ApiAdminCustomer[]>([])
-  const [customerSearching, setCustomerSearching] = useState(false)
-  const [selectedCustomer, setSelectedCustomer] = useState<ApiAdminCustomer | null>(null)
+  const [customerName, setCustomerName] = useState('')
 
   const [items, setItems] = useState<B2BOrderLineItem[]>(() => [emptyItem()])
 
-  const [addressMode, setAddressMode] = useState<B2BAddressMode>('saved')
-  const [selectedAddressId, setSelectedAddressId] = useState('')
   const [governorateId, setGovernorateIdState] = useState('')
   const [districtId, setDistrictId] = useState('')
   const [addressLine, setAddressLine] = useState('')
@@ -73,15 +64,9 @@ export function useB2BOrderDrawer({ open, onCreated }: UseB2BOrderDrawerOptions)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const customerRequestId = useRef(0)
-
   const reset = useCallback(() => {
-    setCustomerQuery('')
-    setCustomerResults([])
-    setSelectedCustomer(null)
+    setCustomerName('')
     setItems([emptyItem()])
-    setAddressMode('saved')
-    setSelectedAddressId('')
     setGovernorateIdState('')
     setDistrictId('')
     setAddressLine('')
@@ -99,7 +84,7 @@ export function useB2BOrderDrawer({ open, onCreated }: UseB2BOrderDrawerOptions)
     if (!open) reset()
   }, [open, reset])
 
-  // Load governorates for the manual-address mode once the drawer opens.
+  // Load governorates once the drawer opens.
   useEffect(() => {
     if (!open) return
     let cancelled = false
@@ -111,52 +96,13 @@ export function useB2BOrderDrawer({ open, onCreated }: UseB2BOrderDrawerOptions)
         const response = await getShippingGovernorates(defaultCountry._id)
         if (!cancelled) setGovernorates(response.data ?? [])
       } catch {
-        // Manual address mode simply shows no governorate options.
+        // Address fields simply show no governorate options.
       }
     })()
     return () => {
       cancelled = true
     }
   }, [open])
-
-  useEffect(() => {
-    const keyword = customerQuery.trim()
-    if (!keyword) {
-      setCustomerResults([])
-      setCustomerSearching(false)
-      return
-    }
-    const requestId = ++customerRequestId.current
-    setCustomerSearching(true)
-    const handle = window.setTimeout(() => {
-      void (async () => {
-        try {
-          const response = await getAdminCustomers({ keyword, role: 'user', limit: 8 })
-          if (requestId !== customerRequestId.current) return
-          setCustomerResults(response.data ?? [])
-        } catch {
-          if (requestId !== customerRequestId.current) return
-          setCustomerResults([])
-        } finally {
-          if (requestId === customerRequestId.current) setCustomerSearching(false)
-        }
-      })()
-    }, 300)
-    return () => window.clearTimeout(handle)
-  }, [customerQuery])
-
-  const selectCustomer = useCallback((customer: ApiAdminCustomer) => {
-    setSelectedCustomer(customer)
-    setCustomerQuery('')
-    setCustomerResults([])
-    setSelectedAddressId(customer.addresses?.find((a) => a.isDefault)?._id ?? '')
-    setErrors((previous) => ({ ...previous, customer: undefined }))
-  }, [])
-
-  const clearCustomer = useCallback(() => {
-    setSelectedCustomer(null)
-    setSelectedAddressId('')
-  }, [])
 
   const setGovernorateId = useCallback((value: string) => {
     setGovernorateIdState(value)
@@ -229,21 +175,15 @@ export function useB2BOrderDrawer({ open, onCreated }: UseB2BOrderDrawerOptions)
     )
   }, [])
 
-  const savedAddresses = useMemo(
-    () => selectedCustomer?.addresses ?? [],
-    [selectedCustomer],
-  )
-
   const submit = useCallback(async () => {
+    const trimmedName = customerName.trim()
     const nextErrors: B2BOrderFormErrors = {}
-    if (!selectedCustomer) nextErrors.customer = 'customerRequired'
+    if (trimmedName.length < 2) nextErrors.customer = 'customerRequired'
 
     if (items.length === 0) nextErrors.items = 'itemsRequired'
     else if (items.some((item) => !item.productId)) nextErrors.items = 'productRequired'
 
-    if (addressMode === 'saved') {
-      if (!selectedAddressId) nextErrors.address = 'addressRequired'
-    } else if (!governorateId || addressLine.trim().length < 6) {
+    if (!governorateId || addressLine.trim().length < 6) {
       nextErrors.address = 'addressRequired'
     }
 
@@ -254,19 +194,15 @@ export function useB2BOrderDrawer({ open, onCreated }: UseB2BOrderDrawerOptions)
     setSubmitError(null)
     try {
       const payload = {
-        userId: selectedCustomer!._id,
+        customerName: trimmedName,
         items: items.map((item) => ({
           productId: item.productId!,
           quantity: Math.max(1, Number.parseInt(item.quantity, 10) || 1),
           ...(item.unitPrice.trim() ? { unitPrice: Number.parseFloat(item.unitPrice) } : {}),
         })),
-        ...(addressMode === 'saved'
-          ? { addressId: selectedAddressId }
-          : {
-              governorateId,
-              ...(districtId ? { districtId } : {}),
-              addressLine: addressLine.trim(),
-            }),
+        governorateId,
+        ...(districtId ? { districtId } : {}),
+        addressLine: addressLine.trim(),
         ...(couponCode.trim() ? { couponCode: couponCode.trim() } : {}),
         ...(freeShipping ? { freeShipping: true } : {}),
         paymentMethod: 'cod' as const,
@@ -287,26 +223,19 @@ export function useB2BOrderDrawer({ open, onCreated }: UseB2BOrderDrawerOptions)
     }
   }, [
     addressLine,
-    addressMode,
     couponCode,
+    customerName,
     districtId,
     freeShipping,
     governorateId,
     items,
     markPaid,
     onCreated,
-    selectedAddressId,
-    selectedCustomer,
   ])
 
   return {
-    customerQuery,
-    setCustomerQuery,
-    customerResults,
-    customerSearching,
-    selectedCustomer,
-    selectCustomer,
-    clearCustomer,
+    customerName,
+    setCustomerName,
 
     items,
     addItem,
@@ -315,11 +244,6 @@ export function useB2BOrderDrawer({ open, onCreated }: UseB2BOrderDrawerOptions)
     updateItemQuantity,
     updateItemUnitPrice,
 
-    addressMode,
-    setAddressMode,
-    savedAddresses,
-    selectedAddressId,
-    setSelectedAddressId,
     governorates,
     districts,
     hasDistricts,

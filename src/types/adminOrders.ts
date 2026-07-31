@@ -116,6 +116,8 @@ export interface ApiAdminOrder {
         phone?: string
       }
     | null
+  /** Free-text name for B2B orders not linked to a User. */
+  customerName?: string | null
   items?: ApiAdminOrderItem[]
   itemCount?: number
   shippingAddress?: ApiAdminOrderShippingAddress
@@ -194,12 +196,11 @@ export interface AdminB2BOrderItem {
 
 /** POST /api/v1/orders/b2b request body. */
 export interface AdminB2BOrderPayload {
-  userId: string
+  customerName: string
   items: AdminB2BOrderItem[]
-  addressId?: string
-  governorateId?: string
+  governorateId: string
   districtId?: string
-  addressLine?: string
+  addressLine: string
   couponCode?: string
   freeShipping?: boolean
   paymentMethod: 'cod'

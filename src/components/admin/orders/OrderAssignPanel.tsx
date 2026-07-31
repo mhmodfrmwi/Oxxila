@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import {
   carrierDisabledReason,
   isBostaCarrier,
+  isInternalCarrier,
+  isKnownCarrier,
   type UseOrderAssignReturn,
 } from '../../../hooks/useOrderAssign'
 import { cn } from '../../../lib/cn'
@@ -177,7 +179,7 @@ export function OrderAssignPanel({ assign, orderStatusLabel }: OrderAssignPanelP
         </div>
       ) : null}
 
-      {assign.form.carrierId && !isBostaCarrier(assign.selectedCarrier) ? (
+      {assign.form.carrierId && isKnownCarrier(assign.selectedCarrier) ? (
         <>
           <div>
             <label className={labelClass} htmlFor={`${formId}-driver-name`}>
@@ -212,20 +214,26 @@ export function OrderAssignPanel({ assign, orderStatusLabel }: OrderAssignPanelP
         </>
       ) : null}
 
-      <div>
-        <label className={labelClass} htmlFor={`${formId}-notes`}>
-          {t('admin.orders.details.assign.notes')}
-        </label>
-        <input
-          id={`${formId}-notes`}
-          type="text"
-          value={assign.form.notes}
-          disabled={assign.submitting}
-          placeholder={t('admin.orders.details.assign.notesPlaceholder')}
-          onChange={(event) => assign.setField('notes', event.target.value)}
-          className={cn(fieldClass, 'mt-2')}
-        />
-      </div>
+      {/* Notes: always for Bosta/known; the only extra field for internal */}
+      {assign.form.carrierId &&
+      (isBostaCarrier(assign.selectedCarrier) ||
+        isKnownCarrier(assign.selectedCarrier) ||
+        isInternalCarrier(assign.selectedCarrier)) ? (
+        <div>
+          <label className={labelClass} htmlFor={`${formId}-notes`}>
+            {t('admin.orders.details.assign.notes')}
+          </label>
+          <input
+            id={`${formId}-notes`}
+            type="text"
+            value={assign.form.notes}
+            disabled={assign.submitting}
+            placeholder={t('admin.orders.details.assign.notesPlaceholder')}
+            onChange={(event) => assign.setField('notes', event.target.value)}
+            className={cn(fieldClass, 'mt-2')}
+          />
+        </div>
+      ) : null}
     </div>
   )
 }

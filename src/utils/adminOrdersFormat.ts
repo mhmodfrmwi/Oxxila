@@ -56,6 +56,7 @@ export function customerInitials(name: string): string {
 function resolveCustomerName(order: ApiAdminOrder): string {
   const user = order.user
   if (user && typeof user === 'object' && user.name?.trim()) return user.name.trim()
+  if (order.customerName?.trim()) return order.customerName.trim()
   return '—'
 }
 

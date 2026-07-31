@@ -298,7 +298,7 @@ export function Select({
         maxWidth: position.width,
         maxHeight: position.maxHeight,
         transform: position.openUp ? 'translateY(-100%)' : undefined,
-        zIndex: 200,
+        zIndex: 400,
         boxSizing: 'border-box',
       }
     : undefined
@@ -322,8 +322,9 @@ export function Select({
             style={menuStyle}
             className={cn(
               'overflow-x-hidden overflow-y-auto outline-none',
-              'admin-glass-strong rounded-[var(--admin-radius-lg)] py-1',
-              'shadow-[0_16px_40px_rgba(0,0,0,0.45)]',
+              // Solid panel — glass was too transparent over form fields underneath
+              'rounded-[var(--admin-radius-lg)] border border-white/15 bg-[#151221] py-1',
+              'shadow-[0_20px_48px_rgba(0,0,0,0.65)]',
               'text-sm text-primary-text',
             )}
           >

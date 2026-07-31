@@ -1,5 +1,5 @@
 // src/components/admin/orders/B2BOrderDrawer.tsx
-import { Loader2, Plus, Search, User, X } from 'lucide-react'
+import { Loader2, Plus, Search, X } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getAdminProducts } from '../../../api/admin/products'
@@ -11,7 +11,6 @@ import {
 import { cn } from '../../../lib/cn'
 import type { ApiAdminOrder } from '../../../types/adminOrders'
 import type { ApiProduct } from '../../../types/catalog'
-import { customerInitials } from '../../../utils/adminOrdersFormat'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { Drawer } from '../ui/Drawer'
 import { Select } from '../ui/Select'
@@ -242,81 +241,22 @@ export function B2BOrderDrawer({ open, onClose, onCreated }: B2BOrderDrawerProps
           </p>
         ) : null}
 
-        {/* Customer */}
+        {/* Customer — free-text name (not linked to a registered User) */}
         <div>
-          <p className={labelClass}>{t('admin.orders.b2b.customer')}</p>
-          {drawer.selectedCustomer ? (
-            <div className="mt-2 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-              <div className="flex min-w-0 items-center gap-3">
-                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[rgba(163,148,255,0.2)] text-xs font-bold text-[#a394ff]">
-                  {customerInitials(drawer.selectedCustomer.name ?? '')}
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-white">
-                    {drawer.selectedCustomer.name}
-                  </p>
-                  <p className="truncate text-xs text-white/40">
-                    {drawer.selectedCustomer.email}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={drawer.clearCustomer}
-                className={cn(
-                  'shrink-0 text-xs font-semibold text-[#a394ff] hover:opacity-80',
-                  focusRingClasses,
-                )}
-              >
-                {t('admin.orders.b2b.changeCustomer')}
-              </button>
-            </div>
-          ) : (
-            <div className="relative mt-2">
-              <Search
-                size={14}
-                className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-white/30"
-                aria-hidden
-              />
-              <input
-                type="text"
-                value={drawer.customerQuery}
-                onChange={(event) => drawer.setCustomerQuery(event.target.value)}
-                placeholder={t('admin.orders.b2b.customerSearchPlaceholder')}
-                className={cn(fieldClass, 'ps-9')}
-              />
-              {drawer.customerQuery.trim() ? (
-                <div className="absolute inset-x-0 top-full z-10 mt-1 max-h-56 overflow-y-auto rounded-xl border border-white/10 bg-[#151221] p-1 shadow-xl">
-                  {drawer.customerSearching ? (
-                    <div className="flex items-center justify-center py-4">
-                      <Loader2 size={14} className="animate-spin text-white/40" aria-hidden />
-                    </div>
-                  ) : drawer.customerResults.length === 0 ? (
-                    <p className="px-3 py-2 text-xs text-white/40">
-                      {t('admin.orders.b2b.customerNotFound')}
-                    </p>
-                  ) : (
-                    drawer.customerResults.map((customer) => (
-                      <button
-                        key={customer._id}
-                        type="button"
-                        onClick={() => drawer.selectCustomer(customer)}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-start text-sm text-white/80 hover:bg-white/10"
-                      >
-                        <User size={13} className="shrink-0 text-white/40" aria-hidden />
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate">{customer.name}</span>
-                          <span className="block truncate text-xs text-white/40">
-                            {customer.email}
-                          </span>
-                        </span>
-                      </button>
-                    ))
-                  )}
-                </div>
-              ) : null}
-            </div>
-          )}
+          <label className={labelClass} htmlFor={`${formId}-customer`}>
+            {t('admin.orders.b2b.customer')}
+          </label>
+          <input
+            id={`${formId}-customer`}
+            type="text"
+            value={drawer.customerName}
+            onChange={(event) => drawer.setCustomerName(event.target.value)}
+            placeholder={t('admin.orders.b2b.customerNamePlaceholder', {
+              defaultValue: 'Enter customer name...',
+            })}
+            className={cn(fieldClass, 'mt-2')}
+            autoComplete="off"
+          />
           <FieldError message={drawer.errors.customer} />
         </div>
 
@@ -402,104 +342,60 @@ export function B2BOrderDrawer({ open, onClose, onCreated }: B2BOrderDrawerProps
         {/* Address */}
         <div>
           <p className={labelClass}>{t('admin.orders.b2b.address')}</p>
-          <div className="mt-2 flex gap-2">
-            {(['saved', 'manual'] as const).map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => drawer.setAddressMode(mode)}
-                className={cn(
-                  'rounded-full border px-4 py-1.5 text-xs font-medium transition-colors',
-                  focusRingClasses,
-                  drawer.addressMode === mode
-                    ? 'border-[#a394ff]/40 bg-[rgba(163,148,255,0.15)] text-[#a394ff]'
-                    : 'border-white/10 bg-white/5 text-white/50 hover:text-white/80',
-                )}
-              >
-                {t(`admin.orders.b2b.addressMode${mode === 'saved' ? 'Saved' : 'Manual'}`)}
-              </button>
-            ))}
-          </div>
-
-          {drawer.addressMode === 'saved' ? (
-            <div className="mt-3">
-              {!drawer.selectedCustomer ? (
-                <p className="text-xs text-white/40">{t('admin.orders.b2b.selectCustomerFirst')}</p>
-              ) : drawer.savedAddresses.length === 0 ? (
-                <p className="text-xs text-white/40">{t('admin.orders.b2b.savedAddressEmpty')}</p>
-              ) : (
+          <div className="mt-3 flex flex-col gap-3">
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="text-[8px] uppercase text-white/30">
+                  {t('admin.orders.b2b.governorate')}
+                </label>
                 <Select
-                  value={drawer.selectedAddressId}
-                  onValueChange={(next) => drawer.setSelectedAddressId(next)}
-                  placeholder={t('admin.orders.b2b.savedAddress')}
+                  value={drawer.governorateId}
+                  onValueChange={(next) => drawer.setGovernorateId(next)}
+                  triggerClassName="mt-1"
+                  placeholder={t('admin.orders.b2b.governoratePlaceholder')}
                   options={[
-                    { value: '', label: t('admin.orders.b2b.savedAddress') },
-                    ...drawer.savedAddresses.map((address) => ({
-                      value: address._id ?? '',
-                      label: [address.label, address.governorate?.name, address.district?.name, address.addressLine]
-                        .filter(Boolean)
-                        .join(' • '),
+                    { value: '', label: t('admin.orders.b2b.governoratePlaceholder') },
+                    ...drawer.governorates.map((gov) => ({
+                      value: gov._id,
+                      label: gov.name,
                     })),
                   ]}
                 />
-              )}
-            </div>
-          ) : (
-            <div className="mt-3 flex flex-col gap-3">
-              <div className="flex gap-3">
+              </div>
+              {drawer.hasDistricts ? (
                 <div className="flex-1">
                   <label className="text-[8px] uppercase text-white/30">
-                    {t('admin.orders.b2b.governorate')}
+                    {t('admin.orders.b2b.district')}
                   </label>
                   <Select
-                    value={drawer.governorateId}
-                    onValueChange={(next) => drawer.setGovernorateId(next)}
+                    value={drawer.districtId}
+                    disabled={!drawer.governorateId || drawer.zonesLoading}
+                    onValueChange={(next) => drawer.setDistrictId(next)}
                     triggerClassName="mt-1"
-                    placeholder={t('admin.orders.b2b.governoratePlaceholder')}
+                    placeholder={t('admin.orders.b2b.districtPlaceholder')}
                     options={[
-                      { value: '', label: t('admin.orders.b2b.governoratePlaceholder') },
-                      ...drawer.governorates.map((gov) => ({
-                        value: gov._id,
-                        label: gov.name,
+                      { value: '', label: t('admin.orders.b2b.districtPlaceholder') },
+                      ...drawer.districts.map((district) => ({
+                        value: district._id,
+                        label: district.name,
                       })),
                     ]}
                   />
                 </div>
-                {drawer.hasDistricts ? (
-                  <div className="flex-1">
-                    <label className="text-[8px] uppercase text-white/30">
-                      {t('admin.orders.b2b.district')}
-                    </label>
-                    <Select
-                      value={drawer.districtId}
-                      disabled={!drawer.governorateId || drawer.zonesLoading}
-                      onValueChange={(next) => drawer.setDistrictId(next)}
-                      triggerClassName="mt-1"
-                      placeholder={t('admin.orders.b2b.districtPlaceholder')}
-                      options={[
-                        { value: '', label: t('admin.orders.b2b.districtPlaceholder') },
-                        ...drawer.districts.map((district) => ({
-                          value: district._id,
-                          label: district.name,
-                        })),
-                      ]}
-                    />
-                  </div>
-                ) : null}
-              </div>
-              <div>
-                <label className="text-[8px] uppercase text-white/30">
-                  {t('admin.orders.b2b.addressLine')}
-                </label>
-                <textarea
-                  value={drawer.addressLine}
-                  onChange={(event) => drawer.setAddressLine(event.target.value)}
-                  rows={2}
-                  className={cn(fieldClass, 'mt-1 resize-none')}
-                />
-              </div>
+              ) : null}
             </div>
-          )}
+            <div>
+              <label className="text-[8px] uppercase text-white/30">
+                {t('admin.orders.b2b.addressLine')}
+              </label>
+              <textarea
+                value={drawer.addressLine}
+                onChange={(event) => drawer.setAddressLine(event.target.value)}
+                rows={2}
+                className={cn(fieldClass, 'mt-1 resize-none')}
+              />
+            </div>
+          </div>
           <FieldError message={drawer.errors.address} />
         </div>
 

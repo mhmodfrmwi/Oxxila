@@ -52,6 +52,15 @@ export function isBostaCarrier(carrier: ApiAdminAssignCarrier | null): boolean {
   return carrier?.type === 'api' && carrier.apiProvider === 'bosta'
 }
 
+export function isInternalCarrier(carrier: ApiAdminAssignCarrier | null): boolean {
+  return carrier?.type === 'internal'
+}
+
+/** Known external courier (manual driver fields) — not Bosta and not internal fleet. */
+export function isKnownCarrier(carrier: ApiAdminAssignCarrier | null): boolean {
+  return carrier?.type === 'known'
+}
+
 /** Why a carrier radio is disabled — matches the contract's coverage/pickup/district rules. */
 export function carrierDisabledReason(
   carrier: ApiAdminAssignCarrier,
@@ -172,11 +181,13 @@ export function useOrderAssign({ open, orderId, onOrderUpdated }: UseOrderAssign
     if (!orderId) return false
     const carrier = carriers.find((c) => c._id === form.carrierId) ?? null
     const isBosta = isBostaCarrier(carrier)
+    const isInternal = isInternalCarrier(carrier)
+    const isKnown = isKnownCarrier(carrier)
 
     const errors: AssignFormErrors = {}
     if (!form.carrierId) errors.carrierId = 'carrierRequired'
     else if (isBosta && !form.pickupId) errors.pickupId = 'pickupRequired'
-    else if (!isBosta) {
+    else if (isKnown) {
       if (!form.driverName.trim()) errors.driverName = 'driverNameRequired'
       if (!form.driverPhone.trim()) errors.driverPhone = 'driverPhoneRequired'
     }
@@ -186,23 +197,33 @@ export function useOrderAssign({ open, orderId, onOrderUpdated }: UseOrderAssign
     setSubmitting(true)
     setSubmitError(null)
     try {
-      const body: AdminAssignShippingBody = isBosta
-        ? {
-            carrierId: form.carrierId,
-            pickupId: form.pickupId,
-            size: form.size,
-            notes: form.notes.trim() || undefined,
-            markShipped: true,
-          }
-        : {
-            carrierId: form.carrierId,
-            driverName: form.driverName.trim(),
-            driverPhone: form.driverPhone.trim(),
-            trackingNumber: form.trackingNumber.trim() || undefined,
-            notes: form.notes.trim() || undefined,
-            size: form.size,
-            markShipped: true,
-          }
+      let body: AdminAssignShippingBody
+      if (isBosta) {
+        body = {
+          carrierId: form.carrierId,
+          pickupId: form.pickupId,
+          size: form.size,
+          notes: form.notes.trim() || undefined,
+          markShipped: true,
+        }
+      } else if (isInternal) {
+        body = {
+          carrierId: form.carrierId,
+          notes: form.notes.trim() || undefined,
+          size: form.size,
+          markShipped: true,
+        }
+      } else {
+        body = {
+          carrierId: form.carrierId,
+          driverName: form.driverName.trim(),
+          driverPhone: form.driverPhone.trim(),
+          trackingNumber: form.trackingNumber.trim() || undefined,
+          notes: form.notes.trim() || undefined,
+          size: form.size,
+          markShipped: true,
+        }
+      }
 
       const response = await assignAdminOrderShipping(orderId, body)
       const data = response.data

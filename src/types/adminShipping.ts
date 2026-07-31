@@ -334,6 +334,13 @@ export type AdminAssignShippingBody =
       markShipped?: boolean
     }
   | {
+      /** Internal fleet — notes only, no driver fields. */
+      carrierId: string
+      notes?: string
+      size: AdminShippingPackageSize
+      markShipped?: boolean
+    }
+  | {
       carrierId: string
       driverName: string
       driverPhone: string
