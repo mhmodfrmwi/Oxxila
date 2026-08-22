@@ -1,15 +1,25 @@
+// src/components/landing/contact/ContactInfoCard.tsx
 import { motion } from 'framer-motion'
-import type { LucideIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 interface ContactInfoCardProps {
-  icon: LucideIcon
+  icon: ReactNode
   label: string
   value: string
   href?: string
   delay?: number
+  /** Open WhatsApp / external links in a new tab when set. */
+  external?: boolean
 }
 
-export function ContactInfoCard({ icon: Icon, label, value, href, delay = 0 }: ContactInfoCardProps) {
+export function ContactInfoCard({
+  icon,
+  label,
+  value,
+  href,
+  delay = 0,
+  external = false,
+}: ContactInfoCardProps) {
   const content = (
     <>
       <span
@@ -20,7 +30,7 @@ export function ContactInfoCard({ icon: Icon, label, value, href, delay = 0 }: C
         ].join(' ')}
         aria-hidden
       >
-        <Icon size={20} strokeWidth={1.5} />
+        {icon}
       </span>
       <span className="min-w-0 text-left">
         <span className="block text-sm font-medium text-accent-soft">{label}</span>
@@ -42,7 +52,13 @@ export function ContactInfoCard({ icon: Icon, label, value, href, delay = 0 }: C
       transition={{ duration: 0.45, delay }}
     >
       {href ? (
-        <a href={href} className={className}>
+        <a
+          href={href}
+          className={className}
+          {...(external
+            ? { target: '_blank', rel: 'noopener noreferrer' }
+            : {})}
+        >
           {content}
         </a>
       ) : (

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   archiveProduct,
   createProduct,
+  deleteProduct as apiDeleteProduct,
   getAdminProduct,
   updateProduct,
 } from '../api/admin/products'
@@ -50,6 +51,7 @@ interface UseFormulaSpecsDrawerOptions {
   productId: string | null
   onSaved: (product: ApiProduct) => void
   onArchived: (productId: string) => void
+  onDeleted: (productId: string) => void
 }
 
 function productToForm(product: ApiProduct): AdminProductFormValues {
@@ -104,6 +106,7 @@ export function useFormulaSpecsDrawer({
   productId,
   onSaved,
   onArchived,
+  onDeleted,
 }: UseFormulaSpecsDrawerOptions) {
   const [values, setValues] = useState<AdminProductFormValues>(emptyAdminProductForm)
   const [baseline, setBaseline] = useState('')
@@ -118,6 +121,7 @@ export function useFormulaSpecsDrawer({
   const [loadError, setLoadError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [archiving, setArchiving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const snapshot = useCallback(
     (
@@ -438,6 +442,26 @@ export function useFormulaSpecsDrawer({
     }
   }, [productId, mode, onArchived])
 
+  const deleteProduct = useCallback(async () => {
+    if (!productId || mode !== 'edit') {
+      return { ok: false as const, message: 'Nothing to delete.' }
+    }
+    setDeleting(true)
+    try {
+      await apiDeleteProduct(productId)
+      onDeleted(productId)
+      return { ok: true as const }
+    } catch (error) {
+      return {
+        ok: false as const,
+        message:
+          error instanceof ApiError ? error.message : 'Unable to delete formulation.',
+      }
+    } finally {
+      setDeleting(false)
+    }
+  }, [productId, mode, onDeleted])
+
   const imageSlotsUsed = existingImages.length + newImages.length
   const canUploadMore = imageSlotsUsed < ADMIN_PRODUCT_IMAGES_MAX
 
@@ -454,6 +478,7 @@ export function useFormulaSpecsDrawer({
     loadError,
     submitting,
     archiving,
+    deleting,
     dirty,
     imageSlotsUsed,
     canUploadMore,
@@ -466,5 +491,6 @@ export function useFormulaSpecsDrawer({
     clearCatalog,
     save,
     archive,
+    deleteProduct,
   }
 }

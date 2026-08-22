@@ -31,7 +31,10 @@ export function useBrowsingHistory(limit = 6) {
 
         const mapped = (response.data ?? [])
           .map((entry) => entry.product)
-          .filter(Boolean)
+          .filter(
+            (product): product is NonNullable<typeof product> =>
+              Boolean(product) && product.isActive !== false,
+          )
           .slice(0, limit)
           .map(mapApiProductToRecommendedProduct)
 

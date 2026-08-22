@@ -39,6 +39,7 @@ interface FormulaSpecsDrawerProps {
   onClose: () => void
   onSaved: (product: ApiProduct) => void
   onArchived: (productId: string) => void
+  onDeleted: (productId: string) => void
 }
 
 function LocalImagePreview({ file }: { file: File }) {
@@ -68,6 +69,7 @@ export function FormulaSpecsDrawer({
   onClose,
   onSaved,
   onArchived,
+  onDeleted,
 }: FormulaSpecsDrawerProps) {
   const { t } = useTranslation()
   const toast = useToast()
@@ -75,6 +77,7 @@ export function FormulaSpecsDrawer({
   const tabsId = useId()
   const [discardOpen, setDiscardOpen] = useState(false)
   const [archiveOpen, setArchiveOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<FormulaSpecsTab>('details')
 
   const drawer = useFormulaSpecsDrawer({
@@ -92,6 +95,10 @@ export function FormulaSpecsDrawer({
     onArchived: (id) => {
       toast.success(t('admin.products.formula.archiveSuccess'))
       onArchived(id)
+    },
+    onDeleted: (id) => {
+      toast.success(t('admin.products.formula.deleteSuccess'))
+      onDeleted(id)
     },
   })
 
@@ -121,7 +128,7 @@ export function FormulaSpecsDrawer({
   }, [drawer.values.category, drawer.values.subCategory, subcategories, subLoading])
 
   const requestClose = useCallback(() => {
-    if (drawer.submitting || drawer.archiving || faqs.submitting) return
+    if (drawer.submitting || drawer.archiving || drawer.deleting || faqs.submitting) return
     const faqDirty = Boolean(faqs.question.trim() || faqs.answer.trim())
     if (drawer.dirty || faqDirty) {
       setDiscardOpen(true)
@@ -131,6 +138,7 @@ export function FormulaSpecsDrawer({
   }, [
     drawer.submitting,
     drawer.archiving,
+    drawer.deleting,
     drawer.dirty,
     faqs.submitting,
     faqs.question,
@@ -139,9 +147,9 @@ export function FormulaSpecsDrawer({
   ])
 
   const handleDrawerClose = useCallback(() => {
-    if (discardOpen || archiveOpen) return
+    if (discardOpen || archiveOpen || deleteOpen) return
     requestClose()
-  }, [discardOpen, archiveOpen, requestClose])
+  }, [discardOpen, archiveOpen, deleteOpen, requestClose])
 
   const handleSave = async () => {
     const result = await drawer.save()
@@ -158,6 +166,14 @@ export function FormulaSpecsDrawer({
     }
   }
 
+  const handleDelete = async () => {
+    const result = await drawer.deleteProduct()
+    setDeleteOpen(false)
+    if (!result.ok) {
+      toast.error(t('admin.products.formula.deleteFailed'), result.message)
+    }
+  }
+
   const title = t('admin.products.formula.title')
   const description =
     mode === 'edit' && drawer.slug
@@ -166,7 +182,7 @@ export function FormulaSpecsDrawer({
         ? t('admin.products.formula.refNew')
         : t('admin.products.formula.refUnavailable')
 
-  const busy = drawer.submitting || drawer.archiving || faqs.submitting
+  const busy = drawer.submitting || drawer.archiving || drawer.deleting || faqs.submitting
   const showDetailsFooter = activeTab === 'details' && !drawer.loadError
   const showFaqFooter = activeTab === 'faq' && !drawer.loadError && faqs.canCreate
 
@@ -198,19 +214,34 @@ export function FormulaSpecsDrawer({
           showDetailsFooter ? (
             <div className="flex items-center gap-3">
               {mode === 'edit' ? (
-                <button
-                  type="button"
-                  disabled={busy || drawer.loadingProduct}
-                  onClick={() => setArchiveOpen(true)}
-                  className={cn(
-                    'min-h-11 flex-1 rounded-xl border border-border-subtle bg-white/5 px-4',
-                    'text-xs font-bold uppercase tracking-[0.12em] text-primary-text',
-                    'hover:bg-white/10 disabled:pointer-events-none disabled:opacity-50',
-                    focusRingClasses,
-                  )}
-                >
-                  {t('admin.products.formula.archive')}
-                </button>
+                <div className="flex min-w-0 flex-1 items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={busy || drawer.loadingProduct}
+                    onClick={() => setArchiveOpen(true)}
+                    className={cn(
+                      'min-h-11 min-w-0 flex-1 rounded-xl border border-border-subtle bg-white/5 px-3',
+                      'text-xs font-bold uppercase tracking-[0.12em] text-primary-text',
+                      'hover:bg-white/10 disabled:pointer-events-none disabled:opacity-50',
+                      focusRingClasses,
+                    )}
+                  >
+                    {t('admin.products.formula.archive')}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy || drawer.loadingProduct}
+                    onClick={() => setDeleteOpen(true)}
+                    className={cn(
+                      'min-h-11 min-w-0 flex-1 rounded-xl border border-support-error/40 bg-support-error/10 px-3',
+                      'text-xs font-bold uppercase tracking-[0.12em] text-support-error',
+                      'hover:bg-support-error/15 disabled:pointer-events-none disabled:opacity-50',
+                      focusRingClasses,
+                    )}
+                  >
+                    {t('admin.products.formula.delete')}
+                  </button>
+                </div>
               ) : (
                 <div className="flex-1" />
               )}
@@ -795,6 +826,41 @@ export function FormulaSpecsDrawer({
       >
         <p className="text-sm text-secondary-text">
           {t('admin.products.formula.archiveBody')}
+        </p>
+      </Dialog>
+
+      <Dialog
+        open={deleteOpen}
+        title={t('admin.products.formula.deleteTitle')}
+        description={t('admin.products.formula.deleteDescription')}
+        onClose={() => setDeleteOpen(false)}
+        size="sm"
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="ghost" onClick={() => setDeleteOpen(false)}>
+              {t('admin.products.formula.cancel')}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={drawer.deleting}
+              className="border-support-error/40 text-support-error hover:bg-support-error/10"
+              onClick={() => void handleDelete()}
+            >
+              {drawer.deleting ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 size={11} className="animate-spin" aria-hidden />
+                  {t('admin.products.formula.deleting')}
+                </span>
+              ) : (
+                t('admin.products.formula.deleteConfirm')
+              )}
+            </Button>
+          </div>
+        }
+      >
+        <p className="text-sm text-secondary-text">
+          {t('admin.products.formula.deleteBody')}
         </p>
       </Dialog>
     </>

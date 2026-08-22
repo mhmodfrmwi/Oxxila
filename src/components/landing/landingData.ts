@@ -21,8 +21,18 @@ export const HERO_LEFT_BLOB_PATH =
 export const contactInfo = [
   { id: 'call', label: 'Call', value: '080 152 111 55 17', href: 'tel:0801521115517' },
   { id: 'email', label: 'Email', value: 'contact@oxilla.com', href: 'mailto:contact@oxilla.com' },
-  { id: 'location', label: 'Location', value: 'Texas, USA', href: undefined },
+  { id: 'whatsapp', label: 'WhatsApp', value: '', href: undefined as string | undefined },
+  { id: 'location', label: 'Location', value: 'Texas, USA', href: undefined as string | undefined },
 ] as const
+
+export type ContactInfoId = (typeof contactInfo)[number]['id']
+
+export type ContactInfoItem = {
+  id: ContactInfoId
+  label: string
+  value: string
+  href?: string
+}
 
 export const footerInstagramImages = [
   { id: 'ig-1', src: ctaProduct1, alt: 'Skincare product on vanity' },

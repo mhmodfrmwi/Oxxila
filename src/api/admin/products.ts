@@ -235,6 +235,14 @@ export function archiveProduct(id: string) {
   })
 }
 
+/** Hard-delete product record (admin). */
+export function deleteProduct(id: string) {
+  return apiRequest<null>(`/products/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    auth: true,
+  })
+}
+
 /** PATCH /api/v1/products/:id/best-seller — flips `isBestSeller` on the server. */
 export function toggleAdminProductBestSeller(id: string) {
   return apiRequest<{ isBestSeller: boolean }>(

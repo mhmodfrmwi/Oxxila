@@ -62,6 +62,11 @@ export function AdminProductsPage() {
     catalog.reload()
   }, [catalog, closeDrawer])
 
+  const handleDeleted = useCallback(() => {
+    closeDrawer()
+    catalog.reload()
+  }, [catalog, closeDrawer])
+
   const failed = Boolean(catalog.error) && !catalog.loading && catalog.products.length === 0
   const staleError = Boolean(catalog.error) && catalog.products.length > 0
   const currentPage = catalog.pagination?.currentPage ?? catalog.filters.page
@@ -170,6 +175,7 @@ export function AdminProductsPage() {
         onClose={closeDrawer}
         onSaved={handleSaved}
         onArchived={handleArchived}
+        onDeleted={handleDeleted}
       />
     </>
   )

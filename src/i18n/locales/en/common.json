@@ -240,7 +240,8 @@
       "unavailable": "Messaging is temporarily unavailable. Please reach us by phone or email below.",
       "call": "Call",
       "emailLabel": "Email",
-      "location": "Location"
+      "location": "Location",
+      "whatsapp": "WhatsApp"
     }
   },
   "categoryFilters": {
@@ -1672,16 +1673,20 @@
         "viewCatalog": "View current catalog",
         "removeCatalog": "Remove catalog",
         "archive": "Archive",
+        "delete": "Delete",
         "save": "Save Formulation",
         "saving": "Saving…",
         "archiving": "Archiving…",
+        "deleting": "Deleting…",
         "close": "Close",
         "cancel": "Cancel",
         "createSuccess": "Formulation created",
         "updateSuccess": "Formulation saved",
         "archiveSuccess": "Formulation archived",
+        "deleteSuccess": "Formulation deleted",
         "saveFailed": "Unable to save formulation",
         "archiveFailed": "Unable to archive formulation",
+        "deleteFailed": "Unable to delete formulation",
         "discardTitle": "Discard unsaved changes?",
         "discardDescription": "Unsaved changes will be lost.",
         "discardBody": "Close the drawer without saving your edits?",
@@ -1691,6 +1696,10 @@
         "archiveDescription": "This hides the product from the active catalog.",
         "archiveBody": "Archived formulas are set inactive and leave the Products list.",
         "archiveConfirm": "Archive",
+        "deleteTitle": "Delete formulation?",
+        "deleteDescription": "This permanently removes the product.",
+        "deleteBody": "Deleted formulas cannot be recovered. Prefer Archive if you only want to hide them from the catalog.",
+        "deleteConfirm": "Delete",
         "tabsAria": "Formula specs sections",
         "tabs": {
           "details": "Details",
