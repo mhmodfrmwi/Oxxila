@@ -41,7 +41,7 @@
 .checkout-stepper-step--complete .checkout-stepper-index {
   border-color: var(--primary-button);
   background: var(--primary-button);
-  color: var(--on-emphasis);
+  color: var(--icon-on-color);
 }
 
 .checkout-stepper-divider {

@@ -7,7 +7,9 @@ import { ACCOUNT_SIDEBAR_NAV } from '../../config/accountNav'
 import { HOME_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
+import { useGiftCards } from '../../hooks/useGiftCards'
 import { cn } from '../../lib/cn'
+import { formatCartPrice } from '../../utils/formatProductPrice'
 import { focusRingClasses } from '../ui/interactionStyles'
 import { UserAvatar } from './UserAvatar'
 
@@ -46,6 +48,7 @@ export function AccountSidebar({
   const navigate = useNavigate()
   const { logout } = useAuth()
   const toast = useToast()
+  const { balance, loading: giftCardsLoading } = useGiftCards()
   const [loggingOut, setLoggingOut] = useState(false)
 
   async function handleLogout() {
@@ -63,9 +66,12 @@ export function AccountSidebar({
     }
   }
 
+  const creditBadge =
+    balance % 1 === 0 ? String(balance) : balance.toFixed(0)
+
   const itemClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'block rounded-xl px-4 py-3 text-sm font-medium transition-colors',
+      'flex items-center justify-between gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-colors',
       focusRingClasses,
       isActive
         ? 'bg-button-primary text-on-emphasis'
@@ -99,7 +105,17 @@ export function AccountSidebar({
           {navItems.map((item) => (
             <li key={item.id}>
               <NavLink to={item.to} end={item.end} className={itemClass}>
-                {t(item.labelKey)}
+                <span>{t(item.labelKey)}</span>
+                {item.id === 'giftCards' ? (
+                  <span
+                    className="shrink-0 rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold tabular-nums text-accent"
+                    aria-label={t('nav.dropdown.storeCredit', {
+                      balance: formatCartPrice(balance),
+                    })}
+                  >
+                    {giftCardsLoading ? '…' : creditBadge}
+                  </span>
+                ) : null}
               </NavLink>
             </li>
           ))}

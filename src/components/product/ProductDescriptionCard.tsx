@@ -57,39 +57,41 @@ export function ProductDescriptionCard({
     <article
       className={cn('product-detail-description-card flex min-w-0 flex-col', className)}
     >
-      <div
-        className="product-detail-description-tabs"
-        role="tablist"
-        aria-label={t('productDetail.tabs.ariaLabel')}
-      >
-        {TAB_IDS.map((tabId) => {
-          const tabButtonId = `product-tab-${tabId}`
-          const panelId = `product-panel-${tabId}`
-          return (
-            <button
-              key={tabId}
-              id={tabButtonId}
-              type="button"
-              role="tab"
-              aria-selected={activeTab === tabId}
-              aria-controls={panelId}
-              onClick={() => setActiveTab(tabId)}
-              className={cn('product-detail-tab', focusRingClasses)}
-              data-active={activeTab === tabId ? 'true' : 'false'}
-            >
-              {t(`productDetail.tabs.${tabId}`)}
-            </button>
-          )
-        })}
-      </div>
+      <div className="product-detail-description-shell" data-active-tab={activeTab}>
+        <div
+          className="product-detail-description-tabs"
+          role="tablist"
+          aria-label={t('productDetail.tabs.ariaLabel')}
+        >
+          {TAB_IDS.map((tabId) => {
+            const tabButtonId = `product-tab-${tabId}`
+            const panelId = `product-panel-${tabId}`
+            return (
+              <button
+                key={tabId}
+                id={tabButtonId}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tabId}
+                aria-controls={panelId}
+                onClick={() => setActiveTab(tabId)}
+                className={cn('product-detail-tab', focusRingClasses)}
+                data-active={activeTab === tabId ? 'true' : 'false'}
+              >
+                {t(`productDetail.tabs.${tabId}`)}
+              </button>
+            )
+          })}
+        </div>
 
-      <div
-        id={`product-panel-${activeTab}`}
-        className="product-detail-description-panel"
-        role="tabpanel"
-        aria-labelledby={`product-tab-${activeTab}`}
-      >
-        {tabContent[activeTab]}
+        <div
+          id={`product-panel-${activeTab}`}
+          className="product-detail-description-panel"
+          role="tabpanel"
+          aria-labelledby={`product-tab-${activeTab}`}
+        >
+          {tabContent[activeTab]}
+        </div>
       </div>
     </article>
   )

@@ -60,6 +60,8 @@
     "subscribing": "Subscribing...",
     "subscribed": "Subscribed",
     "newsletterUnavailable": "Newsletter signup is temporarily unavailable.",
+    "followInstagram": "Follow on Instagram",
+    "viewInstagramPost": "View {{alt}} on Instagram",
     "policyLinks": {
       "about": "About Oxxila",
       "quality": "Our Quality Promise",
@@ -67,6 +69,8 @@
       "standards": "Dermatology Standards",
       "terms": "Terms & Conditions",
       "privacy": "Privacy Policy",
+      "refund": "Refund Policy",
+      "shipping": "Shipping Policy",
       "contact": "Contact Us"
     },
     "shoppingLinks": {
@@ -78,6 +82,40 @@
       "shipping": "Shipping & Delivery",
       "returns": "Returns & Refunds",
       "trackOrder": "Track Your Order"
+    }
+  },
+  "giftCards": {
+    "title": "Gift Cards",
+    "description": "Your store credit from COD return refunds. Use it at checkout on your next order.",
+    "balanceLabel": "Available balance",
+    "balanceHint": "Credits from approved COD returns appear here automatically after refund.",
+    "loading": "Loading balance…",
+    "retry": "Try again",
+    "historyTitle": "Activity",
+    "emptyTitle": "No gift card activity yet",
+    "emptyDescription": "When a COD return is refunded as store credit, it will show up here.",
+    "viewReturns": "View my returns",
+    "balanceAfter": "Balance: {{balance}}",
+    "tx": {
+      "codReturnIssued": "COD return refund credited",
+      "orderRedeemed": "Used on order {{orderNumber}}",
+      "creditIssued": "Store credit added",
+      "creditRedeemed": "Store credit used"
+    }
+  },
+  "contentPage": {
+    "eyebrow": "Legal",
+    "errorTitle": "Unable to load page",
+    "errorDescription": "This page could not be loaded. Please try again.",
+    "retry": "Try again",
+    "emptyTitle": "Coming soon",
+    "emptyDescription": "We're preparing this page. Please check back shortly.",
+    "backHome": "Back to home",
+    "titles": {
+      "terms": "Terms & Conditions",
+      "privacy": "Privacy Policy",
+      "refundPolicy": "Refund Policy",
+      "shippingPolicy": "Shipping Policy"
     }
   },
   "about": {
@@ -328,6 +366,8 @@
     "offers": {
       "ariaLabel": "Sale promotions",
       "empty": "No active offers right now.",
+      "emptyTitle": "No active offers right now",
+      "emptyDescription": "Check back soon for exclusive deals and limited-time discounts.",
       "loadError": "Unable to load offers.",
       "specialOffer": "Special Offer",
       "percentOff": "{{percent}}% Off",
@@ -360,7 +400,11 @@
     },
     "ariaLabel": "Product details",
     "notFound": "Product not found.",
+    "notFoundTitle": "Product not found",
+    "notFoundDescription": "This item may have been removed, or the link you followed is outdated.",
     "loadError": "Unable to load product details.",
+    "loadErrorTitle": "Unable to load product",
+    "loadErrorDescription": "Please check your connection and try again in a moment.",
     "perPiece": "/ pcs",
     "percentOff": "{{percent}}% off",
     "offerEnds": "Offer ends {{date}}",
@@ -428,6 +472,8 @@
       "askSpecialist": "Ask a specialist",
       "faqAria": "Product safety questions",
       "empty": "No safety questions available for this product yet.",
+      "emptyTitle": "No safety questions yet",
+      "emptyDescription": "Common questions about clinical use and ingredient interactions will appear here.",
       "askForm": {
         "title": "Ask a specialist",
         "description": "Share your question about clinical use or ingredient interactions. Our team will follow up by email.",
@@ -452,6 +498,8 @@
       "loadMore": "Load more reviews",
       "loadingMore": "Loading reviews…",
       "empty": "No reviews yet.",
+      "emptyTitle": "No reviews yet",
+      "emptyDescription": "Be the first to share your experience with this product.",
       "helpful": "Helpful ({{count}})",
       "delete": "Delete",
       "deleteSuccess": "Review deleted successfully",
@@ -864,6 +912,7 @@
       "myReturns": "My Returns",
       "myAddresses": "My Addresses",
       "changePassword": "Change Password",
+      "giftCards": "Gift Cards",
       "logout": "Logout"
     },
     "fields": {
@@ -1105,6 +1154,7 @@
       "dashboard": "Dashboard",
       "products": "Products",
       "categories": "Categories",
+      "websiteContent": "Website Content",
       "brands": "Brands",
       "subcategories": "Subcategories",
       "faqs": "FAQs",
@@ -1113,7 +1163,46 @@
       "reviews": "Reviews",
       "shipping": "Shipping",
       "returns": "Returns",
-      "settings": "Oxxila Settings"
+      "settings": "Oxxila Settings",
+      "websiteContent": "Website Content"
+    },
+    "permissionDenied": {
+      "title": "Access denied",
+      "description": "You do not have permission to view this admin section."
+    },
+    "roles": {
+      "title": "Permission Roles",
+      "aria": "Permission roles",
+      "addAria": "Add role",
+      "systemBadge": "System",
+      "emptyTitle": "No permission roles",
+      "emptyDescription": "Create roles to control what each admin can access.",
+      "loadErrorTitle": "Unable to load roles",
+      "deleteSuccess": "Role deleted successfully",
+      "deleteError": "Unable to delete role",
+      "editAria": "Edit {{name}}",
+      "deleteAria": "Delete {{name}}",
+      "actions": {
+        "create": "Create",
+        "read": "Read",
+        "update": "Update",
+        "delete": "Delete"
+      },
+      "drawer": {
+        "createTitle": "Create Role",
+        "editTitle": "Edit Role",
+        "subtitle": "Permission matrix",
+        "name": "Role name",
+        "description": "Description",
+        "permissions": "Permissions",
+        "tabColumn": "Module",
+        "systemRoleHint": "System Super Admin permissions cannot be changed.",
+        "save": "Save",
+        "saving": "Saving…",
+        "createSuccess": "Role created successfully",
+        "updateSuccess": "Role updated successfully",
+        "loadErrorTitle": "Unable to load role"
+      }
     },
     "dashboard": {
       "title": "Executive Overview",
@@ -1240,6 +1329,20 @@
         "subcategories": "Subcategories",
         "status": "Status",
         "actions": "Actions"
+      },
+      "tree": {
+        "tableAria": "Categories tree",
+        "showing": "Showing {{showing}} of {{total}} categories",
+        "visible": "Visible",
+        "hidden": "Hidden",
+        "addSubcategory": "Add subcategory",
+        "addSubcategoryAria": "Add subcategory to {{name}}",
+        "showAria": "Show {{name}}",
+        "hideAria": "Hide {{name}}",
+        "showSubcategoryAria": "Show subcategory {{name}}",
+        "hideSubcategoryAria": "Hide subcategory {{name}}",
+        "editSubcategoryAria": "Edit subcategory {{name}}",
+        "deleteSubcategoryAria": "Delete subcategory {{name}}"
       },
       "drawer": {
         "createTitle": "Create Category",
@@ -1646,7 +1749,7 @@
         "sensitivity": "Sensitivity",
         "sensitiveSkin": "Sensitive skin",
         "clinical": "Clinical Configuration",
-        "price": "Retail Unit Price ($)",
+        "price": "Retail Unit Price (EGP)",
         "stock": "In Stock",
         "category": "Category",
         "subCategory": "Sub Category",
@@ -2100,6 +2203,14 @@
         "markReceivedButton": "Mark received",
         "scheduleBostaButton": "Schedule Bosta",
         "refundButton": "Refund",
+        "refundAsGift": {
+          "button": "Refund as Gift Card",
+          "title": "Refund as gift card",
+          "description": "Issue store credit for return {{id}}.",
+          "confirm": "Issue gift card credit",
+          "copy": "This order was paid by cash on delivery. Confirming will issue {{amount}} as store credit to the customer's gift card balance.",
+          "success": "Return refunded as gift card successfully"
+        },
         "approveSuccess": "Return approved successfully",
         "rejectSuccess": "Return rejected",
         "scheduleSuccess": "Bosta pickup scheduled successfully",
@@ -2585,6 +2696,67 @@
         }
       }
     },
+    "websiteContent": {
+      "title": "Website Content",
+      "subtitle": "Manage contact info, social links, landing sections, and legal pages.",
+      "tabsAria": "Website content sections",
+      "tabs": {
+        "contact": "Contact",
+        "social": "Social",
+        "instagram": "Instagram",
+        "howItWorks": "How it works",
+        "contentPages": "Content pages"
+      },
+      "howItWorks": {
+        "title": "How it works",
+        "subtitle": "Landing video section title, thumbnail, and three steps.",
+        "sectionTitle": "Section title",
+        "videoUrl": "Video URL",
+        "thumbnail": "Video thumbnail",
+        "noThumbnail": "No thumbnail",
+        "thumbnailUrl": "Thumbnail URL",
+        "uploadThumbnail": "Upload thumbnail",
+        "stepsHeading": "Steps",
+        "stepLabel": "Step {{number}}",
+        "stepTitle": "Step title",
+        "stepDescription": "Step description",
+        "save": "Save How it works",
+        "saving": "Saving…",
+        "saveSuccess": "How it works settings updated successfully",
+        "saveError": "Unable to save How it works settings"
+      },
+      "contentPages": {
+        "title": "Content pages",
+        "subtitle": "About page sections and policy pages shown in the footer.",
+        "navAria": "Content page list",
+        "draft": "Draft",
+        "sectionsHeading": "About sections",
+        "addSection": "Add section",
+        "noSections": "No sections yet.",
+        "sectionLabel": "Section {{number}}",
+        "removeSection": "Remove section",
+        "noImage": "No image",
+        "sectionKey": "Key",
+        "sectionTitle": "Title",
+        "sectionBody": "Body",
+        "sectionImageUrl": "Image URL",
+        "sectionUpload": "Upload image",
+        "pageTitle": "Page title",
+        "pageContent": "Content",
+        "isPublished": "Published",
+        "save": "Save page",
+        "saving": "Saving…",
+        "saveSuccess": "Content page updated successfully",
+        "saveError": "Unable to save content page",
+        "slugs": {
+          "about": "About",
+          "terms": "Terms & Conditions",
+          "privacy": "Privacy Policy",
+          "refund-policy": "Refund Policy",
+          "shipping-policy": "Shipping Policy"
+        }
+      }
+    },
     "settings": {
       "title": "System Configuration",
       "subtitle": "Manage core infrastructure, payment protocols, and brand aesthetics.",
@@ -2592,6 +2764,48 @@
       "applySoon": "Batch apply is not available in this phase.",
       "loadErrorTitle": "Unable to load section",
       "retry": "Retry",
+      "contact": {
+        "title": "Contact & WhatsApp",
+        "subtitle": "Phone, email, location, and WhatsApp shown on the landing Contact section.",
+        "phone": "Phone",
+        "email": "Email",
+        "location": "Location",
+        "whatsapp": "WhatsApp number",
+        "whatsappPlaceholder": "+20 100 000 0000",
+        "whatsappHint": "Visitors tap the WhatsApp icon to open a chat with this number.",
+        "whatsappPreview": "Opens: {{url}}",
+        "save": "Save contact info",
+        "saving": "Saving…",
+        "saveSuccess": "Contact settings updated successfully",
+        "saveError": "Unable to save contact settings"
+      },
+      "instagram": {
+        "title": "Instagram grid",
+        "subtitle": "Four footer tiles shown under Follow on Instagram.",
+        "slotLabel": "Tile {{number}}",
+        "noImage": "No image",
+        "imageUrl": "Image URL",
+        "upload": "Upload image",
+        "postUrl": "Instagram post URL",
+        "alt": "Alt text",
+        "save": "Save Instagram grid",
+        "saving": "Saving…",
+        "saveSuccess": "Instagram grid updated successfully",
+        "saveError": "Unable to save Instagram grid"
+      },
+      "social": {
+        "title": "Social links",
+        "subtitle": "Footer icon buttons — leave empty to hide a network.",
+        "facebook": "Facebook",
+        "twitter": "X (Twitter)",
+        "instagram": "Instagram profile",
+        "linkedin": "LinkedIn",
+        "youtube": "YouTube",
+        "save": "Save social links",
+        "saving": "Saving…",
+        "saveSuccess": "Social links updated successfully",
+        "saveError": "Unable to save social links"
+      },
       "payments": {
         "title": "Payment Gateways",
         "aria": "Payment gateways",
@@ -2857,6 +3071,7 @@
         "unlock": "Unlock",
         "lockAria": "Lock {{name}}",
         "unlockAria": "Unlock {{name}}",
+        "lastSuperAdminLock": "Cannot disable the last Super Admin",
         "emptyTitle": "No admin roles",
         "emptyDescription": "Admin users will appear here once configured.",
         "loadErrorTitle": "Unable to load admins",
@@ -2869,6 +3084,10 @@
           "password": "Password",
           "adminTitle": "Admin title",
           "adminTitleOptional": "Optional",
+          "adminRole": "Permission role",
+          "adminRoleOptional": "optional",
+          "adminRolePlaceholder": "Select a role",
+          "adminRoleLoading": "Loading roles…",
           "active": "Active",
           "activeHint": "Locked admins cannot sign in.",
           "save": "Save",

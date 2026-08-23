@@ -1,0 +1,66 @@
+/**
+ * Product page — not found / load error states.
+ */
+
+.product-page-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-inline: auto;
+  max-width: 28rem;
+  padding: 4rem 1.5rem 5rem;
+  text-align: center;
+}
+
+.product-page-error-icon {
+  display: flex;
+  height: 4.5rem;
+  width: 4.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: var(--surface-muted);
+  color: var(--primary-button);
+}
+
+.product-page-error-title {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-family-serif, var(--font-family-base));
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+  color: var(--primary-text);
+}
+
+.product-page-error-description {
+  margin: 0;
+  max-width: 22rem;
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: var(--secondary-text);
+}
+
+.product-page-error-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.product-page-error-link {
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25rem;
+  color: var(--primary-link);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.product-page-error-link:hover {
+  color: var(--primary-link-hover, var(--primary-button));
+}

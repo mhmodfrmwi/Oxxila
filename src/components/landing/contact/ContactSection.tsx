@@ -3,6 +3,7 @@ import { Mail, MapPin, Phone } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getContactSettings } from '../../../api/settings'
+import { buildWhatsAppUrl } from '../../../utils/contactSettings'
 import { FadeUp } from '../../ui/FadeUp'
 import { SectionHeader } from '../SectionHeader'
 import {
@@ -66,7 +67,7 @@ export function ContactSection() {
             id: 'whatsapp',
             label: 'WhatsApp',
             value: data.whatsapp || '',
-            href: data.whatsappUrl || undefined,
+            href: buildWhatsAppUrl(data.whatsapp, data.whatsappUrl),
           },
           {
             id: 'location',

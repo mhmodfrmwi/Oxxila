@@ -3,6 +3,7 @@ import { Loader2, MapPin, PackageX, Truck } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAdminReturnDetail } from '../../../hooks/useAdminReturnDetail'
+import { useAdminPermissions } from '../../../hooks/useAdminPermissions'
 import { useReturnActions } from '../../../hooks/useReturnActions'
 import { useToast } from '../../../context/ToastContext'
 import { cn } from '../../../lib/cn'
@@ -139,7 +140,8 @@ export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDet
   const { returnDetail, loading, error, reload } = useAdminReturnDetail({ returnId })
   const [approveOpen, setApproveOpen] = useState(false)
   const [rejectOpen, setRejectOpen] = useState(false)
-  const [refundOpen, setRefundOpen] = useState(false)
+  const [refundGatewayOpen, setRefundGatewayOpen] = useState(false)
+  const [refundGiftOpen, setRefundGiftOpen] = useState(false)
 
   const handleMutated = () => {
     reload()
@@ -406,7 +408,8 @@ export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDet
             onMarkPickedUp={() => void handleMarkPickedUp()}
             onMarkReceived={() => void handleMarkReceived()}
             onScheduleBosta={() => void handleScheduleBosta()}
-            onRefundClick={() => setRefundOpen(true)}
+            onRefundGatewayClick={() => setRefundGatewayOpen(true)}
+            onRefundGiftClick={() => setRefundGiftOpen(true)}
           />
         </div>
       ) : null}
@@ -446,16 +449,34 @@ export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDet
       />
 
       <RefundReturnDialog
-        open={refundOpen}
+        open={refundGatewayOpen}
+        variant="gateway"
         returnShortId={returnDetail?.shortId}
         refundAmount={returnDetail?.refundAmount ?? 0}
         paymentMethod={returnDetail?.orderPaymentMethod ?? null}
         submitting={actions.refundSubmitting}
         error={actions.refundError}
-        onClose={() => setRefundOpen(false)}
+        onClose={() => setRefundGatewayOpen(false)}
         onSubmit={async () => {
           const result = await actions.refundReturn()
           if (result.ok) toast.success(t('admin.returns.actions.refundSuccess'))
+          else if (result.error) toast.error(result.error)
+          return result.ok
+        }}
+      />
+
+      <RefundReturnDialog
+        open={refundGiftOpen}
+        variant="gift"
+        returnShortId={returnDetail?.shortId}
+        refundAmount={returnDetail?.refundAmount ?? 0}
+        paymentMethod="cod"
+        submitting={actions.refundGiftSubmitting}
+        error={actions.refundGiftError}
+        onClose={() => setRefundGiftOpen(false)}
+        onSubmit={async () => {
+          const result = await actions.refundReturnAsGift()
+          if (result.ok) toast.success(t('admin.returns.actions.refundAsGift.success'))
           else if (result.error) toast.error(result.error)
           return result.ok
         }}
@@ -472,7 +493,8 @@ interface ReturnActionsFooterProps {
   onMarkPickedUp: () => void
   onMarkReceived: () => void
   onScheduleBosta: () => void
-  onRefundClick: () => void
+  onRefundGatewayClick: () => void
+  onRefundGiftClick: () => void
 }
 
 /** Status-driven action buttons — business rules live in `getReturnActionAvailability`. */
@@ -484,19 +506,38 @@ function ReturnActionsFooter({
   onMarkPickedUp,
   onMarkReceived,
   onScheduleBosta,
-  onRefundClick,
+  onRefundGatewayClick,
+  onRefundGiftClick,
 }: ReturnActionsFooterProps) {
   const { t } = useTranslation()
-  const { canApprove, canReject, canMarkPickedUp, canMarkReceived, canScheduleBosta, canRefund } =
-    availability
+  const { can } = useAdminPermissions()
+  const canWriteReturns = can('returns', 'update')
+  const {
+    canApprove,
+    canReject,
+    canMarkPickedUp,
+    canMarkReceived,
+    canScheduleBosta,
+    canRefundGateway,
+    canRefundAsGift,
+  } = availability
+
+  const showApprove = canWriteReturns && canApprove
+  const showReject = canWriteReturns && canReject
+  const showMarkPickedUp = canWriteReturns && canMarkPickedUp
+  const showMarkReceived = canWriteReturns && canMarkReceived
+  const showScheduleBosta = canWriteReturns && canScheduleBosta
+  const showRefundGateway = canWriteReturns && canRefundGateway
+  const showRefundAsGift = canWriteReturns && canRefundAsGift
 
   if (
-    !canApprove &&
-    !canReject &&
-    !canMarkPickedUp &&
-    !canMarkReceived &&
-    !canScheduleBosta &&
-    !canRefund
+    !showApprove &&
+    !showReject &&
+    !showMarkPickedUp &&
+    !showMarkReceived &&
+    !showScheduleBosta &&
+    !showRefundGateway &&
+    !showRefundAsGift
   ) {
     return null
   }
@@ -506,12 +547,12 @@ function ReturnActionsFooter({
       className="flex flex-wrap gap-2 border-t border-white/10 pt-4"
       aria-label={t('admin.returns.actions.sectionAria')}
     >
-      {canApprove ? (
+      {showApprove ? (
         <Button type="button" variant="gradient" onClick={onApproveClick}>
           {t('admin.returns.actions.approveButton')}
         </Button>
       ) : null}
-      {canMarkPickedUp ? (
+      {showMarkPickedUp ? (
         <button
           type="button"
           disabled={actions.advanceSubmitting}
@@ -529,7 +570,7 @@ function ReturnActionsFooter({
           {t('admin.returns.actions.markPickedUpButton')}
         </button>
       ) : null}
-      {canMarkReceived ? (
+      {showMarkReceived ? (
         <button
           type="button"
           disabled={actions.advanceSubmitting}
@@ -547,7 +588,7 @@ function ReturnActionsFooter({
           {t('admin.returns.actions.markReceivedButton')}
         </button>
       ) : null}
-      {canScheduleBosta ? (
+      {showScheduleBosta ? (
         <button
           type="button"
           disabled={actions.scheduleSubmitting}
@@ -565,12 +606,17 @@ function ReturnActionsFooter({
           {t('admin.returns.actions.scheduleBostaButton')}
         </button>
       ) : null}
-      {canRefund ? (
-        <Button type="button" variant="gradient" onClick={onRefundClick}>
+      {showRefundAsGift ? (
+        <Button type="button" variant="gradient" onClick={onRefundGiftClick}>
+          {t('admin.returns.actions.refundAsGift.button')}
+        </Button>
+      ) : null}
+      {showRefundGateway ? (
+        <Button type="button" variant="gradient" onClick={onRefundGatewayClick}>
           {t('admin.returns.actions.refundButton')}
         </Button>
       ) : null}
-      {canReject ? (
+      {showReject ? (
         <button
           type="button"
           onClick={onRejectClick}

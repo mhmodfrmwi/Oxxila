@@ -304,7 +304,7 @@
 .order-confirmation-status-step--complete .order-confirmation-status-node {
   border-color: var(--primary-button);
   background: var(--primary-button);
-  color: var(--on-emphasis);
+  color: var(--icon-on-color);
 }
 
 .order-confirmation-status-label {

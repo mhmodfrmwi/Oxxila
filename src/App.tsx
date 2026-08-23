@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import {
   ACCOUNT_CHANGE_PASSWORD_PATH,
+  ACCOUNT_GIFT_CARDS_PATH,
   ACCOUNT_ORDERS_PATH,
   ADD_ADDRESS_PATH,
   ADDRESSES_PATH,
@@ -11,6 +12,11 @@ import {
   CHANGE_PASSWORD_PATH,
   CHECKOUT_PATH,
   DOCS_PATH,
+  ABOUT_PATH,
+  TERMS_PATH,
+  PRIVACY_PATH,
+  REFUND_POLICY_PATH,
+  SHIPPING_POLICY_PATH,
   FORGOT_PASSWORD_PATH,
   HOME_PATH,
   LOGIN_PATH,
@@ -47,8 +53,11 @@ const AdminLayout = lazy(() =>
 const LandingPage = lazy(() =>
   import('./pages/LandingPage').then((module) => ({ default: module.LandingPage })),
 )
-const DocsPage = lazy(() =>
-  import('./pages/DocsPage').then((module) => ({ default: module.DocsPage })),
+const ContentPage = lazy(() =>
+  import('./pages/ContentPage').then((module) => ({ default: module.ContentPage })),
+)
+const AboutPage = lazy(() =>
+  import('./pages/AboutPage').then((module) => ({ default: module.AboutPage })),
 )
 const ShopPage = lazy(() =>
   import('./pages/ShopPage').then((module) => ({ default: module.ShopPage })),
@@ -68,6 +77,9 @@ const AccountChangePasswordPage = lazy(() =>
   import('./pages/AccountChangePasswordPage').then((module) => ({
     default: module.AccountChangePasswordPage,
   })),
+)
+const GiftCardsPage = lazy(() =>
+  import('./pages/GiftCardsPage').then((module) => ({ default: module.GiftCardsPage })),
 )
 const AddressesPage = lazy(() =>
   import('./pages/AddressesPage').then((module) => ({ default: module.AddressesPage })),
@@ -197,13 +209,29 @@ const AdminSettingsPage = lazy(() =>
     default: module.AdminSettingsPage,
   })),
 )
+const AdminWebsiteContentPage = lazy(() =>
+  import('./pages/admin/AdminWebsiteContentPage').then((module) => ({
+    default: module.AdminWebsiteContentPage,
+  })),
+)
 
 export default function App() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
         <Route path={HOME_PATH} element={<LandingPage />} />
-        <Route path={DOCS_PATH} element={<DocsPage />} />
+        <Route path={DOCS_PATH} element={<Navigate to={ABOUT_PATH} replace />} />
+        <Route path={ABOUT_PATH} element={<AboutPage />} />
+        <Route path={TERMS_PATH} element={<ContentPage slug="terms" />} />
+        <Route path={PRIVACY_PATH} element={<ContentPage slug="privacy" />} />
+        <Route
+          path={REFUND_POLICY_PATH}
+          element={<ContentPage slug="refund-policy" />}
+        />
+        <Route
+          path={SHIPPING_POLICY_PATH}
+          element={<ContentPage slug="shipping-policy" />}
+        />
         <Route path={SHOP_PATH} element={<ShopPage />} />
         <Route path={CART_PATH} element={<CartPage />} />
         <Route path={MY_ACCOUNT_PATH} element={<AccountPage />} />
@@ -213,6 +241,7 @@ export default function App() {
           path={ACCOUNT_CHANGE_PASSWORD_PATH}
           element={<AccountChangePasswordPage />}
         />
+        <Route path={ACCOUNT_GIFT_CARDS_PATH} element={<GiftCardsPage />} />
         <Route path={CHECKOUT_PATH} element={<CheckoutPage />} />
         <Route path={PAYMENT_PATH} element={<PaymentPage />} />
         <Route path={PAYMENT_CALLBACK_PATH} element={<PaymentCallbackPage />} />
@@ -254,6 +283,7 @@ export default function App() {
           <Route path="reviews" element={<AdminReviewsPage />} />
           <Route path="shipping" element={<AdminShippingPage />} />
           <Route path="returns" element={<AdminReturnsPage />} />
+          <Route path="website-content" element={<AdminWebsiteContentPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
       </Routes>

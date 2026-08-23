@@ -16,7 +16,7 @@ import { SectionHeader } from '../SectionHeader'
 import { CarouselControls } from './CarouselControls'
 import { ProductCard } from './ProductCard'
 
-const AUTOPLAY_MS = 4000
+const AUTOPLAY_MS = 2000
 const SWIPE_THRESHOLD = 50
 const MOBILE_BREAKPOINT = 769
 

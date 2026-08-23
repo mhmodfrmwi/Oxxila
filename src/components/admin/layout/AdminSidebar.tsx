@@ -1,8 +1,11 @@
 // src/components/admin/layout/AdminSidebar.tsx
+import { useMemo } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import logoSettings from '../../../assets/admin/oxilla-logo-settings.svg'
 import { cn } from '../../../lib/cn'
+import { useAdminPermissions } from '../../../hooks/useAdminPermissions'
+import { filterAdminNavItems } from '../../../utils/adminPermissions'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import {
   ADMIN_NAV_ITEMS,
@@ -56,6 +59,14 @@ interface AdminSidebarProps {
  */
 export function AdminSidebar({ className }: AdminSidebarProps) {
   const { t } = useTranslation()
+  const { permissions, canReadTab } = useAdminPermissions()
+
+  const visibleNavItems = useMemo(
+    () => filterAdminNavItems(ADMIN_NAV_ITEMS, permissions),
+    [permissions],
+  )
+
+  const showSettings = canReadTab('settings')
 
   return (
     <aside
@@ -71,36 +82,38 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
       </div>
 
       <nav className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-4">
-        {ADMIN_NAV_ITEMS.map((item) => (
+        {visibleNavItems.map((item) => (
           <NavItemLink key={item.id} item={item} />
         ))}
       </nav>
 
-      <div className="shrink-0 border-t border-white/10 px-6 pt-[20px] pb-6">
-        <NavLink
-          to={ADMIN_SETTINGS_NAV.to}
-          className={({ isActive }) =>
-            cn(
-              'flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-[10.4px]',
-              'transition-colors hover:bg-white/[0.08]',
-              focusRingClasses,
-              isActive && 'border-[rgb(163_148_255_/_0.35)] bg-[rgb(163_148_255_/_0.1)]',
-            )
-          }
-        >
-          <img
-            src={logoSettings}
-            alt=""
-            width={27}
-            height={28}
-            className="h-[28px] w-[27.429px] shrink-0 object-contain"
-            aria-hidden
-          />
-          <span className="min-w-0 flex-1 text-sm leading-5 font-semibold text-white">
-            {t(ADMIN_SETTINGS_NAV.labelKey)}
-          </span>
-        </NavLink>
-      </div>
+      {showSettings ? (
+        <div className="shrink-0 border-t border-white/10 px-6 pt-[20px] pb-6">
+          <NavLink
+            to={ADMIN_SETTINGS_NAV.to}
+            className={({ isActive }) =>
+              cn(
+                'flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-[10.4px]',
+                'transition-colors hover:bg-white/[0.08]',
+                focusRingClasses,
+                isActive && 'border-[rgb(163_148_255_/_0.35)] bg-[rgb(163_148_255_/_0.1)]',
+              )
+            }
+          >
+            <img
+              src={logoSettings}
+              alt=""
+              width={27}
+              height={28}
+              className="h-[28px] w-[27.429px] shrink-0 object-contain"
+              aria-hidden
+            />
+            <span className="min-w-0 flex-1 text-sm leading-5 font-semibold text-white">
+              {t(ADMIN_SETTINGS_NAV.labelKey)}
+            </span>
+          </NavLink>
+        </div>
+      ) : null}
     </aside>
   )
 }

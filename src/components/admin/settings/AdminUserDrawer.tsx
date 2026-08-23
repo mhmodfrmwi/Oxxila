@@ -12,6 +12,7 @@ import type { AdminUserRow } from '../../../types/adminUsers'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { Drawer } from '../ui/Drawer'
 import { EmptyState } from '../ui/EmptyState'
+import { Select } from '../ui/Select'
 import { Skeleton } from '../ui/Skeleton'
 
 interface AdminUserDrawerProps {
@@ -197,6 +198,35 @@ export function AdminUserDrawer({
               <FieldError message={drawer.errors.password} />
             </div>
           ) : null}
+
+          <div>
+            <label className={labelClass} htmlFor={`${formId}-adminRole`}>
+              {t('admin.settings.admins.drawer.adminRole')}
+              {mode === 'edit' ? (
+                <span className="ms-1 font-normal text-white/40">
+                  ({t('admin.settings.admins.drawer.adminRoleOptional')})
+                </span>
+              ) : null}
+            </label>
+            <Select
+              id={`${formId}-adminRole`}
+              value={drawer.values.adminRole}
+              onValueChange={(value) => drawer.setField('adminRole', value)}
+              options={drawer.roles.map((role) => ({
+                value: role._id,
+                label: role.name,
+              }))}
+              placeholder={
+                drawer.rolesLoading
+                  ? t('admin.settings.admins.drawer.adminRoleLoading')
+                  : t('admin.settings.admins.drawer.adminRolePlaceholder')
+              }
+              disabled={drawer.submitting || drawer.rolesLoading}
+              triggerClassName="mt-2"
+              aria-invalid={Boolean(drawer.errors.adminRole)}
+            />
+            <FieldError message={drawer.errors.adminRole} />
+          </div>
 
           <div>
             <label className={labelClass} htmlFor={`${formId}-title`}>

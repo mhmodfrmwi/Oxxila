@@ -1,0 +1,231 @@
+// src/components/admin/website-content/HowItWorksSettingsCard.tsx
+import { Loader2, PlayCircle } from 'lucide-react'
+import { useId, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useToast } from '../../../context/ToastContext'
+import { useAdminHowItWorksSettings } from '../../../hooks/useAdminHowItWorksSettings'
+import { useAdminPermissions } from '../../../hooks/useAdminPermissions'
+import { cn } from '../../../lib/cn'
+import { Button } from '../../ui/Button'
+import { focusRingClasses } from '../../ui/interactionStyles'
+import { EmptyState } from '../ui/EmptyState'
+import { GlassCard } from '../ui/GlassCard'
+import { Skeleton } from '../ui/Skeleton'
+
+const fieldClass = cn(
+  'w-full rounded-xl border border-white/10 bg-white/5 px-[13.6px] py-[10.4px]',
+  'text-sm text-white placeholder:text-white/40',
+  focusRingClasses,
+)
+
+const labelClass = 'text-xs font-semibold uppercase tracking-[0.08em] text-white/70'
+
+export function HowItWorksSettingsCard() {
+  const { t } = useTranslation()
+  const toast = useToast()
+  const formId = useId()
+  const { can } = useAdminPermissions()
+  const canUpdate = can('websiteContent', 'update')
+  const {
+    values,
+    thumbnailPreview,
+    loading,
+    saving,
+    error,
+    setField,
+    setStepField,
+    setThumbnailImageFile,
+    save,
+    reload,
+  } = useAdminHowItWorksSettings()
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!canUpdate) return
+    try {
+      await save()
+      toast.success(t('admin.websiteContent.howItWorks.saveSuccess'))
+    } catch {
+      toast.error(t('admin.websiteContent.howItWorks.saveError'))
+    }
+  }
+
+  return (
+    <GlassCard aria-labelledby={`${formId}-title`}>
+      <div className="mb-5 flex items-start gap-3">
+        <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/10 text-accent">
+          <PlayCircle size={20} aria-hidden />
+        </span>
+        <div className="min-w-0">
+          <h2 id={`${formId}-title`} className="text-base font-bold leading-6 text-white">
+            {t('admin.websiteContent.howItWorks.title')}
+          </h2>
+          <p className="mt-1 text-sm leading-5 text-white/55">
+            {t('admin.websiteContent.howItWorks.subtitle')}
+          </p>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="space-y-4" aria-hidden>
+          {[0, 1, 2, 3, 4].map((index) => (
+            <Skeleton key={index} className="h-11 w-full rounded-xl" />
+          ))}
+        </div>
+      ) : error && !values.title && values.steps.every((step) => !step.title) ? (
+        <EmptyState
+          title={t('admin.settings.loadErrorTitle')}
+          description={error}
+          action={
+            <Button type="button" variant="outline" onClick={() => void reload()}>
+              {t('admin.settings.retry')}
+            </Button>
+          }
+        />
+      ) : (
+        <form className="space-y-5" onSubmit={(event) => void handleSubmit(event)} noValidate>
+          <div>
+            <label className={labelClass} htmlFor={`${formId}-title-input`}>
+              {t('admin.websiteContent.howItWorks.sectionTitle')}
+            </label>
+            <input
+              id={`${formId}-title-input`}
+              type="text"
+              value={values.title}
+              disabled={saving}
+              onChange={(event) => setField('title', event.target.value)}
+              className={cn(fieldClass, 'mt-2')}
+            />
+          </div>
+
+          <div>
+            <label className={labelClass} htmlFor={`${formId}-video`}>
+              {t('admin.websiteContent.howItWorks.videoUrl')}
+            </label>
+            <input
+              id={`${formId}-video`}
+              type="url"
+              value={values.videoUrl}
+              disabled={saving}
+              onChange={(event) => setField('videoUrl', event.target.value)}
+              placeholder="https://..."
+              className={cn(fieldClass, 'mt-2')}
+            />
+          </div>
+
+          <div>
+            <label className={labelClass}>{t('admin.websiteContent.howItWorks.thumbnail')}</label>
+            <div className="mt-2 aspect-video overflow-hidden rounded-xl border border-white/10 bg-white/5">
+              {thumbnailPreview ? (
+                <img
+                  src={thumbnailPreview}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-xs text-white/30">
+                  {t('admin.websiteContent.howItWorks.noThumbnail')}
+                </div>
+              )}
+            </div>
+            <div className="mt-3 space-y-3">
+              <div>
+                <label className={labelClass} htmlFor={`${formId}-thumb-url`}>
+                  {t('admin.websiteContent.howItWorks.thumbnailUrl')}
+                </label>
+                <input
+                  id={`${formId}-thumb-url`}
+                  type="url"
+                  value={values.thumbnailImage}
+                  disabled={saving}
+                  onChange={(event) => setField('thumbnailImage', event.target.value)}
+                  placeholder="https://..."
+                  className={cn(fieldClass, 'mt-2')}
+                />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor={`${formId}-thumb-file`}>
+                  {t('admin.websiteContent.howItWorks.uploadThumbnail')}
+                </label>
+                <input
+                  id={`${formId}-thumb-file`}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  disabled={saving}
+                  onChange={(event) =>
+                    setThumbnailImageFile(event.target.files?.[0] ?? null)
+                  }
+                  className={cn(
+                    fieldClass,
+                    'mt-2 file:me-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-xs file:text-white',
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <p className={labelClass}>{t('admin.websiteContent.howItWorks.stepsHeading')}</p>
+            {values.steps.map((step, index) => (
+              <div
+                key={index}
+                className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+              >
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-white/50">
+                  {t('admin.websiteContent.howItWorks.stepLabel', { number: index + 1 })}
+                </p>
+                <div className="space-y-3">
+                  <div>
+                    <label className={labelClass} htmlFor={`${formId}-step-title-${index}`}>
+                      {t('admin.websiteContent.howItWorks.stepTitle')}
+                    </label>
+                    <input
+                      id={`${formId}-step-title-${index}`}
+                      type="text"
+                      value={step.title}
+                      disabled={saving}
+                      onChange={(event) => setStepField(index, 'title', event.target.value)}
+                      className={cn(fieldClass, 'mt-2')}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass} htmlFor={`${formId}-step-desc-${index}`}>
+                      {t('admin.websiteContent.howItWorks.stepDescription')}
+                    </label>
+                    <textarea
+                      id={`${formId}-step-desc-${index}`}
+                      value={step.description}
+                      disabled={saving}
+                      rows={3}
+                      onChange={(event) =>
+                        setStepField(index, 'description', event.target.value)
+                      }
+                      className={cn(fieldClass, 'mt-2 resize-y')}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {error ? (
+            <p className="text-sm text-support-error" role="alert">
+              {error}
+            </p>
+          ) : null}
+
+          <Button type="submit" disabled={saving || !canUpdate} className="w-full justify-center">
+            {saving ? (
+              <>
+                <Loader2 size={16} className="animate-spin" aria-hidden />
+                {t('admin.websiteContent.howItWorks.saving')}
+              </>
+            ) : (
+              t('admin.websiteContent.howItWorks.save')
+            )}
+          </Button>
+        </form>
+      )}
+    </GlassCard>
+  )
+}

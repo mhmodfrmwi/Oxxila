@@ -11,6 +11,8 @@ interface RefundReturnDialogProps {
   refundAmount: number
   /** Order's payment method — drives which refund copy (store credit vs gateway) is shown. */
   paymentMethod: 'cod' | 'card' | null
+  /** Gift card flow uses dedicated copy for the COD refund-as-gift action. */
+  variant?: 'gateway' | 'gift'
   submitting: boolean
   error: string | null
   onClose: () => void
@@ -22,6 +24,7 @@ export function RefundReturnDialog({
   returnShortId,
   refundAmount,
   paymentMethod,
+  variant = 'gateway',
   submitting,
   error,
   onClose,
@@ -29,6 +32,8 @@ export function RefundReturnDialog({
 }: RefundReturnDialogProps) {
   const { t, i18n } = useTranslation()
   const amount = formatAdminReturnMoney(refundAmount, i18n.language)
+  const isGift = variant === 'gift'
+  const copyKey = paymentMethod === 'card' ? 'card' : 'cod'
 
   const handleClose = () => {
     if (submitting) return
@@ -40,16 +45,25 @@ export function RefundReturnDialog({
     if (ok) onClose()
   }
 
-  const copyKey = paymentMethod === 'card' ? 'card' : 'cod'
+  const titleKey = isGift
+    ? 'admin.returns.actions.refundAsGift.title'
+    : 'admin.returns.actions.refund.title'
+  const descriptionKey = isGift
+    ? 'admin.returns.actions.refundAsGift.description'
+    : 'admin.returns.actions.refund.description'
+  const confirmKey = isGift
+    ? 'admin.returns.actions.refundAsGift.confirm'
+    : 'admin.returns.actions.refund.confirm'
+  const copyTextKey = isGift
+    ? 'admin.returns.actions.refundAsGift.copy'
+    : `admin.returns.actions.refund.copy.${copyKey}`
 
   return (
     <Dialog
       open={open}
-      title={t('admin.returns.actions.refund.title')}
+      title={t(titleKey)}
       description={
-        returnShortId
-          ? t('admin.returns.actions.refund.description', { id: returnShortId })
-          : undefined
+        returnShortId ? t(descriptionKey, { id: returnShortId }) : undefined
       }
       onClose={handleClose}
       size="sm"
@@ -65,14 +79,14 @@ export function RefundReturnDialog({
             onClick={() => void handleSubmit()}
           >
             {submitting ? <Loader2 size={13} className="animate-spin" aria-hidden /> : null}
-            {t('admin.returns.actions.refund.confirm')}
+            {t(confirmKey)}
           </Button>
         </div>
       }
     >
       <div className="flex flex-col gap-4">
         <p className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm leading-5 text-white/80">
-          {t(`admin.returns.actions.refund.copy.${copyKey}`, { amount })}
+          {t(copyTextKey, { amount })}
         </p>
 
         {error ? (

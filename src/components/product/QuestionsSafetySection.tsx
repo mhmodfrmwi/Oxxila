@@ -1,10 +1,11 @@
 // src/components/product/QuestionsSafetySection.tsx
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, ShieldQuestion } from 'lucide-react'
 import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { Button } from '../ui/Button'
+import { ProductSectionEmptyState } from './ProductSectionEmptyState'
 import '../../styles/questions-safety.css'
 
 export interface FAQItem {
@@ -41,7 +42,8 @@ export function QuestionsSafetySection({
   const resolvedTitle = title ?? t('productDetail.questions.title')
   const resolvedSubtitle = subtitle ?? t('productDetail.questions.subtitle')
   const resolvedButtonText = buttonText ?? t('productDetail.questions.askSpecialist')
-  const resolvedEmpty = emptyMessage ?? t('productDetail.questions.empty')
+  const resolvedEmptyTitle = t('productDetail.questions.emptyTitle')
+  const resolvedEmptyDescription = emptyMessage ?? t('productDetail.questions.emptyDescription')
 
   return (
     <section
@@ -71,7 +73,14 @@ export function QuestionsSafetySection({
           aria-label={t('productDetail.questions.faqAria')}
         >
           {faqs.length === 0 && (
-            <p className="text-sm text-secondary-text">{resolvedEmpty}</p>
+            <ProductSectionEmptyState
+              icon={ShieldQuestion}
+              title={resolvedEmptyTitle}
+              description={resolvedEmptyDescription}
+              actionLabel={resolvedButtonText}
+              onAction={onAskSpecialist}
+              variant="compact"
+            />
           )}
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index

@@ -8,11 +8,12 @@ import type {
 
 function toQuery(params: AdminCategoriesListParams): string {
   const search = new URLSearchParams()
-  const entries: Array<[string, string | number | undefined]> = [
+  const entries: Array<[string, string | number | boolean | undefined]> = [
     ['page', params.page],
     ['limit', params.limit],
     ['sort', params.sort],
     ['keyword', params.keyword],
+    ['includeInactive', params.includeInactive ? true : undefined],
   ]
   for (const [key, value] of entries) {
     if (value === undefined || value === '') continue
@@ -41,13 +42,14 @@ export function getAdminCategories(
   })
 }
 
-/** GET /api/v1/categories/:id — active category only. */
+/** GET /api/v1/categories/:id — pass includeInactive for admin detail of hidden categories. */
 export function getAdminCategory(
   categoryId: string,
-  options?: { signal?: AbortSignal },
+  options?: { signal?: AbortSignal; includeInactive?: boolean },
 ) {
+  const query = options?.includeInactive ? '?includeInactive=true' : ''
   return apiRequest<ApiAdminCategory>(
-    `/categories/${encodeURIComponent(categoryId)}`,
+    `/categories/${encodeURIComponent(categoryId)}${query}`,
     {
       method: 'GET',
       auth: true,

@@ -1,7 +1,11 @@
 // src/components/promo-carousel/PromoCarouselSection.tsx
+import { Tag } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { SHOP_PATH } from '../../config/routes'
 import { useOffersCarousel } from '../../hooks/useOffersCarousel'
 import { ContentSection } from '../layout/ContentSection'
+import { ProductSectionEmptyState } from '../product/ProductSectionEmptyState'
 import { CountdownPromoCarousel } from './CountdownPromoCarousel'
 
 function OffersSkeleton() {
@@ -15,6 +19,7 @@ function OffersSkeleton() {
 
 export function PromoCarouselSection() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { slides, loading, error } = useOffersCarousel()
 
   return (
@@ -26,9 +31,14 @@ export function PromoCarouselSection() {
           {t('shop.offers.loadError')}
         </p>
       ) : slides.length === 0 ? (
-        <p className="py-6 text-center text-sm text-secondary-text" role="status">
-          {t('shop.offers.empty')}
-        </p>
+        <ProductSectionEmptyState
+          variant="banner"
+          icon={Tag}
+          title={t('shop.offers.emptyTitle')}
+          description={t('shop.offers.emptyDescription')}
+          actionLabel={t('actions.continueShopping')}
+          onAction={() => navigate(SHOP_PATH)}
+        />
       ) : (
         <CountdownPromoCarousel
           slides={slides}

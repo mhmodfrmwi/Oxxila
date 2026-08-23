@@ -3,6 +3,17 @@ export const HOME_PATH = '/home'
 
 export const DOCS_PATH = '/docs'
 
+/** CMS About page (legacy /docs redirects here). */
+export const ABOUT_PATH = '/about'
+
+export const TERMS_PATH = '/terms'
+
+export const PRIVACY_PATH = '/privacy'
+
+export const REFUND_POLICY_PATH = '/refund-policy'
+
+export const SHIPPING_POLICY_PATH = '/shipping-policy'
+
 export const SHOP_PATH = '/shop'
 
 export const CATEGORIES_PATH = '/categories'
@@ -34,6 +45,8 @@ export const ADDRESSES_PATH = '/account/addresses'
 export const ADD_ADDRESS_PATH = '/account/addresses/add'
 
 export const ACCOUNT_CHANGE_PASSWORD_PATH = '/account/change-password'
+
+export const ACCOUNT_GIFT_CARDS_PATH = '/account/gift-cards'
 
 export const CHECKOUT_PATH = '/checkout'
 
@@ -85,3 +98,5 @@ export const ADMIN_REVIEWS_PATH = `${ADMIN_PATH}/reviews`
 export const ADMIN_SHIPPING_PATH = `${ADMIN_PATH}/shipping`
 export const ADMIN_RETURNS_PATH = `${ADMIN_PATH}/returns`
 export const ADMIN_SETTINGS_PATH = `${ADMIN_PATH}/settings`
+
+export const ADMIN_WEBSITE_CONTENT_PATH = `${ADMIN_PATH}/website-content`

@@ -1,10 +1,13 @@
+// src/api/auth.ts
 import { apiRequest } from '../lib/api'
+import type { ApiAdminRole } from '../types/adminPermissions'
 
 export interface AuthUser {
   id: string
   name: string
   email: string
   role: string
+  adminRole?: ApiAdminRole
   phone?: string
   /** Canonical profile photo from API (uploaded image, else OAuth photo). */
   avatar?: string

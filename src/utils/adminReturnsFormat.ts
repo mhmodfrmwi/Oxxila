@@ -159,12 +159,15 @@ export interface ReturnActionAvailability {
   canMarkReceived: boolean
   /** Bosta handler, approved/picked_up, and not yet scheduled. */
   canScheduleBosta: boolean
-  /** Milestone 3 — refund is only allowed once the item has been received back. */
-  canRefund: boolean
+  /** Milestone 3 — gateway refund once the item has been received back (card orders). */
+  canRefundGateway: boolean
+  /** Milestone 3 — gift card / store credit refund for COD orders. */
+  canRefundAsGift: boolean
 }
 
 export function getReturnActionAvailability(detail: AdminReturnDetail): ReturnActionAvailability {
-  const { refundStatus, logisticsHandler, bostaExternalId } = detail
+  const { refundStatus, logisticsHandler, bostaExternalId, orderPaymentMethod } = detail
+  const received = refundStatus === 'received'
   return {
     canApprove: refundStatus === 'pending',
     canReject: refundStatus === 'pending' || refundStatus === 'approved',
@@ -174,7 +177,8 @@ export function getReturnActionAvailability(detail: AdminReturnDetail): ReturnAc
       logisticsHandler === 'bosta' &&
       !bostaExternalId &&
       (refundStatus === 'approved' || refundStatus === 'picked_up'),
-    canRefund: refundStatus === 'received',
+    canRefundGateway: received && orderPaymentMethod === 'card',
+    canRefundAsGift: received && orderPaymentMethod === 'cod',
   }
 }
 

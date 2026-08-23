@@ -18,11 +18,30 @@ export interface AdminCategoryRow {
   subcategoryCount: number
 }
 
+/** Nested subcategory on a category tree row (from populated `subcategories[]`). */
+export interface AdminCategoryTreeSubcategory {
+  id: string
+  name: string
+  slug: string
+  isActive: boolean
+}
+
+/** Category with nested subcategories for the admin tree table. */
+export interface AdminCategoryTreeRow {
+  id: string
+  name: string
+  slug: string
+  image: string | null
+  isActive: boolean
+  subcategories: AdminCategoryTreeSubcategory[]
+}
+
 export interface AdminCategoriesListParams {
   page?: number
   limit?: number
   sort?: string
   keyword?: string
+  includeInactive?: boolean
 }
 
 export interface AdminCategoryWriteFields {

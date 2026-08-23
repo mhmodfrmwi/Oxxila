@@ -2,11 +2,13 @@
 import { useTranslation } from 'react-i18next'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
 import { AdminRolesCard } from '../../components/admin/settings/AdminRolesCard'
+import { AdminRolesManagerCard } from '../../components/admin/settings/AdminRolesManagerCard'
 import { BannersManagerCard } from '../../components/admin/settings/BannersManagerCard'
 import { CartRecoveryCard } from '../../components/admin/settings/CartRecoveryCard'
 import { CouponManagerCard } from '../../components/admin/settings/CouponManagerCard'
 import { OffersManagerCard } from '../../components/admin/settings/OffersManagerCard'
 import { PaymentGatewaysCard } from '../../components/admin/settings/PaymentGatewaysCard'
+import { useAdminPermissions } from '../../hooks/useAdminPermissions'
 
 /**
  * System Configuration (Phase 7).
@@ -14,6 +16,8 @@ import { PaymentGatewaysCard } from '../../components/admin/settings/PaymentGate
  */
 export function AdminSettingsPage() {
   const { t } = useTranslation()
+  const { canReadTab } = useAdminPermissions()
+  const canManageRoles = canReadTab('roles')
 
   return (
     <>
@@ -33,7 +37,8 @@ export function AdminSettingsPage() {
 
         <div className="flex w-full shrink-0 flex-col gap-[var(--admin-content-gap-tight)] xl:w-[var(--admin-rail-width)]">
           <CartRecoveryCard />
-          <AdminRolesCard />
+          {canManageRoles ? <AdminRolesManagerCard /> : null}
+          {canManageRoles ? <AdminRolesCard /> : null}
         </div>
       </div>
     </>

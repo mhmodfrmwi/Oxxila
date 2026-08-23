@@ -60,6 +60,8 @@
     "subscribing": "جاري الاشتراك...",
     "subscribed": "تم الاشتراك",
     "newsletterUnavailable": "الاشتراك في النشرة غير متاح مؤقتًا.",
+    "followInstagram": "تابعنا على إنستجرام",
+    "viewInstagramPost": "عرض {{alt}} على إنستجرام",
     "policyLinks": {
       "about": "عن أوكسيلا",
       "quality": "وعد الجودة",
@@ -67,6 +69,8 @@
       "standards": "معايير الأمراض الجلدية",
       "terms": "الشروط والأحكام",
       "privacy": "سياسة الخصوصية",
+      "refund": "سياسة الاسترداد",
+      "shipping": "سياسة الشحن",
       "contact": "اتصل بنا"
     },
     "shoppingLinks": {
@@ -78,6 +82,40 @@
       "shipping": "الشحن والتوصيل",
       "returns": "الإرجاع والاسترداد",
       "trackOrder": "تتبع طلبك"
+    }
+  },
+  "giftCards": {
+    "title": "بطاقات الهدايا",
+    "description": "رصيد المتجر من مرتجعات الدفع عند الاستلام. استخدمه في الطلب التالي عند الدفع.",
+    "balanceLabel": "الرصيد المتاح",
+    "balanceHint": "رصيد مرتجعات COD المعتمدة يظهر هنا تلقائيًا بعد الاسترداد.",
+    "loading": "جارٍ تحميل الرصيد…",
+    "retry": "إعادة المحاولة",
+    "historyTitle": "الحركات",
+    "emptyTitle": "لا توجد حركات بعد",
+    "emptyDescription": "عند استرداد مرتجع COD كرصيد متجر، سيظهر هنا.",
+    "viewReturns": "عرض مرتجعاتي",
+    "balanceAfter": "الرصيد: {{balance}}",
+    "tx": {
+      "codReturnIssued": "استرداد مرتجع COD — رصيد مضاف",
+      "orderRedeemed": "استخدام في الطلب {{orderNumber}}",
+      "creditIssued": "إضافة رصيد متجر",
+      "creditRedeemed": "استخدام رصيد متجر"
+    }
+  },
+  "contentPage": {
+    "eyebrow": "قانوني",
+    "errorTitle": "تعذر تحميل الصفحة",
+    "errorDescription": "تعذر تحميل هذه الصفحة. يرجى المحاولة مرة أخرى.",
+    "retry": "إعادة المحاولة",
+    "emptyTitle": "قريبًا",
+    "emptyDescription": "نجهّز هذه الصفحة حاليًا. يرجى العودة لاحقًا.",
+    "backHome": "العودة للرئيسية",
+    "titles": {
+      "terms": "الشروط والأحكام",
+      "privacy": "سياسة الخصوصية",
+      "refundPolicy": "سياسة الاسترداد",
+      "shippingPolicy": "سياسة الشحن"
     }
   },
   "about": {
@@ -328,6 +366,8 @@
     "offers": {
       "ariaLabel": "عروض التخفيضات",
       "empty": "لا توجد عروض نشطة حاليًا.",
+      "emptyTitle": "لا توجد عروض نشطة حاليًا",
+      "emptyDescription": "تابعنا قريبًا — عروض حصرية وخصومات لفترة محدودة.",
       "loadError": "تعذر تحميل العروض.",
       "specialOffer": "عرض خاص",
       "percentOff": "خصم {{percent}}%",
@@ -360,7 +400,11 @@
     },
     "ariaLabel": "تفاصيل المنتج",
     "notFound": "المنتج غير موجود.",
+    "notFoundTitle": "المنتج غير موجود",
+    "notFoundDescription": "ربما تمت إزالة هذا المنتج، أو أن الرابط الذي اتبعته لم يعد صالحًا.",
     "loadError": "تعذر تحميل تفاصيل المنتج.",
+    "loadErrorTitle": "تعذر تحميل المنتج",
+    "loadErrorDescription": "يرجى التحقق من الاتصال والمحاولة مرة أخرى بعد لحظات.",
     "perPiece": "/ قطعة",
     "percentOff": "خصم {{percent}}%",
     "offerEnds": "ينتهي العرض {{date}}",
@@ -428,6 +472,8 @@
       "askSpecialist": "اسأل متخصصًا",
       "faqAria": "أسئلة سلامة المنتج",
       "empty": "لا توجد أسئلة سلامة لهذا المنتج بعد.",
+      "emptyTitle": "لا توجد أسئلة سلامة بعد",
+      "emptyDescription": "ستظهر هنا الأسئلة الشائعة حول الاستخدام السريري وتفاعلات المكونات.",
       "askForm": {
         "title": "اسأل متخصصًا",
         "description": "شارك سؤالك حول الاستخدام السريري أو تفاعلات المكونات. سيتواصل فريقنا معك عبر البريد الإلكتروني.",
@@ -452,6 +498,8 @@
       "loadMore": "تحميل المزيد من التقييمات",
       "loadingMore": "جاري تحميل التقييمات…",
       "empty": "لا توجد تقييمات بعد.",
+      "emptyTitle": "لا توجد تقييمات بعد",
+      "emptyDescription": "كن أول من يشارك تجربته مع هذا المنتج.",
       "helpful": "مفيد ({{count}})",
       "delete": "حذف",
       "deleteSuccess": "تم حذف التقييم بنجاح",
@@ -864,6 +912,7 @@
       "myReturns": "مرتجعاتي",
       "myAddresses": "عناويني",
       "changePassword": "تغيير كلمة المرور",
+      "giftCards": "بطاقات الهدايا",
       "logout": "تسجيل الخروج"
     },
     "fields": {
@@ -1105,6 +1154,7 @@
       "dashboard": "لوحة التحكم",
       "products": "المنتجات",
       "categories": "الفئات",
+      "websiteContent": "محتوى الموقع",
       "brands": "العلامات التجارية",
       "subcategories": "الفئات الفرعية",
       "faqs": "الأسئلة الشائعة",
@@ -1113,7 +1163,46 @@
       "reviews": "المراجعات",
       "shipping": "الشحن",
       "returns": "المرتجعات",
-      "settings": "إعدادات أوكسيلا"
+      "settings": "إعدادات أوكسيلا",
+      "websiteContent": "محتوى الموقع"
+    },
+    "permissionDenied": {
+      "title": "تم رفض الوصول",
+      "description": "ليس لديك صلاحية لعرض هذا القسم من لوحة الإدارة."
+    },
+    "roles": {
+      "title": "أدوار الصلاحيات",
+      "aria": "أدوار الصلاحيات",
+      "addAria": "إضافة دور",
+      "systemBadge": "نظام",
+      "emptyTitle": "لا توجد أدوار صلاحيات",
+      "emptyDescription": "أنشئ أدوارًا للتحكم في ما يمكن لكل مسؤول الوصول إليه.",
+      "loadErrorTitle": "تعذر تحميل الأدوار",
+      "deleteSuccess": "تم حذف الدور بنجاح",
+      "deleteError": "تعذر حذف الدور",
+      "editAria": "تعديل {{name}}",
+      "deleteAria": "حذف {{name}}",
+      "actions": {
+        "create": "إنشاء",
+        "read": "قراءة",
+        "update": "تحديث",
+        "delete": "حذف"
+      },
+      "drawer": {
+        "createTitle": "إنشاء دور",
+        "editTitle": "تعديل دور",
+        "subtitle": "مصفوفة الصلاحيات",
+        "name": "اسم الدور",
+        "description": "الوصف",
+        "permissions": "الصلاحيات",
+        "tabColumn": "الوحدة",
+        "systemRoleHint": "لا يمكن تغيير صلاحيات مسؤول النظام الفائق.",
+        "save": "حفظ",
+        "saving": "جاري الحفظ…",
+        "createSuccess": "تم إنشاء الدور بنجاح",
+        "updateSuccess": "تم تحديث الدور بنجاح",
+        "loadErrorTitle": "تعذر تحميل الدور"
+      }
     },
     "dashboard": {
       "title": "نظرة تنفيذية",
@@ -1246,6 +1335,20 @@
         "subcategories": "الفئات الفرعية",
         "status": "الحالة",
         "actions": "إجراءات"
+      },
+      "tree": {
+        "tableAria": "شجرة الفئات",
+        "showing": "عرض {{showing}} من {{total}} فئة",
+        "visible": "ظاهرة",
+        "hidden": "مخفية",
+        "addSubcategory": "إضافة فئة فرعية",
+        "addSubcategoryAria": "إضافة فئة فرعية إلى {{name}}",
+        "showAria": "إظهار {{name}}",
+        "hideAria": "إخفاء {{name}}",
+        "showSubcategoryAria": "إظهار الفئة الفرعية {{name}}",
+        "hideSubcategoryAria": "إخفاء الفئة الفرعية {{name}}",
+        "editSubcategoryAria": "تعديل الفئة الفرعية {{name}}",
+        "deleteSubcategoryAria": "حذف الفئة الفرعية {{name}}"
       },
       "drawer": {
         "createTitle": "إنشاء فئة",
@@ -1652,7 +1755,7 @@
         "sensitivity": "الحساسية",
         "sensitiveSkin": "بشرة حساسة",
         "clinical": "الإعداد السريري",
-        "price": "سعر الوحدة ($)",
+        "price": "سعر الوحدة (ج.م.)",
         "stock": "المخزون",
         "category": "الفئة",
         "subCategory": "الفئة الفرعية",
@@ -2106,6 +2209,14 @@
         "markReceivedButton": "تحديد كمستلم بالمستودع",
         "scheduleBostaButton": "جدولة استلام بوسطة",
         "refundButton": "استرداد",
+        "refundAsGift": {
+          "button": "استرداد كبطاقة هدايا",
+          "title": "استرداد كبطاقة هدايا",
+          "description": "إصدار رصيد متجر لطلب الإرجاع {{id}}.",
+          "confirm": "إصدار رصيد بطاقة الهدايا",
+          "copy": "تم الدفع نقدًا عند الاستلام. بالتأكيد سيتم إضافة {{amount}} كرصيد في بطاقة هدايا العميل.",
+          "success": "تم استرداد طلب الإرجاع كبطاقة هدايا بنجاح"
+        },
         "approveSuccess": "تمت الموافقة على طلب الإرجاع بنجاح",
         "rejectSuccess": "تم رفض طلب الإرجاع",
         "scheduleSuccess": "تمت جدولة استلام بوسطة بنجاح",
@@ -2599,6 +2710,67 @@
         }
       }
     },
+    "websiteContent": {
+      "title": "محتوى الموقع",
+      "subtitle": "إدارة بيانات التواصل وروابط التواصل ومحتوى الصفحة الرئيسية والصفحات القانونية.",
+      "tabsAria": "أقسام محتوى الموقع",
+      "tabs": {
+        "contact": "التواصل",
+        "social": "التواصل الاجتماعي",
+        "instagram": "إنستغرام",
+        "howItWorks": "كيف يعمل",
+        "contentPages": "صفحات المحتوى"
+      },
+      "howItWorks": {
+        "title": "كيف يعمل",
+        "subtitle": "عنوان قسم الفيديو والصورة المصغرة وثلاث خطوات في الصفحة الرئيسية.",
+        "sectionTitle": "عنوان القسم",
+        "videoUrl": "رابط الفيديو",
+        "thumbnail": "الصورة المصغرة للفيديو",
+        "noThumbnail": "لا توجد صورة مصغرة",
+        "thumbnailUrl": "رابط الصورة المصغرة",
+        "uploadThumbnail": "رفع صورة مصغرة",
+        "stepsHeading": "الخطوات",
+        "stepLabel": "الخطوة {{number}}",
+        "stepTitle": "عنوان الخطوة",
+        "stepDescription": "وصف الخطوة",
+        "save": "حفظ كيف يعمل",
+        "saving": "جارٍ الحفظ…",
+        "saveSuccess": "تم تحديث إعدادات كيف يعمل بنجاح",
+        "saveError": "تعذّر حفظ إعدادات كيف يعمل"
+      },
+      "contentPages": {
+        "title": "صفحات المحتوى",
+        "subtitle": "أقسام صفحة من نحن وصفحات السياسات المعروضة في التذييل.",
+        "navAria": "قائمة صفحات المحتوى",
+        "draft": "مسودة",
+        "sectionsHeading": "أقسام من نحن",
+        "addSection": "إضافة قسم",
+        "noSections": "لا توجد أقسام بعد.",
+        "sectionLabel": "القسم {{number}}",
+        "removeSection": "إزالة القسم",
+        "noImage": "لا توجد صورة",
+        "sectionKey": "المفتاح",
+        "sectionTitle": "العنوان",
+        "sectionBody": "المحتوى",
+        "sectionImageUrl": "رابط الصورة",
+        "sectionUpload": "رفع صورة",
+        "pageTitle": "عنوان الصفحة",
+        "pageContent": "المحتوى",
+        "isPublished": "منشور",
+        "save": "حفظ الصفحة",
+        "saving": "جارٍ الحفظ…",
+        "saveSuccess": "تم تحديث صفحة المحتوى بنجاح",
+        "saveError": "تعذّر حفظ صفحة المحتوى",
+        "slugs": {
+          "about": "من نحن",
+          "terms": "الشروط والأحكام",
+          "privacy": "سياسة الخصوصية",
+          "refund-policy": "سياسة الاسترداد",
+          "shipping-policy": "سياسة الشحن"
+        }
+      }
+    },
     "settings": {
       "title": "إعدادات النظام",
       "subtitle": "إدارة البنية الأساسية وبروتوكولات الدفع وجمالية العلامة.",
@@ -2606,6 +2778,48 @@
       "applySoon": "التطبيق الجماعي غير متاح في هذه المرحلة.",
       "loadErrorTitle": "تعذّر تحميل القسم",
       "retry": "إعادة المحاولة",
+      "contact": {
+        "title": "التواصل وواتساب",
+        "subtitle": "الهاتف والبريد والموقع ورقم واتساب المعروض في قسم Contact بالصفحة الرئيسية.",
+        "phone": "الهاتف",
+        "email": "البريد الإلكتروني",
+        "location": "الموقع",
+        "whatsapp": "رقم واتساب",
+        "whatsappPlaceholder": "+20 100 000 0000",
+        "whatsappHint": "عند الضغط على أيقونة واتساب يفتح محادثة مع هذا الرقم.",
+        "whatsappPreview": "يفتح: {{url}}",
+        "save": "حفظ بيانات التواصل",
+        "saving": "جارٍ الحفظ…",
+        "saveSuccess": "تم تحديث بيانات التواصل بنجاح",
+        "saveError": "تعذّر حفظ بيانات التواصل"
+      },
+      "instagram": {
+        "title": "شبكة إنستجرام",
+        "subtitle": "أربع صور تظهر في الفوتر تحت Follow on Instagram.",
+        "slotLabel": "بلاطة {{number}}",
+        "noImage": "لا توجد صورة",
+        "imageUrl": "رابط الصورة",
+        "upload": "رفع صورة",
+        "postUrl": "رابط منشور إنستجرام",
+        "alt": "النص البديل",
+        "save": "حفظ شبكة إنستجرام",
+        "saving": "جارٍ الحفظ…",
+        "saveSuccess": "تم تحديث شبكة إنستجرام بنجاح",
+        "saveError": "تعذّر حفظ شبكة إنستجرام"
+      },
+      "social": {
+        "title": "روابط السوشيال",
+        "subtitle": "أيقونات الفوتر — اترك الحقل فارغًا لإخفاء الشبكة.",
+        "facebook": "فيسبوك",
+        "twitter": "X (تويتر)",
+        "instagram": "حساب إنستجرام",
+        "linkedin": "لينكدإن",
+        "youtube": "يوتيوب",
+        "save": "حفظ روابط السوشيال",
+        "saving": "جارٍ الحفظ…",
+        "saveSuccess": "تم تحديث روابط السوشيال بنجاح",
+        "saveError": "تعذّر حفظ روابط السوشيال"
+      },
       "payments": {
         "title": "بوابات الدفع",
         "aria": "بوابات الدفع",
@@ -2871,6 +3085,7 @@
         "unlock": "فتح",
         "lockAria": "قفل {{name}}",
         "unlockAria": "فتح {{name}}",
+        "lastSuperAdminLock": "لا يمكن تعطيل آخر Super Admin",
         "emptyTitle": "لا توجد أدوار مشرفين",
         "emptyDescription": "ستظهر حسابات المشرفين هنا بعد إعدادها.",
         "loadErrorTitle": "تعذّر تحميل المشرفين",
@@ -2883,6 +3098,10 @@
           "password": "كلمة المرور",
           "adminTitle": "المسمى الوظيفي",
           "adminTitleOptional": "اختياري",
+          "adminRole": "دور الصلاحيات",
+          "adminRoleOptional": "اختياري",
+          "adminRolePlaceholder": "اختر دورًا",
+          "adminRoleLoading": "جاري تحميل الأدوار…",
           "active": "نشط",
           "activeHint": "المشرفون المقفولون لا يمكنهم تسجيل الدخول.",
           "save": "حفظ",

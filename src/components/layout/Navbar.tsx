@@ -15,6 +15,7 @@ import {
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { useToast } from '../../context/ToastContext'
+import { useGiftCards } from '../../hooks/useGiftCards'
 import { useUserAvatar } from '../../hooks/useUserAvatar'
 import { UserAvatar } from '../account/UserAvatar'
 import { Logo } from '../ui/Logo'
@@ -35,7 +36,9 @@ export function Navbar() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { isAuthenticated, logout } = useAuth()
-  const { name, src, loading: avatarLoading, storeCreditBalance } = useUserAvatar()
+  const { name, src, loading: avatarLoading } = useUserAvatar()
+  const { balance: giftCardBalance, loading: giftCardsLoading, refresh: refreshGiftCards } =
+    useGiftCards()
   const { itemCount } = useCart()
   const toast = useToast()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -229,7 +232,9 @@ export function Navbar() {
                   open={accountOpen}
                   onClose={closeAccountMenu}
                   rootRef={accountMenuRef}
-                  storeCreditBalance={storeCreditBalance}
+                  storeCreditBalance={giftCardBalance}
+                  giftCardsLoading={giftCardsLoading}
+                  onRefreshGiftCards={() => void refreshGiftCards()}
                 />
               </div>
               <button

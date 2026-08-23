@@ -14,7 +14,7 @@ export interface UtilityPromo {
 }
 
 const defaultPromo: UtilityPromo = {
-  title: 'Free shipping over $50 orders',
+  title: 'Free shipping over 50 EGP orders',
   subtitle: 'Limited-time offer',
 }
 

@@ -1,8 +1,10 @@
 // src/components/product/reviews/ReviewsSection.tsx
+import { MessageSquareHeart } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/cn'
 import { Button } from '../../ui/Button'
+import { ProductSectionEmptyState } from '../ProductSectionEmptyState'
 import { RatingSummaryCard } from './RatingSummaryCard'
 import { ReviewCard } from './ReviewCard'
 import type { ReviewsSectionProps } from './types'
@@ -109,7 +111,13 @@ export function ReviewsSection({
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-secondary-text">{t('productDetail.reviews.empty')}</p>
+                <ProductSectionEmptyState
+                  icon={MessageSquareHeart}
+                  title={t('productDetail.reviews.emptyTitle')}
+                  description={t('productDetail.reviews.emptyDescription')}
+                  actionLabel={t('productDetail.reviews.writeReview')}
+                  onAction={onWriteReview}
+                />
               )}
             </div>
 

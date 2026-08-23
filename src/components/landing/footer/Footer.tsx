@@ -3,11 +3,16 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getCollectionHref } from '../../../config/collections'
 import {
-  DOCS_PATH,
+  ABOUT_PATH,
   HOME_PATH,
+  PRIVACY_PATH,
+  REFUND_POLICY_PATH,
   RETURNS_HISTORY_PATH,
+  SHIPPING_POLICY_PATH,
   SHOP_PATH,
+  TERMS_PATH,
 } from '../../../config/routes'
+import { FooterSettingsProvider } from '../../../context/FooterSettingsContext'
 import { FadeUp } from '../../ui/FadeUp'
 import { Logo } from '../../ui/Logo'
 import { FooterLinks } from './FooterLinks'
@@ -18,15 +23,23 @@ import { SocialLinks } from './SocialLinks'
 export function Footer() {
   const { t } = useTranslation()
 
-  // Only include destinations that exist in App routes (or in-page anchors on those pages).
   const policyLinks = useMemo(
     () => [
-      { label: t('footer.policyLinks.about'), to: DOCS_PATH },
-      { label: t('footer.policyLinks.quality'), to: `${DOCS_PATH}#about-quality-title` },
-      { label: t('footer.policyLinks.authenticity'), to: `${DOCS_PATH}#about-cta-title` },
-      { label: t('footer.policyLinks.standards'), to: `${DOCS_PATH}#about-medical-title` },
+      { label: t('footer.policyLinks.about'), to: ABOUT_PATH },
+      { label: t('footer.policyLinks.quality'), to: `${ABOUT_PATH}#quality` },
+      {
+        label: t('footer.policyLinks.authenticity'),
+        to: `${ABOUT_PATH}#authenticity`,
+      },
+      {
+        label: t('footer.policyLinks.standards'),
+        to: `${ABOUT_PATH}#medical`,
+      },
+      { label: t('footer.policyLinks.terms'), to: TERMS_PATH },
+      { label: t('footer.policyLinks.privacy'), to: PRIVACY_PATH },
+      { label: t('footer.policyLinks.refund'), to: REFUND_POLICY_PATH },
+      { label: t('footer.policyLinks.shipping'), to: SHIPPING_POLICY_PATH },
       { label: t('footer.policyLinks.contact'), to: `${HOME_PATH}#contact` },
-      // terms / privacy — no routes yet; omitted intentionally
     ],
     [t],
   )
@@ -38,14 +51,15 @@ export function Footer() {
       { label: t('footer.shoppingLinks.brands'), to: `${SHOP_PATH}#brand-stores-heading` },
       { label: t('footer.shoppingLinks.newArrivals'), to: getCollectionHref('new-arrivals') },
       { label: t('footer.shoppingLinks.bestSellers'), to: getCollectionHref('best-sellers') },
+      { label: t('footer.shoppingLinks.shipping'), to: SHIPPING_POLICY_PATH },
       { label: t('footer.shoppingLinks.returns'), to: RETURNS_HISTORY_PATH },
-      // shipping / track order — no standalone routes yet; omitted intentionally
     ],
     [t],
   )
 
   return (
     <footer className="relative bg-background text-primary-text">
+      <FooterSettingsProvider>
       <div
         className="h-px w-full bg-gradient-to-r from-transparent via-accent-soft to-transparent"
         aria-hidden
@@ -81,6 +95,7 @@ export function Footer() {
           </div>
         </div>
       </div>
+      </FooterSettingsProvider>
     </footer>
   )
 }

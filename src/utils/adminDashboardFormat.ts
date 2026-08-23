@@ -41,7 +41,7 @@ export function formatDashboardMoney(value: number, locale = 'en'): string {
   const abs = Math.abs(value)
   return new Intl.NumberFormat(resolved, {
     style: 'currency',
-    currency: 'USD',
+    currency: 'EGP',
     notation: abs >= 1_000_000 ? 'compact' : 'standard',
     maximumFractionDigits: abs >= 100 ? 0 : 2,
     minimumFractionDigits: abs > 0 && abs < 100 ? 2 : 0,

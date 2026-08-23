@@ -1,9 +1,14 @@
 // src/components/admin/layout/AdminLayout.tsx
 import type { CSSProperties } from 'react'
+import { useMemo } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import logoSettings from '../../../assets/admin/oxilla-logo-settings.svg'
 import { cn } from '../../../lib/cn'
+import { useAdminPermissions } from '../../../hooks/useAdminPermissions'
+import { filterAdminNavItems } from '../../../utils/adminPermissions'
 import { focusRingClasses } from '../../ui/interactionStyles'
+import { AdminPermissionGate } from '../AdminPermissionGate'
 import {
   adminPageShellStyle,
   resolveAdminPageShell,
@@ -20,25 +25,41 @@ import { AdminSidebar } from './AdminSidebar'
 export function AdminLayout() {
   const { t } = useTranslation()
   const { pathname } = useLocation()
+  const { permissions, canReadTab } = useAdminPermissions()
   const shell = resolveAdminPageShell(pathname)
-  const mobileItems = [
-    ...ADMIN_NAV_ITEMS.map((item) => ({
-      id: item.id,
-      labelKey: item.labelKey,
-      to: item.to,
-      end: item.end,
-      iconSrc: item.iconSrc,
-      iconSize: item.iconSize,
-    })),
-    {
-      id: ADMIN_SETTINGS_NAV.id,
-      labelKey: ADMIN_SETTINGS_NAV.labelKey,
-      to: ADMIN_SETTINGS_NAV.to,
-      end: undefined as boolean | undefined,
-      iconSrc: null as string | null,
-      iconSize: null as 20 | 24 | null,
-    },
-  ]
+
+  const visibleNavItems = useMemo(
+    () => filterAdminNavItems(ADMIN_NAV_ITEMS, permissions),
+    [permissions],
+  )
+
+  const showSettings = canReadTab('settings')
+
+  const mobileItems = useMemo(
+    () => [
+      ...visibleNavItems.map((item) => ({
+        id: item.id,
+        labelKey: item.labelKey,
+        to: item.to,
+        end: item.end,
+        iconSrc: item.iconSrc,
+        iconSize: item.iconSize,
+      })),
+      ...(showSettings
+        ? [
+            {
+              id: ADMIN_SETTINGS_NAV.id,
+              labelKey: ADMIN_SETTINGS_NAV.labelKey,
+              to: ADMIN_SETTINGS_NAV.to,
+              end: undefined as boolean | undefined,
+              iconSrc: logoSettings as string | null,
+              iconSize: null as 20 | 24 | null,
+            },
+          ]
+        : []),
+    ],
+    [showSettings, visibleNavItems],
+  )
 
   return (
     <div
@@ -81,6 +102,15 @@ export function AdminLayout() {
                     size={item.iconSize}
                     className="!size-3.5"
                   />
+                ) : item.iconSrc ? (
+                  <img
+                    src={item.iconSrc}
+                    alt=""
+                    width={14}
+                    height={14}
+                    className="size-3.5 shrink-0 object-contain"
+                    aria-hidden
+                  />
                 ) : null}
                 {t(item.labelKey)}
               </NavLink>
@@ -90,7 +120,9 @@ export function AdminLayout() {
 
         <main className="flex min-h-0 min-w-0 flex-1 flex-col px-4 py-5 sm:p-[var(--admin-content-padding)]">
           <div className="flex w-full min-w-0 flex-1 flex-col gap-[var(--admin-content-gap)]">
-            <Outlet />
+            <AdminPermissionGate>
+              <Outlet />
+            </AdminPermissionGate>
           </div>
         </main>
       </div>

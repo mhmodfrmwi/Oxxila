@@ -1,10 +1,19 @@
 /**
- * Typography tokens — Playfair Display is the global font family.
+ * Typography tokens — New York is the global font family.
  * Font tokens are theme-independent; color tokens live in tokens.css.
  */
 
+@font-face {
+  font-family: 'New York';
+  src: url('/fonts/new-york.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --font-family-base: 'Playfair Display', Georgia, serif;
+  --font-family-base: 'New York', Georgia, 'Times New Roman', serif;
+  --font-family-serif: var(--font-family-base);
   --font-family-display: var(--font-family-base);
 
   --font-size-base: 1.25rem;

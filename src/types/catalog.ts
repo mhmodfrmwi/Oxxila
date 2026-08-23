@@ -18,6 +18,7 @@ export interface ApiCategory {
     name: string
     slug: string
     image?: string
+    isActive?: boolean
   }>
 }
 

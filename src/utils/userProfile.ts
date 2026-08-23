@@ -1,7 +1,24 @@
 // src/utils/userProfile.ts
 import type { AuthUser } from '../api/auth'
 import type { UserProfile } from '../api/users'
+import type { ApiAdminRole } from '../types/adminPermissions'
+import { normalizePermissions } from './adminPermissions'
 import { normalizeAvatarUrl } from './userAvatar'
+
+function mapProfileAdminRole(
+  role: UserProfile['adminRole'],
+): ApiAdminRole | undefined {
+  if (!role || typeof role !== 'object' || !role._id) return undefined
+
+  return {
+    _id: String(role._id),
+    name: role.name ?? '',
+    slug: role.slug ?? '',
+    description: role.description,
+    isSystem: role.isSystem,
+    permissions: normalizePermissions(role.permissions),
+  }
+}
 
 export function profileToAuthUser(
   profile: UserProfile,
@@ -20,6 +37,8 @@ export function profileToAuthUser(
     provisionalAvatar: undefined,
     storeCreditBalance:
       profile.storeCreditBalance ?? previous?.storeCreditBalance ?? 0,
+    adminRole:
+      mapProfileAdminRole(profile.adminRole) ?? previous?.adminRole,
   }
 }
 

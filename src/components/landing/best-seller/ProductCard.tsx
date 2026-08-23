@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { PRODUCTS_PATH } from '../../../config/routes'
 import { useProductCardActions } from '../../../hooks/useProductCardActions'
+import { formatProductPrice } from '../../../utils/formatProductPrice'
 import { formatReviewCount } from '../../../utils/formatReviewCount'
 
 export interface BestSellerProduct {
@@ -153,11 +154,11 @@ export function ProductCard({
         <div className="flex items-end justify-between gap-2">
           <div className="flex items-baseline gap-2">
             <span className="text-base font-bold text-primary-text">
-              ${product.price}
+              {formatProductPrice(product.price)}
             </span>
             {product.originalPrice != null && product.originalPrice > product.price && (
               <span className="text-sm text-secondary-text line-through">
-                ${product.originalPrice}
+                {formatProductPrice(product.originalPrice)}
               </span>
             )}
           </div>

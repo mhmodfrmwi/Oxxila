@@ -1,5 +1,5 @@
 // src/components/product/ProductHero.tsx
-import { Heart, Package, Share2, ShoppingBag } from 'lucide-react'
+import { Heart, Share2, ShoppingBag } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
@@ -157,7 +157,6 @@ export function ProductHero({
     subCategoryName,
     tags,
     stockCount,
-    deliveryEstimate,
   } = product
 
   const displayRating = ratingOverride ?? rating
@@ -195,15 +194,6 @@ export function ProductHero({
 
   const availabilityLabel =
     isOutOfStock ? t('productDetail.outOfStock') : t('productDetail.inStock')
-
-  const stockBadgeLabel = isOutOfStock
-    ? t('productDetail.outOfStock')
-    : deliveryEstimate
-      ? t('productDetail.inStockReadyWithDelivery', {
-          count: stockCount,
-          delivery: deliveryEstimate,
-        })
-      : t('productDetail.inStockReady', { count: stockCount })
 
   const badgeLabel = translateBadge(badge, t)
 
@@ -362,16 +352,6 @@ export function ProductHero({
                 {t('productDetail.sold', { count: soldCount })}
               </p>
             )}
-
-            <p
-              className={cn(
-                'product-detail-stock-badge',
-                isOutOfStock && 'product-detail-stock-badge--out-of-stock',
-              )}
-            >
-              <Package size={16} strokeWidth={1.5} aria-hidden />
-              <span>{stockBadgeLabel}</span>
-            </p>
 
             <p className="product-detail-info-description">{description}</p>
 

@@ -57,7 +57,7 @@
   padding: var(--pd-card-padding);
 }
 
-/* Description column — Figma: 384px white card, tabs + content */
+/* Description column — folder tabs + white content panel */
 .product-detail-description-card {
   display: flex;
   flex-direction: column;
@@ -65,27 +65,45 @@
   height: 100%;
   border: 1px solid var(--pd-hero-shell-border);
   border-radius: var(--pd-card-radius);
-  background-color: var(--input-background);
-  padding: var(--pd-card-padding);
+  background-color: var(--pd-desc-shell-bg, #f3f0fa);
+  padding: 20px 20px 24px;
   box-shadow: var(--pd-card-shadow);
 }
 
 @media (width >= 1024px) {
   .product-detail-description-card {
     min-height: var(--pd-hero-row-min);
+    padding: 24px 24px 28px;
   }
 }
 
 [data-theme='dark'] .product-detail-description-card {
+  --pd-desc-shell-bg: rgb(255 255 255 / 0.04);
   box-shadow: var(--pd-card-shadow-dark);
+}
+
+.product-detail-description-shell {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
 }
 
 .product-detail-description-tabs {
   display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 0;
-  gap: 24px;
-  border-bottom: 1px solid var(--pd-hero-shell-border);
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.product-detail-description-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .product-detail-purchase-card {
@@ -512,24 +530,35 @@
 
 .product-detail-description-text {
   margin: 0;
-  font-family: var(--font-family-base);
-  font-size: 0.875rem;
+  font-family: var(--font-family-serif, var(--font-family-base));
+  font-size: 0.9375rem;
   font-weight: var(--font-weight-regular);
-  line-height: 1.5rem;
+  line-height: 1.65;
   letter-spacing: 0;
   color: var(--primary-text);
 }
 
 .product-detail-description-panel {
-  margin-top: 16px;
+  margin-top: 0;
   min-height: 0;
   flex: 1;
-  font-family: var(--font-family-base);
-  font-size: 0.875rem;
+  padding: 24px 22px 26px;
+  border-radius: 0 20px 20px 20px;
+  background-color: var(--card-background);
+  font-family: var(--font-family-serif, var(--font-family-base));
+  font-size: 0.9375rem;
   font-weight: var(--font-weight-regular);
-  line-height: 1.5rem;
+  line-height: 1.65;
   letter-spacing: 0;
   color: var(--primary-text);
+}
+
+.product-detail-description-shell[data-active-tab='advantages'] .product-detail-description-panel {
+  border-radius: 20px;
+}
+
+.product-detail-description-shell[data-active-tab='composition'] .product-detail-description-panel {
+  border-radius: 20px 0 20px 20px;
 }
 
 .product-detail-ba-thumb {
@@ -651,21 +680,47 @@
 }
 
 .product-detail-tab {
-  font-family: var(--font-family-base);
-  font-size: 0.875rem;
+  position: relative;
+  z-index: 0;
+  flex: 1 1 0;
+  min-width: 0;
+  border: none;
+  border-radius: 16px 16px 0 0;
+  background: transparent;
+  padding: 12px 10px 14px;
+  font-family: var(--font-family-serif, var(--font-family-base));
+  font-size: 0.8125rem;
   line-height: 1.25rem;
   font-weight: var(--font-weight-medium);
   letter-spacing: 0;
-  color: var(--secondary-text);
-  padding: 0 0 12px;
-  margin-bottom: -1px;
-  border-bottom: 2px solid transparent;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  color: rgb(101 90 131 / 0.55);
+  text-align: center;
+  white-space: nowrap;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+@media (width >= 1280px) {
+  .product-detail-tab {
+    padding: 14px 16px 16px;
+    font-size: 0.9375rem;
+  }
 }
 
 .product-detail-tab[data-active='true'] {
+  z-index: 1;
+  margin-bottom: -1px;
+  background-color: var(--card-background);
   color: var(--primary-text);
-  border-bottom-color: var(--primary-button);
+}
+
+[data-theme='dark'] .product-detail-tab {
+  color: rgb(255 255 255 / 0.45);
+}
+
+[data-theme='dark'] .product-detail-tab[data-active='true'] {
+  color: var(--primary-text);
 }
 
 .product-detail-tab:hover:not([data-active='true']) {
@@ -674,10 +729,11 @@
 
 .product-detail-check-item {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-start;
-  font-size: 0.875rem;
-  line-height: 1.5rem;
+  font-family: var(--font-family-serif, var(--font-family-base));
+  font-size: 0.9375rem;
+  line-height: 1.65;
   color: var(--primary-text);
 }
 
@@ -686,11 +742,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  margin-top: 2px;
+  width: 22px;
+  height: 22px;
+  margin-top: 3px;
   border-radius: 9999px;
-  background-color: var(--primary-button);
+  background-color: rgb(123 101 251 / 0.72);
   color: var(--text-on-color);
 }
 

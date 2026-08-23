@@ -73,6 +73,18 @@ export function refundAdminReturn(returnId: string, options?: { signal?: AbortSi
   })
 }
 
+/** POST /api/v1/returns/:id/refund-as-gift — COD returns only; issues store credit. */
+export function refundReturnAsGift(returnId: string, options?: { signal?: AbortSignal }) {
+  return apiRequest<ApiRefundReturnResult>(
+    `/returns/${encodeURIComponent(returnId)}/refund-as-gift`,
+    {
+      method: 'POST',
+      auth: true,
+      signal: options?.signal,
+    },
+  )
+}
+
 /** POST /api/v1/returns/:id/bosta/schedule — schedule a Bosta customer-return pickup. */
 export function scheduleAdminBostaReturn(returnId: string, options?: { signal?: AbortSignal }) {
   return apiRequest<ApiScheduleBostaReturnResult>(

@@ -1,28 +1,22 @@
+// src/components/landing/footer/InstagramGrid.tsx
 import { motion } from 'framer-motion'
-import type { FeaturedImage } from '../../../types/catalog'
-import { useLandingCatalogContext } from '../../../hooks/useLandingCatalogContext'
+import { useTranslation } from 'react-i18next'
+import { useFooterSettingsContext } from '../../../context/FooterSettingsContext'
 import { Heading } from '../../ui/Heading'
-import { footerInstagramImages } from '../landingData'
 import { InstagramIcon } from './SocialIcons'
 
 export function InstagramGrid() {
-  const { featuredImages, loading } = useLandingCatalogContext()
-  const images: FeaturedImage[] = loading || featuredImages.length === 0
-    ? footerInstagramImages.map((image) => ({
-        id: image.id,
-        src: image.src,
-        alt: image.alt,
-      }))
-    : featuredImages
+  const { t } = useTranslation()
+  const { instagramTiles } = useFooterSettingsContext()
 
   return (
     <div>
-      <Heading variant="card">Follow on Instagram</Heading>
+      <Heading variant="card">{t('footer.followInstagram')}</Heading>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-3.5">
-        {images.map((image, index) => (
+        {instagramTiles.map((image, index) => (
           <motion.a
             key={image.id}
-            href="https://instagram.com"
+            href={image.href}
             target="_blank"
             rel="noopener noreferrer"
             className="group relative aspect-square cursor-pointer overflow-hidden rounded-3xl bg-border-subtle"
@@ -30,7 +24,7 @@ export function InstagramGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: index * 0.06 }}
-            aria-label={`View ${image.alt} on Instagram`}
+            aria-label={t('footer.viewInstagramPost', { alt: image.alt })}
           >
             <img
               src={image.src}
@@ -52,6 +46,7 @@ export function InstagramGrid() {
             </span>
           </motion.a>
         ))}
+
       </div>
     </div>
   )

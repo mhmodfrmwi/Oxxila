@@ -21,7 +21,7 @@ const HERO_WIDTH = 1440
 const HERO_HEIGHT = 796
 
 const heroFabClass = cn(
-  'hero-fab pointer-events-none absolute z-30 flex aspect-square items-center justify-center rounded-full',
+  'hero-fab pointer-events-none absolute z-40 flex aspect-square items-center justify-center rounded-full',
   'bg-button-primary text-on-emphasis',
   'shadow-lg shadow-button-primary/35',
 )
@@ -110,7 +110,7 @@ export function HeroSection() {
         >
           <svg
             viewBox={`0 0 ${HERO_WIDTH} ${HERO_HEIGHT}`}
-            className="absolute inset-0 h-full w-full"
+            className="absolute inset-0 z-0 h-full w-full"
             aria-hidden
           >
             <defs>
@@ -161,15 +161,6 @@ export function HeroSection() {
               </>
             )}
 
-            <image
-              href={heroCollageImage}
-              x="288"
-              y="21.1492"
-              width="898"
-              height="699"
-              preserveAspectRatio="xMidYMid meet"
-            />
-
             <g clipPath="url(#hero-right-blob)">
               <image
                 href={heroRightProduct}
@@ -193,20 +184,29 @@ export function HeroSection() {
             </g>
           </svg>
 
-          <div className="pointer-events-none absolute inset-0 z-20">
-            <div className="absolute inset-x-0 text-center" style={{ top: pctY(92) }}>
-              <h1 className="font-serif text-5xl font-medium leading-[1.15] text-primary-text xl:text-6xl 2xl:text-7xl">
-                {t('home.hero.titleLine1')} <br /> {t('home.hero.titleLine2')}
-              </h1>
-            </div>
-
-            <p
-              className="absolute inset-x-0 mx-auto max-w-3xl px-6 text-center font-serif text-lg italic leading-snug text-primary-text/80"
-              style={{ top: pctY(228) }}
-            >
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 px-6 pt-[7%] text-center sm:pt-[8%]">
+            <h1 className="font-serif text-5xl font-medium leading-[1.15] text-primary-text xl:text-6xl 2xl:text-7xl">
+              {t('home.hero.titleLine1')} <br /> {t('home.hero.titleLine2')}
+            </h1>
+            <p className="mx-auto mt-5 max-w-3xl font-serif text-lg italic leading-relaxed text-primary-text/80 xl:mt-6 xl:text-xl">
               {t('home.hero.subtitleDesktop')}
             </p>
           </div>
+
+          <svg
+            viewBox={`0 0 ${HERO_WIDTH} ${HERO_HEIGHT}`}
+            className="pointer-events-none absolute inset-0 z-20 h-full w-full"
+            aria-hidden
+          >
+            <image
+              href={heroCollageImage}
+              x="288"
+              y="-40"
+              width="898"
+              height="699"
+              preserveAspectRatio="xMidYMid meet"
+            />
+          </svg>
 
           <div
             className={heroFabClass}
@@ -233,7 +233,7 @@ export function HeroSection() {
           <Link
             to={SHOP_PATH}
             className={[
-              'absolute z-30 flex min-h-11 items-center justify-center rounded-full bg-button-primary text-on-emphasis transition-colors hover:bg-button-primary-hover hover:text-primary-text',
+              'absolute z-40 flex min-h-11 items-center justify-center rounded-full bg-button-primary text-on-emphasis transition-colors hover:bg-button-primary-hover hover:text-primary-text',
               typeSmallClasses,
             ].join(' ')}
             style={{
@@ -249,7 +249,7 @@ export function HeroSection() {
           <a
             href="#contact"
             className={[
-              'absolute z-30 flex min-h-11 items-center justify-center rounded-full border border-button-primary bg-background text-button-primary transition-colors hover:bg-card',
+              'absolute z-40 flex min-h-11 items-center justify-center rounded-full border border-button-primary bg-background text-button-primary transition-colors hover:bg-card',
               typeSmallClasses,
             ].join(' ')}
             style={{

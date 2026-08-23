@@ -1,6 +1,7 @@
 // src/api/users.ts
 import { apiRequest } from '../lib/api'
 import type { ApiProduct } from '../types/catalog'
+import type { ApiAdminRole } from '../types/adminPermissions'
 
 export interface BrowsingHistoryEntry {
   product: ApiProduct
@@ -16,6 +17,7 @@ export interface UserProfile {
   phone?: string
   avatar?: string
   role?: string
+  adminRole?: ApiAdminRole | null
   storeCreditBalance?: number
 }
 

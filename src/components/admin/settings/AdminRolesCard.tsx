@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAdminUsers } from '../../../hooks/useAdminUsers'
 import type { AdminUserDrawerMode } from '../../../hooks/useAdminUserDrawer'
+import { useAdminPermissions } from '../../../hooks/useAdminPermissions'
 import { cn } from '../../../lib/cn'
 import type { AdminUserRow } from '../../../types/adminUsers'
 import { Button } from '../../ui/Button'
@@ -21,6 +22,8 @@ function AdminRow({
   index,
   locking,
   isSelf,
+  canUpdate,
+  isLastActiveSuperAdmin,
   onEdit,
   onToggleLock,
 }: {
@@ -28,21 +31,29 @@ function AdminRow({
   index: number
   locking: boolean
   isSelf: boolean
+  canUpdate: boolean
+  isLastActiveSuperAdmin: boolean
   onEdit: (id: string) => void
   onToggleLock: (admin: AdminUserRow) => void
 }) {
   const { t } = useTranslation()
-  const lockDisabled = locking || (isSelf && admin.active)
+  const lockDisabled =
+    !canUpdate ||
+    locking ||
+    (isSelf && admin.active) ||
+    (isLastActiveSuperAdmin && admin.active)
 
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-[10.4px]">
       <button
         type="button"
-        onClick={() => onEdit(admin.id)}
+        onClick={() => (canUpdate ? onEdit(admin.id) : undefined)}
+        disabled={!canUpdate}
         className={cn(
           'flex min-w-0 flex-1 items-center gap-4 text-start',
           focusRingClasses,
           'rounded-xl',
+          !canUpdate && 'cursor-default',
         )}
       >
         <span
@@ -78,49 +89,58 @@ function AdminRow({
         </div>
       </button>
 
-      <button
-        type="button"
-        disabled={lockDisabled}
-        onClick={() => onToggleLock(admin)}
-        className={cn(
-          'inline-flex size-8 shrink-0 items-center justify-center rounded-lg',
-          'text-white/50 transition-colors hover:bg-white/10 hover:text-white',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-          focusRingClasses,
-        )}
-        aria-label={
-          isSelf && admin.active
-            ? 'You cannot lock your own account'
-            : admin.active
-              ? t('admin.settings.admins.lockAria', { name: admin.name })
-              : t('admin.settings.admins.unlockAria', { name: admin.name })
-        }
-        title={
-          isSelf && admin.active
-            ? 'You cannot lock your own account'
-            : admin.active
-              ? t('admin.settings.admins.lock')
-              : t('admin.settings.admins.unlock')
-        }
-      >
-        {locking ? (
-          <Loader2 size={13} className="animate-spin" aria-hidden />
-        ) : admin.active ? (
-          <Lock size={13} aria-hidden />
-        ) : (
-          <LockOpen size={13} aria-hidden />
-        )}
-      </button>
+      {canUpdate ? (
+        <button
+          type="button"
+          disabled={lockDisabled}
+          onClick={() => onToggleLock(admin)}
+          className={cn(
+            'inline-flex size-8 shrink-0 items-center justify-center rounded-lg',
+            'text-white/50 transition-colors hover:bg-white/10 hover:text-white',
+            'disabled:cursor-not-allowed disabled:opacity-50',
+            focusRingClasses,
+          )}
+          aria-label={
+            isLastActiveSuperAdmin && admin.active
+              ? t('admin.settings.admins.lastSuperAdminLock')
+              : isSelf && admin.active
+                ? 'You cannot lock your own account'
+                : admin.active
+                  ? t('admin.settings.admins.lockAria', { name: admin.name })
+                  : t('admin.settings.admins.unlockAria', { name: admin.name })
+          }
+          title={
+            isLastActiveSuperAdmin && admin.active
+              ? t('admin.settings.admins.lastSuperAdminLock')
+              : isSelf && admin.active
+                ? 'You cannot lock your own account'
+                : admin.active
+                  ? t('admin.settings.admins.lock')
+                  : t('admin.settings.admins.unlock')
+          }
+        >
+          {locking ? (
+            <Loader2 size={13} className="animate-spin" aria-hidden />
+          ) : admin.active ? (
+            <Lock size={13} aria-hidden />
+          ) : (
+            <LockOpen size={13} aria-hidden />
+          )}
+        </button>
+      ) : null}
     </div>
   )
 }
 
 /**
- * Admin Roles — list + create/edit drawer + lock/unlock (Phase 7E).
+ * Admin users — list + create/edit drawer + lock/unlock (Phase 7E).
  * Figma Settings `937:22011`. Lock/unlock maps to backend `active`.
  */
 export function AdminRolesCard() {
   const { t } = useTranslation()
+  const { can } = useAdminPermissions()
+  const canCreate = can('roles', 'create')
+  const canUpdate = can('roles', 'update')
   const {
     admins,
     loading,
@@ -134,6 +154,10 @@ export function AdminRolesCard() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerMode, setDrawerMode] = useState<AdminUserDrawerMode>('create')
   const [editAdminId, setEditAdminId] = useState<string | null>(null)
+
+  const activeSuperAdminCount = admins.filter(
+    (admin) => admin.isSuperAdmin && admin.active,
+  ).length
 
   const openCreate = useCallback(() => {
     setDrawerMode('create')
@@ -189,18 +213,20 @@ export function AdminRolesCard() {
               {t('admin.settings.admins.title')}
             </h3>
           </div>
-          <button
-            type="button"
-            onClick={openCreate}
-            className={cn(
-              'inline-flex size-8 items-center justify-center rounded-full',
-              'bg-white/10 text-white transition-colors hover:bg-white/15',
-              focusRingClasses,
-            )}
-            aria-label={t('admin.settings.admins.addAria')}
-          >
-            <Plus size={13} aria-hidden />
-          </button>
+          {canCreate ? (
+            <button
+              type="button"
+              onClick={openCreate}
+              className={cn(
+                'inline-flex size-8 items-center justify-center rounded-full',
+                'bg-white/10 text-white transition-colors hover:bg-white/15',
+                focusRingClasses,
+              )}
+              aria-label={t('admin.settings.admins.addAria')}
+            >
+              <Plus size={13} aria-hidden />
+            </button>
+          ) : null}
         </div>
 
         {staleError ? (
@@ -258,6 +284,12 @@ export function AdminRolesCard() {
                 index={index}
                 locking={lockingId === admin.id}
                 isSelf={Boolean(currentUserId && admin.id === currentUserId)}
+                canUpdate={canUpdate}
+                isLastActiveSuperAdmin={
+                  admin.isSuperAdmin &&
+                  admin.active &&
+                  activeSuperAdminCount <= 1
+                }
                 onEdit={openEdit}
                 onToggleLock={handleToggleLock}
               />
@@ -266,16 +298,18 @@ export function AdminRolesCard() {
         ) : null}
       </GlassCard>
 
-      <AdminUserDrawer
-        open={drawerOpen}
-        mode={drawerMode}
-        adminId={editAdminId}
-        isSelf={Boolean(
-          editAdminId && currentUserId && editAdminId === currentUserId,
-        )}
-        onClose={closeDrawer}
-        onSaved={handleSaved}
-      />
+      {canCreate || canUpdate ? (
+        <AdminUserDrawer
+          open={drawerOpen}
+          mode={drawerMode}
+          adminId={editAdminId}
+          isSelf={Boolean(
+            editAdminId && currentUserId && editAdminId === currentUserId,
+          )}
+          onClose={closeDrawer}
+          onSaved={handleSaved}
+        />
+      ) : null}
     </>
   )
 }

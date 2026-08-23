@@ -2,25 +2,29 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-
-const STEP_IDS = ['concern', 'explanations', 'checkout'] as const
+import type { HowItWorksStepView } from '../../../hooks/useHowItWorksSettings'
 
 interface HowItWorksAccordionProps {
+  steps: HowItWorksStepView[]
   openId: string
   onOpenChange: (id: string) => void
 }
 
-export function HowItWorksAccordion({ openId, onOpenChange }: HowItWorksAccordionProps) {
+export function HowItWorksAccordion({
+  steps,
+  openId,
+  onOpenChange,
+}: HowItWorksAccordionProps) {
   const { t } = useTranslation()
 
   return (
     <div className="space-y-4" role="region" aria-label={t('home.howItWorks.stepsAria')}>
-      {STEP_IDS.map((stepId) => {
-        const isOpen = openId === stepId
+      {steps.map((step) => {
+        const isOpen = openId === step.id
 
         return (
           <motion.div
-            key={stepId}
+            key={step.id}
             initial={false}
             className={[
               'overflow-hidden rounded-3xl border transition-colors duration-300',
@@ -33,10 +37,10 @@ export function HowItWorksAccordion({ openId, onOpenChange }: HowItWorksAccordio
               type="button"
               className="flex w-full items-center justify-between gap-3 px-4 py-4 text-start min-[481px]:gap-4 min-[481px]:px-5 min-[481px]:py-5 sm:px-6 sm:py-6"
               aria-expanded={isOpen}
-              onClick={() => onOpenChange(isOpen ? '' : stepId)}
+              onClick={() => onOpenChange(isOpen ? '' : step.id)}
             >
               <span className="min-w-0 font-serif text-base font-medium text-primary-text min-[481px]:text-lg sm:text-xl">
-                {t(`home.howItWorks.steps.${stepId}.title`)}
+                {step.title}
               </span>
 
               <span
@@ -68,7 +72,7 @@ export function HowItWorksAccordion({ openId, onOpenChange }: HowItWorksAccordio
                 >
                   <div className="px-5 pb-5 sm:px-6 sm:pb-6">
                     <p className="text-sm leading-relaxed text-secondary-text sm:text-base">
-                      {t(`home.howItWorks.steps.${stepId}.description`)}
+                      {step.description}
                     </p>
                   </div>
                 </motion.div>

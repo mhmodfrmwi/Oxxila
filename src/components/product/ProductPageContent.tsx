@@ -11,6 +11,7 @@ import { AskSpecialistDialog } from './AskSpecialistDialog'
 import { MoreFromMACCosmetics } from './MoreFromMACCosmetics'
 import { PreviouslyBrowsedRelated } from './PreviouslyBrowsedRelated'
 import { ProductHero } from './ProductHero'
+import { ProductPageErrorState } from './ProductPageErrorState'
 import { QuestionsSafetySection } from './QuestionsSafetySection'
 import { ReviewsSection } from './reviews/ReviewsSection'
 import { WriteReviewDialog } from './WriteReviewDialog'
@@ -75,9 +76,7 @@ export function ProductPageContent() {
   if (error || !product) {
     return (
       <div className="container-content pb-10 sm:pb-12 lg:pb-20">
-        <p className="text-sm text-support-error" role="alert">
-          {errorKind === 'not_found' ? t('productDetail.notFound') : t('productDetail.loadError')}
-        </p>
+        <ProductPageErrorState kind={errorKind === 'not_found' ? 'not_found' : 'load_error'} />
       </div>
     )
   }

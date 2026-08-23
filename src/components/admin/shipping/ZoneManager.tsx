@@ -42,8 +42,8 @@ function ColumnShell({
   children: ReactNode
 }) {
   return (
-    <div className="flex min-w-0 flex-1 flex-col gap-3">
-      <div className="flex items-center justify-between gap-2">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
+      <div className="flex shrink-0 items-center justify-between gap-2">
         <h4 className="text-sm font-bold text-white">
           {title}
           {typeof count === 'number' ? (
@@ -64,7 +64,7 @@ function ColumnShell({
           <Plus size={12} aria-hidden />
         </button>
       </div>
-      <div className="flex min-h-[16rem] flex-col gap-1.5 overflow-y-auto rounded-xl border border-white/5 bg-white/[0.02] p-2">
+      <div className="flex min-h-[16rem] max-h-[min(26rem,58vh)] flex-col gap-1.5 overflow-y-auto overscroll-y-contain rounded-xl border border-white/5 bg-white/[0.02] p-2">
         {children}
       </div>
     </div>
@@ -352,7 +352,7 @@ export function ZoneManager() {
         <p className="mt-1 text-xs text-white/40">{t('admin.shipping.zones.subtitle')}</p>
       </div>
 
-      <div className="flex flex-col gap-4 lg:flex-row">
+      <div className="flex min-h-0 flex-col gap-4 lg:flex-row lg:items-stretch">
         <ColumnShell
           title={t('admin.shipping.zones.countries')}
           count={zones.countries.length}

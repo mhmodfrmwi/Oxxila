@@ -71,7 +71,11 @@ export function useSubcategoryDrawer({
       resetForm(subcategoryToFormValues(subcategory))
       setImagePreview(subcategory.image)
     } else {
-      resetForm(emptySubcategoryFormValues())
+      const initial = emptySubcategoryFormValues()
+      if (subcategory?.categoryId) {
+        initial.category = subcategory.categoryId
+      }
+      resetForm(initial)
       setImagePreview(null)
     }
 

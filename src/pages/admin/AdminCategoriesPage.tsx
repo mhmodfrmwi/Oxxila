@@ -2,74 +2,159 @@
 import { Plus } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CategoriesCatalogTable } from '../../components/admin/categories/CategoriesCatalogTable'
+import { AdminCan } from '../../components/admin/AdminCan'
 import { CategoriesCatalogToolbar } from '../../components/admin/categories/CategoriesCatalogToolbar'
+import { CategoriesTreeTable } from '../../components/admin/categories/CategoriesTreeTable'
 import { CategoryDrawer } from '../../components/admin/categories/CategoryDrawer'
 import { DeleteCategoryDialog } from '../../components/admin/categories/DeleteCategoryDialog'
+import { DeleteSubcategoryDialog } from '../../components/admin/subcategories/DeleteSubcategoryDialog'
+import { SubcategoryDrawer } from '../../components/admin/subcategories/SubcategoryDrawer'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
 import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { Button } from '../../components/ui/Button'
 import { focusRingClasses } from '../../components/ui/interactionStyles'
-import { useAdminCategories } from '../../hooks/useAdminCategories'
+import { useAdminCategoryTree } from '../../hooks/useAdminCategoryTree'
 import type { CategoryDrawerMode } from '../../hooks/useCategoryDrawer'
+import type { SubcategoryDrawerMode } from '../../hooks/useSubcategoryDrawer'
 import { cn } from '../../lib/cn'
-import type { AdminCategoryRow } from '../../types/adminCategories'
+import type {
+  AdminCategoryRow,
+  AdminCategoryTreeRow,
+  AdminCategoryTreeSubcategory,
+} from '../../types/adminCategories'
+import type { AdminSubcategoryRow } from '../../types/adminSubcategories'
+
+function treeRowToCategoryRow(row: AdminCategoryTreeRow): AdminCategoryRow {
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    image: row.image,
+    isActive: row.isActive,
+    subcategoryCount: row.subcategories.length,
+  }
+}
+
+function treeSubcategoryToRow(
+  category: AdminCategoryTreeRow,
+  subcategory: AdminCategoryTreeSubcategory,
+): AdminSubcategoryRow {
+  return {
+    id: subcategory.id,
+    name: subcategory.name,
+    slug: subcategory.slug,
+    image: null,
+    isActive: subcategory.isActive,
+    categoryId: category.id,
+    categoryName: category.name,
+  }
+}
+
+function createSubcategoryStub(category: AdminCategoryTreeRow): AdminSubcategoryRow {
+  return {
+    id: '',
+    name: '',
+    slug: '',
+    image: null,
+    isActive: true,
+    categoryId: category.id,
+    categoryName: category.name,
+  }
+}
 
 /**
- * Categories Manager — list, create/edit drawer, activate toggle, delete.
+ * Categories Manager — tree view with nested subcategories, create/edit drawers, visibility toggles, delete.
  */
 export function AdminCategoriesPage() {
   const { t } = useTranslation()
-  const catalog = useAdminCategories()
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [drawerMode, setDrawerMode] = useState<CategoryDrawerMode>('create')
+  const tree = useAdminCategoryTree()
+  const [categoryDrawerOpen, setCategoryDrawerOpen] = useState(false)
+  const [categoryDrawerMode, setCategoryDrawerMode] =
+    useState<CategoryDrawerMode>('create')
   const [editCategory, setEditCategory] = useState<AdminCategoryRow | null>(
     null,
   )
-  const [deleteTarget, setDeleteTarget] = useState<AdminCategoryRow | null>(
-    null,
+  const [deleteCategoryTarget, setDeleteCategoryTarget] =
+    useState<AdminCategoryRow | null>(null)
+  const [subcategoryDrawerOpen, setSubcategoryDrawerOpen] = useState(false)
+  const [subcategoryDrawerMode, setSubcategoryDrawerMode] =
+    useState<SubcategoryDrawerMode>('create')
+  const [editSubcategory, setEditSubcategory] =
+    useState<AdminSubcategoryRow | null>(null)
+  const [deleteSubcategoryTarget, setDeleteSubcategoryTarget] =
+    useState<AdminSubcategoryRow | null>(null)
+
+  const openCreateCategory = useCallback(() => {
+    setCategoryDrawerMode('create')
+    setEditCategory(null)
+    setCategoryDrawerOpen(true)
+  }, [])
+
+  const openEditCategory = useCallback((category: AdminCategoryTreeRow) => {
+    setCategoryDrawerMode('edit')
+    setEditCategory(treeRowToCategoryRow(category))
+    setCategoryDrawerOpen(true)
+  }, [])
+
+  const closeCategoryDrawer = useCallback(() => {
+    setCategoryDrawerOpen(false)
+    setEditCategory(null)
+  }, [])
+
+  const openCreateSubcategory = useCallback((category: AdminCategoryTreeRow) => {
+    setSubcategoryDrawerMode('create')
+    setEditSubcategory(createSubcategoryStub(category))
+    setSubcategoryDrawerOpen(true)
+  }, [])
+
+  const openEditSubcategory = useCallback(
+    (
+      category: AdminCategoryTreeRow,
+      subcategory: AdminCategoryTreeSubcategory,
+    ) => {
+      setSubcategoryDrawerMode('edit')
+      setEditSubcategory(treeSubcategoryToRow(category, subcategory))
+      setSubcategoryDrawerOpen(true)
+    },
+    [],
   )
 
-  const openCreate = useCallback(() => {
-    setDrawerMode('create')
-    setEditCategory(null)
-    setDrawerOpen(true)
+  const closeSubcategoryDrawer = useCallback(() => {
+    setSubcategoryDrawerOpen(false)
+    setEditSubcategory(null)
   }, [])
 
-  const openEdit = useCallback((category: AdminCategoryRow) => {
-    setDrawerMode('edit')
-    setEditCategory(category)
-    setDrawerOpen(true)
-  }, [])
-
-  const closeDrawer = useCallback(() => {
-    setDrawerOpen(false)
-    setEditCategory(null)
-  }, [])
-
-  const handleSaved = useCallback(
+  const handleCategorySaved = useCallback(
     (category: AdminCategoryRow) => {
-      catalog.upsertCategory(category)
-      catalog.reload()
+      tree.upsertCategory(category)
+      tree.reload()
     },
-    [catalog],
+    [tree],
+  )
+
+  const handleSubcategorySaved = useCallback(() => {
+    tree.reload()
+  }, [tree])
+
+  const handleDeleteSubcategory = useCallback(
+    async (subcategoryId: string) => {
+      if (!deleteSubcategoryTarget?.categoryId) return
+      await tree.deleteSubcategory(
+        deleteSubcategoryTarget.categoryId,
+        subcategoryId,
+      )
+    },
+    [deleteSubcategoryTarget?.categoryId, tree],
   )
 
   const failed =
-    Boolean(catalog.error) &&
-    !catalog.loading &&
-    catalog.categories.length === 0
-  const staleError = Boolean(catalog.error) && catalog.categories.length > 0
-  const currentPage = catalog.pagination?.currentPage ?? catalog.filters.page
-  const totalPages = Math.max(catalog.pagination?.numberOfPages ?? 1, 1)
-  const totalCount =
-    catalog.pagination?.totalDocuments ?? catalog.categories.length
-  const showingCount = catalog.categories.length
+    Boolean(tree.error) && !tree.loading && tree.categories.length === 0
+  const staleError = Boolean(tree.error) && tree.categories.length > 0
 
-  const emptyTitle = catalog.hasActiveFilters
+  const emptyTitle = tree.hasActiveFilters
     ? t('admin.categories.emptyFilteredTitle')
     : t('admin.categories.emptyTitle')
-  const emptyDescription = catalog.hasActiveFilters
+  const emptyDescription = tree.hasActiveFilters
     ? t('admin.categories.emptyFilteredDescription')
     : t('admin.categories.emptyDescription')
 
@@ -81,26 +166,28 @@ export function AdminCategoriesPage() {
         actions={
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
             <CategoriesCatalogToolbar
-              keyword={catalog.filters.keyword}
-              onKeywordChange={catalog.setKeyword}
-              disabled={catalog.loading && catalog.categories.length === 0}
+              keyword={tree.filters.keyword}
+              onKeywordChange={tree.setKeyword}
+              disabled={tree.loading && tree.categories.length === 0}
             />
-            <button
-              type="button"
-              onClick={openCreate}
-              className={cn(
-                'inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5',
-                'bg-gradient-to-r from-accent to-[#7c69ff]',
-                'text-sm font-bold text-white',
-                'shadow-[0_8px_12.5px_rgb(163_148_255_/_0.3)]',
-                'transition-opacity hover:opacity-95',
-                focusRingClasses,
-              )}
-              aria-label={t('admin.categories.addCategory')}
-            >
-              <Plus size={13} aria-hidden />
-              {t('admin.categories.addCategory')}
-            </button>
+            <AdminCan tab="categories" action="create">
+              <button
+                type="button"
+                onClick={openCreateCategory}
+                className={cn(
+                  'inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5',
+                  'bg-gradient-to-r from-accent to-[#7c69ff]',
+                  'text-sm font-bold text-white',
+                  'shadow-[0_8px_12.5px_rgb(163_148_255_/_0.3)]',
+                  'transition-opacity hover:opacity-95',
+                  focusRingClasses,
+                )}
+                aria-label={t('admin.categories.addCategory')}
+              >
+                <Plus size={13} aria-hidden />
+                {t('admin.categories.addCategory')}
+              </button>
+            </AdminCan>
           </div>
         }
       />
@@ -109,13 +196,13 @@ export function AdminCategoriesPage() {
         <EmptyState
           title={t('admin.categories.loadErrorTitle')}
           description={
-            catalog.error ?? t('admin.categories.loadErrorDescription')
+            tree.error ?? t('admin.categories.loadErrorDescription')
           }
           action={
             <Button
               type="button"
               variant="outline"
-              onClick={() => void catalog.reload()}
+              onClick={() => void tree.reload()}
             >
               {t('admin.categories.retry')}
             </Button>
@@ -128,61 +215,94 @@ export function AdminCategoriesPage() {
               className="mb-3 rounded-xl border border-support-error/30 bg-support-error/10 px-4 py-3 text-sm text-support-error"
               role="alert"
             >
-              {catalog.error}
+              {tree.error}
             </p>
           ) : null}
 
-          <CategoriesCatalogTable
-            categories={catalog.categories}
-            loading={catalog.loading}
+          <CategoriesTreeTable
+            categories={tree.categories}
+            loading={tree.loading}
             emptyTitle={emptyTitle}
             emptyDescription={emptyDescription}
             emptyAction={
-              catalog.hasActiveFilters ? (
+              tree.hasActiveFilters ? (
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={catalog.clearFilters}
+                  onClick={tree.clearFilters}
                 >
                   {t('admin.categories.clearFilters')}
                 </Button>
               ) : (
-                <Button type="button" variant="outline" onClick={openCreate}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={openCreateCategory}
+                >
                   {t('admin.categories.addCategory')}
                 </Button>
               )
             }
-            showingCount={showingCount}
-            totalCount={totalCount}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={catalog.setPage}
-            togglingCategoryId={catalog.togglingCategoryId}
-            deletingCategoryId={catalog.deletingCategoryId}
-            onEditCategory={openEdit}
-            onDeleteCategory={setDeleteTarget}
-            onToggleActive={(id) => void catalog.toggleActive(id)}
+            totalCount={tree.totalCount}
+            togglingCategoryId={tree.togglingCategoryId}
+            deletingCategoryId={tree.deletingCategoryId}
+            togglingSubcategoryId={tree.togglingSubcategoryId}
+            deletingSubcategoryId={tree.deletingSubcategoryId}
+            onEditCategory={openEditCategory}
+            onDeleteCategory={(category) =>
+              setDeleteCategoryTarget(treeRowToCategoryRow(category))
+            }
+            onToggleCategoryActive={(id) => void tree.toggleCategoryActive(id)}
+            onAddSubcategory={openCreateSubcategory}
+            onEditSubcategory={openEditSubcategory}
+            onDeleteSubcategory={(category, subcategory) =>
+              setDeleteSubcategoryTarget(
+                treeSubcategoryToRow(category, subcategory),
+              )
+            }
+            onToggleSubcategoryActive={(categoryId, subcategoryId) =>
+              void tree.toggleSubcategoryActive(categoryId, subcategoryId)
+            }
           />
         </>
       )}
 
       <CategoryDrawer
-        open={drawerOpen}
-        mode={drawerMode}
+        open={categoryDrawerOpen}
+        mode={categoryDrawerMode}
         category={editCategory}
-        onClose={closeDrawer}
-        onSaved={handleSaved}
+        onClose={closeCategoryDrawer}
+        onSaved={handleCategorySaved}
+      />
+
+      <SubcategoryDrawer
+        open={subcategoryDrawerOpen}
+        mode={subcategoryDrawerMode}
+        subcategory={editSubcategory}
+        onClose={closeSubcategoryDrawer}
+        onSaved={handleSubcategorySaved}
       />
 
       <DeleteCategoryDialog
-        open={Boolean(deleteTarget)}
-        category={deleteTarget}
+        open={Boolean(deleteCategoryTarget)}
+        category={deleteCategoryTarget}
         submitting={
-          deleteTarget != null &&
-          catalog.deletingCategoryId === deleteTarget.id
+          deleteCategoryTarget != null &&
+          tree.deletingCategoryId === deleteCategoryTarget.id
         }
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={catalog.deleteCategory}
+        onClose={() => setDeleteCategoryTarget(null)}
+        onConfirm={tree.deleteCategory}
+      />
+
+      <DeleteSubcategoryDialog
+        open={Boolean(deleteSubcategoryTarget)}
+        subcategory={deleteSubcategoryTarget}
+        submitting={
+          deleteSubcategoryTarget != null &&
+          tree.deletingSubcategoryId === deleteSubcategoryTarget.id
+        }
+        onClose={() => setDeleteSubcategoryTarget(null)}
+        onConfirm={handleDeleteSubcategory}
       />
     </>
   )

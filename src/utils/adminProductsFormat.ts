@@ -38,7 +38,7 @@ export function resolveInventoryProgress(stock: number): number {
 export function formatAdminProductPrice(value: number, locale = 'en'): string {
   return new Intl.NumberFormat(resolveDashboardLocale(locale), {
     style: 'currency',
-    currency: 'USD',
+    currency: 'EGP',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value)

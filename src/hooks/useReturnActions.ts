@@ -2,6 +2,7 @@
 import { useCallback, useState } from 'react'
 import {
   refundAdminReturn,
+  refundReturnAsGift,
   scheduleAdminBostaReturn,
   updateAdminReturnStatus,
 } from '../api/admin/returns'
@@ -37,6 +38,7 @@ export function useReturnActions({ returnId, onMutated }: UseReturnActionsOption
   const [advanceState, setAdvanceState] = useState<ActionState>(idleState)
   const [scheduleState, setScheduleState] = useState<ActionState>(idleState)
   const [refundState, setRefundState] = useState<ActionState>(idleState)
+  const [refundGiftState, setRefundGiftState] = useState<ActionState>(idleState)
 
   const resetApproveError = useCallback(() => {
     setApproveState((previous) => (previous.error ? { ...previous, error: null } : previous))
@@ -140,6 +142,24 @@ export function useReturnActions({ returnId, onMutated }: UseReturnActionsOption
     }
   }, [returnId, onMutated])
 
+  const refundReturnAsGiftCard = useCallback(async (): Promise<ReturnActionResult> => {
+    if (!returnId) return { ok: false, error: null }
+    setRefundGiftState({ submitting: true, error: null })
+    try {
+      await refundReturnAsGift(returnId)
+      setRefundGiftState(idleState)
+      onMutated()
+      return { ok: true, error: null }
+    } catch (error) {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : 'Unable to refund return as gift card'
+      setRefundGiftState({ submitting: false, error: message })
+      return { ok: false, error: message }
+    }
+  }, [returnId, onMutated])
+
   return {
     approveSubmitting: approveState.submitting,
     approveError: approveState.error,
@@ -158,6 +178,9 @@ export function useReturnActions({ returnId, onMutated }: UseReturnActionsOption
     refundSubmitting: refundState.submitting,
     refundError: refundState.error,
     refundReturn,
+    refundGiftSubmitting: refundGiftState.submitting,
+    refundGiftError: refundGiftState.error,
+    refundReturnAsGift: refundReturnAsGiftCard,
   }
 }
 

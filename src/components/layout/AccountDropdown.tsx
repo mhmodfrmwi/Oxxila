@@ -4,7 +4,9 @@ import { useEffect, useId, useRef, type RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { ACCOUNT_NAV_ICONS, ACCOUNT_SIDEBAR_NAV } from '../../config/accountNav'
+import { ACCOUNT_GIFT_CARDS_PATH } from '../../config/routes'
 import { cn } from '../../lib/cn'
+import { formatCartPrice } from '../../utils/formatProductPrice'
 import { focusRingClasses } from '../ui/interactionStyles'
 
 interface AccountDropdownProps {
@@ -13,6 +15,8 @@ interface AccountDropdownProps {
   /** Root that contains the trigger + menu — clicks inside do not close. */
   rootRef: RefObject<HTMLElement | null>
   storeCreditBalance?: number
+  giftCardsLoading?: boolean
+  onRefreshGiftCards?: () => void
   className?: string
   /** Optional stable id for aria-controls on the trigger. */
   id?: string
@@ -23,6 +27,8 @@ export function AccountDropdown({
   onClose,
   rootRef,
   storeCreditBalance = 0,
+  giftCardsLoading = false,
+  onRefreshGiftCards,
   className,
   id,
 }: AccountDropdownProps) {
@@ -92,9 +98,15 @@ export function AccountDropdown({
     }
   }, [open, onClose, rootRef])
 
-  const creditLabel = Number.isInteger(storeCreditBalance)
-    ? String(storeCreditBalance)
-    : storeCreditBalance.toFixed(0)
+  useEffect(() => {
+    if (open) onRefreshGiftCards?.()
+  }, [open, onRefreshGiftCards])
+
+  const creditLabel = formatCartPrice(storeCreditBalance)
+  const creditBadge =
+    storeCreditBalance % 1 === 0
+      ? String(storeCreditBalance)
+      : storeCreditBalance.toFixed(0)
 
   return (
     <div
@@ -133,23 +145,29 @@ export function AccountDropdown({
           )
         })}
         <li role="none">
-          <div
+          <Link
             role="menuitem"
-            aria-disabled="true"
+            to={ACCOUNT_GIFT_CARDS_PATH}
             tabIndex={open ? 0 : -1}
+            onClick={onClose}
             className={cn(
               'flex w-full items-center gap-3 rounded-xl px-3 py-2.5',
-              'font-serif text-sm text-primary-text',
+              'font-serif text-sm text-primary-text transition-colors',
+              'hover:bg-accent/10 hover:text-accent',
+              focusRingClasses,
             )}
           >
             <CircleDollarSign size={18} strokeWidth={1.5} aria-hidden className="shrink-0" />
             <span className="min-w-0 flex-1 truncate text-start">
               {t('nav.dropdown.giftCards')}
             </span>
-            <span className="shrink-0 tabular-nums text-secondary-text" aria-label={t('nav.dropdown.storeCredit', { balance: creditLabel })}>
-              {creditLabel}
+            <span
+              className="shrink-0 tabular-nums text-secondary-text"
+              aria-label={t('nav.dropdown.storeCredit', { balance: creditLabel })}
+            >
+              {giftCardsLoading ? '…' : creditBadge}
             </span>
-          </div>
+          </Link>
         </li>
       </ul>
     </div>

@@ -150,13 +150,9 @@ export function ContactForm() {
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5, delay: 0.1 }}
+      transition={{ duration: 2, delay: 0.1 }}
       noValidate
     >
-      <p className="rounded-xl bg-surface-muted/60 px-4 py-3 text-sm text-secondary-text" role="status">
-        {t('home.contact.unavailable')}
-      </p>
-
       <FloatingField
         id="name"
         label={t('home.contact.name')}

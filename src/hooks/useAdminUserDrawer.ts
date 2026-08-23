@@ -6,7 +6,9 @@ import {
   getAdminUser,
   updateAdminUser,
 } from '../api/admin/admins'
+import { getAdminRoles } from '../api/admin/adminRoles'
 import { ApiError } from '../lib/api'
+import type { ApiAdminRole } from '../types/adminPermissions'
 import type {
   AdminUserFormErrors,
   AdminUserFormValues,
@@ -47,6 +49,8 @@ export function useAdminUserDrawer({
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [dirty, setDirty] = useState(false)
+  const [roles, setRoles] = useState<ApiAdminRole[]>([])
+  const [rolesLoading, setRolesLoading] = useState(false)
   const baselineRef = useRef<string>('')
   const requestIdRef = useRef(0)
 
@@ -63,16 +67,38 @@ export function useAdminUserDrawer({
       resetForm(emptyAdminFormValues())
       setLoading(false)
       setLoadError(null)
+      setRoles([])
       return
     }
+
+    const controller = new AbortController()
+    void (async () => {
+      setRolesLoading(true)
+      try {
+        const response = await getAdminRoles({ signal: controller.signal })
+        setRoles(response.data ?? [])
+      } catch (error) {
+        if (!isAbortError(error)) {
+          setRoles([])
+        }
+      } finally {
+        setRolesLoading(false)
+      }
+    })()
 
     if (mode === 'create') {
       resetForm(emptyAdminFormValues())
       setLoading(false)
       setLoadError(null)
-      return
     }
 
+    return () => {
+      controller.abort()
+    }
+  }, [open, mode, resetForm])
+
+  useEffect(() => {
+    if (!open || mode !== 'edit') return
     if (!adminId) {
       setLoadError('Admin not found')
       setLoading(false)
@@ -191,6 +217,8 @@ export function useAdminUserDrawer({
     submitting,
     submitError,
     dirty,
+    roles,
+    rolesLoading,
     setField,
     submit,
   }

@@ -3,6 +3,8 @@ import type {
   AdminCategoryFormErrors,
   AdminCategoryFormValues,
   AdminCategoryRow,
+  AdminCategoryTreeRow,
+  AdminCategoryTreeSubcategory,
   AdminCategoryWriteFields,
   ApiAdminCategory,
 } from '../types/adminCategories'
@@ -17,6 +19,34 @@ export const ADMIN_CATEGORY_IMAGE_TYPES = [
 ] as const
 export const ADMIN_CATEGORY_NAME_MIN = 2
 export const ADMIN_CATEGORY_NAME_MAX = 50
+
+function mapApiSubcategoryToTreeSub(
+  subcategory: NonNullable<ApiAdminCategory['subcategories']>[number],
+): AdminCategoryTreeSubcategory {
+  return {
+    id: String(subcategory._id),
+    name: subcategory.name ?? '',
+    slug: subcategory.slug ?? '',
+    isActive: subcategory.isActive !== false,
+  }
+}
+
+export function mapApiCategoryToTreeRow(
+  category: ApiAdminCategory,
+): AdminCategoryTreeRow {
+  const subcategories = Array.isArray(category.subcategories)
+    ? category.subcategories.map(mapApiSubcategoryToTreeSub)
+    : []
+
+  return {
+    id: String(category._id),
+    name: category.name ?? '',
+    slug: category.slug ?? '',
+    image: category.image ? String(category.image) : null,
+    isActive: category.isActive !== false,
+    subcategories,
+  }
+}
 
 export function mapApiCategoryToAdminRow(
   category: ApiAdminCategory,

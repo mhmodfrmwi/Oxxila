@@ -1,5 +1,6 @@
+// src/components/landing/footer/SocialLinks.tsx
 import { motion } from 'framer-motion'
-import { footerSocialLinks } from '../landingData'
+import { useFooterSettingsContext } from '../../../context/FooterSettingsContext'
 import {
   FacebookIcon,
   InstagramIcon,
@@ -17,10 +18,12 @@ const iconMap = {
 } as const
 
 export function SocialLinks() {
+  const { socialLinks } = useFooterSettingsContext()
+
   return (
     <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-      {footerSocialLinks.map((social) => {
-        const Icon = iconMap[social.id as keyof typeof iconMap]
+      {socialLinks.map((social) => {
+        const Icon = iconMap[social.id]
         return (
           <motion.a
             key={social.id}

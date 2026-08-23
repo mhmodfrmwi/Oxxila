@@ -1,4 +1,5 @@
 // src/types/adminUsers.ts
+import type { ApiAdminRole } from './adminPermissions'
 
 /** Raw admin from /api/v1/admins. */
 export interface ApiAdminUser {
@@ -7,6 +8,7 @@ export interface ApiAdminUser {
   email: string
   role?: 'admin' | 'user'
   adminTitle?: string | null
+  adminRole?: ApiAdminRole | null
   active?: boolean
   phone?: string
   avatar?: string
@@ -20,9 +22,12 @@ export interface AdminUserRow {
   name: string
   email: string
   adminTitle: string | null
+  adminRoleId: string | null
+  adminRoleName: string | null
   titleLabel: string
   initials: string
   active: boolean
+  isSuperAdmin: boolean
 }
 
 export interface AdminUsersListParams {
@@ -37,6 +42,7 @@ export interface AdminUserCreatePayload {
   name: string
   email: string
   password: string
+  adminRole: string
   adminTitle?: string | null
 }
 
@@ -45,6 +51,7 @@ export interface AdminUserUpdatePayload {
   name?: string
   email?: string
   adminTitle?: string | null
+  adminRole?: string
   active?: boolean
 }
 
@@ -54,6 +61,7 @@ export interface AdminUserFormValues {
   email: string
   password: string
   adminTitle: string
+  adminRole: string
   active: boolean
 }
 

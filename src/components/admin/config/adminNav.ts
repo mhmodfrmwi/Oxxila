@@ -12,6 +12,7 @@ import {
   ADMIN_SETTINGS_PATH,
   ADMIN_SHIPPING_PATH,
   ADMIN_SUBCATEGORIES_PATH,
+  ADMIN_WEBSITE_CONTENT_PATH,
 } from '../../../config/routes'
 import iconBrands from '../../../assets/admin/icon-brands.svg'
 import iconCategories from '../../../assets/admin/icon-categories.svg'
@@ -43,13 +44,6 @@ export interface AdminNavItem {
  * to show them again.
  */
 export const ADMIN_NAV_ITEMS_HIDDEN_FROM_SIDEBAR: readonly AdminNavItem[] = [
-  {
-    id: 'categories',
-    labelKey: 'admin.nav.categories',
-    to: ADMIN_CATEGORIES_PATH,
-    iconSrc: iconCategories,
-    iconSize: 24,
-  },
   {
     id: 'brands',
     labelKey: 'admin.nav.brands',
@@ -88,6 +82,20 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     to: ADMIN_PRODUCTS_PATH,
     iconSrc: iconProducts,
     iconSize: 20,
+  },
+  {
+    id: 'categories',
+    labelKey: 'admin.nav.categories',
+    to: ADMIN_CATEGORIES_PATH,
+    iconSrc: iconCategories,
+    iconSize: 24,
+  },
+  {
+    id: 'websiteContent',
+    labelKey: 'admin.nav.websiteContent',
+    to: ADMIN_WEBSITE_CONTENT_PATH,
+    iconSrc: iconFaqs,
+    iconSize: 24,
   },
   {
     id: 'orders',
