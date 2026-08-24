@@ -11,7 +11,7 @@ import { CountdownPromoCarousel } from './CountdownPromoCarousel'
 function OffersSkeleton() {
   return (
     <div
-      className="h-[min(220px,48vw)] w-full animate-pulse rounded-card bg-surface-muted sm:h-[240px]"
+      className="aspect-[1440/240] max-h-[14rem] min-h-[6.5rem] w-full animate-pulse bg-surface-muted"
       aria-hidden
     />
   )
@@ -20,7 +20,7 @@ function OffersSkeleton() {
 export function PromoCarouselSection() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { slides, loading, error } = useOffersCarousel()
+  const { slides, loading, error, isUpcoming } = useOffersCarousel()
 
   return (
     <ContentSection aria-label={t('shop.offers.ariaLabel')} padding="compact">
@@ -42,7 +42,11 @@ export function PromoCarouselSection() {
       ) : (
         <CountdownPromoCarousel
           slides={slides}
-          ariaLabel={t('shop.offers.carouselAria')}
+          ariaLabel={
+            isUpcoming
+              ? t('shop.offers.upcomingCarouselAria')
+              : t('shop.offers.carouselAria')
+          }
         />
       )}
     </ContentSection>

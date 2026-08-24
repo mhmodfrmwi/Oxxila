@@ -1,5 +1,5 @@
 // src/components/admin/categories/CategoriesTreeTable.tsx
-import { ImageOff, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ChevronRight, ImageOff, Pencil, Plus, Trash2 } from 'lucide-react'
 import { Fragment, useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAdminPermissions } from '../../../hooks/useAdminPermissions'
@@ -47,10 +47,14 @@ function CategoryThumbnail({
   src,
   name,
   indented = false,
+  expandControl,
+  meta,
 }: {
   src: string | null
   name: string
   indented?: boolean
+  expandControl?: ReactNode
+  meta?: ReactNode
 }) {
   const [failed, setFailed] = useState(false)
   const showImage = Boolean(src) && !failed
@@ -62,10 +66,11 @@ function CategoryThumbnail({
   return (
     <div
       className={cn(
-        'flex min-w-0 items-center gap-4',
+        'flex min-w-0 items-center gap-3',
         indented && 'ps-8',
       )}
     >
+      {expandControl}
       {showImage ? (
         <img
           src={src!}
@@ -84,9 +89,12 @@ function CategoryThumbnail({
           <ImageOff size={indented ? 12 : 14} />
         </span>
       )}
-      <p className="truncate text-sm font-bold text-primary-text" title={name}>
-        {name}
-      </p>
+      <div className="min-w-0">
+        <p className="truncate text-sm font-bold text-primary-text" title={name}>
+          {name}
+        </p>
+        {meta}
+      </div>
     </div>
   )
 }
@@ -178,6 +186,28 @@ export function CategoriesTreeTable({
   const canDelete = can('categories', 'delete')
   const locale = i18n.language
   const isEmpty = !loading && categories.length === 0
+  const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  )
+
+  const toggleExpanded = (categoryId: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(categoryId)) next.delete(categoryId)
+      else next.add(categoryId)
+      return next
+    })
+  }
+
+  const handleAddSubcategory = (category: AdminCategoryTreeRow) => {
+    setExpandedIds((prev) => {
+      if (prev.has(category.id)) return prev
+      const next = new Set(prev)
+      next.add(category.id)
+      return next
+    })
+    onAddSubcategory?.(category)
+  }
 
   return (
     <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.02]">
@@ -220,171 +250,133 @@ export function CategoriesTreeTable({
               </>
             ) : null}
 
-            {categories.map((category) => (
-              <Fragment key={category.id}>
-                <tr className="border-b border-white/5 bg-white/[0.01]">
-                  <td className="px-6 py-4">
-                    <CategoryThumbnail src={category.image} name={category.name} />
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="font-mono text-xs text-secondary-text">
-                      {category.slug}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      {canUpdate ? (
-                        <ActiveSwitch
-                          checked={category.isActive}
-                          disabled={
-                            loading || togglingCategoryId === category.id
-                          }
-                          label={
-                            category.isActive
-                              ? t('admin.categories.tree.hideAria', {
-                                  name: category.name,
-                                })
-                              : t('admin.categories.tree.showAria', {
-                                  name: category.name,
-                                })
-                          }
-                          onToggle={() => onToggleCategoryActive?.(category.id)}
-                        />
-                      ) : null}
-                      <StatusBadge
-                        tone={category.isActive ? 'success' : 'neutral'}
-                      >
-                        {category.isActive
-                          ? t('admin.categories.tree.visible')
-                          : t('admin.categories.tree.hidden')}
-                      </StatusBadge>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-end">
-                    <div className="inline-flex items-center justify-end gap-1">
-                      {canCreate ? (
-                        <button
-                          type="button"
-                          onClick={() => onAddSubcategory?.(category)}
-                          className={cn(
-                            'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
-                            'transition-colors hover:bg-accent/10 hover:text-accent',
-                            focusRingClasses,
-                          )}
-                          aria-label={t('admin.categories.tree.addSubcategoryAria', {
-                            name: category.name,
-                          })}
-                          title={t('admin.categories.tree.addSubcategory')}
-                        >
-                          <Plus size={13} aria-hidden />
-                        </button>
-                      ) : null}
-                      {canUpdate ? (
-                        <button
-                          type="button"
-                          onClick={() => onEditCategory?.(category)}
-                          className={cn(
-                            'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
-                            'transition-colors hover:bg-white/10 hover:text-white',
-                            focusRingClasses,
-                          )}
-                          aria-label={t('admin.categories.editAria', {
-                            name: category.name,
-                          })}
-                        >
-                          <Pencil size={13} aria-hidden />
-                        </button>
-                      ) : null}
-                      {canDelete ? (
-                        <button
-                          type="button"
-                          onClick={() => onDeleteCategory?.(category)}
-                          disabled={deletingCategoryId === category.id}
-                          className={cn(
-                            'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
-                            'transition-colors hover:bg-support-error/10 hover:text-support-error',
-                            'disabled:pointer-events-none disabled:opacity-40',
-                            focusRingClasses,
-                          )}
-                          aria-label={t('admin.categories.deleteAria', {
-                            name: category.name,
-                          })}
-                        >
-                          <Trash2 size={13} aria-hidden />
-                        </button>
-                      ) : null}
-                    </div>
-                  </td>
-                </tr>
+            {categories.map((category) => {
+              const hasSubcategories = category.subcategories.length > 0
+              const isExpanded = expandedIds.has(category.id)
 
-                {category.subcategories.map((subcategory) => (
-                  <tr
-                    key={`${category.id}-${subcategory.id}`}
-                    className="border-b border-white/5"
-                  >
-                    <td className="px-6 py-3">
+              return (
+                <Fragment key={category.id}>
+                  <tr className="border-b border-white/5 bg-white/[0.01]">
+                    <td className="px-6 py-4">
                       <CategoryThumbnail
-                        src={null}
-                        name={subcategory.name}
-                        indented
+                        src={category.image}
+                        name={category.name}
+                        expandControl={
+                          hasSubcategories ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleExpanded(category.id)}
+                              className={cn(
+                                'inline-flex size-7 shrink-0 items-center justify-center rounded-md text-white/45',
+                                'transition-colors hover:bg-white/10 hover:text-white',
+                                focusRingClasses,
+                              )}
+                              aria-expanded={isExpanded}
+                              aria-label={
+                                isExpanded
+                                  ? t('admin.categories.tree.collapseAria', {
+                                      name: category.name,
+                                    })
+                                  : t('admin.categories.tree.expandAria', {
+                                      name: category.name,
+                                    })
+                              }
+                            >
+                              <ChevronRight
+                                size={16}
+                                className={cn(
+                                  'transition-transform duration-200',
+                                  isExpanded ? 'rotate-90' : 'rtl:rotate-180',
+                                )}
+                                aria-hidden
+                              />
+                            </button>
+                          ) : (
+                            <span className="size-7 shrink-0" aria-hidden />
+                          )
+                        }
+                        meta={
+                          hasSubcategories && !isExpanded ? (
+                            <p className="mt-0.5 text-[11px] text-secondary-text">
+                              {t('admin.categories.tree.subcategoryCount', {
+                                count: formatDashboardNumber(
+                                  category.subcategories.length,
+                                  locale,
+                                ),
+                              })}
+                            </p>
+                          ) : null
+                        }
                       />
                     </td>
-                    <td className="px-6 py-3">
+                    <td className="px-6 py-4">
                       <span className="font-mono text-xs text-secondary-text">
-                        {subcategory.slug}
+                        {category.slug}
                       </span>
                     </td>
-                    <td className="px-6 py-3">
+                    <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         {canUpdate ? (
                           <ActiveSwitch
-                            checked={subcategory.isActive}
+                            checked={category.isActive}
                             disabled={
-                              loading || togglingSubcategoryId === subcategory.id
+                              loading || togglingCategoryId === category.id
                             }
                             label={
-                              subcategory.isActive
-                                ? t('admin.categories.tree.hideSubcategoryAria', {
-                                    name: subcategory.name,
+                              category.isActive
+                                ? t('admin.categories.tree.hideAria', {
+                                    name: category.name,
                                   })
-                                : t('admin.categories.tree.showSubcategoryAria', {
-                                    name: subcategory.name,
+                                : t('admin.categories.tree.showAria', {
+                                    name: category.name,
                                   })
                             }
                             onToggle={() =>
-                              onToggleSubcategoryActive?.(
-                                category.id,
-                                subcategory.id,
-                              )
+                              onToggleCategoryActive?.(category.id)
                             }
                           />
                         ) : null}
                         <StatusBadge
-                          tone={subcategory.isActive ? 'success' : 'neutral'}
+                          tone={category.isActive ? 'success' : 'neutral'}
                         >
-                          {subcategory.isActive
+                          {category.isActive
                             ? t('admin.categories.tree.visible')
                             : t('admin.categories.tree.hidden')}
                         </StatusBadge>
                       </div>
                     </td>
-                    <td className="px-6 py-3 text-end">
+                    <td className="px-6 py-4 text-end">
                       <div className="inline-flex items-center justify-end gap-1">
+                        {canCreate ? (
+                          <button
+                            type="button"
+                            onClick={() => handleAddSubcategory(category)}
+                            className={cn(
+                              'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
+                              'transition-colors hover:bg-accent/10 hover:text-accent',
+                              focusRingClasses,
+                            )}
+                            aria-label={t(
+                              'admin.categories.tree.addSubcategoryAria',
+                              { name: category.name },
+                            )}
+                            title={t('admin.categories.tree.addSubcategory')}
+                          >
+                            <Plus size={13} aria-hidden />
+                          </button>
+                        ) : null}
                         {canUpdate ? (
                           <button
                             type="button"
-                            onClick={() =>
-                              onEditSubcategory?.(category, subcategory)
-                            }
+                            onClick={() => onEditCategory?.(category)}
                             className={cn(
                               'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
                               'transition-colors hover:bg-white/10 hover:text-white',
                               focusRingClasses,
                             )}
-                            aria-label={t(
-                              'admin.categories.tree.editSubcategoryAria',
-                              { name: subcategory.name },
-                            )}
+                            aria-label={t('admin.categories.editAria', {
+                              name: category.name,
+                            })}
                           >
                             <Pencil size={13} aria-hidden />
                           </button>
@@ -392,20 +384,17 @@ export function CategoriesTreeTable({
                         {canDelete ? (
                           <button
                             type="button"
-                            onClick={() =>
-                              onDeleteSubcategory?.(category, subcategory)
-                            }
-                            disabled={deletingSubcategoryId === subcategory.id}
+                            onClick={() => onDeleteCategory?.(category)}
+                            disabled={deletingCategoryId === category.id}
                             className={cn(
                               'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
                               'transition-colors hover:bg-support-error/10 hover:text-support-error',
                               'disabled:pointer-events-none disabled:opacity-40',
                               focusRingClasses,
                             )}
-                            aria-label={t(
-                              'admin.categories.tree.deleteSubcategoryAria',
-                              { name: subcategory.name },
-                            )}
+                            aria-label={t('admin.categories.deleteAria', {
+                              name: category.name,
+                            })}
                           >
                             <Trash2 size={13} aria-hidden />
                           </button>
@@ -413,9 +402,122 @@ export function CategoriesTreeTable({
                       </div>
                     </td>
                   </tr>
-                ))}
-              </Fragment>
-            ))}
+
+                  {isExpanded
+                    ? category.subcategories.map((subcategory) => (
+                        <tr
+                          key={`${category.id}-${subcategory.id}`}
+                          className="border-b border-white/5"
+                        >
+                          <td className="px-6 py-3">
+                            <CategoryThumbnail
+                              src={null}
+                              name={subcategory.name}
+                              indented
+                              expandControl={
+                                <span className="size-7 shrink-0" aria-hidden />
+                              }
+                            />
+                          </td>
+                          <td className="px-6 py-3">
+                            <span className="font-mono text-xs text-secondary-text">
+                              {subcategory.slug}
+                            </span>
+                          </td>
+                          <td className="px-6 py-3">
+                            <div className="flex items-center gap-2">
+                              {canUpdate ? (
+                                <ActiveSwitch
+                                  checked={subcategory.isActive}
+                                  disabled={
+                                    loading ||
+                                    togglingSubcategoryId === subcategory.id
+                                  }
+                                  label={
+                                    subcategory.isActive
+                                      ? t(
+                                          'admin.categories.tree.hideSubcategoryAria',
+                                          { name: subcategory.name },
+                                        )
+                                      : t(
+                                          'admin.categories.tree.showSubcategoryAria',
+                                          { name: subcategory.name },
+                                        )
+                                  }
+                                  onToggle={() =>
+                                    onToggleSubcategoryActive?.(
+                                      category.id,
+                                      subcategory.id,
+                                    )
+                                  }
+                                />
+                              ) : null}
+                              <StatusBadge
+                                tone={
+                                  subcategory.isActive ? 'success' : 'neutral'
+                                }
+                              >
+                                {subcategory.isActive
+                                  ? t('admin.categories.tree.visible')
+                                  : t('admin.categories.tree.hidden')}
+                              </StatusBadge>
+                            </div>
+                          </td>
+                          <td className="px-6 py-3 text-end">
+                            <div className="inline-flex items-center justify-end gap-1">
+                              {canUpdate ? (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    onEditSubcategory?.(category, subcategory)
+                                  }
+                                  className={cn(
+                                    'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
+                                    'transition-colors hover:bg-white/10 hover:text-white',
+                                    focusRingClasses,
+                                  )}
+                                  aria-label={t(
+                                    'admin.categories.tree.editSubcategoryAria',
+                                    { name: subcategory.name },
+                                  )}
+                                >
+                                  <Pencil size={13} aria-hidden />
+                                </button>
+                              ) : null}
+                              {canDelete ? (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    onDeleteSubcategory?.(
+                                      category,
+                                      subcategory,
+                                    )
+                                  }
+                                  disabled={
+                                    deletingSubcategoryId === subcategory.id
+                                  }
+                                  className={cn(
+                                    'inline-flex size-8 items-center justify-center rounded-lg text-white/50',
+                                    'transition-colors hover:bg-support-error/10 hover:text-support-error',
+                                    'disabled:pointer-events-none disabled:opacity-40',
+                                    focusRingClasses,
+                                  )}
+                                  aria-label={t(
+                                    'admin.categories.tree.deleteSubcategoryAria',
+                                    { name: subcategory.name },
+                                  )}
+                                >
+                                  <Trash2 size={13} aria-hidden />
+                                </button>
+                              ) : null}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    : null}
+                </Fragment>
+              )
+            })}
           </tbody>
         </table>
       </div>

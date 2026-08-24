@@ -1,6 +1,8 @@
-import { Lock } from 'lucide-react'
-import type { ReactNode } from 'react'
+// src/components/promo-carousel/PromoCarouselCard.tsx
+import { useTheme } from '../../context/ThemeContext'
 import { cn } from '../../lib/cn'
+import lockDark from '../../assets/promo/lock-dark.png'
+import lockLight from '../../assets/promo/lock-light.png'
 import { CountdownTimer } from './CountdownTimer'
 
 export type PromoCarouselBackgroundVariant = 'light' | 'dark'
@@ -8,43 +10,44 @@ export type PromoCarouselBackgroundVariant = 'light' | 'dark'
 export interface PromoCarouselCardProps {
   title: string
   targetDate: Date | string
-  icon?: ReactNode
-  backgroundVariant: PromoCarouselBackgroundVariant
+  backgroundVariant?: PromoCarouselBackgroundVariant
+  countdownLabel?: string
   className?: string
 }
 
 export function PromoCarouselCard({
   title,
   targetDate,
-  icon,
   backgroundVariant,
+  countdownLabel,
   className,
 }: PromoCarouselCardProps) {
+  const { theme } = useTheme()
+  const isDark = (backgroundVariant ?? theme) === 'dark'
+  const lockSrc = isDark ? lockDark : lockLight
+
   return (
     <article
-      className={cn(
-        'promo-countdown-card w-full',
-        'transition-transform duration-500 ease-out',
-        'lg:[@media(hover:hover)]:hover:scale-[1.01]',
-        className,
-      )}
-      data-promo-countdown-variant={backgroundVariant}
+      className={cn('promo-countdown-card w-full', className)}
+      data-promo-countdown-variant={isDark ? 'dark' : 'light'}
     >
-      <div className="promo-countdown-card__bg" aria-hidden>
-        <div className="promo-countdown-card__bg-stripe" aria-hidden />
-      </div>
+      <div className="promo-countdown-card__stripe" aria-hidden />
 
       <div className="promo-countdown-card__content">
         <h3 className="promo-countdown-card__title">{title}</h3>
 
-        <div className="promo-countdown-card__badge mx-auto" aria-hidden>
-          <span className="promo-countdown-card__badge-icon">
-            {icon ?? <Lock strokeWidth={2.25} aria-hidden />}
-          </span>
-        </div>
+        <img
+          className="promo-countdown-card__lock"
+          src={lockSrc}
+          alt=""
+          width={333}
+          height={333}
+          decoding="async"
+          aria-hidden
+        />
 
         <div className="promo-countdown-card__timer-wrap">
-          <CountdownTimer targetDate={targetDate} />
+          <CountdownTimer targetDate={targetDate} label={countdownLabel} />
         </div>
       </div>
     </article>

@@ -130,11 +130,11 @@ export function RegisterForm() {
           <PasswordStrength password={password} />
         </div>
 
-        <SocialLoginButtons disabled={loading} />
-
         <Button type="submit" fullWidth pill className="h-14 sm:h-[65px]" disabled={loading}>
           {loading ? t('auth.register.submitting') : t('auth.register.submit')}
         </Button>
+
+        <SocialLoginButtons disabled={loading} />
       </form>
 
       <p className="mt-6 text-center text-sm text-secondary-text">

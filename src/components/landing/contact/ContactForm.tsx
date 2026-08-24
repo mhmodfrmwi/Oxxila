@@ -2,9 +2,11 @@
 import { motion } from 'framer-motion'
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { sendContactMessage } from '../../../api/settings'
+import { ApiError } from '../../../lib/api'
+import { cn } from '../../../lib/cn'
 import { gradientCtaClasses } from '../../ui/buttonStyles'
 import { typeSmallClasses } from '../../ui/typography'
-import { cn } from '../../../lib/cn'
 
 type FieldName = 'name' | 'email' | 'message'
 
@@ -42,7 +44,6 @@ interface FloatingFieldProps {
   error?: string
   disabled?: boolean
   onChange: (value: string) => void
-  onBlur: () => void
 }
 
 function FloatingField({
@@ -53,7 +54,6 @@ function FloatingField({
   error,
   disabled,
   onChange,
-  onBlur,
 }: FloatingFieldProps) {
   const isTextarea = id === 'message'
 
@@ -70,7 +70,6 @@ function FloatingField({
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `contact-${id}-error` : undefined}
           onChange={(e) => onChange(e.target.value)}
-          onBlur={onBlur}
           className={cn(inputBase, 'h-auto min-h-[7.5rem] resize-y py-4')}
         />
       ) : (
@@ -84,7 +83,6 @@ function FloatingField({
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `contact-${id}-error` : undefined}
           onChange={(e) => onChange(e.target.value)}
-          onBlur={onBlur}
           className={inputBase}
         />
       )}
@@ -100,99 +98,136 @@ function FloatingField({
   )
 }
 
-/** No contact API endpoint — keep the form visible but non-submitting. */
 export function ContactForm() {
   const { t } = useTranslation()
   const [values, setValues] = useState<FormValues>({ name: '', email: '', message: '' })
   const [errors, setErrors] = useState<FormErrors>({})
-  const [touched, setTouched] = useState<Record<FieldName, boolean>>({
-    name: false,
-    email: false,
-    message: false,
-  })
+  const [submittedOnce, setSubmittedOnce] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [sent, setSent] = useState(false)
 
   function validate(formValues: FormValues): FormErrors {
     const nextErrors: FormErrors = {}
     if (!formValues.name.trim()) nextErrors.name = t('home.contact.nameRequired')
+    else if (formValues.name.trim().length < 2) {
+      nextErrors.name = t('home.contact.nameRequired')
+    }
     if (!formValues.email.trim()) {
       nextErrors.email = t('home.contact.emailRequired')
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email)) {
       nextErrors.email = t('home.contact.emailInvalid')
     }
     if (!formValues.message.trim()) nextErrors.message = t('home.contact.messageRequired')
+    else if (formValues.message.trim().length < 5) {
+      nextErrors.message = t('home.contact.messageRequired')
+    }
     return nextErrors
   }
 
   function updateField(field: FieldName, value: string) {
-    setValues((prev) => ({ ...prev, [field]: value }))
-    if (touched[field]) {
-      setErrors((prev) => {
-        const next = validate({ ...values, [field]: value })
-        return { ...prev, [field]: next[field] }
-      })
+    const nextValues = { ...values, [field]: value }
+    setValues(nextValues)
+    setSent(false)
+    setSubmitError(null)
+    // Clear field errors only after the user has already tried to send.
+    if (submittedOnce) {
+      setErrors(validate(nextValues))
     }
   }
 
-  function blurField(field: FieldName) {
-    setTouched((prev) => ({ ...prev, [field]: true }))
-    const nextErrors = validate(values)
-    setErrors((prev) => ({ ...prev, [field]: nextErrors[field] }))
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setSubmitError(null)
+    setSent(false)
+    setSubmittedOnce(true)
+
+    const nextErrors = validate(values)
+    setErrors(nextErrors)
+    if (Object.keys(nextErrors).length > 0) return
+
+    setSubmitting(true)
+    try {
+      await sendContactMessage({
+        name: values.name.trim(),
+        email: values.email.trim(),
+        message: values.message.trim(),
+      })
+      setValues({ name: '', email: '', message: '' })
+      setSubmittedOnce(false)
+      setErrors({})
+      setSent(true)
+    } catch (error) {
+      setSubmitError(
+        error instanceof ApiError
+          ? error.message
+          : t('home.contact.unavailable'),
+      )
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
     <motion.form
-      onSubmit={handleSubmit}
+      onSubmit={(event) => {
+        void handleSubmit(event)
+      }}
       className="mx-auto w-full max-w-xl space-y-4 px-0 sm:px-0"
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 2, delay: 0.1 }}
+      transition={{ duration: 0.6, delay: 0.1 }}
       noValidate
     >
       <FloatingField
         id="name"
         label={t('home.contact.name')}
         value={values.name}
-        error={touched.name ? errors.name : undefined}
-        disabled
+        error={errors.name}
+        disabled={submitting}
         onChange={(v) => updateField('name', v)}
-        onBlur={() => blurField('name')}
       />
       <FloatingField
         id="email"
         label={t('home.contact.email')}
         type="email"
         value={values.email}
-        error={touched.email ? errors.email : undefined}
-        disabled
+        error={errors.email}
+        disabled={submitting}
         onChange={(v) => updateField('email', v)}
-        onBlur={() => blurField('email')}
       />
       <FloatingField
         id="message"
         label={t('home.contact.message')}
         value={values.message}
-        error={touched.message ? errors.message : undefined}
-        disabled
+        error={errors.message}
+        disabled={submitting}
         onChange={(v) => updateField('message', v)}
-        onBlur={() => blurField('message')}
       />
+
+      {submitError ? (
+        <p className="text-sm text-support-error" role="alert">
+          {submitError}
+        </p>
+      ) : null}
+      {sent ? (
+        <p className="text-sm text-support-success" role="status">
+          {t('home.contact.sent')}
+        </p>
+      ) : null}
 
       <motion.button
         type="submit"
-        disabled
+        disabled={submitting}
         className={cn(
           'flex h-14 w-full min-h-11 items-center justify-center gap-2 rounded-full px-8 text-on-emphasis',
           typeSmallClasses,
           gradientCtaClasses,
-          'cursor-not-allowed opacity-60',
+          'disabled:cursor-not-allowed disabled:opacity-60',
         )}
       >
-        {t('home.contact.send')}
+        {submitting ? t('home.contact.sending') : t('home.contact.send')}
       </motion.button>
     </motion.form>
   )

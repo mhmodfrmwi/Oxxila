@@ -1,4 +1,4 @@
-import { PRODUCTS_PATH, SHOP_PATH } from '../config/routes'
+import { PRODUCTS_PATH, SEARCH_PATH, SHOP_PATH } from '../config/routes'
 import { categoryBrowsePath } from './categoryBrowseParams'
 import type { ProductDetail, ProductImage } from '../types/productDetail'
 import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
@@ -13,10 +13,20 @@ function parseDelimitedList(value: string | undefined | null): string[] {
   const content = value.includes('|') ? value.split('|').slice(1).join('|').trim() : value.trim()
   if (!content) return []
 
-  return content
-    .split(';')
+  let items = content
+    .split(/[\n\r;]+/)
     .map((item) => item.trim())
     .filter(Boolean)
+
+  // Admin often pastes one block without `;` — split before a capitalised clause.
+  if (items.length === 1 && /[a-z0-9,.%)]\s+[A-Z]/.test(items[0])) {
+    items = items[0]
+      .split(/(?<=[a-z0-9,.%)])\s+(?=[A-Z])/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+  }
+
+  return items
 }
 
 function mapImages(images: readonly string[], productName: string): ProductImage[] {
@@ -130,8 +140,13 @@ export function mapApiProductToProductDetail(product: ApiProduct): ProductDetail
     id: product._id,
     slug: product.slug,
     href: `${PRODUCTS_PATH}/${product.slug}`,
-    brand: product.brand?.name ?? '',
-    brandLogo: product.brand?.logo || undefined,
+    brand: product.brand?.name?.trim() ?? '',
+    brandLogo: product.brand?.logo
+      ? resolveProductImageUrl(product.brand.logo)
+      : undefined,
+    brandHref: product.brand?._id
+      ? `${SEARCH_PATH}?brand=${encodeURIComponent(product.brand._id)}`
+      : undefined,
     title: product.name,
     price,
     originalPrice,

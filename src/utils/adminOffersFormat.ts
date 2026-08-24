@@ -20,6 +20,27 @@ function toDatetimeLocal(value: string | Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
+/** Local start-of-today for `datetime-local` min (disables past calendar days). */
+export function startOfTodayDatetimeLocal(): string {
+  const date = new Date()
+  date.setHours(0, 0, 0, 0)
+  return toDatetimeLocal(date)
+}
+
+/**
+ * `min` for datetime-local: never before today.
+ * If an existing value is already in the past (edit), keep it selectable so the field stays valid.
+ */
+export function offerDateInputMin(currentValue?: string): string {
+  const today = startOfTodayDatetimeLocal()
+  if (!currentValue?.trim()) return today
+  const current = new Date(currentValue)
+  if (Number.isNaN(current.getTime())) return today
+  return current.getTime() < new Date(today).getTime()
+    ? toDatetimeLocal(current)
+    : today
+}
+
 /** Figma Offers table: `03 Apr 12:00 am`. */
 export function formatOfferDateTime(value: string, locale = 'en'): string {
   const date = new Date(value)
@@ -163,8 +184,13 @@ export function offerToFormValues(offer: ApiAdminOffer): AdminOfferFormValues {
 export function validateOfferForm(
   values: AdminOfferFormValues,
   mode: 'create' | 'edit',
+  options?: { productPrice?: number | null },
 ): AdminOfferFormErrors {
   const errors: AdminOfferFormErrors = {}
+  const productPrice =
+    options?.productPrice == null || !Number.isFinite(options.productPrice)
+      ? null
+      : options.productPrice
 
   if (mode === 'create' || values.product) {
     if (!values.product.trim()) {
@@ -183,14 +209,16 @@ export function validateOfferForm(
       if (!Number.isFinite(discountValue)) {
         errors.discountValue =
           values.discountMode === 'percent'
-            ? 'discountPercent must be between 0 and 100'
-            : 'discountAmount must be >= 0'
+            ? 'Percentage must be between 0 and 100'
+            : 'Fixed discount must be 0 or greater'
       } else if (values.discountMode === 'percent') {
         if (discountValue < 0 || discountValue > 100) {
-          errors.discountValue = 'discountPercent must be between 0 and 100'
+          errors.discountValue = 'Percentage cannot exceed 100%'
         }
       } else if (discountValue < 0) {
-        errors.discountValue = 'discountAmount must be >= 0'
+        errors.discountValue = 'Fixed discount must be 0 or greater'
+      } else if (productPrice != null && discountValue > productPrice) {
+        errors.discountValue = 'Fixed discount cannot exceed product price'
       }
     }
   }
@@ -205,6 +233,7 @@ export function validateOfferForm(
 
   const startRaw = values.startDate.trim()
   const endRaw = values.endDate.trim()
+  const todayStart = new Date(startOfTodayDatetimeLocal())
 
   if (mode === 'create' || startRaw !== '') {
     if (!startRaw) {
@@ -213,6 +242,8 @@ export function validateOfferForm(
       const start = new Date(startRaw)
       if (Number.isNaN(start.getTime())) {
         errors.startDate = 'startDate must be a valid ISO 8601 date'
+      } else if (mode === 'create' && start < todayStart) {
+        errors.startDate = 'Start date cannot be in the past'
       }
     }
   }
@@ -224,6 +255,8 @@ export function validateOfferForm(
       const end = new Date(endRaw)
       if (Number.isNaN(end.getTime())) {
         errors.endDate = 'endDate must be a valid ISO 8601 date'
+      } else if (mode === 'create' && end < todayStart) {
+        errors.endDate = 'End date cannot be in the past'
       }
     }
   }

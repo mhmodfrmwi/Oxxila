@@ -82,6 +82,22 @@ export function getPaymentSessionStatus(sessionId: string) {
   }>(`/orders/payment-session/${sessionId}`, { auth: true })
 }
 
+export type PaymentGatewayCode = 'stripe' | 'paymob' | 'cod'
+
+export interface EnabledPaymentGateway {
+  code: PaymentGatewayCode
+  name: string
+}
+
+/** GET /api/v1/payments/gateways/enabled — enabled gateways for checkout. */
+export function getEnabledPaymentGateways(options?: { signal?: AbortSignal }) {
+  return apiRequest<EnabledPaymentGateway[]>('/payments/gateways/enabled', {
+    method: 'GET',
+    auth: true,
+    signal: options?.signal,
+  })
+}
+
 export interface GetMyOrdersParams {
   page?: number
   limit?: number

@@ -62,16 +62,10 @@ export function useAdminInstagramSettings() {
   }, [load])
 
   const setSlotField = useCallback(
-    (index: number, field: 'image' | 'postUrl' | 'alt', value: string) => {
+    (index: number, field: 'postUrl' | 'alt', value: string) => {
       setSlots((prev) =>
         prev.map((slot, slotIndex) =>
-          slotIndex === index
-            ? {
-                ...slot,
-                [field]: value,
-                ...(field === 'image' ? { previewUrl: value.trim() || slot.previewUrl } : {}),
-              }
-            : slot,
+          slotIndex === index ? { ...slot, [field]: value } : slot,
         ),
       )
     },

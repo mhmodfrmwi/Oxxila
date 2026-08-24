@@ -1,6 +1,8 @@
+// src/components/promo-carousel/useCountdown.ts
 import { useEffect, useState } from 'react'
 
 export interface CountdownValues {
+  days: number
   hours: number
   minutes: number
   seconds: number
@@ -17,16 +19,24 @@ export function getCountdownValues(targetDate: Date | string): CountdownValues {
   const isExpired = target.getTime() <= Date.now()
   const totalSeconds = Math.floor(remainingMs / 1000)
 
-  return {
-    hours: Math.floor(totalSeconds / 3600),
-    minutes: Math.floor((totalSeconds % 3600) / 60),
-    seconds: totalSeconds % 60,
-    isExpired,
-  }
+  const days = Math.floor(totalSeconds / 86400)
+  const hours = Math.floor((totalSeconds % 86400) / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+
+  return { days, hours, minutes, seconds, isExpired }
 }
 
-export function formatCountdown({ hours, minutes, seconds }: Pick<CountdownValues, 'hours' | 'minutes' | 'seconds'>) {
+export function formatCountdown({
+  days,
+  hours,
+  minutes,
+  seconds,
+}: Pick<CountdownValues, 'days' | 'hours' | 'minutes' | 'seconds'>) {
   const pad = (value: number) => String(value).padStart(2, '0')
+  if (days > 0) {
+    return `${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+  }
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
 }
 

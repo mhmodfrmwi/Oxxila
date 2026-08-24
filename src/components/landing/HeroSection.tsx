@@ -66,7 +66,7 @@ export function HeroSection() {
   const isDark = theme === 'dark'
 
   return (
-    <section className="relative overflow-hidden bg-background py-8 sm:py-12 lg:py-20">
+    <section className="relative overflow-hidden bg-background pt-3 pb-8 sm:pt-4 sm:pb-12 lg:pt-6 lg:pb-16">
       <div className="mx-auto w-full max-w-[1440px]">
         <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-5 min-[1025px]:hidden">
           <div className="relative mx-auto max-w-lg overflow-hidden rounded-3xl bg-surface-muted">
@@ -184,11 +184,31 @@ export function HeroSection() {
             </g>
           </svg>
 
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 px-6 pt-[7%] text-center sm:pt-[8%]">
-            <h1 className="font-serif text-5xl font-medium leading-[1.15] text-primary-text xl:text-6xl 2xl:text-7xl">
-              {t('home.hero.titleLine1')} <br /> {t('home.hero.titleLine2')}
+          {/* Figma Hero 4 (110:4575): title y=80 / 52px, subtitle y=224 / 16px, collage y=21 */}
+          <div
+            className="pointer-events-none absolute z-10 text-center"
+            style={{
+              left: pctX(276),
+              top: pctY(80),
+              width: pctX(888),
+            }}
+          >
+            <h1 className="font-serif text-[clamp(2.25rem,4vw,58px)] font-normal leading-[1.2] text-[#5d5a88]">
+              {t('home.hero.titleLine1')}
+              <br />
+              {t('home.hero.titleLine2')}
             </h1>
-            <p className="mx-auto mt-5 max-w-3xl font-serif text-lg italic leading-relaxed text-primary-text/80 xl:mt-6 xl:text-xl">
+          </div>
+
+          <div
+            className="pointer-events-none absolute z-10 text-center"
+            style={{
+              left: pctX(380),
+              top: pctY(224),
+              width: pctX(680),
+            }}
+          >
+            <p className="font-serif text-[clamp(0.875rem,1.25vw,18px)] font-normal leading-[1.2] text-[#9491b8]">
               {t('home.hero.subtitleDesktop')}
             </p>
           </div>
@@ -201,7 +221,7 @@ export function HeroSection() {
             <image
               href={heroCollageImage}
               x="288"
-              y="-40"
+              y="0"
               width="898"
               height="699"
               preserveAspectRatio="xMidYMid meet"
@@ -211,7 +231,7 @@ export function HeroSection() {
           <div
             className={heroFabClass}
             style={{
-              ...centerStyle(115, 650.149),
+              ...centerStyle(115, 650.1),
               width: pctX(70),
             }}
             aria-hidden
@@ -222,7 +242,7 @@ export function HeroSection() {
           <div
             className={heroFabClass}
             style={{
-              ...centerStyle(1325, 430.149),
+              ...centerStyle(1325, 430.1),
               width: pctX(70),
             }}
             aria-hidden
@@ -232,10 +252,7 @@ export function HeroSection() {
 
           <Link
             to={SHOP_PATH}
-            className={[
-              'absolute z-40 flex min-h-11 items-center justify-center rounded-full bg-button-primary text-on-emphasis transition-colors hover:bg-button-primary-hover hover:text-primary-text',
-              typeSmallClasses,
-            ].join(' ')}
+            className="absolute z-40 flex items-center justify-center rounded-full bg-[#7b65fb] font-serif text-[clamp(0.875rem,1.25vw,18px)] font-normal leading-none text-white transition-colors hover:bg-button-primary-hover hover:text-primary-text"
             style={{
               left: pctX(432),
               top: pctY(726),
@@ -248,15 +265,12 @@ export function HeroSection() {
 
           <a
             href="#contact"
-            className={[
-              'absolute z-40 flex min-h-11 items-center justify-center rounded-full border border-button-primary bg-background text-button-primary transition-colors hover:bg-card',
-              typeSmallClasses,
-            ].join(' ')}
+            className="absolute z-40 flex items-center justify-center rounded-full border border-[#7b65fb] bg-[#f5f6ff] font-serif text-[clamp(0.875rem,1.25vw,18px)] font-normal leading-none text-[#7b65fb] transition-colors hover:bg-card"
             style={{
-              left: pctX(728.5),
-              top: pctY(726.5),
-              width: pctX(279),
-              height: pctY(69),
+              left: pctX(728),
+              top: pctY(726),
+              width: pctX(280),
+              height: pctY(70),
             }}
           >
             {t('home.hero.contactUs')}

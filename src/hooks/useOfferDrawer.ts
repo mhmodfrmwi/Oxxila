@@ -166,7 +166,10 @@ export function useOfferDrawer({
   )
 
   const submit = useCallback(async () => {
-    const nextErrors = validateOfferForm(values, mode)
+    const selectedProduct = products.find((item) => item._id === values.product)
+    const nextErrors = validateOfferForm(values, mode, {
+      productPrice: selectedProduct?.price,
+    })
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return false
 
@@ -206,12 +209,16 @@ export function useOfferDrawer({
     } finally {
       setSubmitting(false)
     }
-  }, [locale, mode, offerId, onSaved, values])
+  }, [locale, mode, offerId, onSaved, products, values])
+
+  const selectedProductPrice =
+    products.find((item) => item._id === values.product)?.price ?? null
 
   return {
     values,
     errors,
     products,
+    selectedProductPrice,
     loading,
     loadError,
     submitting,

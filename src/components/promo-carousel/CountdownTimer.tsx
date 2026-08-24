@@ -10,14 +10,19 @@ interface CountdownTimerProps {
 export function CountdownTimer({ targetDate, label }: CountdownTimerProps) {
   const { t } = useTranslation()
   const countdown = useCountdown(targetDate)
-  const display = countdown.isExpired ? '00:00:00' : formatCountdown(countdown)
   const resolvedLabel = label ?? t('shop.offers.openIn')
+  const time = countdown.isExpired ? '00:00:00' : formatCountdown(countdown)
 
   return (
     <div className="promo-countdown-card__timer-block">
       <span className="promo-countdown-card__label">{resolvedLabel}</span>
-      <time dateTime={display} className="promo-countdown-card__timer">
-        {display}
+      <time
+        className="promo-countdown-card__time"
+        dateTime={String(targetDate)}
+        role="timer"
+        aria-live="polite"
+      >
+        {time}
       </time>
     </div>
   )

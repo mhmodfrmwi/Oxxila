@@ -43,6 +43,17 @@ export function getContactSettings() {
   return apiRequest<ApiContactSettings>('/settings/contact')
 }
 
+export function sendContactMessage(body: {
+  name: string
+  email: string
+  message: string
+}) {
+  return apiRequest<null>('/settings/contact/message', {
+    method: 'POST',
+    body,
+  })
+}
+
 export function updateContactSettings(body: Partial<ApiContactSettings>) {
   return apiRequest<ApiContactSettings>('/settings/contact', {
     method: 'PUT',
@@ -126,11 +137,18 @@ export const CONTENT_PAGE_SLUGS = [
 
 export type ContentPageSlug = (typeof CONTENT_PAGE_SLUGS)[number]
 
+export interface ApiContentPageSectionItem {
+  title: string
+  description: string
+}
+
 export interface ApiContentPageSection {
   key: string
   title: string
+  subtitle: string
   body: string
-  image: string
+  items: ApiContentPageSectionItem[]
+  buttonLabel: string
 }
 
 export interface ApiContentPageListItem {
@@ -142,8 +160,16 @@ export interface ApiContentPageListItem {
 }
 
 export interface ApiContentPage extends ApiContentPageListItem {
-  content: string
   sections: ApiContentPageSection[]
+}
+
+export type ContentPageSectionPayload = {
+  key: string
+  title: string
+  subtitle?: string
+  body: string
+  items?: ApiContentPageSectionItem[]
+  buttonLabel?: string
 }
 
 export function listContentPages(includeDrafts = false) {
@@ -164,32 +190,10 @@ export function updateContentPage(
   payload: {
     title?: string
     subtitle?: string
-    content?: string
     isPublished?: boolean
-    sections?: Array<{ key: string; title: string; body: string; image?: string }>
+    sections?: ContentPageSectionPayload[]
   },
-  sectionImage?: { file: File; sectionKey: string },
 ) {
-  if (sectionImage) {
-    const body = new FormData()
-    if (payload.title !== undefined) body.append('title', payload.title)
-    if (payload.subtitle !== undefined) body.append('subtitle', payload.subtitle)
-    if (payload.content !== undefined) body.append('content', payload.content)
-    if (payload.isPublished !== undefined) {
-      body.append('isPublished', String(payload.isPublished))
-    }
-    if (payload.sections !== undefined) {
-      body.append('sections', JSON.stringify(payload.sections))
-    }
-    body.append('sectionKey', sectionImage.sectionKey)
-    body.append('sectionImage', sectionImage.file)
-    return apiRequest<ApiContentPage>(`/settings/pages/${encodeURIComponent(slug)}`, {
-      method: 'PUT',
-      auth: true,
-      body,
-    })
-  }
-
   return apiRequest<ApiContentPage>(`/settings/pages/${encodeURIComponent(slug)}`, {
     method: 'PUT',
     auth: true,

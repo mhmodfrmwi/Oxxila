@@ -3,7 +3,7 @@ export const HOME_PATH = '/home'
 
 export const DOCS_PATH = '/docs'
 
-/** CMS About page (legacy /docs redirects here). */
+/** CMS About page — redirects to /docs (designed About + policies hub). */
 export const ABOUT_PATH = '/about'
 
 export const TERMS_PATH = '/terms'

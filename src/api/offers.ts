@@ -13,8 +13,8 @@ export interface ApiOfferProduct {
 export interface ApiOffer {
   _id: string
   product: ApiOfferProduct | string
-  discountPercent: number
-  discountAmount: number
+  discountPercent?: number | null
+  discountAmount?: number | null
   productCount?: number | null
   startDate: string
   endDate: string
@@ -39,4 +39,9 @@ function buildQuery(params?: GetOffersParams) {
 
 export function getOffers(params?: GetOffersParams) {
   return apiRequest<ApiOffer[]>(`/offers${buildQuery(params)}`)
+}
+
+/** Nearest future active offer (startDate > now). */
+export function getUpcomingOffer() {
+  return apiRequest<ApiOffer | null>('/offers/upcoming')
 }

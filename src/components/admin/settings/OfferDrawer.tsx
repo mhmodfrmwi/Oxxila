@@ -14,6 +14,7 @@ import { Drawer } from '../ui/Drawer'
 import { EmptyState } from '../ui/EmptyState'
 import { Select } from '../ui/Select'
 import { Skeleton } from '../ui/Skeleton'
+import { offerDateInputMin } from '../../../utils/adminOffersFormat'
 
 interface OfferDrawerProps {
   open: boolean
@@ -204,7 +205,13 @@ export function OfferDrawer({
               id={`${formId}-value`}
               type="number"
               min={0}
-              max={drawer.values.discountMode === 'percent' ? 100 : undefined}
+              max={
+                drawer.values.discountMode === 'percent'
+                  ? 100
+                  : drawer.selectedProductPrice != null
+                    ? drawer.selectedProductPrice
+                    : undefined
+              }
               step="any"
               value={drawer.values.discountValue}
               disabled={drawer.submitting}
@@ -243,6 +250,7 @@ export function OfferDrawer({
             <input
               id={`${formId}-start`}
               type="datetime-local"
+              min={offerDateInputMin(drawer.values.startDate)}
               value={drawer.values.startDate}
               disabled={drawer.submitting}
               onChange={(event) =>
@@ -260,6 +268,11 @@ export function OfferDrawer({
             <input
               id={`${formId}-end`}
               type="datetime-local"
+              min={
+                drawer.values.startDate.trim()
+                  ? drawer.values.startDate
+                  : offerDateInputMin(drawer.values.endDate)
+              }
               value={drawer.values.endDate}
               disabled={drawer.submitting}
               onChange={(event) =>

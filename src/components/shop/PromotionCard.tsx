@@ -1,3 +1,4 @@
+// src/components/shop/PromotionCard.tsx
 import { Link } from 'react-router-dom'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../ui/interactionStyles'
@@ -10,7 +11,7 @@ interface PromotionCardProps {
 
 const imageAspect: Record<ShopPromotion['layout'], string> = {
   compact: 'aspect-[5/4] w-full',
-  tall: 'h-full min-h-[220px] w-full lg:min-h-0',
+  tall: 'relative min-h-[220px] w-full flex-1 lg:min-h-0',
   wide: 'aspect-[21/9] w-full sm:aspect-[2.15/1]',
 }
 
@@ -29,7 +30,7 @@ export function PromotionCard({ promotion, className }: PromotionCardProps) {
         '[@media(hover:hover)]:hover:shadow-lg [@media(hover:hover)]:hover:shadow-black/10',
         'dark:[@media(hover:hover)]:hover:border-border-subtle dark:[@media(hover:hover)]:hover:shadow-none',
         focusRingClasses,
-        layout === 'tall' && 'lg:min-h-[520px]',
+        layout === 'tall' && 'lg:min-h-0',
         className,
       )}
     >
@@ -57,13 +58,17 @@ export function PromotionCard({ promotion, className }: PromotionCardProps) {
           className={cn(
             'relative overflow-hidden rounded-input',
             imageAspect[layout],
-            layout === 'tall' && 'flex-1',
           )}
         >
           <img
             src={image}
             alt={imageAlt}
-            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+            className={cn(
+              'object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.04]',
+              layout === 'tall'
+                ? 'absolute inset-0 h-full w-full'
+                : 'h-full w-full',
+            )}
             loading="lazy"
           />
         </div>

@@ -87,7 +87,7 @@ export function ProductPageContent() {
     <>
       <div className="container-content pb-10 sm:pb-12 lg:pb-20">
         <Breadcrumb
-          className="mb-6 sm:mb-8 lg:mb-10"
+          className="mb-6 mt-4 sm:mb-8 sm:mt-6 lg:mb-10 lg:mt-8"
           items={[
             { label: t('nav.home'), href: HOME_PATH },
             { label: product.categoryName, href: product.categoryHref },

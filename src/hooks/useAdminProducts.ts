@@ -11,7 +11,7 @@ import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
 import type { ApiPagination } from '../lib/api'
 import type { ApiCategory } from '../types/catalog'
-import type { AdminProductRow, AdminProductsListParams } from '../types/adminProducts'
+import type { AdminProductRow, AdminProductsCatalogTab, AdminProductsListParams } from '../types/adminProducts'
 import { mapApiProductToAdminRow } from '../utils/adminProductsFormat'
 
 const DEFAULT_PAGE = 1
@@ -22,6 +22,7 @@ const SEARCH_DEBOUNCE_MS = 300
 export interface AdminProductsFilters {
   keyword: string
   category: string
+  catalogTab: AdminProductsCatalogTab
   page: number
   limit: number
   sort: string
@@ -44,6 +45,7 @@ function normalizeFilters(
   return {
     keyword: partial?.keyword ?? '',
     category: partial?.category ?? '',
+    catalogTab: partial?.catalogTab ?? 'active',
     page: partial?.page ?? DEFAULT_PAGE,
     limit: partial?.limit ?? DEFAULT_LIMIT,
     sort: partial?.sort ?? DEFAULT_SORT,
@@ -132,10 +134,18 @@ export function useAdminProducts(options?: UseAdminProductsOptions) {
       limit: filters.limit,
       sort: filters.sort,
       period: 30,
+      isActive: filters.catalogTab === 'archived' ? false : true,
       ...(debouncedKeyword ? { keyword: debouncedKeyword } : {}),
       ...(filters.category ? { category: filters.category } : {}),
     }),
-    [debouncedKeyword, filters.category, filters.limit, filters.page, filters.sort],
+    [
+      debouncedKeyword,
+      filters.catalogTab,
+      filters.category,
+      filters.limit,
+      filters.page,
+      filters.sort,
+    ],
   )
 
   useEffect(() => {
@@ -196,6 +206,10 @@ export function useAdminProducts(options?: UseAdminProductsOptions) {
 
   const setCategory = useCallback((category: string) => {
     setFilters((previous) => ({ ...previous, category, page: 1 }))
+  }, [])
+
+  const setCatalogTab = useCallback((catalogTab: AdminProductsCatalogTab) => {
+    setFilters((previous) => ({ ...previous, catalogTab, page: 1 }))
   }, [])
 
   const setPage = useCallback((page: number) => {
@@ -273,6 +287,7 @@ export function useAdminProducts(options?: UseAdminProductsOptions) {
     togglingBestSellerId,
     setKeyword,
     setCategory,
+    setCatalogTab,
     setPage,
     clearFilters,
     reload,

@@ -150,11 +150,11 @@ export function LoginForm() {
             </div>
           </div>
 
-          <SocialLoginButtons disabled={loading} />
-
-        <Button type="submit" fullWidth pill className="h-14 sm:h-[65px]" disabled={loading}>
+          <Button type="submit" fullWidth pill className="h-14 sm:h-[65px]" disabled={loading}>
           {loading ? t('auth.login.submitting') : t('auth.login.submit')}
         </Button>
+
+          <SocialLoginButtons disabled={loading} />
       </form>
 
       <p className="mt-6 text-center text-sm text-secondary-text">

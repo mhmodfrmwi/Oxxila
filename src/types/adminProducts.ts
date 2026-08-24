@@ -1,6 +1,8 @@
 // src/types/adminProducts.ts
 import type { ApiProduct } from './catalog'
 
+export type AdminProductsCatalogTab = 'active' | 'archived'
+
 export interface AdminProductsListParams {
   page?: number
   limit?: number
@@ -14,6 +16,11 @@ export interface AdminProductsListParams {
   priceMax?: number
   /** Days for GET /products performance trend (backend default 30). */
   period?: number
+  /**
+   * Catalog visibility. Backend defaults to active-only when omitted.
+   * Pass `false` for the Archived tab.
+   */
+  isActive?: boolean
 }
 
 export type AdminProductInventoryStatus = 'in_stock' | 'low_stock' | 'out_of_stock'

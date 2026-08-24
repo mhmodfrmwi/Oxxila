@@ -28,21 +28,49 @@ interface ProductHeroProps {
   className?: string
 }
 
-function BrandMark({ brand, brandLogo }: { brand: string; brandLogo?: string }) {
-  const initial = brand.charAt(0).toUpperCase()
+function BrandMark({
+  brand,
+  brandLogo,
+  href,
+}: {
+  brand: string
+  brandLogo?: string
+  href?: string
+}) {
+  const name = brand.trim()
+  if (!name) return null
 
-  return (
-    <div className="product-detail-info-brand">
-      <span className="product-detail-info-brand-mark" aria-hidden>
+  const initial = name.charAt(0).toUpperCase()
+  const className =
+    'mb-3 inline-flex max-w-full items-center gap-2.5 text-primary-text transition-opacity hover:opacity-80'
+
+  const content = (
+    <>
+      <span
+        className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border-subtle bg-surface-muted text-sm font-semibold"
+        aria-hidden
+      >
         {brandLogo ? (
-          <img src={brandLogo} alt="" className="h-full w-full object-contain" />
+          <img src={brandLogo} alt="" className="h-full w-full object-contain p-1" />
         ) : (
           initial
         )}
       </span>
-      <span className="product-detail-info-brand-name">{brand}</span>
-    </div>
+      <span className="truncate font-serif text-sm font-medium tracking-wide md:text-base">
+        {name}
+      </span>
+    </>
   )
+
+  if (href) {
+    return (
+      <Link to={href} className={className} aria-label={name}>
+        {content}
+      </Link>
+    )
+  }
+
+  return <div className={className}>{content}</div>
 }
 
 function SocialIconButton({
@@ -135,6 +163,7 @@ export function ProductHero({
   const {
     brand,
     brandLogo,
+    brandHref,
     badge,
     title,
     price,
@@ -151,7 +180,6 @@ export function ProductHero({
     beforeAfterImages,
     sizes,
     shades,
-    sku,
     categoryName,
     categoryHref,
     subCategoryName,
@@ -311,7 +339,7 @@ export function ProductHero({
           />
 
           <article className="product-detail-purchase-card order-2 min-w-0 lg:order-3">
-            <BrandMark brand={brand} brandLogo={brandLogo} />
+            <BrandMark brand={brand} brandLogo={brandLogo} href={brandHref} />
 
             <h1 className="product-detail-info-title">{title}</h1>
 
@@ -347,11 +375,14 @@ export function ProductHero({
               )}
             </div>
 
-            {soldCount != null && soldCount > 0 && (
-              <p className="product-detail-price-unit">
-                {t('productDetail.sold', { count: soldCount })}
+            {soldCount != null && soldCount > 0 ? (
+              <p className="product-detail-stock-badge" role="status">
+                <ShoppingBag size={16} strokeWidth={1.75} aria-hidden />
+                <span>
+                  {t('productDetail.soldRecently', { count: soldCount })}
+                </span>
               </p>
-            )}
+            ) : null}
 
             <p className="product-detail-info-description">{description}</p>
 
@@ -488,10 +519,6 @@ export function ProductHero({
 
             <dl className="product-detail-meta">
               <div>
-                <dt>{t('productDetail.sku')}</dt>
-                <dd>{sku}</dd>
-              </div>
-              <div>
                 <dt>{t('productDetail.category')}</dt>
                 <dd>
                   <Link
@@ -502,16 +529,29 @@ export function ProductHero({
                   </Link>
                 </dd>
               </div>
-              {subCategoryName && (
+              {subCategoryName ? (
                 <div>
                   <dt>{t('productDetail.subcategory')}</dt>
                   <dd className="capitalize">{subCategoryName}</dd>
                 </div>
-              )}
-              <div>
-                <dt>{t('productDetail.brand')}</dt>
-                <dd className="capitalize">{brand}</dd>
-              </div>
+              ) : null}
+              {brand.trim() ? (
+                <div>
+                  <dt>{t('productDetail.brand')}</dt>
+                  <dd className="capitalize">
+                    {brandHref ? (
+                      <Link
+                        to={brandHref}
+                        className="text-link transition-colors hover:text-link-hover"
+                      >
+                        {brand}
+                      </Link>
+                    ) : (
+                      brand
+                    )}
+                  </dd>
+                </div>
+              ) : null}
               <div>
                 <dt>{t('productDetail.availability')}</dt>
                 <dd>{availabilityLabel}</dd>

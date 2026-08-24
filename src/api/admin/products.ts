@@ -22,6 +22,7 @@ function toQuery(params: AdminProductsListParams): string {
     ['priceMin', params.priceMin],
     ['priceMax', params.priceMax],
     ['period', params.period],
+    ['isActive', params.isActive],
   ]
   for (const [key, value] of entries) {
     if (value === undefined || value === '') continue
@@ -226,12 +227,21 @@ export function uploadImages(id: string, images: File[]) {
   })
 }
 
-/** Soft-archive via `isActive: false` (list API only returns active products). */
+/** Soft-archive via `isActive: false` (appears under the Archived catalog tab). */
 export function archiveProduct(id: string) {
   return apiRequest<ApiProduct>(`/products/${id}`, {
     method: 'PUT',
     auth: true,
     body: { isActive: false },
+  })
+}
+
+/** Restore an archived formula via `isActive: true`. */
+export function restoreProduct(id: string) {
+  return apiRequest<ApiProduct>(`/products/${id}`, {
+    method: 'PUT',
+    auth: true,
+    body: { isActive: true },
   })
 }
 

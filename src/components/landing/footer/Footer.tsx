@@ -3,12 +3,9 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getCollectionHref } from '../../../config/collections'
 import {
-  ABOUT_PATH,
+  DOCS_PATH,
   HOME_PATH,
-  PRIVACY_PATH,
-  REFUND_POLICY_PATH,
   RETURNS_HISTORY_PATH,
-  SHIPPING_POLICY_PATH,
   SHOP_PATH,
   TERMS_PATH,
 } from '../../../config/routes'
@@ -25,20 +22,29 @@ export function Footer() {
 
   const policyLinks = useMemo(
     () => [
-      { label: t('footer.policyLinks.about'), to: ABOUT_PATH },
-      { label: t('footer.policyLinks.quality'), to: `${ABOUT_PATH}#quality` },
+      { label: t('footer.policyLinks.about'), to: DOCS_PATH },
+      { label: t('footer.policyLinks.quality'), to: `${DOCS_PATH}#quality` },
       {
         label: t('footer.policyLinks.authenticity'),
-        to: `${ABOUT_PATH}#authenticity`,
+        to: `${DOCS_PATH}#authenticity`,
       },
       {
         label: t('footer.policyLinks.standards'),
-        to: `${ABOUT_PATH}#medical`,
+        to: `${DOCS_PATH}#medical`,
       },
       { label: t('footer.policyLinks.terms'), to: TERMS_PATH },
-      { label: t('footer.policyLinks.privacy'), to: PRIVACY_PATH },
-      { label: t('footer.policyLinks.refund'), to: REFUND_POLICY_PATH },
-      { label: t('footer.policyLinks.shipping'), to: SHIPPING_POLICY_PATH },
+      {
+        label: t('footer.policyLinks.privacy'),
+        to: `${DOCS_PATH}#privacy`,
+      },
+      {
+        label: t('footer.policyLinks.refund'),
+        to: `${DOCS_PATH}#refund-policy`,
+      },
+      {
+        label: t('footer.policyLinks.shipping'),
+        to: `${DOCS_PATH}#shipping-policy`,
+      },
       { label: t('footer.policyLinks.contact'), to: `${HOME_PATH}#contact` },
     ],
     [t],
@@ -51,7 +57,10 @@ export function Footer() {
       { label: t('footer.shoppingLinks.brands'), to: `${SHOP_PATH}#brand-stores-heading` },
       { label: t('footer.shoppingLinks.newArrivals'), to: getCollectionHref('new-arrivals') },
       { label: t('footer.shoppingLinks.bestSellers'), to: getCollectionHref('best-sellers') },
-      { label: t('footer.shoppingLinks.shipping'), to: SHIPPING_POLICY_PATH },
+      {
+        label: t('footer.shoppingLinks.shipping'),
+        to: `${DOCS_PATH}#shipping-policy`,
+      },
       { label: t('footer.shoppingLinks.returns'), to: RETURNS_HISTORY_PATH },
     ],
     [t],

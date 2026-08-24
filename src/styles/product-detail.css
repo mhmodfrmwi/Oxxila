@@ -228,7 +228,7 @@
   text-decoration: line-through;
 }
 
-/* Stock badge — Figma: 39px tall, 8px radius, white/dark card fill */
+/* Social-proof / sold badge — Figma: pill, green text + bag icon */
 .product-detail-stock-badge {
   display: inline-flex;
   width: fit-content;
@@ -237,15 +237,17 @@
   gap: 8px;
   min-height: 39px;
   margin-bottom: 20px;
-  border-radius: 8px;
-  background-color: var(--surface-subtle);
-  padding: 8px 12px;
-  font-family: var(--font-family-base);
+  border-radius: 9999px;
+  background-color: var(--card-background);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 14px;
+  font-family: var(--font-family-serif, var(--font-family-base));
   font-size: 0.875rem;
   font-weight: var(--font-weight-medium);
   line-height: 1.25rem;
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
   color: var(--support-success);
+  box-shadow: 0 1px 2px rgb(93 90 136 / 0.06);
 }
 
 .product-detail-stock-badge--out-of-stock {
@@ -533,8 +535,9 @@
   font-family: var(--font-family-serif, var(--font-family-base));
   font-size: 0.9375rem;
   font-weight: var(--font-weight-regular);
-  line-height: 1.65;
-  letter-spacing: 0;
+  line-height: 1.8;
+  letter-spacing: 0.03em;
+  word-spacing: 0.06em;
   color: var(--primary-text);
 }
 
@@ -548,8 +551,9 @@
   font-family: var(--font-family-serif, var(--font-family-base));
   font-size: 0.9375rem;
   font-weight: var(--font-weight-regular);
-  line-height: 1.65;
-  letter-spacing: 0;
+  line-height: 1.8;
+  letter-spacing: 0.03em;
+  word-spacing: 0.06em;
   color: var(--primary-text);
 }
 
@@ -733,7 +737,9 @@
   align-items: flex-start;
   font-family: var(--font-family-serif, var(--font-family-base));
   font-size: 0.9375rem;
-  line-height: 1.65;
+  line-height: 1.8;
+  letter-spacing: 0.03em;
+  word-spacing: 0.06em;
   color: var(--primary-text);
 }
 

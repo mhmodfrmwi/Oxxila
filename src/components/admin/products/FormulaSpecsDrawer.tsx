@@ -39,6 +39,7 @@ interface FormulaSpecsDrawerProps {
   onClose: () => void
   onSaved: (product: ApiProduct) => void
   onArchived: (productId: string) => void
+  onRestored: (productId: string) => void
   onDeleted: (productId: string) => void
 }
 
@@ -69,6 +70,7 @@ export function FormulaSpecsDrawer({
   onClose,
   onSaved,
   onArchived,
+  onRestored,
   onDeleted,
 }: FormulaSpecsDrawerProps) {
   const { t } = useTranslation()
@@ -77,6 +79,7 @@ export function FormulaSpecsDrawer({
   const tabsId = useId()
   const [discardOpen, setDiscardOpen] = useState(false)
   const [archiveOpen, setArchiveOpen] = useState(false)
+  const [restoreOpen, setRestoreOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<FormulaSpecsTab>('details')
 
@@ -95,6 +98,10 @@ export function FormulaSpecsDrawer({
     onArchived: (id) => {
       toast.success(t('admin.products.formula.archiveSuccess'))
       onArchived(id)
+    },
+    onRestored: (id) => {
+      toast.success(t('admin.products.formula.restoreSuccess'))
+      onRestored(id)
     },
     onDeleted: (id) => {
       toast.success(t('admin.products.formula.deleteSuccess'))
@@ -128,7 +135,15 @@ export function FormulaSpecsDrawer({
   }, [drawer.values.category, drawer.values.subCategory, subcategories, subLoading])
 
   const requestClose = useCallback(() => {
-    if (drawer.submitting || drawer.archiving || drawer.deleting || faqs.submitting) return
+    if (
+      drawer.submitting ||
+      drawer.archiving ||
+      drawer.restoring ||
+      drawer.deleting ||
+      faqs.submitting
+    ) {
+      return
+    }
     const faqDirty = Boolean(faqs.question.trim() || faqs.answer.trim())
     if (drawer.dirty || faqDirty) {
       setDiscardOpen(true)
@@ -138,6 +153,7 @@ export function FormulaSpecsDrawer({
   }, [
     drawer.submitting,
     drawer.archiving,
+    drawer.restoring,
     drawer.deleting,
     drawer.dirty,
     faqs.submitting,
@@ -147,9 +163,9 @@ export function FormulaSpecsDrawer({
   ])
 
   const handleDrawerClose = useCallback(() => {
-    if (discardOpen || archiveOpen || deleteOpen) return
+    if (discardOpen || archiveOpen || restoreOpen || deleteOpen) return
     requestClose()
-  }, [discardOpen, archiveOpen, deleteOpen, requestClose])
+  }, [discardOpen, archiveOpen, restoreOpen, deleteOpen, requestClose])
 
   const handleSave = async () => {
     const result = await drawer.save()
@@ -163,6 +179,14 @@ export function FormulaSpecsDrawer({
     setArchiveOpen(false)
     if (!result.ok) {
       toast.error(t('admin.products.formula.archiveFailed'), result.message)
+    }
+  }
+
+  const handleRestore = async () => {
+    const result = await drawer.restore()
+    setRestoreOpen(false)
+    if (!result.ok) {
+      toast.error(t('admin.products.formula.restoreFailed'), result.message)
     }
   }
 
@@ -182,9 +206,22 @@ export function FormulaSpecsDrawer({
         ? t('admin.products.formula.refNew')
         : t('admin.products.formula.refUnavailable')
 
-  const busy = drawer.submitting || drawer.archiving || drawer.deleting || faqs.submitting
+  const busy =
+    drawer.submitting ||
+    drawer.archiving ||
+    drawer.restoring ||
+    drawer.deleting ||
+    faqs.submitting
   const showDetailsFooter = activeTab === 'details' && !drawer.loadError
   const showFaqFooter = activeTab === 'faq' && !drawer.loadError && faqs.canCreate
+
+  const footerActionClass = cn(
+    'inline-flex min-h-11 items-center justify-center px-5',
+    'text-xs font-bold uppercase tracking-[0.12em]',
+    'rounded-full transition-colors',
+    'disabled:pointer-events-none disabled:opacity-50',
+    focusRingClasses,
+  )
 
   const handleFaqSubmit = async () => {
     const ok = await faqs.submit()
@@ -212,49 +249,58 @@ export function FormulaSpecsDrawer({
         width="formula"
         footer={
           showDetailsFooter ? (
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
               {mode === 'edit' ? (
-                <div className="flex min-w-0 flex-1 items-center gap-2">
-                  <button
-                    type="button"
-                    disabled={busy || drawer.loadingProduct}
-                    onClick={() => setArchiveOpen(true)}
-                    className={cn(
-                      'min-h-11 min-w-0 flex-1 rounded-xl border border-border-subtle bg-white/5 px-3',
-                      'text-xs font-bold uppercase tracking-[0.12em] text-primary-text',
-                      'hover:bg-white/10 disabled:pointer-events-none disabled:opacity-50',
-                      focusRingClasses,
-                    )}
-                  >
-                    {t('admin.products.formula.archive')}
-                  </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  {drawer.isActive ? (
+                    <button
+                      type="button"
+                      disabled={busy || drawer.loadingProduct}
+                      onClick={() => setArchiveOpen(true)}
+                      className={cn(
+                        footerActionClass,
+                        'border border-white/15 bg-white/5 text-primary-text hover:bg-white/10',
+                      )}
+                    >
+                      {t('admin.products.formula.archive')}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={busy || drawer.loadingProduct}
+                      onClick={() => setRestoreOpen(true)}
+                      className={cn(
+                        footerActionClass,
+                        'border border-accent/40 bg-accent/10 text-accent hover:bg-accent/15',
+                      )}
+                    >
+                      {t('admin.products.formula.restore')}
+                    </button>
+                  )}
                   <button
                     type="button"
                     disabled={busy || drawer.loadingProduct}
                     onClick={() => setDeleteOpen(true)}
                     className={cn(
-                      'min-h-11 min-w-0 flex-1 rounded-xl border border-support-error/40 bg-support-error/10 px-3',
-                      'text-xs font-bold uppercase tracking-[0.12em] text-support-error',
-                      'hover:bg-support-error/15 disabled:pointer-events-none disabled:opacity-50',
-                      focusRingClasses,
+                      footerActionClass,
+                      'border border-support-error/45 bg-transparent text-support-error hover:bg-support-error/10',
                     )}
                   >
                     {t('admin.products.formula.delete')}
                   </button>
                 </div>
               ) : (
-                <div className="flex-1" />
+                <div className="hidden sm:block" />
               )}
               <button
                 type="submit"
                 form={formId}
                 disabled={busy || drawer.loadingProduct || Boolean(drawer.loadError)}
                 className={cn(
-                  'min-h-11 flex-[1.4] rounded-xl px-4',
-                  'bg-gradient-to-r from-accent to-[#7c69ff] text-xs font-bold uppercase tracking-[0.12em] text-white',
+                  footerActionClass,
+                  'w-full px-8 sm:ms-auto sm:w-auto',
+                  'bg-gradient-to-r from-accent to-[#7c69ff] text-white',
                   'shadow-[0_8px_20px_rgb(163_148_255_/_0.28)]',
-                  'disabled:pointer-events-none disabled:opacity-50',
-                  focusRingClasses,
                 )}
               >
                 {drawer.submitting ? (
@@ -273,11 +319,10 @@ export function FormulaSpecsDrawer({
               form={faqFormId}
               disabled={faqs.submitting}
               className={cn(
-                'flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4',
-                'bg-gradient-to-r from-accent to-[#7c69ff] text-xs font-bold uppercase tracking-[0.12em] text-white',
+                footerActionClass,
+                'w-full px-8',
+                'bg-gradient-to-r from-accent to-[#7c69ff] text-white',
                 'shadow-[0_8px_20px_rgb(163_148_255_/_0.28)]',
-                'disabled:pointer-events-none disabled:opacity-50',
-                focusRingClasses,
               )}
             >
               {faqs.submitting ? (
@@ -826,6 +871,40 @@ export function FormulaSpecsDrawer({
       >
         <p className="text-sm text-secondary-text">
           {t('admin.products.formula.archiveBody')}
+        </p>
+      </Dialog>
+
+      <Dialog
+        open={restoreOpen}
+        title={t('admin.products.formula.restoreTitle')}
+        description={t('admin.products.formula.restoreDescription')}
+        onClose={() => setRestoreOpen(false)}
+        size="sm"
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="ghost" onClick={() => setRestoreOpen(false)}>
+              {t('admin.products.formula.cancel')}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={drawer.restoring}
+              onClick={() => void handleRestore()}
+            >
+              {drawer.restoring ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 size={11} className="animate-spin" aria-hidden />
+                  {t('admin.products.formula.restoring')}
+                </span>
+              ) : (
+                t('admin.products.formula.restoreConfirm')
+              )}
+            </Button>
+          </div>
+        }
+      >
+        <p className="text-sm text-secondary-text">
+          {t('admin.products.formula.restoreBody')}
         </p>
       </Dialog>
 

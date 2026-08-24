@@ -1,6 +1,6 @@
 // src/components/promo-carousel/CountdownPromoCarousel.tsx
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCallback, useState, type ReactNode } from 'react'
+import { useCallback, useState } from 'react'
 import { CarouselFrame } from '../carousel/CarouselFrame'
 import { carouselTransition } from '../carousel/carouselMotion'
 import { useCarouselAutoplay } from '../../hooks/useCarouselAutoplay'
@@ -14,8 +14,9 @@ export interface CountdownPromoSlide {
   id: string
   title: string
   targetDate: Date | string
-  icon?: ReactNode
-  backgroundVariant: PromoCarouselBackgroundVariant
+  backgroundVariant?: PromoCarouselBackgroundVariant
+  /** Countdown caption, e.g. "open in" / "ends in". */
+  countdownLabel?: string
 }
 
 /** @deprecated Use `CountdownPromoSlide` */
@@ -68,7 +69,7 @@ export function CountdownPromoCarousel({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className="overflow-hidden">
+      <div className="overflow-visible">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={currentSlide.id}
@@ -87,8 +88,8 @@ export function CountdownPromoCarousel({
             <PromoCarouselCard
               title={currentSlide.title}
               targetDate={currentSlide.targetDate}
-              icon={currentSlide.icon}
               backgroundVariant={currentSlide.backgroundVariant}
+              countdownLabel={currentSlide.countdownLabel}
             />
           </motion.div>
         </AnimatePresence>

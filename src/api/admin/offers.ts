@@ -22,12 +22,12 @@ function toQuery(params: AdminOffersListParams): string {
   return query ? `?${query}` : ''
 }
 
-/** GET /api/v1/offers — public live-offers list (no admin-all endpoint exists). */
+/** GET /api/v1/offers/manage — all offers for admin (not only live). */
 export function getAdminOffers(
   params: AdminOffersListParams = {},
   options?: { signal?: AbortSignal },
 ) {
-  return apiRequest<ApiAdminOffer[]>(`/offers${toQuery(params)}`, {
+  return apiRequest<ApiAdminOffer[]>(`/offers/manage${toQuery(params)}`, {
     method: 'GET',
     auth: true,
     signal: options?.signal,

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
 import { FormulaSpecsDrawer } from '../../components/admin/products/FormulaSpecsDrawer'
+import { ProductsCatalogStatusTabs } from '../../components/admin/products/ProductsCatalogStatusTabs'
 import { ProductsCatalogTable } from '../../components/admin/products/ProductsCatalogTable'
 import { ProductsCatalogToolbar } from '../../components/admin/products/ProductsCatalogToolbar'
 import { EmptyState } from '../../components/admin/ui/EmptyState'
@@ -62,6 +63,11 @@ export function AdminProductsPage() {
     catalog.reload()
   }, [catalog, closeDrawer])
 
+  const handleRestored = useCallback(() => {
+    closeDrawer()
+    catalog.reload()
+  }, [catalog, closeDrawer])
+
   const handleDeleted = useCallback(() => {
     closeDrawer()
     catalog.reload()
@@ -73,13 +79,18 @@ export function AdminProductsPage() {
   const totalPages = Math.max(catalog.pagination?.numberOfPages ?? 1, 1)
   const totalCount = catalog.pagination?.totalDocuments ?? catalog.products.length
   const showingCount = catalog.products.length
+  const isArchivedTab = catalog.filters.catalogTab === 'archived'
 
   const emptyTitle = catalog.hasActiveFilters
     ? t('admin.products.emptyFilteredTitle')
-    : t('admin.products.emptyTitle')
+    : isArchivedTab
+      ? t('admin.products.emptyArchivedTitle')
+      : t('admin.products.emptyTitle')
   const emptyDescription = catalog.hasActiveFilters
     ? t('admin.products.emptyFilteredDescription')
-    : t('admin.products.emptyDescription')
+    : isArchivedTab
+      ? t('admin.products.emptyArchivedDescription')
+      : t('admin.products.emptyDescription')
 
   return (
     <>
@@ -132,6 +143,13 @@ export function AdminProductsPage() {
             </div>
           ) : null}
 
+          <ProductsCatalogStatusTabs
+            active={catalog.filters.catalogTab}
+            activeCount={totalCount}
+            onChange={catalog.setCatalogTab}
+            disabled={catalog.loading}
+          />
+
           <ProductsCatalogToolbar
             keyword={catalog.filters.keyword}
             onKeywordChange={catalog.setKeyword}
@@ -175,6 +193,7 @@ export function AdminProductsPage() {
         onClose={closeDrawer}
         onSaved={handleSaved}
         onArchived={handleArchived}
+        onRestored={handleRestored}
         onDeleted={handleDeleted}
       />
     </>

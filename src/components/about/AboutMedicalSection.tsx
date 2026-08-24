@@ -1,12 +1,46 @@
+// src/components/about/AboutMedicalSection.tsx
 import { useTranslation } from 'react-i18next'
 import { Heading } from '../ui/Heading'
-import { ABOUT_MEDICAL_IDS, aboutMedicalIcons, aboutSphereImage } from './aboutData'
+import type { AboutTextItem } from '../../utils/aboutCopy'
+import {
+  ABOUT_MEDICAL_IDS,
+  aboutMedicalIcons,
+  aboutSphereImage,
+  type AboutMedicalId,
+} from './aboutData'
 
-export function AboutMedicalSection() {
+interface AboutMedicalSectionProps {
+  title?: string | null
+  subtitle?: string | null
+  cards?: AboutTextItem[] | null
+}
+
+export function AboutMedicalSection({
+  title,
+  subtitle,
+  cards,
+}: AboutMedicalSectionProps = {}) {
   const { t } = useTranslation()
+  const resolvedCards: Array<AboutTextItem & { id: AboutMedicalId }> =
+    cards && cards.length > 0
+      ? ABOUT_MEDICAL_IDS.map((id, index) => ({
+          id,
+          title: cards[index]?.title || t(`about.medical.items.${id}.title`),
+          description:
+            cards[index]?.description || t(`about.medical.items.${id}.description`),
+        }))
+      : ABOUT_MEDICAL_IDS.map((id) => ({
+          id,
+          title: t(`about.medical.items.${id}.title`),
+          description: t(`about.medical.items.${id}.description`),
+        }))
 
   return (
-    <section className="container-content pb-8 sm:pb-10 lg:pb-14" aria-labelledby="about-medical-title">
+    <section
+      id="medical"
+      className="container-content scroll-mt-24 pb-8 sm:pb-10 lg:pb-14"
+      aria-labelledby="about-medical-title"
+    >
       <div className="about-medical-grid">
         <div className="about-medical-visual">
           <img
@@ -19,25 +53,23 @@ export function AboutMedicalSection() {
 
         <div>
           <Heading variant="section-compact" id="about-medical-title">
-            {t('about.medical.title')}
+            {title?.trim() || t('about.medical.title')}
           </Heading>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-secondary-text md:text-base">
-            {t('about.medical.subtitle')}
+            {subtitle?.trim() || t('about.medical.subtitle')}
           </p>
 
           <ul className="about-medical-list">
-            {ABOUT_MEDICAL_IDS.map((id) => {
-              const Icon = aboutMedicalIcons[id]
+            {resolvedCards.map((card) => {
+              const Icon = aboutMedicalIcons[card.id]
               return (
-                <li key={id} className="about-medical-item">
+                <li key={card.id} className="about-medical-item">
                   <div className="about-medical-item__icon" aria-hidden>
                     <Icon size={20} strokeWidth={1.75} />
                   </div>
                   <div>
-                    <h3 className="about-medical-item__title">{t(`about.medical.items.${id}.title`)}</h3>
-                    <p className="about-medical-item__description">
-                      {t(`about.medical.items.${id}.description`)}
-                    </p>
+                    <h3 className="about-medical-item__title">{card.title}</h3>
+                    <p className="about-medical-item__description">{card.description}</p>
                   </div>
                 </li>
               )

@@ -56,8 +56,8 @@ const LandingPage = lazy(() =>
 const ContentPage = lazy(() =>
   import('./pages/ContentPage').then((module) => ({ default: module.ContentPage })),
 )
-const AboutPage = lazy(() =>
-  import('./pages/AboutPage').then((module) => ({ default: module.AboutPage })),
+const DocsPage = lazy(() =>
+  import('./pages/DocsPage').then((module) => ({ default: module.DocsPage })),
 )
 const ShopPage = lazy(() =>
   import('./pages/ShopPage').then((module) => ({ default: module.ShopPage })),
@@ -220,17 +220,20 @@ export default function App() {
     <Suspense fallback={<RouteFallback />}>
       <Routes>
         <Route path={HOME_PATH} element={<LandingPage />} />
-        <Route path={DOCS_PATH} element={<Navigate to={ABOUT_PATH} replace />} />
-        <Route path={ABOUT_PATH} element={<AboutPage />} />
+        <Route path={DOCS_PATH} element={<DocsPage />} />
+        <Route path={ABOUT_PATH} element={<Navigate to={DOCS_PATH} replace />} />
         <Route path={TERMS_PATH} element={<ContentPage slug="terms" />} />
-        <Route path={PRIVACY_PATH} element={<ContentPage slug="privacy" />} />
+        <Route
+          path={PRIVACY_PATH}
+          element={<Navigate to={`${DOCS_PATH}#privacy`} replace />}
+        />
         <Route
           path={REFUND_POLICY_PATH}
-          element={<ContentPage slug="refund-policy" />}
+          element={<Navigate to={`${DOCS_PATH}#refund-policy`} replace />}
         />
         <Route
           path={SHIPPING_POLICY_PATH}
-          element={<ContentPage slug="shipping-policy" />}
+          element={<Navigate to={`${DOCS_PATH}#shipping-policy`} replace />}
         />
         <Route path={SHOP_PATH} element={<ShopPage />} />
         <Route path={CART_PATH} element={<CartPage />} />

@@ -28,7 +28,7 @@ export function ProductDescriptionCard({
   const tabContent: Record<DescriptionTab, ReactNode> = {
     description: <p className="product-detail-description-text">{description}</p>,
     advantages: (
-      <ul className="space-y-3">
+      <ul className="space-y-4">
         {advantages.map((item) => (
           <li key={item} className="product-detail-check-item">
             <span className="product-detail-check-icon" aria-hidden>
@@ -40,7 +40,7 @@ export function ProductDescriptionCard({
       </ul>
     ),
     composition: (
-      <ul className="space-y-3">
+      <ul className="space-y-4">
         {composition.map((item) => (
           <li key={item} className="product-detail-check-item">
             <span className="product-detail-check-icon" aria-hidden>

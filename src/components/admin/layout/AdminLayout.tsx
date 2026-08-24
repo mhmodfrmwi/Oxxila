@@ -15,6 +15,7 @@ import {
 } from '../config/adminPageShell'
 import { ADMIN_NAV_ITEMS, ADMIN_SETTINGS_NAV } from '../config/adminNav'
 import { AdminBrandLogo } from './AdminBrandLogo'
+import { AdminLogoutButton } from './AdminLogoutButton'
 import { AdminNavIcon } from './AdminNavIcon'
 import { AdminSidebar } from './AdminSidebar'
 
@@ -73,9 +74,12 @@ export function AdminLayout() {
         <header className="sticky top-0 z-20 border-b border-white/10 bg-white/5 backdrop-blur-[9.6px] lg:hidden">
           <div className="flex items-center justify-between gap-3 px-4 py-4">
             <AdminBrandLogo showSubtitle={false} />
-            <span className="text-[0.52rem] font-medium tracking-[0.2em] text-white/40 uppercase">
-              {t('admin.brand.subtitle')}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[0.52rem] font-medium tracking-[0.2em] text-white/40 uppercase">
+                {t('admin.brand.subtitle')}
+              </span>
+              <AdminLogoutButton compact />
+            </div>
           </div>
           <nav
             className="flex gap-1 overflow-x-auto px-3 pb-3"

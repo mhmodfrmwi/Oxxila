@@ -15,6 +15,8 @@ interface SavedAddressCardProps {
   selected?: boolean
   deleting?: boolean
   showActions?: boolean
+  /** Tighter layout for checkout address picker. */
+  density?: 'default' | 'compact'
   onSelect: () => void
   onEdit?: () => void
   onDelete?: () => void
@@ -27,6 +29,7 @@ export function SavedAddressCard({
   selected,
   deleting,
   showActions = true,
+  density = 'default',
   onSelect,
   onEdit,
   onDelete,
@@ -38,7 +41,11 @@ export function SavedAddressCard({
 
   return (
     <article
-      className={cn('saved-address-card', selected && 'saved-address-card--selected')}
+      className={cn(
+        'saved-address-card',
+        density === 'compact' && 'saved-address-card--compact',
+        selected && 'saved-address-card--selected',
+      )}
     >
       <button
         type="button"

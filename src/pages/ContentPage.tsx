@@ -11,7 +11,10 @@ import { RouteFallback } from '../components/ui/RouteFallback'
 import { HOME_PATH } from '../config/routes'
 import { useContentPage } from '../hooks/useContentPage'
 import { cn } from '../lib/cn'
-import { isPlaceholderContent } from '../utils/contentPage'
+import {
+  isEmptyContentPage,
+  plainTextParagraphs,
+} from '../utils/contentPage'
 
 interface ContentPageProps {
   slug: ContentPageSlug
@@ -73,10 +76,7 @@ export function ContentPage({ slug }: ContentPageProps) {
         })
   const title = page.title?.trim() || fallbackTitle
   const subtitle = page.subtitle?.trim() || ''
-  const empty = isPlaceholderContent(page.content)
-  const hasSections =
-    Array.isArray(page.sections) &&
-    page.sections.some((section) => section.title.trim() || section.body.trim())
+  const empty = isEmptyContentPage(page)
 
   return (
     <Layout
@@ -93,7 +93,7 @@ export function ContentPage({ slug }: ContentPageProps) {
             {subtitle ? <p className="content-page__subtitle">{subtitle}</p> : null}
           </header>
 
-          {empty && !hasSections ? (
+          {empty ? (
             <div className="content-page__empty" role="status">
               <span className="content-page__empty-icon" aria-hidden>
                 <FileText size={28} />
@@ -106,44 +106,27 @@ export function ContentPage({ slug }: ContentPageProps) {
             </div>
           ) : (
             <div className="content-page__body">
-              {!empty ? (
-                <div
-                  className="content-page__prose"
-                  dangerouslySetInnerHTML={{ __html: page.content }}
-                />
-              ) : null}
-
-              {hasSections
-                ? page.sections.map((section) => {
-                    if (!section.title.trim() && !section.body.trim() && !section.image) {
-                      return null
-                    }
-                    return (
-                      <section
-                        key={section.key}
-                        id={section.key}
-                        className="content-page__section"
-                      >
-                        {section.title ? (
-                          <h2 className="content-page__section-title">{section.title}</h2>
-                        ) : null}
-                        {section.image ? (
-                          <img
-                            src={section.image}
-                            alt=""
-                            className="content-page__section-image"
-                          />
-                        ) : null}
-                        {section.body ? (
-                          <div
-                            className="content-page__prose"
-                            dangerouslySetInnerHTML={{ __html: section.body }}
-                          />
-                        ) : null}
-                      </section>
-                    )
-                  })
-                : null}
+              {page.sections.map((section) => {
+                if (!section.title.trim() && !section.body.trim()) return null
+                const paragraphs = plainTextParagraphs(section.body)
+                return (
+                  <section key={section.key} id={section.key} className="content-page__section">
+                    {section.title ? (
+                      <h2 className="content-page__section-title">{section.title}</h2>
+                    ) : null}
+                    {section.subtitle?.trim() ? (
+                      <p className="content-page__subtitle">{section.subtitle}</p>
+                    ) : null}
+                    {paragraphs.length > 0 ? (
+                      <div className="content-page__prose">
+                        {paragraphs.map((paragraph, index) => (
+                          <p key={`${section.key}-p-${index}`}>{paragraph}</p>
+                        ))}
+                      </div>
+                    ) : null}
+                  </section>
+                )
+              })}
             </div>
           )}
         </article>

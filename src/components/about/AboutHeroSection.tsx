@@ -1,6 +1,8 @@
+// src/components/about/AboutHeroSection.tsx
 import { useTranslation } from 'react-i18next'
 import { aboutHeroImage } from './aboutData'
 
+/** Static docs hero — copy and image are not CMS-driven. */
 export function AboutHeroSection() {
   const { t } = useTranslation()
 

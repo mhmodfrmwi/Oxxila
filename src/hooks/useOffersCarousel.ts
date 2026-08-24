@@ -1,7 +1,11 @@
 // src/hooks/useOffersCarousel.ts
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getOffers, type ApiOffer } from '../api/offers'
+import {
+  getOffers,
+  getUpcomingOffer,
+  type ApiOffer,
+} from '../api/offers'
 import type { CountdownPromoSlide } from '../components/promo-carousel/CountdownPromoCarousel'
 import { ApiError } from '../lib/api'
 
@@ -9,6 +13,8 @@ export interface OffersCarouselState {
   loading: boolean
   error: string | null
   slides: CountdownPromoSlide[]
+  /** True when slides are from the nearest upcoming offer (not live yet). */
+  isUpcoming: boolean
 }
 
 export function useOffersCarousel(limit = 8): OffersCarouselState {
@@ -16,6 +22,7 @@ export function useOffersCarousel(limit = 8): OffersCarouselState {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [offers, setOffers] = useState<ApiOffer[]>([])
+  const [isUpcoming, setIsUpcoming] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -23,14 +30,34 @@ export function useOffersCarousel(limit = 8): OffersCarouselState {
     async function load() {
       setLoading(true)
       setError(null)
+      setIsUpcoming(false)
 
       try {
         const response = await getOffers({ limit })
         if (cancelled) return
-        setOffers(response.data ?? [])
+
+        const live = response.data ?? []
+        if (live.length > 0) {
+          setOffers(live)
+          setIsUpcoming(false)
+          return
+        }
+
+        const upcomingResponse = await getUpcomingOffer()
+        if (cancelled) return
+
+        const upcoming = upcomingResponse.data
+        if (upcoming) {
+          setOffers([upcoming])
+          setIsUpcoming(true)
+        } else {
+          setOffers([])
+          setIsUpcoming(false)
+        }
       } catch (err) {
         if (cancelled) return
         setOffers([])
+        setIsUpcoming(false)
         setError(err instanceof ApiError ? err.message : t('shop.offers.loadError'))
       } finally {
         if (!cancelled) setLoading(false)
@@ -47,34 +74,23 @@ export function useOffersCarousel(limit = 8): OffersCarouselState {
   const slides = useMemo(
     () =>
       offers
-        .map((offer, index): CountdownPromoSlide | null => {
-          const product =
-            typeof offer.product === 'object' && offer.product != null ? offer.product : null
+        .map((offer): CountdownPromoSlide | null => {
+          const targetDate = isUpcoming ? offer.startDate : offer.endDate
+          if (!targetDate) return null
 
-          let title = t('shop.offers.specialOffer')
-          if (offer.discountPercent > 0) {
-            title = product?.name
-              ? t('shop.offers.percentOffWithName', {
-                  percent: Math.round(offer.discountPercent),
-                  name: product.name,
-                })
-              : t('shop.offers.percentOff', { percent: Math.round(offer.discountPercent) })
-          } else if (product?.name) {
-            title = product.name
-          }
-
-          if (!offer.endDate) return null
-
+          // Keep product/discount hidden until the countdown ends (Figma locked sale).
           return {
             id: offer._id,
-            title,
-            targetDate: offer.endDate,
-            backgroundVariant: index % 2 === 0 ? 'light' : 'dark',
+            title: t('shop.offers.bigSale'),
+            targetDate,
+            countdownLabel: isUpcoming
+              ? t('shop.offers.openIn')
+              : t('shop.offers.endsIn'),
           }
         })
         .filter((slide): slide is CountdownPromoSlide => slide != null),
-    [offers, t],
+    [offers, isUpcoming, t],
   )
 
-  return { loading, error, slides }
+  return { loading, error, slides, isUpcoming }
 }

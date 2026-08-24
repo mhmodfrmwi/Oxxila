@@ -9,6 +9,8 @@ export interface ProductDetail {
   href: string
   brand: string
   brandLogo?: string
+  /** Link to brand-filtered search, when brand id is known. */
+  brandHref?: string
   title: string
   price: number
   originalPrice?: number

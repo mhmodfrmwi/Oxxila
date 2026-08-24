@@ -1,7 +1,13 @@
 // src/hooks/usePaymentPage.ts
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createCodOrder, createPaymentSession } from '../api/orders'
+import {
+  createCodOrder,
+  createPaymentSession,
+  getEnabledPaymentGateways,
+  type EnabledPaymentGateway,
+  type PaymentGatewayCode,
+} from '../api/orders'
 import {
   createMyAddress,
   getUserProfile,
@@ -23,8 +29,22 @@ import { useToast } from '../context/ToastContext'
 import { useCartAddresses } from './useCartAddresses'
 import { ApiError } from '../lib/api'
 import { storePaymentSessionId } from '../utils/paymentSessionStorage'
+import { findDefaultAddress } from '../utils/userAddress'
 
-export type PaymentMethodId = 'stripe' | 'paymob' | 'cod'
+export type PaymentMethodId = PaymentGatewayCode
+
+const PAYMENT_METHOD_ORDER: PaymentMethodId[] = ['stripe', 'paymob', 'cod']
+
+function sortEnabledMethods(gateways: EnabledPaymentGateway[]): PaymentMethodId[] {
+  const enabled = new Set(
+    gateways
+      .map((gateway) => gateway.code)
+      .filter((code): code is PaymentMethodId =>
+        PAYMENT_METHOD_ORDER.includes(code as PaymentMethodId),
+      ),
+  )
+  return PAYMENT_METHOD_ORDER.filter((code) => enabled.has(code))
+}
 
 export interface NewAddressFormState {
   label: string
@@ -122,7 +142,8 @@ export function usePaymentPage() {
   const [newAddressForm, setNewAddressForm] = useState<NewAddressFormState>(emptyNewAddressForm)
   const [newAddressErrors, setNewAddressErrors] = useState<NewAddressFormErrors>({})
   const [savingAddress, setSavingAddress] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId>('stripe')
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId | null>(null)
+  const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<PaymentMethodId[]>([])
   const [pageLoading, setPageLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -140,20 +161,48 @@ export function usePaymentPage() {
       if (cancelled) return
 
       setPageLoading(true)
+      setSubmitError(null)
       try {
-        const [profileResponse, countriesResponse] = await Promise.all([
+        const [profileResult, countriesResult, gatewaysResult] = await Promise.allSettled([
           getUserProfile(),
           getShippingCountries(),
+          getEnabledPaymentGateways(),
         ])
         if (cancelled) return
 
-        setPhone(profileResponse.data?.phone ?? '')
+        if (profileResult.status === 'fulfilled') {
+          setPhone(profileResult.value.data?.phone ?? '')
+        }
 
-        const countries = countriesResponse.data ?? []
-        const defaultCountry = countries[0]
-        if (defaultCountry) {
-          const governoratesResponse = await getShippingGovernorates(defaultCountry._id)
-          if (!cancelled) setGovernorates(governoratesResponse.data ?? [])
+        if (gatewaysResult.status === 'fulfilled') {
+          const enabledMethods = sortEnabledMethods(gatewaysResult.value.data ?? [])
+          setEnabledPaymentMethods(enabledMethods)
+          setPaymentMethod((current) => {
+            if (current && enabledMethods.includes(current)) return current
+            return enabledMethods[0] ?? null
+          })
+        } else {
+          setEnabledPaymentMethods([])
+          setPaymentMethod(null)
+        }
+
+        if (countriesResult.status === 'fulfilled') {
+          const countries = countriesResult.value.data ?? []
+          const defaultCountry = countries[0]
+          if (defaultCountry) {
+            const governoratesResponse = await getShippingGovernorates(defaultCountry._id)
+            if (!cancelled) setGovernorates(governoratesResponse.data ?? [])
+          }
+        }
+
+        const firstError = [profileResult, countriesResult, gatewaysResult].find(
+          (result) => result.status === 'rejected',
+        )
+        if (firstError && firstError.status === 'rejected') {
+          const reason = firstError.reason
+          setSubmitError(
+            reason instanceof ApiError ? reason.message : 'Unable to load payment data.',
+          )
         }
       } catch (error) {
         if (!cancelled) {
@@ -222,6 +271,25 @@ export function usePaymentPage() {
     setHasDistricts(true)
     setSubmitError(null)
   }
+
+  function showSavedAddresses() {
+    setShowNewAddressForm(false)
+    setNewAddressForm(emptyNewAddressForm)
+    setNewAddressErrors({})
+    setDistricts([])
+    setHasDistricts(true)
+    setSubmitError(null)
+    setSelectedAddressId((current) => {
+      if (current && addresses.some((entry) => entry._id === current)) return current
+      return findDefaultAddress(addresses)?._id ?? null
+    })
+  }
+
+  // No saved addresses yet → stay on the new-address form by default.
+  useEffect(() => {
+    if (addressLoading || addressLoadError) return
+    if (addresses.length === 0) setShowNewAddressForm(true)
+  }, [addressLoading, addressLoadError, addresses.length])
 
   function updateNewAddressField<K extends keyof NewAddressFormState>(
     key: K,
@@ -354,6 +422,14 @@ export function usePaymentPage() {
       return
     }
 
+    if (!paymentMethod) {
+      toast.error(
+        t('checkout.payment.invalidForm'),
+        t('checkout.payment.noMethodsAvailable'),
+      )
+      return
+    }
+
     const provider = resolveProvider(paymentMethod)
 
     submittingRef.current = true
@@ -433,6 +509,7 @@ export function usePaymentPage() {
     selectAddress,
     showNewAddressForm,
     openNewAddressForm,
+    showSavedAddresses,
     newAddressForm,
     newAddressErrors,
     updateNewAddressField,
@@ -447,6 +524,7 @@ export function usePaymentPage() {
     shippingLoading,
     paymentMethod,
     setPaymentMethod,
+    enabledPaymentMethods,
     pageLoading,
     submitting,
     submitError,

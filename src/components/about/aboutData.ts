@@ -1,3 +1,4 @@
+// src/components/about/aboutData.ts
 import type { LucideIcon } from 'lucide-react'
 import {
   BadgeCheck,

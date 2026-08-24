@@ -9,51 +9,107 @@ import {
   type ApiContentPageListItem,
   type ContentPageSlug,
 } from '../api/settings'
+import { ABOUT_CONTENT_DEFAULTS } from '../data/aboutContentDefaults'
+
+export const ABOUT_SECTION_KEYS = [
+  'intro',
+  'quality',
+  'medical',
+  'infrastructure',
+  'authenticity',
+] as const
+
+export type AboutSectionKey = (typeof ABOUT_SECTION_KEYS)[number]
+
+export const ABOUT_ITEM_SLOTS: Record<AboutSectionKey, number> = {
+  intro: 2,
+  quality: 3,
+  medical: 3,
+  infrastructure: 3,
+  authenticity: 0,
+}
+
+export interface ContentPageSectionItemForm {
+  title: string
+  description: string
+}
 
 export interface ContentPageSectionForm {
   key: string
   title: string
+  subtitle: string
   body: string
-  image: string
-  imageFile: File | null
-  previewUrl: string | null
+  items: ContentPageSectionItemForm[]
+  buttonLabel: string
 }
 
 export interface ContentPageForm {
   slug: ContentPageSlug
   title: string
   subtitle: string
-  content: string
   isPublished: boolean
   sections: ContentPageSectionForm[]
 }
 
-function toSectionForm(section: {
-  key: string
-  title: string
-  body: string
-  image: string
-}): ContentPageSectionForm {
-  const image = section.image ?? ''
-  return {
-    key: section.key ?? '',
+function ensureAboutSections(
+  sections: ApiContentPage['sections'] | undefined,
+): ContentPageSectionForm[] {
+  return ABOUT_SECTION_KEYS.map((key) => {
+    const existing = sections?.find((section) => section.key === key)
+    const defaults = ABOUT_CONTENT_DEFAULTS.sections.find((section) => section.key === key)
+    const slotCount = ABOUT_ITEM_SLOTS[key]
+
+    const items = Array.from({ length: slotCount }, (_, index) => {
+      const fromApi = existing?.items?.[index]
+      const fromDefault = defaults?.items?.[index]
+      return {
+        title: fromApi?.title?.trim() || fromDefault?.title || '',
+        description: fromApi?.description?.trim() || fromDefault?.description || '',
+      }
+    })
+
+    return {
+      key,
+      title: existing?.title?.trim() || defaults?.title || '',
+      subtitle: existing?.subtitle?.trim() || defaults?.subtitle || '',
+      body: existing?.body?.trim() || defaults?.body || '',
+      items,
+      buttonLabel: existing?.buttonLabel?.trim() || defaults?.buttonLabel || '',
+    }
+  })
+}
+
+function toPolicySections(
+  sections: ApiContentPage['sections'] | undefined,
+): ContentPageSectionForm[] {
+  return (sections ?? []).map((section, index) => ({
+    key: section.key || `section-${index + 1}`,
     title: section.title ?? '',
+    subtitle: '',
     body: section.body ?? '',
-    image,
-    imageFile: null,
-    previewUrl: image.trim() || null,
-  }
+    items: [],
+    buttonLabel: '',
+  }))
 }
 
 function toForm(data: ApiContentPage): ContentPageForm {
+  const isAbout = data.slug === 'about'
   return {
     slug: data.slug,
-    title: data.title ?? '',
-    subtitle: data.subtitle ?? '',
-    content: data.content ?? '',
+    title: data.title?.trim() || (isAbout ? ABOUT_CONTENT_DEFAULTS.title : ''),
+    subtitle: data.subtitle?.trim() || (isAbout ? ABOUT_CONTENT_DEFAULTS.subtitle : ''),
     isPublished: Boolean(data.isPublished),
-    sections: (data.sections ?? []).map(toSectionForm),
+    sections: isAbout ? ensureAboutSections(data.sections) : toPolicySections(data.sections),
   }
+}
+
+function slugifyKey(value: string, fallback: string): string {
+  const slug = value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 40)
+  return slug || fallback
 }
 
 export function useAdminContentPages() {
@@ -105,32 +161,20 @@ export function useAdminContentPages() {
   }, [])
 
   const setField = useCallback(
-    (field: 'title' | 'subtitle' | 'content' | 'isPublished', value: string | boolean) => {
+    (field: 'title' | 'subtitle' | 'isPublished', value: string | boolean) => {
       setPage((prev) => (prev ? { ...prev, [field]: value } : prev))
     },
     [],
   )
 
   const setSectionField = useCallback(
-    (
-      index: number,
-      field: 'key' | 'title' | 'body' | 'image',
-      value: string,
-    ) => {
+    (index: number, field: 'title' | 'subtitle' | 'body' | 'buttonLabel', value: string) => {
       setPage((prev) => {
         if (!prev) return prev
         return {
           ...prev,
           sections: prev.sections.map((section, sectionIndex) =>
-            sectionIndex === index
-              ? {
-                  ...section,
-                  [field]: value,
-                  ...(field === 'image'
-                    ? { previewUrl: value.trim() || section.previewUrl, imageFile: null }
-                    : {}),
-                }
-              : section,
+            sectionIndex === index ? { ...section, [field]: value } : section,
           ),
         }
       })
@@ -138,23 +182,35 @@ export function useAdminContentPages() {
     [],
   )
 
-  const setSectionImageFile = useCallback((index: number, file: File | null) => {
-    setPage((prev) => {
-      if (!prev) return prev
-      return {
-        ...prev,
-        sections: prev.sections.map((section, sectionIndex) => {
-          if (sectionIndex !== index) return section
-          const previewUrl = file ? URL.createObjectURL(file) : section.image.trim() || null
-          return { ...section, imageFile: file, previewUrl }
-        }),
-      }
-    })
-  }, [])
+  const setSectionItemField = useCallback(
+    (
+      sectionIndex: number,
+      itemIndex: number,
+      field: 'title' | 'description',
+      value: string,
+    ) => {
+      setPage((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          sections: prev.sections.map((section, index) => {
+            if (index !== sectionIndex) return section
+            return {
+              ...section,
+              items: section.items.map((item, i) =>
+                i === itemIndex ? { ...item, [field]: value } : item,
+              ),
+            }
+          }),
+        }
+      })
+    },
+    [],
+  )
 
   const addSection = useCallback(() => {
     setPage((prev) => {
-      if (!prev) return prev
+      if (!prev || prev.slug === 'about') return prev
       const nextIndex = prev.sections.length + 1
       return {
         ...prev,
@@ -163,10 +219,10 @@ export function useAdminContentPages() {
           {
             key: `section-${nextIndex}`,
             title: '',
+            subtitle: '',
             body: '',
-            image: '',
-            imageFile: null,
-            previewUrl: null,
+            items: [],
+            buttonLabel: '',
           },
         ],
       }
@@ -175,11 +231,23 @@ export function useAdminContentPages() {
 
   const removeSection = useCallback((index: number) => {
     setPage((prev) => {
-      if (!prev) return prev
+      if (!prev || prev.slug === 'about') return prev
       return {
         ...prev,
         sections: prev.sections.filter((_, sectionIndex) => sectionIndex !== index),
       }
+    })
+  }, [])
+
+  const moveSection = useCallback((index: number, direction: -1 | 1) => {
+    setPage((prev) => {
+      if (!prev || prev.slug === 'about') return prev
+      const target = index + direction
+      if (target < 0 || target >= prev.sections.length) return prev
+      const sections = [...prev.sections]
+      const [item] = sections.splice(index, 1)
+      sections.splice(target, 0, item)
+      return { ...prev, sections }
     })
   }, [])
 
@@ -189,30 +257,27 @@ export function useAdminContentPages() {
     setSaving(true)
     setError(null)
     try {
-      const sectionWithUpload = page.sections.find((section) => section.imageFile)
-      const payload =
-        page.slug === 'about'
-          ? {
-              sections: page.sections.map(({ key, title, body, image }) => ({
-                key: key.trim(),
-                title: title.trim(),
-                body,
-                image: image.trim(),
-              })),
-            }
-          : {
-              title: page.title.trim(),
-              content: page.content,
-              isPublished: page.isPublished,
-            }
+      const payload = {
+        title: page.title.trim(),
+        subtitle: page.subtitle.trim(),
+        isPublished: page.isPublished,
+        sections: page.sections.map((section, index) => ({
+          key:
+            page.slug === 'about'
+              ? section.key
+              : slugifyKey(section.title, `section-${index + 1}`),
+          title: section.title.trim(),
+          subtitle: section.subtitle.trim(),
+          body: section.body,
+          items: section.items.map((item) => ({
+            title: item.title.trim(),
+            description: item.description.trim(),
+          })),
+          buttonLabel: section.buttonLabel.trim(),
+        })),
+      }
 
-      const response = await updateContentPage(
-        page.slug,
-        payload,
-        sectionWithUpload?.imageFile
-          ? { file: sectionWithUpload.imageFile, sectionKey: sectionWithUpload.key.trim() }
-          : undefined,
-      )
+      const response = await updateContentPage(page.slug, payload)
 
       if (response.data) {
         setPage(toForm(response.data))
@@ -228,11 +293,9 @@ export function useAdminContentPages() {
     }
   }, [loadList, page])
 
-  const slugs = CONTENT_PAGE_SLUGS
-
   return {
     pages,
-    slugs,
+    slugs: CONTENT_PAGE_SLUGS,
     selectedSlug,
     page,
     loadingList,
@@ -242,9 +305,10 @@ export function useAdminContentPages() {
     selectSlug,
     setField,
     setSectionField,
-    setSectionImageFile,
+    setSectionItemField,
     addSection,
     removeSection,
+    moveSection,
     save,
     reloadList: loadList,
     reloadPage: () => loadPage(selectedSlug),

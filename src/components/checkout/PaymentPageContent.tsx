@@ -48,6 +48,7 @@ export function PaymentPageContent() {
     selectAddress,
     showNewAddressForm,
     openNewAddressForm,
+    showSavedAddresses,
     newAddressForm,
     newAddressErrors,
     updateNewAddressField,
@@ -58,6 +59,7 @@ export function PaymentPageContent() {
     hasDistricts,
     paymentMethod,
     setPaymentMethod,
+    enabledPaymentMethods,
     pageLoading,
     submitting,
     submitError,
@@ -135,6 +137,7 @@ export function PaymentPageContent() {
                   selectAddress={selectAddress}
                   showNewAddressForm={showNewAddressForm}
                   openNewAddressForm={openNewAddressForm}
+                  showSavedAddresses={showSavedAddresses}
                   newAddressForm={newAddressForm}
                   newAddressErrors={newAddressErrors}
                   updateNewAddressField={updateNewAddressField}
@@ -145,6 +148,7 @@ export function PaymentPageContent() {
                   hasDistricts={hasDistricts}
                   paymentMethod={paymentMethod}
                   setPaymentMethod={setPaymentMethod}
+                  enabledPaymentMethods={enabledPaymentMethods}
                 />
 
                 <Button
@@ -169,7 +173,7 @@ export function PaymentPageContent() {
                 onRemoveCoupon={removeCoupon}
                 ctaLabel={t('cart.summary.payNow')}
                 onCtaClick={() => void handlePayNow()}
-                ctaDisabled={submitting || !selectedAddressId}
+                ctaDisabled={submitting || !selectedAddressId || !paymentMethod}
                 showPromo={false}
                 trustBadgeVariant="payment"
                 footerNote={t('checkout.payment.securityNote')}

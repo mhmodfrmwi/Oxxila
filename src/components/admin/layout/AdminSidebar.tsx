@@ -13,6 +13,7 @@ import {
   type AdminNavItem,
 } from '../config/adminNav'
 import { AdminBrandLogo } from './AdminBrandLogo'
+import { AdminLogoutButton } from './AdminLogoutButton'
 import { AdminNavIcon } from './AdminNavIcon'
 
 function NavItemLink({ item }: { item: AdminNavItem }) {
@@ -85,6 +86,10 @@ export function AdminSidebar({ className }: AdminSidebarProps) {
         {visibleNavItems.map((item) => (
           <NavItemLink key={item.id} item={item} />
         ))}
+
+        <div className="mt-auto pt-2">
+          <AdminLogoutButton />
+        </div>
       </nav>
 
       {showSettings ? (

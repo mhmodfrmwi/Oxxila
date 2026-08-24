@@ -5,6 +5,7 @@ import {
   createProduct,
   deleteProduct as apiDeleteProduct,
   getAdminProduct,
+  restoreProduct,
   updateProduct,
 } from '../api/admin/products'
 import { ApiError } from '../lib/api'
@@ -51,6 +52,7 @@ interface UseFormulaSpecsDrawerOptions {
   productId: string | null
   onSaved: (product: ApiProduct) => void
   onArchived: (productId: string) => void
+  onRestored: (productId: string) => void
   onDeleted: (productId: string) => void
 }
 
@@ -106,6 +108,7 @@ export function useFormulaSpecsDrawer({
   productId,
   onSaved,
   onArchived,
+  onRestored,
   onDeleted,
 }: UseFormulaSpecsDrawerOptions) {
   const [values, setValues] = useState<AdminProductFormValues>(emptyAdminProductForm)
@@ -116,11 +119,13 @@ export function useFormulaSpecsDrawer({
   const [catalogFile, setCatalogFile] = useState<File | null>(null)
   const [removeCatalog, setRemoveCatalog] = useState(false)
   const [slug, setSlug] = useState<string | null>(null)
+  const [isActive, setIsActive] = useState(true)
   const [errors, setErrors] = useState<AdminProductFormErrors>({})
   const [loadingProduct, setLoadingProduct] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [archiving, setArchiving] = useState(false)
+  const [restoring, setRestoring] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
   const snapshot = useCallback(
@@ -152,6 +157,7 @@ export function useFormulaSpecsDrawer({
     setCatalogFile(null)
     setRemoveCatalog(false)
     setSlug(null)
+    setIsActive(true)
     setErrors({})
     setLoadError(null)
     setBaseline(snapshot(form, [], null, [], null, false))
@@ -189,6 +195,7 @@ export function useFormulaSpecsDrawer({
         setCatalogFile(null)
         setRemoveCatalog(false)
         setSlug(product.slug ?? null)
+        setIsActive(product.isActive !== false)
         setErrors({})
         setBaseline(snapshot(form, images, catalog, [], null, false))
       } catch (error) {
@@ -429,6 +436,7 @@ export function useFormulaSpecsDrawer({
     setArchiving(true)
     try {
       await archiveProduct(productId)
+      setIsActive(false)
       onArchived(productId)
       return { ok: true as const }
     } catch (error) {
@@ -441,6 +449,27 @@ export function useFormulaSpecsDrawer({
       setArchiving(false)
     }
   }, [productId, mode, onArchived])
+
+  const restore = useCallback(async () => {
+    if (!productId || mode !== 'edit') {
+      return { ok: false as const, message: 'Nothing to restore.' }
+    }
+    setRestoring(true)
+    try {
+      await restoreProduct(productId)
+      setIsActive(true)
+      onRestored(productId)
+      return { ok: true as const }
+    } catch (error) {
+      return {
+        ok: false as const,
+        message:
+          error instanceof ApiError ? error.message : 'Unable to restore formulation.',
+      }
+    } finally {
+      setRestoring(false)
+    }
+  }, [productId, mode, onRestored])
 
   const deleteProduct = useCallback(async () => {
     if (!productId || mode !== 'edit') {
@@ -469,6 +498,7 @@ export function useFormulaSpecsDrawer({
     values,
     errors,
     slug,
+    isActive,
     existingImages,
     existingCatalog,
     newImages,
@@ -478,6 +508,7 @@ export function useFormulaSpecsDrawer({
     loadError,
     submitting,
     archiving,
+    restoring,
     deleting,
     dirty,
     imageSlotsUsed,
@@ -491,6 +522,7 @@ export function useFormulaSpecsDrawer({
     clearCatalog,
     save,
     archive,
+    restore,
     deleteProduct,
   }
 }
