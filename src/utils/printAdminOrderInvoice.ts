@@ -1,63 +1,63 @@
 // src/utils/printAdminOrderInvoice.ts
-import logoIcon from '../assets/oxxila-logo-mark.svg'
-import logoWordmark from '../assets/Oxxila.svg'
-import type { AdminOrderDetail } from '../types/adminOrders'
+import logoIcon from "../assets/oxxila-logo-mark.svg";
+import logoWordmark from "../assets/Oxxila.svg";
+import type { AdminOrderDetail } from "../types/adminOrders";
 import {
   formatAdminOrderDateTime,
   formatAdminOrderMoney,
-} from './adminOrdersFormat'
+} from "./adminOrdersFormat";
 
 export interface OrderInvoiceLabels {
-  documentTitle: string
-  brand: string
-  invoice: string
-  order: string
-  date: string
-  billTo: string
-  shipTo: string
-  phone: string
-  email: string
-  items: string
-  product: string
-  qty: string
-  unitPrice: string
-  lineTotal: string
-  subtotal: string
-  shipping: string
-  discount: string
-  storeCredit: string
-  coupon: string
-  total: string
-  payment: string
-  paymentStatus: string
-  carrier: string
-  carrierNotSelected: string
-  tracking: string
-  orderDetails: string
-  thankYou: string
-  thankYouSub: string
-  print: string
-  download: string
-  printFailed: string
-  languageEnglish: string
-  languageArabic: string
+  documentTitle: string;
+  brand: string;
+  invoice: string;
+  order: string;
+  date: string;
+  billTo: string;
+  shipTo: string;
+  phone: string;
+  email: string;
+  items: string;
+  product: string;
+  qty: string;
+  unitPrice: string;
+  lineTotal: string;
+  subtotal: string;
+  shipping: string;
+  discount: string;
+  storeCredit: string;
+  coupon: string;
+  total: string;
+  payment: string;
+  paymentStatus: string;
+  carrier: string;
+  carrierNotSelected: string;
+  tracking: string;
+  orderDetails: string;
+  thankYou: string;
+  thankYouSub: string;
+  print: string;
+  download: string;
+  printFailed: string;
+  languageEnglish: string;
+  languageArabic: string;
 }
 
 function escapeHtml(value: string): string {
   return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function assetHref(importedUrl: string): string {
-  return new URL(importedUrl, window.location.origin).href
+  return new URL(importedUrl, window.location.origin).href;
 }
 
 function formatAddress(order: AdminOrderDetail): string {
-  const address = order.shippingAddress
-  if (!address) return order.zoneLabel ?? '—'
+  const address = order.shippingAddress;
+  if (!address) return order.zoneLabel ?? "—";
   return (
     [
       address.addressLine,
@@ -67,16 +67,19 @@ function formatAddress(order: AdminOrderDetail): string {
     ]
       .map((part) => part?.trim())
       .filter(Boolean)
-      .join(', ') ||
+      .join(", ") ||
     order.zoneLabel ||
-    '—'
-  )
+    "—"
+  );
 }
 
-function resolveCarrierLabel(order: AdminOrderDetail, notSelected: string): string {
-  const carrier = order.carrierName?.trim()
-  if (order.hasAssignedCarrier && carrier) return carrier
-  return notSelected
+function resolveCarrierLabel(
+  order: AdminOrderDetail,
+  notSelected: string,
+): string {
+  const carrier = order.carrierName?.trim();
+  if (order.hasAssignedCarrier && carrier) return carrier;
+  return notSelected;
 }
 
 function buildInvoiceSheet(
@@ -86,41 +89,41 @@ function buildInvoiceSheet(
   logoIconUrl: string,
   logoWordmarkUrl: string,
 ): string {
-  const money = (value: number) => formatAdminOrderMoney(value, locale)
-  const date = formatAdminOrderDateTime(order.createdAt, locale)
-  const carrierLabel = resolveCarrierLabel(order, labels.carrierNotSelected)
+  const money = (value: number) => formatAdminOrderMoney(value, locale);
+  const date = formatAdminOrderDateTime(order.createdAt, locale);
+  const carrierLabel = resolveCarrierLabel(order, labels.carrierNotSelected);
 
   const trackingMeta = order.trackingNumber?.trim()
     ? `<div class="meta-item">
             <span class="label">${escapeHtml(labels.tracking)}</span>
             <span class="value">${escapeHtml(order.trackingNumber.trim())}</span>
           </div>`
-    : ''
+    : "";
 
   const itemRows =
     order.items.length === 0
       ? `<tr><td colspan="4" class="empty">—</td></tr>`
       : order.items
           .map((item) => {
-            const qty = Number(item.quantity) || 0
-            const unit = Number(item.price) || 0
-            const line = unit * qty
+            const qty = Number(item.quantity) || 0;
+            const unit = Number(item.price) || 0;
+            const line = unit * qty;
             return `<tr>
               <td class="product">${escapeHtml(item.name)}</td>
               <td class="center">${qty}</td>
               <td class="end nowrap">${escapeHtml(money(unit))}</td>
               <td class="end nowrap strong">${escapeHtml(money(line))}</td>
-            </tr>`
+            </tr>`;
           })
-          .join('')
+          .join("");
 
   const discountRow =
     order.discountAmount > 0
       ? `<div class="total-row">
-          <span>${escapeHtml(labels.discount)}${order.couponCode ? ` (${escapeHtml(order.couponCode)})` : ''}</span>
+          <span>${escapeHtml(labels.discount)}${order.couponCode ? ` (${escapeHtml(order.couponCode)})` : ""}</span>
           <span class="save">−${escapeHtml(money(order.discountAmount))}</span>
         </div>`
-      : ''
+      : "";
 
   const creditRow =
     order.storeCreditApplied > 0
@@ -128,22 +131,23 @@ function buildInvoiceSheet(
           <span>${escapeHtml(labels.storeCredit)}</span>
           <span class="save">−${escapeHtml(money(order.storeCreditApplied))}</span>
         </div>`
-      : ''
+      : "";
 
   const phone = order.customerPhone
     ? `<p class="detail-line">${escapeHtml(labels.phone)}: <strong>${escapeHtml(order.customerPhone)}</strong></p>`
-    : ''
+    : "";
   const email = order.customerEmail
     ? `<p class="detail-line">${escapeHtml(labels.email)}: <strong>${escapeHtml(order.customerEmail)}</strong></p>`
-    : ''
+    : "";
 
   const subtotal =
     order.subtotal > 0
       ? order.subtotal
       : order.items.reduce(
-          (sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 0),
+          (sum, item) =>
+            sum + (Number(item.price) || 0) * (Number(item.quantity) || 0),
           0,
-        )
+        );
 
   return `<article class="sheet" data-locale="${escapeHtml(locale)}">
       <header class="topbar">
@@ -170,7 +174,7 @@ function buildInvoiceSheet(
           </div>
           <div class="meta-item">
             <span class="label">${escapeHtml(labels.carrier)}</span>
-            <span class="value${order.hasAssignedCarrier && order.carrierName ? '' : ' muted-value'}">${escapeHtml(carrierLabel)}</span>
+            <span class="value${order.hasAssignedCarrier && order.carrierName ? "" : " muted-value"}">${escapeHtml(carrierLabel)}</span>
           </div>
           ${trackingMeta}
         </div>
@@ -228,7 +232,7 @@ function buildInvoiceSheet(
           <p class="footer-sub">${escapeHtml(labels.thankYouSub)}</p>
         </div>
       </div>
-    </article>`
+    </article>`;
 }
 
 function buildInvoiceHtml(
@@ -236,15 +240,27 @@ function buildInvoiceHtml(
   labelsByLocale: { en: OrderInvoiceLabels; ar: OrderInvoiceLabels },
   initialLocale: string,
 ): string {
-  const initial = initialLocale.startsWith('ar') ? 'ar' : 'en'
-  const logoIconUrl = escapeHtml(assetHref(logoIcon))
-  const logoWordmarkUrl = escapeHtml(assetHref(logoWordmark))
-  const sheetEn = buildInvoiceSheet(order, labelsByLocale.en, 'en', logoIconUrl, logoWordmarkUrl)
-  const sheetAr = buildInvoiceSheet(order, labelsByLocale.ar, 'ar', logoIconUrl, logoWordmarkUrl)
-  const uiLabels = labelsByLocale[initial]
+  const initial = initialLocale.startsWith("ar") ? "ar" : "en";
+  const logoIconUrl = escapeHtml(assetHref(logoIcon));
+  const logoWordmarkUrl = escapeHtml(assetHref(logoWordmark));
+  const sheetEn = buildInvoiceSheet(
+    order,
+    labelsByLocale.en,
+    "en",
+    logoIconUrl,
+    logoWordmarkUrl,
+  );
+  const sheetAr = buildInvoiceSheet(
+    order,
+    labelsByLocale.ar,
+    "ar",
+    logoIconUrl,
+    logoWordmarkUrl,
+  );
+  const uiLabels = labelsByLocale[initial];
 
   return `<!DOCTYPE html>
-<html lang="${initial}" dir="${initial === 'ar' ? 'rtl' : 'ltr'}">
+<html lang="${initial}" dir="${initial === "ar" ? "rtl" : "ltr"}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -576,15 +592,15 @@ function buildInvoiceHtml(
 </head>
 <body>
   <div class="page">
-    <div id="invoice-en"${initial === 'en' ? '' : ' hidden'}>${sheetEn}</div>
-    <div id="invoice-ar"${initial === 'ar' ? '' : ' hidden'}>${sheetAr}</div>
+    <div id="invoice-en"${initial === "en" ? "" : " hidden"}>${sheetEn}</div>
+    <div id="invoice-ar"${initial === "ar" ? "" : " hidden"}>${sheetAr}</div>
 
     <div class="actions">
       <div class="lang-switch" role="group" aria-label="Invoice language">
-        <button type="button" class="lang-btn${initial === 'en' ? ' active' : ''}" data-locale="en" onclick="setInvoiceLocale('en')">
+        <button type="button" class="lang-btn${initial === "en" ? " active" : ""}" data-locale="en" onclick="setInvoiceLocale('en')">
           ${escapeHtml(uiLabels.languageEnglish)}
         </button>
-        <button type="button" class="lang-btn${initial === 'ar' ? ' active' : ''}" data-locale="ar" onclick="setInvoiceLocale('ar')">
+        <button type="button" class="lang-btn${initial === "ar" ? " active" : ""}" data-locale="ar" onclick="setInvoiceLocale('ar')">
           ${escapeHtml(uiLabels.languageArabic)}
         </button>
       </div>
@@ -608,8 +624,14 @@ function buildInvoiceHtml(
     function updateActionLabels(locale) {
       var isAr = locale === 'ar';
       var labels = ${JSON.stringify({
-        en: { print: labelsByLocale.en.print, download: labelsByLocale.en.download },
-        ar: { print: labelsByLocale.ar.print, download: labelsByLocale.ar.download },
+        en: {
+          print: labelsByLocale.en.print,
+          download: labelsByLocale.en.download,
+        },
+        ar: {
+          print: labelsByLocale.ar.print,
+          download: labelsByLocale.ar.download,
+        },
       })};
       var printBtn = document.getElementById('print-btn');
       var downloadBtn = document.getElementById('download-btn');
@@ -646,7 +668,7 @@ function buildInvoiceHtml(
     }
   </script>
 </body>
-</html>`
+</html>`;
 }
 
 /**
@@ -656,20 +678,20 @@ function buildInvoiceHtml(
 export function printAdminOrderInvoice(
   order: AdminOrderDetail,
   labelsByLocale: { en: OrderInvoiceLabels; ar: OrderInvoiceLabels },
-  initialLocale = 'en',
+  initialLocale = "en",
 ): boolean {
-  const html = buildInvoiceHtml(order, labelsByLocale, initialLocale)
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const printWindow = window.open(url, '_blank', 'width=920,height=1100')
+  const html = buildInvoiceHtml(order, labelsByLocale, initialLocale);
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const printWindow = window.open(url, "_blank", "width=920,height=1100");
 
   if (!printWindow) {
-    URL.revokeObjectURL(url)
-    return false
+    URL.revokeObjectURL(url);
+    return false;
   }
 
-  const revoke = () => URL.revokeObjectURL(url)
-  printWindow.addEventListener('beforeunload', revoke, { once: true })
-  window.setTimeout(revoke, 5 * 60_000)
-  return true
+  const revoke = () => URL.revokeObjectURL(url);
+  printWindow.addEventListener("beforeunload", revoke, { once: true });
+  window.setTimeout(revoke, 5 * 60_000);
+  return true;
 }
