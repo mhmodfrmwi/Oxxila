@@ -57,8 +57,8 @@ export function AdminLogoutButton({
               'hover:bg-white/5 hover:text-white/80',
             )
           : cn(
-              'flex w-full items-center gap-3 rounded-xl px-4 py-3',
-              'text-base font-normal text-white/60',
+              'flex w-full items-center gap-3 rounded-xl px-4 py-2.5',
+              'text-base font-normal leading-6 text-white/60',
               'transition-colors hover:bg-support-error/10 hover:text-support-error',
             ),
         className,

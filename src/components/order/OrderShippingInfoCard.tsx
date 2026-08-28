@@ -3,11 +3,13 @@ import { MapPin } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import type { ApiOrder } from '../../types/order'
-import { formatEstimatedDeliveryArrival } from '../../utils/orderDelivery'
 import {
+  formatEstimatedDeliveryArrival,
   formatEstimatedDeliveryRange,
-  formatOrderShippingAddressLines,
-} from '../../utils/orderFormat'
+  getOrderShippingMethodLabel,
+  hasOrderDeliveryEstimate,
+} from '../../utils/orderDelivery'
+import { formatOrderShippingAddressLines } from '../../utils/orderFormat'
 
 interface OrderShippingInfoCardProps {
   order: ApiOrder
@@ -24,6 +26,10 @@ export function OrderShippingInfoCard({
 }: OrderShippingInfoCardProps) {
   const { t } = useTranslation()
   const addressLines = formatOrderShippingAddressLines(order)
+  const hasDeliveryEstimate = hasOrderDeliveryEstimate(order)
+  const estimatedArrival = formatEstimatedDeliveryArrival(order)
+  const deliveryWindow = formatEstimatedDeliveryRange(order)
+  const shippingMethod = getOrderShippingMethodLabel(order, t('checkout.track.standardShipping'))
 
   return (
     <section
@@ -44,22 +50,30 @@ export function OrderShippingInfoCard({
         {phone && <p className="mt-2">{phone}</p>}
       </div>
 
-      <div className="order-confirmation-divider" />
+      {hasDeliveryEstimate && (
+        <>
+          <div className="order-confirmation-divider" />
 
-      <dl className="order-confirmation-details-list">
-        <div className="order-confirmation-details-row">
-          <dt>{t('checkout.delivery.estimatedDelivery')}</dt>
-          <dd>{formatEstimatedDeliveryArrival(order)}</dd>
-        </div>
-        <div className="order-confirmation-details-row">
-          <dt>{t('checkout.track.shippingMethod')}</dt>
-          <dd>{order.shipping.methodName || t('checkout.track.standardShipping')}</dd>
-        </div>
-        <div className="order-confirmation-details-row">
-          <dt>{t('checkout.track.deliveryWindow')}</dt>
-          <dd>{formatEstimatedDeliveryRange(order)}</dd>
-        </div>
-      </dl>
+          <dl className="order-confirmation-details-list">
+            {estimatedArrival && (
+              <div className="order-confirmation-details-row">
+                <dt>{t('checkout.delivery.estimatedDelivery')}</dt>
+                <dd>{estimatedArrival}</dd>
+              </div>
+            )}
+            <div className="order-confirmation-details-row">
+              <dt>{t('checkout.track.shippingMethod')}</dt>
+              <dd>{shippingMethod}</dd>
+            </div>
+            {deliveryWindow && (
+              <div className="order-confirmation-details-row">
+                <dt>{t('checkout.track.deliveryWindow')}</dt>
+                <dd>{deliveryWindow}</dd>
+              </div>
+            )}
+          </dl>
+        </>
+      )}
     </section>
   )
 }

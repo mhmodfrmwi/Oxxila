@@ -217,7 +217,7 @@ export function OffersManagerCard() {
         className="rounded-[2rem]"
         toolbar={
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">
+            <h3 className="admin-card-title">
               {t('admin.settings.offers.title')}
             </h3>
             <button

@@ -28,7 +28,7 @@ const widthClasses = {
   settings: 'max-w-[25.6rem]',
   /** Figma Order Details drawer is 420px. */
   order: 'max-w-[21rem]',
-  /** Figma Patient Intelligence drawer is 480px. */
+  /** Customer details drawer is 480px. */
   customer: 'max-w-[24rem]',
 } as const
 
@@ -65,6 +65,8 @@ export function Drawer({
   const descriptionId = useId()
   const panelRef = useRef<HTMLElement>(null)
   const previouslyFocusedRef = useRef<HTMLElement | null>(null)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
   const isRtl = i18n.dir() === 'rtl'
   const enterX = isRtl ? '-100%' : '100%'
 
@@ -93,7 +95,7 @@ export function Drawer({
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         event.preventDefault()
-        onClose()
+        onCloseRef.current()
         return
       }
 
@@ -133,7 +135,7 @@ export function Drawer({
       previouslyFocusedRef.current?.focus()
       previouslyFocusedRef.current = null
     }
-  }, [open, onClose])
+  }, [open])
 
   return (
     <AnimatePresence>

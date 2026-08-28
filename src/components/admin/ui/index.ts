@@ -1,4 +1,5 @@
 // src/components/admin/ui/index.ts
+export { AdminButton } from './AdminButton'
 export { DataTable } from './DataTable'
 export type { DataTableColumn } from './DataTable'
 export { Dialog } from './Dialog'

@@ -411,7 +411,7 @@ export function useFormulaSpecsDrawer({
       return { ok: true as const, product: saved }
     } catch (error) {
       const message =
-        error instanceof ApiError ? error.message : 'Unable to save formulation.'
+        error instanceof ApiError ? error.message : 'Unable to save product.'
       return { ok: false as const, message }
     } finally {
       setSubmitting(false)
@@ -443,7 +443,7 @@ export function useFormulaSpecsDrawer({
       return {
         ok: false as const,
         message:
-          error instanceof ApiError ? error.message : 'Unable to archive formulation.',
+          error instanceof ApiError ? error.message : 'Unable to archive product.',
       }
     } finally {
       setArchiving(false)
@@ -464,7 +464,7 @@ export function useFormulaSpecsDrawer({
       return {
         ok: false as const,
         message:
-          error instanceof ApiError ? error.message : 'Unable to restore formulation.',
+          error instanceof ApiError ? error.message : 'Unable to restore product.',
       }
     } finally {
       setRestoring(false)
@@ -484,7 +484,7 @@ export function useFormulaSpecsDrawer({
       return {
         ok: false as const,
         message:
-          error instanceof ApiError ? error.message : 'Unable to delete formulation.',
+          error instanceof ApiError ? error.message : 'Unable to delete product.',
       }
     } finally {
       setDeleting(false)

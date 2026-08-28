@@ -3,7 +3,7 @@ import { type ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { HOME_PATH, LOGIN_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
-import { RouteFallback } from '../ui/RouteFallback'
+import { AdminLoadingScreen } from './layout/AdminLoadingScreen'
 
 interface RequireAdminProps {
   children: ReactNode
@@ -22,7 +22,7 @@ export function RequireAdmin({ children }: RequireAdminProps) {
   const location = useLocation()
 
   if (profileLoading) {
-    return <RouteFallback />
+    return <AdminLoadingScreen />
   }
 
   if (!isAuthenticated) {

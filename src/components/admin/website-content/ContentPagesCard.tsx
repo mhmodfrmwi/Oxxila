@@ -10,7 +10,7 @@ import {
 } from '../../../hooks/useAdminContentPages'
 import { useAdminPermissions } from '../../../hooks/useAdminPermissions'
 import { cn } from '../../../lib/cn'
-import { Button } from '../../ui/Button'
+import { AdminButton } from '../ui/AdminButton'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { EmptyState } from '../ui/EmptyState'
 import { GlassCard } from '../ui/GlassCard'
@@ -130,7 +130,7 @@ export function ContentPagesCard() {
               title={t('admin.settings.loadErrorTitle')}
               description={error}
               action={
-                <Button
+                <AdminButton
                   type="button"
                   variant="outline"
                   onClick={() => {
@@ -139,7 +139,7 @@ export function ContentPagesCard() {
                   }}
                 >
                   {t('admin.settings.retry')}
-                </Button>
+                </AdminButton>
               }
             />
           ) : page ? (
@@ -192,16 +192,16 @@ export function ContentPagesCard() {
                     : t('admin.websiteContent.contentPages.policySectionsHeading')}
                 </p>
                 {!isAbout ? (
-                  <Button
+                  <AdminButton
                     type="button"
                     variant="outline"
+                    size="sm"
                     disabled={saving}
                     onClick={addSection}
-                    className="min-h-8 px-3 py-1.5 text-xs"
                   >
                     <Plus size={14} aria-hidden />
                     {t('admin.websiteContent.contentPages.addSection')}
-                  </Button>
+                  </AdminButton>
                 ) : null}
               </div>
 
@@ -439,11 +439,7 @@ export function ContentPagesCard() {
                 </p>
               ) : null}
 
-              <Button
-                type="submit"
-                disabled={saving || !canUpdate}
-                className="w-full justify-center"
-              >
+              <AdminButton type="submit" disabled={saving || !canUpdate} fullWidth>
                 {saving ? (
                   <>
                     <Loader2 size={16} className="animate-spin" aria-hidden />
@@ -452,7 +448,7 @@ export function ContentPagesCard() {
                 ) : (
                   t('admin.websiteContent.contentPages.save')
                 )}
-              </Button>
+              </AdminButton>
             </form>
           ) : null}
         </div>

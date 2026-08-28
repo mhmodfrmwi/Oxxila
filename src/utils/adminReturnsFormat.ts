@@ -12,6 +12,7 @@ import {
   formatDashboardMoney,
   formatOrderId,
 } from './adminDashboardFormat'
+import { customerInitials } from './adminOrdersFormat'
 
 export function formatAdminReturnMoney(value: number, locale = 'en'): string {
   return formatDashboardMoney(value, locale)
@@ -86,6 +87,7 @@ export function mapApiReturnToRow(returnRequest: ApiAdminReturn): AdminReturnRow
     createdAt: returnRequest.createdAt,
     userName: user?.name?.trim() || '—',
     userEmail: user?.email?.trim() || null,
+    userInitials: customerInitials(user?.name?.trim() || ''),
     orderId,
     orderShortLabel: orderId ? formatReturnOrderLabel(orderId) : null,
     refundAmount: returnRequest.refundAmount,
@@ -121,6 +123,7 @@ export function mapApiReturnToDetail(returnRequest: ApiAdminReturn): AdminReturn
     adminNote: returnRequest.adminNote?.trim() || null,
     userName: user?.name?.trim() || '—',
     userEmail: user?.email?.trim() || null,
+    userInitials: customerInitials(user?.name?.trim() || ''),
     userPhone: user?.phone?.trim() || null,
     orderId,
     orderShortLabel: orderId ? formatReturnOrderLabel(orderId) : null,

@@ -111,12 +111,7 @@ export function DocsPage() {
   }
 
   return (
-    <Layout
-      utilityPromo={{
-        title: t('shop.promo.title'),
-        subtitle: t('shop.promo.subtitle'),
-      }}
-    >
+    <Layout>
       <PageBleed>
         <AboutHeroSection />
         <AboutIntroSection

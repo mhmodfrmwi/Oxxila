@@ -6,7 +6,7 @@ import { useToast } from '../../../context/ToastContext'
 import { useAdminHowItWorksSettings } from '../../../hooks/useAdminHowItWorksSettings'
 import { useAdminPermissions } from '../../../hooks/useAdminPermissions'
 import { cn } from '../../../lib/cn'
-import { Button } from '../../ui/Button'
+import { AdminButton } from '../ui/AdminButton'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { EmptyState } from '../ui/EmptyState'
 import { GlassCard } from '../ui/GlassCard'
@@ -77,9 +77,9 @@ export function HowItWorksSettingsCard() {
           title={t('admin.settings.loadErrorTitle')}
           description={error}
           action={
-            <Button type="button" variant="outline" onClick={() => void reload()}>
+            <AdminButton type="button" variant="outline" onClick={() => void reload()}>
               {t('admin.settings.retry')}
-            </Button>
+            </AdminButton>
           }
         />
       ) : (
@@ -223,11 +223,7 @@ export function HowItWorksSettingsCard() {
             </p>
           ) : null}
 
-          <Button
-            type="submit"
-            disabled={saving || !canUpdate}
-            className="w-full justify-center sm:w-auto"
-          >
+          <AdminButton type="submit" disabled={saving || !canUpdate}>
             {saving ? (
               <>
                 <Loader2 size={16} className="animate-spin" aria-hidden />
@@ -236,7 +232,7 @@ export function HowItWorksSettingsCard() {
             ) : (
               t('admin.websiteContent.howItWorks.save')
             )}
-          </Button>
+          </AdminButton>
         </form>
       )}
     </GlassCard>

@@ -86,6 +86,7 @@ export function filterAdminNavItems(
 }
 
 const PATH_TAB_RULES: Array<{ prefix: string; tab: AdminTabKey; exact?: boolean }> = [
+  { prefix: '/admin/reports', tab: 'reports' },
   { prefix: '/admin/website-content', tab: 'websiteContent' },
   { prefix: '/admin/settings', tab: 'settings' },
   { prefix: '/admin/products', tab: 'products' },
@@ -119,6 +120,7 @@ export function firstAllowedAdminPath(permissions: AdminPermissionsMap | null): 
 
   const ordered: Array<{ tab: AdminTabKey; path: string }> = [
     { tab: 'dashboard', path: '/admin' },
+    { tab: 'reports', path: '/admin/reports' },
     { tab: 'products', path: '/admin/products' },
     { tab: 'categories', path: '/admin/categories' },
     { tab: 'websiteContent', path: '/admin/website-content' },

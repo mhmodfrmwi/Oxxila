@@ -81,9 +81,9 @@
   --primary-link-active: #8b5cf6;
 
   /* Canonical Admin shell = Settings Figma 937:21865 × 0.8 */
-  --admin-font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --admin-font-display: 'New York', Georgia, 'Times New Roman', serif;
-  --admin-font-brand: 'Poppins', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --admin-font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --admin-font-display: "Playfair Display", Georgia, serif;
+  --admin-font-brand: "Poppins", "Inter", ui-sans-serif, system-ui, sans-serif;
   /* Component 50 × 0.8 */
   --admin-sidebar-width: 211.4286px;
   /* Main.x × 0.8 */
@@ -168,6 +168,14 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--secondary-text);
+}
+
+.admin-shell .admin-card-title {
+  font-family: var(--admin-font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  color: var(--primary-text);
 }
 
 @utility admin-glass {

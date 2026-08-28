@@ -8,6 +8,12 @@ import type {
   AdminCategoryWriteFields,
   ApiAdminCategory,
 } from '../types/adminCategories'
+import { mapApiAuditBlock } from './adminAuditFormat'
+
+function auditCreatorName(category: ApiAdminCategory): string | null {
+  const audit = mapApiAuditBlock(category.audit)
+  return audit?.createdBy?.name?.trim() || null
+}
 
 /** From category upload middleware (`maxFileSizeMB: 2`). */
 export const ADMIN_CATEGORY_FILE_MAX_BYTES = 2 * 1024 * 1024
@@ -28,6 +34,7 @@ function mapApiSubcategoryToTreeSub(
     name: subcategory.name ?? '',
     slug: subcategory.slug ?? '',
     isActive: subcategory.isActive !== false,
+    createdByName: null,
   }
 }
 
@@ -44,6 +51,7 @@ export function mapApiCategoryToTreeRow(
     slug: category.slug ?? '',
     image: category.image ? String(category.image) : null,
     isActive: category.isActive !== false,
+    createdByName: auditCreatorName(category),
     subcategories,
   }
 }

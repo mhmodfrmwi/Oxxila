@@ -99,6 +99,14 @@ function CategoryThumbnail({
   )
 }
 
+function CreatedByCell({ name }: { name: string | null }) {
+  return (
+    <span className="text-sm text-white/70" title={name ?? undefined}>
+      {name ?? '—'}
+    </span>
+  )
+}
+
 function ActiveSwitch({
   checked,
   label,
@@ -149,6 +157,9 @@ function TreeRowSkeleton({ indented = false }: { indented?: boolean }) {
       </td>
       <td className="px-6 py-4">
         <Skeleton className="h-3 w-24" />
+      </td>
+      <td className="px-6 py-4">
+        <Skeleton className="h-3 w-20" />
       </td>
       <td className="px-6 py-4">
         <Skeleton className="h-5 w-20" />
@@ -222,7 +233,7 @@ export function CategoriesTreeTable({
 
       <div className="overflow-x-auto">
         <table
-          className="w-full min-w-[48rem] border-collapse text-start"
+          className="w-full min-w-[56rem] border-collapse text-start"
           aria-label={t('admin.categories.tree.tableAria')}
         >
           <thead>
@@ -232,6 +243,9 @@ export function CategoriesTreeTable({
               </th>
               <th className="px-6 py-4 text-start font-semibold">
                 {t('admin.categories.columns.slug')}
+              </th>
+              <th className="px-6 py-4 text-start font-semibold">
+                {t('admin.categories.columns.createdBy')}
               </th>
               <th className="px-6 py-4 text-start font-semibold">
                 {t('admin.categories.columns.status')}
@@ -313,6 +327,9 @@ export function CategoriesTreeTable({
                       <span className="font-mono text-xs text-secondary-text">
                         {category.slug}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <CreatedByCell name={category.createdByName} />
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
@@ -423,6 +440,9 @@ export function CategoriesTreeTable({
                             <span className="font-mono text-xs text-secondary-text">
                               {subcategory.slug}
                             </span>
+                          </td>
+                          <td className="px-6 py-3">
+                            <CreatedByCell name={subcategory.createdByName} />
                           </td>
                           <td className="px-6 py-3">
                             <div className="flex items-center gap-2">

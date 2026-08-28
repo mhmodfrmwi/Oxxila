@@ -10,6 +10,7 @@ import { ProductsCatalogToolbar } from '../../components/admin/products/Products
 import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { Button } from '../../components/ui/Button'
 import { useAdminProducts } from '../../hooks/useAdminProducts'
+import { useAdminUrlOpen } from '../../hooks/useAdminUrlOpen'
 import type { FormulaSpecsMode } from '../../hooks/useFormulaSpecsDrawer'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../../components/ui/interactionStyles'
@@ -47,6 +48,8 @@ export function AdminProductsPage() {
     setEditingId(productId)
     setDrawerOpen(true)
   }, [])
+
+  useAdminUrlOpen(openEdit)
 
   const closeDrawer = useCallback(() => {
     setDrawerOpen(false)

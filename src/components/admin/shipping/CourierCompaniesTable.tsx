@@ -113,11 +113,7 @@ export function CourierCompaniesTable({
         headerClassName: 'text-center',
         className: 'text-center',
         cell: (row) => (
-          <span className="text-sm text-white/60">
-            {row.type === 'api'
-              ? t('admin.shipping.carriers.bosta')
-              : row.deliveryDays ?? '—'}
-          </span>
+          <span className="text-sm text-white/60">{row.deliveryDays ?? '—'}</span>
         ),
       },
       {

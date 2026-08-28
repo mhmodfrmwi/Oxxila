@@ -95,7 +95,8 @@ export function LanguageSwitcher({ className, compact = false }: LanguageSwitche
           role="listbox"
           aria-label={t('language.switcher')}
           className={cn(
-            'absolute end-0 top-full z-50 mt-2 min-w-[10rem] overflow-hidden rounded-xl border border-border-subtle bg-card py-1 shadow-lg',
+            'absolute end-0 top-full z-50 mt-2 min-w-[10rem] overflow-hidden',
+            'rounded-2xl border border-border-subtle bg-card p-1.5 shadow-lg',
           )}
         >
           {SUPPORTED_LANGUAGES.map((language) => {
@@ -105,9 +106,9 @@ export function LanguageSwitcher({ className, compact = false }: LanguageSwitche
                 <button
                   type="button"
                   className={cn(
-                    'flex w-full items-center px-4 py-2.5 text-start text-sm transition-colors',
+                    'mx-1.5 flex w-[calc(100%-0.75rem)] items-center rounded-xl px-3.5 py-3 text-start text-sm font-medium transition-colors',
                     selected
-                      ? 'bg-accent/10 font-medium text-accent'
+                      ? 'bg-accent/10 text-accent'
                       : 'text-primary-text hover:bg-input',
                     focusRingClasses,
                   )}

@@ -14,6 +14,7 @@ import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { Button } from '../../components/ui/Button'
 import { focusRingClasses } from '../../components/ui/interactionStyles'
 import { useAdminOrders } from '../../hooks/useAdminOrders'
+import { useAdminUrlOpen } from '../../hooks/useAdminUrlOpen'
 import { cn } from '../../lib/cn'
 import type { AdminOrderRow } from '../../types/adminOrders'
 
@@ -31,6 +32,8 @@ export function AdminOrdersPage() {
   const openDrawer = useCallback((orderId: string) => {
     setDrawerOrderId(orderId)
   }, [])
+
+  useAdminUrlOpen(openDrawer)
 
   const closeDrawer = useCallback(() => {
     setDrawerOrderId(null)

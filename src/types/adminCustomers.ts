@@ -74,7 +74,7 @@ export interface ApiAdminCustomerAddress {
   isDefault?: boolean
 }
 
-/** Normalized detail model for the Patient Intelligence drawer. */
+/** Normalized detail model for the customer details drawer. */
 export interface AdminCustomerDetail {
   id: string
   name: string

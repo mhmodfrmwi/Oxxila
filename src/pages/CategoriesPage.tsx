@@ -5,12 +5,7 @@ import { PageBleed } from '../components/layout/PageBleed'
 
 export function CategoriesPage() {
   return (
-    <Layout
-      utilityPromo={{
-        title: 'Return within 30 days',
-        subtitle: 'from purchase date',
-      }}
-    >
+    <Layout>
       <PageBleed>
         <CategoryPageContent />
       </PageBleed>

@@ -87,6 +87,12 @@ export const WISHLIST_PATH = '/wishlist'
 export const ADMIN_PATH = '/admin'
 
 export const ADMIN_DASHBOARD_PATH = ADMIN_PATH
+export const ADMIN_REPORTS_PATH = `${ADMIN_PATH}/reports`
+
+export function adminReportProductPath(productId: string) {
+  return `${ADMIN_REPORTS_PATH}/products/${productId}`
+}
+
 export const ADMIN_PRODUCTS_PATH = `${ADMIN_PATH}/products`
 export const ADMIN_CATEGORIES_PATH = `${ADMIN_PATH}/categories`
 export const ADMIN_BRANDS_PATH = `${ADMIN_PATH}/brands`
@@ -98,5 +104,7 @@ export const ADMIN_REVIEWS_PATH = `${ADMIN_PATH}/reviews`
 export const ADMIN_SHIPPING_PATH = `${ADMIN_PATH}/shipping`
 export const ADMIN_RETURNS_PATH = `${ADMIN_PATH}/returns`
 export const ADMIN_SETTINGS_PATH = `${ADMIN_PATH}/settings`
+
+export const ADMIN_ACTIVITY_LOG_PATH = `${ADMIN_PATH}/activity-log`
 
 export const ADMIN_WEBSITE_CONTENT_PATH = `${ADMIN_PATH}/website-content`

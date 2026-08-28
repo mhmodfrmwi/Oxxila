@@ -46,7 +46,7 @@ function findLiveCategory(
 
 function CategoryGrid({ categories }: { categories: readonly ShopCategory[] }) {
   return (
-    <div className="flex w-full items-start justify-between gap-3">
+    <div className="flex w-full flex-wrap items-start justify-start gap-3">
       {categories.map((category) => (
         <ShopCategoryCard
           key={category.id}
@@ -89,19 +89,23 @@ export function ShopCategoriesStrip() {
   const { categories } = useLandingCatalogContext()
   const isDesktop = useMediaQuery(DESKTOP_BREAKPOINT)
 
-  const shopCategories = useMemo<ShopCategory[]>(
-    () =>
-      shopCategoryArtwork.map((artwork) => {
-        const live = findLiveCategory(categories, artwork.id, artwork.name)
-        return {
-          id: artwork.id,
-          name: categoryName(t, artwork.id, artwork.name),
-          image: artwork.image,
-          href: categoryBrowsePath(live?.slug ?? artwork.id),
-        }
-      }),
-    [categories, t],
-  )
+  // Only show categories that exist and are active in the catalog.
+  // Hardcoded Figma artwork is presentation only — hidden/deleted categories must not appear.
+  const shopCategories = useMemo<ShopCategory[]>(() => {
+    return shopCategoryArtwork.flatMap((artwork) => {
+      const live = findLiveCategory(categories, artwork.id, artwork.name)
+      if (!live) return []
+
+      return [
+        {
+          id: live._id || artwork.id,
+          name: categoryName(t, artwork.id, live.name || artwork.name),
+          image: live.image || artwork.image,
+          href: categoryBrowsePath(live.slug),
+        },
+      ]
+    })
+  }, [categories, t])
 
   return (
     <section

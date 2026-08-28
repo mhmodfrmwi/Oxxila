@@ -28,7 +28,7 @@ export function BrandCard({ brand, className }: BrandCardProps) {
         <img
           src={logo}
           alt={logoAlt}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain p-1"
           loading="lazy"
           draggable={false}
         />

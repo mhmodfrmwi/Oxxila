@@ -8,6 +8,7 @@ import type {
   AdminPaymentStatus,
   ApiAdminOrder,
 } from '../types/adminOrders'
+import { mapApiAuditBlock } from './adminAuditFormat'
 import {
   formatDashboardDate,
   formatDashboardMoney,
@@ -231,10 +232,25 @@ export function mapApiOrderToAdminDetail(order: ApiAdminOrder): AdminOrderDetail
     trackingNumber:
       order.tracking?.trackingNumber ?? order.shipment?.trackingNumber ?? null,
     totalPrice: order.totalPrice,
+    subtotal: Number(order.subtotal) || 0,
+    shippingPrice: Number(order.shippingPrice ?? order.shipping?.price) || 0,
+    discountAmount: Number(order.discountAmount) || 0,
+    storeCreditApplied: Number(order.storeCreditApplied) || 0,
+    couponCode: order.couponCode?.trim() || null,
+    shippingAddress: address
+      ? {
+          countryName: address.countryName ?? '',
+          governorateName: address.governorateName ?? '',
+          districtName: address.districtName ?? '',
+          addressLine: address.addressLine ?? '',
+          isOther: address.isOther,
+        }
+      : null,
     carrierName: order.shipment?.carrierName?.trim() || null,
     carrierType: order.shipment?.carrierType ?? null,
     hasAssignedCarrier: hasCommittedCarrier(order),
     zoneLabel,
+    audit: mapApiAuditBlock(order.audit),
   }
 }
 
@@ -253,4 +269,31 @@ export function resolveOrderDetailsPhase(
 export function formatOrderCustomerSubtitle(order: AdminOrderDetail): string {
   if (order.customerPhone) return order.customerPhone
   return `${order.paymentStatusLabel} • ${order.orderStatusLabel}`
+}
+
+export function formatAdminOrderAddress(
+  order: Pick<AdminOrderDetail, 'shippingAddress' | 'zoneLabel'>,
+): string {
+  const address = order.shippingAddress
+  if (!address) return order.zoneLabel ?? '—'
+
+  const parts = [
+    address.addressLine,
+    address.districtName,
+    address.governorateName,
+    address.countryName,
+  ]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+
+  return parts.length > 0 ? parts.join(', ') : (order.zoneLabel ?? '—')
+}
+
+export function formatAdminOrderCarrierLabel(
+  order: Pick<AdminOrderDetail, 'hasAssignedCarrier' | 'carrierName'>,
+  notSelectedLabel: string,
+): string {
+  const carrier = order.carrierName?.trim()
+  if (order.hasAssignedCarrier && carrier) return carrier
+  return notSelectedLabel
 }

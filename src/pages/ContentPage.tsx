@@ -41,12 +41,7 @@ export function ContentPage({ slug }: ContentPageProps) {
 
   if (error || !page) {
     return (
-      <Layout
-        utilityPromo={{
-          title: t('shop.promo.title'),
-          subtitle: t('shop.promo.subtitle'),
-        }}
-      >
+      <Layout>
         <PageBleed>
           <div className="content-page">
             <div className="content-page__empty">
@@ -79,12 +74,7 @@ export function ContentPage({ slug }: ContentPageProps) {
   const empty = isEmptyContentPage(page)
 
   return (
-    <Layout
-      utilityPromo={{
-        title: t('shop.promo.title'),
-        subtitle: t('shop.promo.subtitle'),
-      }}
-    >
+    <Layout>
       <PageBleed>
         <article className="content-page">
           <header className="content-page__hero">

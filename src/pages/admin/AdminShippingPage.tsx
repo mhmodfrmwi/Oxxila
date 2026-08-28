@@ -1,6 +1,6 @@
 // src/pages/admin/AdminShippingPage.tsx
 import { Loader2 } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { deleteAdminCarrier } from '../../api/admin/carriers'
 import { AdminPageHeader } from '../../components/admin/layout/AdminPageHeader'
@@ -14,6 +14,7 @@ import { Button } from '../../components/ui/Button'
 import { useToast } from '../../context/ToastContext'
 import type { CarrierDrawerMode } from '../../hooks/useCarrierForm'
 import { useAdminShipping } from '../../hooks/useAdminShipping'
+import { useAdminUrlOpen } from '../../hooks/useAdminUrlOpen'
 import { ApiError } from '../../lib/api'
 import type { AdminCarrierRow } from '../../types/adminShipping'
 
@@ -33,6 +34,9 @@ export function AdminShippingPage() {
   const [deleteTarget, setDeleteTarget] = useState<AdminCarrierRow | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [pendingCarrierOpenId, setPendingCarrierOpenId] = useState<string | null>(null)
+
+  useAdminUrlOpen(setPendingCarrierOpenId)
 
   const openCreate = useCallback(() => {
     setDrawerMode('create')
@@ -45,6 +49,15 @@ export function AdminShippingPage() {
     setEditingCarrier(carrier)
     setDrawerOpen(true)
   }, [])
+
+  useEffect(() => {
+    if (!pendingCarrierOpenId || list.loading) return
+    const carrier = list.allCarriers.find((row) => row.id === pendingCarrierOpenId)
+    if (carrier) {
+      openEdit(carrier)
+      setPendingCarrierOpenId(null)
+    }
+  }, [list.allCarriers, list.loading, openEdit, pendingCarrierOpenId])
 
   const closeDrawer = useCallback(() => {
     setDrawerOpen(false)

@@ -121,7 +121,7 @@ export function ShippingMethodPanel() {
       aria-busy={loading || undefined}
     >
       <div>
-        <h3 className="font-[family-name:var(--admin-font-display)] text-lg font-normal text-white">
+        <h3 className="admin-card-title text-lg">
           {t('admin.shipping.method.title')}
         </h3>
         <p className="mt-1 text-sm text-white/40">

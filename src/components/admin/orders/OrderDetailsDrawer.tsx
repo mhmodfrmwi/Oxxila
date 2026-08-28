@@ -1,6 +1,6 @@
 // src/components/admin/orders/OrderDetailsDrawer.tsx
 import { FileText, Loader2, User, XCircle } from 'lucide-react'
-import { useCallback, useId, useState } from 'react'
+import { useCallback, useId, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useToast } from '../../../context/ToastContext'
 import { useOrderAssign } from '../../../hooks/useOrderAssign'
@@ -8,10 +8,14 @@ import { useOrderDetailsDrawer } from '../../../hooks/useOrderDetailsDrawer'
 import { cn } from '../../../lib/cn'
 import {
   canAdminCancelOrder,
+  formatAdminOrderAddress,
+  formatAdminOrderCarrierLabel,
+  formatAdminOrderDate,
   formatAdminOrderMoney,
   resolveOrderDetailsPhase,
   orderStatusBadgeTone,
 } from '../../../utils/adminOrdersFormat'
+import { printAdminOrderInvoice, type OrderInvoiceLabels } from '../../../utils/printAdminOrderInvoice'
 import { Button } from '../../ui/Button'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { Drawer } from '../ui/Drawer'
@@ -20,6 +24,7 @@ import { GlassCard } from '../ui/GlassCard'
 import { Select } from '../ui/Select'
 import { Skeleton } from '../ui/Skeleton'
 import { StatusBadge } from '../ui/StatusBadge'
+import { AuditMeta } from '../ui/AuditMeta'
 import { CancelOrderDialog } from './CancelOrderDialog'
 import { OrderAssignPanel } from './OrderAssignPanel'
 import { OrderProgressStepper } from './OrderProgressStepper'
@@ -42,6 +47,44 @@ const MANUAL_STATUSES = [
   'cancelled',
 ] as const
 
+function buildOrderInvoiceLabels(t: (key: string) => string): OrderInvoiceLabels {
+  return {
+    documentTitle: t('admin.orders.details.invoicePrint.documentTitle'),
+    brand: t('admin.orders.details.invoicePrint.brand'),
+    invoice: t('admin.orders.details.invoicePrint.invoice'),
+    order: t('admin.orders.details.invoicePrint.order'),
+    date: t('admin.orders.details.invoicePrint.date'),
+    billTo: t('admin.orders.details.invoicePrint.billTo'),
+    shipTo: t('admin.orders.details.invoicePrint.shipTo'),
+    phone: t('admin.orders.details.invoicePrint.phone'),
+    email: t('admin.orders.details.invoicePrint.email'),
+    items: t('admin.orders.details.invoicePrint.items'),
+    product: t('admin.orders.details.invoicePrint.product'),
+    qty: t('admin.orders.details.invoicePrint.qty'),
+    unitPrice: t('admin.orders.details.invoicePrint.unitPrice'),
+    lineTotal: t('admin.orders.details.invoicePrint.lineTotal'),
+    subtotal: t('admin.orders.details.invoicePrint.subtotal'),
+    shipping: t('admin.orders.details.invoicePrint.shipping'),
+    discount: t('admin.orders.details.invoicePrint.discount'),
+    storeCredit: t('admin.orders.details.invoicePrint.storeCredit'),
+    coupon: t('admin.orders.details.invoicePrint.coupon'),
+    total: t('admin.orders.details.invoicePrint.total'),
+    payment: t('admin.orders.details.invoicePrint.payment'),
+    paymentStatus: t('admin.orders.details.invoicePrint.paymentStatus'),
+    carrier: t('admin.orders.details.invoicePrint.carrier'),
+    carrierNotSelected: t('admin.orders.details.invoicePrint.carrierNotSelected'),
+    tracking: t('admin.orders.details.invoicePrint.tracking'),
+    orderDetails: t('admin.orders.details.invoicePrint.orderDetails'),
+    thankYou: t('admin.orders.details.invoicePrint.thankYou'),
+    thankYouSub: t('admin.orders.details.invoicePrint.thankYouSub'),
+    print: t('admin.orders.details.invoicePrint.print'),
+    download: t('admin.orders.details.invoicePrint.download'),
+    printFailed: t('admin.orders.details.invoicePrint.printFailed'),
+    languageEnglish: t('admin.orders.details.invoicePrint.languageEnglish'),
+    languageArabic: t('admin.orders.details.invoicePrint.languageArabic'),
+  }
+}
+
 const fieldClass = cn(
   'w-full appearance-none rounded-xl border border-white/10 bg-white/5 px-[17px] py-[13px]',
   'text-sm text-white placeholder:text-white/40',
@@ -50,6 +93,15 @@ const fieldClass = cn(
 )
 
 const labelClass = 'block text-xs font-medium leading-4 text-white/60'
+
+function DetailRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <p className="text-sm leading-5 text-white">
+      <span className="text-white/50">{label}: </span>
+      {children}
+    </p>
+  )
+}
 
 function OrderDetailsSkeleton() {
   return (
@@ -116,6 +168,21 @@ export function OrderDetailsDrawer({
     onOrderChanged?.()
   }, [onOrderChanged, reload])
 
+  const handlePrintInvoice = useCallback(() => {
+    if (!order) return
+    const opened = printAdminOrderInvoice(
+      order,
+      {
+        en: buildOrderInvoiceLabels(i18n.getFixedT('en')),
+        ar: buildOrderInvoiceLabels(i18n.getFixedT('ar')),
+      },
+      locale,
+    )
+    if (!opened) {
+      toast.error(t('admin.orders.details.invoicePrint.printFailed'))
+    }
+  }, [i18n, locale, order, t, toast])
+
   const phase = order ? resolveOrderDetailsPhase(order) : null
   const canCancel = order ? canAdminCancelOrder(order.orderStatus) : false
   const statusLabel = order
@@ -145,11 +212,11 @@ export function OrderDetailsDrawer({
         <div className="flex gap-3">
           <button
             type="button"
-            disabled
-            title={t('admin.orders.details.invoiceSoon')}
+            onClick={handlePrintInvoice}
+            title={t('admin.orders.details.invoicePrint.hint')}
             className={cn(
               'inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white',
-              'cursor-not-allowed opacity-50',
+              'transition-colors hover:bg-white/10',
               focusRingClasses,
             )}
           >
@@ -284,36 +351,71 @@ export function OrderDetailsDrawer({
                     <span className="text-[8px] font-semibold uppercase tracking-[0.08em] text-white/40">
                       {t('admin.orders.details.orderLabel')}
                     </span>{' '}
-                    <span className="font-semibold">#{order.orderNumber}</span>
+                    <span className="font-semibold">{order.orderNumber}</span>
                   </p>
                   <StatusBadge tone={orderStatusBadgeTone(order.orderStatus)}>
                     {statusLabel}
                   </StatusBadge>
                 </div>
-                <p className="text-sm leading-5 text-white">
-                  <span className="text-white/50">
-                    {t('admin.orders.details.customer')}:{' '}
-                  </span>
+                <DetailRow label={t('admin.orders.details.date')}>
+                  <time dateTime={order.createdAt}>
+                    {formatAdminOrderDate(order.createdAt, locale)}
+                  </time>
+                </DetailRow>
+                <DetailRow label={t('admin.orders.details.customer')}>
                   {order.customerName}
                   {order.customerPhone ? (
                     <span className="text-white/50"> · {order.customerPhone}</span>
                   ) : null}
-                </p>
-                <p className="text-sm leading-5 text-white">
-                  <span className="text-white/50">
-                    {t('admin.orders.details.zone')}:{' '}
+                  {!order.customerPhone && order.customerEmail ? (
+                    <span className="text-white/50"> · {order.customerEmail}</span>
+                  ) : null}
+                </DetailRow>
+                {order.customerEmail && order.customerPhone ? (
+                  <DetailRow label={t('admin.orders.details.email')}>
+                    {order.customerEmail}
+                  </DetailRow>
+                ) : null}
+                <DetailRow label={t('admin.orders.details.address')}>
+                  {formatAdminOrderAddress(order)}
+                </DetailRow>
+                <DetailRow label={t('admin.orders.details.carrier')}>
+                  <span
+                    className={
+                      order.hasAssignedCarrier && order.carrierName
+                        ? undefined
+                        : 'text-white/45 italic'
+                    }
+                  >
+                    {formatAdminOrderCarrierLabel(
+                      order,
+                      t('admin.orders.details.carrierNotSelected'),
+                    )}
                   </span>
-                  {order.zoneLabel ?? '—'}
-                </p>
-                <p className="text-sm leading-5 text-white">
-                  <span className="text-white/50">
-                    {t('admin.orders.details.total')}:{' '}
-                  </span>
+                </DetailRow>
+                {order.trackingNumber ? (
+                  <DetailRow label={t('admin.orders.details.tracking')}>
+                    {order.trackingNumber}
+                  </DetailRow>
+                ) : null}
+                <DetailRow label={t('admin.orders.details.payment')}>
+                  {order.paymentSummary}
+                  <span className="text-white/50"> · {order.paymentStatusLabel}</span>
+                </DetailRow>
+                <DetailRow label={t('admin.orders.details.total')}>
                   {formatAdminOrderMoney(order.totalPrice, locale)}
-                  <span className="text-white/50"> · {order.paymentSummary}</span>
-                </p>
+                  <span className="text-white/50">
+                    {' '}
+                    ·{' '}
+                    {t('admin.orders.details.itemsCount', {
+                      count: order.items.length,
+                    })}
+                  </span>
+                </DetailRow>
               </div>
             </GlassCard>
+
+            <AuditMeta audit={order.audit} />
 
             <OrderProgressStepper
               trackingSteps={order.trackingSteps}

@@ -8,6 +8,7 @@ export interface ContactSettingsForm {
   email: string
   location: string
   whatsapp: string
+  whatsappDialCode: string
 }
 
 const EMPTY_FORM: ContactSettingsForm = {
@@ -15,6 +16,7 @@ const EMPTY_FORM: ContactSettingsForm = {
   email: '',
   location: '',
   whatsapp: '',
+  whatsappDialCode: '20',
 }
 
 function toForm(data: ApiContactSettings): ContactSettingsForm {
@@ -23,6 +25,7 @@ function toForm(data: ApiContactSettings): ContactSettingsForm {
     email: data.email ?? '',
     location: data.location ?? '',
     whatsapp: data.whatsapp ?? '',
+    whatsappDialCode: data.whatsappDialCode ?? '20',
   }
 }
 
@@ -62,6 +65,7 @@ export function useAdminContactSettings() {
         email: values.email.trim(),
         location: values.location.trim(),
         whatsapp: values.whatsapp.trim(),
+        whatsappDialCode: values.whatsappDialCode.trim(),
       })
       if (response.data) setValues(toForm(response.data))
       return response.data

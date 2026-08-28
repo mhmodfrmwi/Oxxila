@@ -67,7 +67,7 @@ export function ContactSection() {
             id: 'whatsapp',
             label: 'WhatsApp',
             value: data.whatsapp || '',
-            href: buildWhatsAppUrl(data.whatsapp, data.whatsappUrl),
+            href: buildWhatsAppUrl(data.whatsapp, data.whatsappDialCode, data.whatsappUrl),
           },
           {
             id: 'location',
@@ -104,7 +104,7 @@ export function ContactSection() {
           <ContactForm />
         </div>
 
-        <div className="mx-auto mt-10 grid max-w-4xl gap-3 sm:mt-12 min-[769px]:grid-cols-2 min-[1024px]:grid-cols-4 min-[769px]:gap-4">
+        <div className="mx-auto mt-10 grid max-w-6xl gap-5 sm:mt-12 min-[769px]:grid-cols-2 min-[769px]:gap-6 min-[1024px]:grid-cols-4 min-[1024px]:gap-8 lg:gap-10">
           {visibleItems.map((item, index) => {
             const icon =
               item.id === 'call' ? (

@@ -177,7 +177,7 @@ export function ProductsCatalogTable({
         id: 'price',
         header: t('admin.products.columns.price'),
         cell: (row) => (
-          <span className="font-[family-name:var(--admin-font-display)] text-lg text-primary-text tabular-nums">
+          <span className="text-base font-bold tabular-nums text-primary-text">
             {formatAdminProductPrice(row.price, locale)}
           </span>
         ),

@@ -11,6 +11,7 @@ import { cn } from '../../../lib/cn'
 import type { AdminCarrierRow, AdminCarrierType } from '../../../types/adminShipping'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { BostaPickupsPanel } from './BostaPickupsPanel'
+import { AuditMeta } from '../ui/AuditMeta'
 import { Drawer } from '../ui/Drawer'
 import { EmptyState } from '../ui/EmptyState'
 import { Select } from '../ui/Select'
@@ -41,6 +42,67 @@ const SELECTABLE_CARRIER_TYPES: Exclude<AdminCarrierType, 'api'>[] = [
 function FieldError({ message }: { message?: string }) {
   if (!message) return null
   return <p className="mt-1 text-xs text-support-error">{message}</p>
+}
+
+function DeliveryDaysFields({
+  formId,
+  form,
+  fieldClass,
+  labelClass,
+  t,
+}: {
+  formId: string
+  form: ReturnType<typeof useCarrierForm>
+  fieldClass: string
+  labelClass: string
+  t: (key: string) => string
+}) {
+  return (
+    <div>
+      <p className={labelClass}>{t('admin.shipping.carriers.drawer.deliveryDays')}</p>
+      <div className="mt-2 flex items-center gap-3">
+        <div className="min-w-0 flex-1">
+          <input
+            id={`${formId}-deliveryDaysMin`}
+            type="number"
+            min={0}
+            step={1}
+            inputMode="numeric"
+            value={form.values.deliveryDaysMin}
+            disabled={form.submitting}
+            placeholder={t('admin.shipping.carriers.drawer.deliveryDaysMinPlaceholder')}
+            onChange={(event) => form.setField('deliveryDaysMin', event.target.value)}
+            className={fieldClass}
+            aria-label={t('admin.shipping.carriers.drawer.deliveryDaysMin')}
+          />
+          <FieldError message={form.errors.deliveryDaysMin} />
+        </div>
+        <span className="shrink-0 text-sm text-white/40" aria-hidden>
+          —
+        </span>
+        <div className="min-w-0 flex-1">
+          <input
+            id={`${formId}-deliveryDaysMax`}
+            type="number"
+            min={0}
+            step={1}
+            inputMode="numeric"
+            value={form.values.deliveryDaysMax}
+            disabled={form.submitting}
+            placeholder={t('admin.shipping.carriers.drawer.deliveryDaysMaxPlaceholder')}
+            onChange={(event) => form.setField('deliveryDaysMax', event.target.value)}
+            className={fieldClass}
+            aria-label={t('admin.shipping.carriers.drawer.deliveryDaysMax')}
+          />
+          <FieldError message={form.errors.deliveryDaysMax} />
+        </div>
+      </div>
+      <p className="mt-2 text-[11px] text-white/40">
+        {t('admin.shipping.carriers.drawer.deliveryDaysHint')}
+      </p>
+      <FieldError message={form.errors.deliveryDays} />
+    </div>
+  )
 }
 
 export function CarrierDrawer({
@@ -76,7 +138,7 @@ export function CarrierDrawer({
           await coverageRef.current.saveForCarrier(row.id)
         }
         onSaved(row)
-        if (mode === 'create') onClose()
+        onClose()
       })()
     },
     [mode, onClose, onSaved],
@@ -274,23 +336,15 @@ export function CarrierDrawer({
               />
             </div>
           </>
-        ) : (
-          <div>
-            <label className={labelClass} htmlFor={`${formId}-deliveryDays`}>
-              {t('admin.shipping.carriers.drawer.deliveryDays')}
-            </label>
-            <input
-              id={`${formId}-deliveryDays`}
-              type="text"
-              value={form.values.deliveryDays}
-              disabled={form.submitting}
-              placeholder={t('admin.shipping.carriers.drawer.deliveryDaysPlaceholder')}
-              onChange={(event) => form.setField('deliveryDays', event.target.value)}
-              className={cn(fieldClass, 'mt-2')}
-            />
-            <FieldError message={form.errors.deliveryDays} />
-          </div>
-        )}
+        ) : null}
+
+        <DeliveryDaysFields
+          formId={formId}
+          form={form}
+          fieldClass={fieldClass}
+          labelClass={labelClass}
+          t={t}
+        />
 
         {showCoverage ? (
           <>
@@ -462,6 +516,10 @@ export function CarrierDrawer({
             />
           </button>
         </div>
+
+        {mode === 'edit' ? (
+          <AuditMeta audit={carrier?.audit ?? null} className="mt-2" />
+        ) : null}
       </form>
 
       {showBostaPickups && carrier ? (

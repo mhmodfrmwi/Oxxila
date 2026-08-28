@@ -12,6 +12,7 @@ import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { Button } from '../../components/ui/Button'
 import { useAdminReviews } from '../../hooks/useAdminReviews'
 import { useAdminReviewsOverview } from '../../hooks/useAdminReviewsOverview'
+import { useAdminUrlOpen } from '../../hooks/useAdminUrlOpen'
 
 /**
  * Reviews & Reputation — overview widgets + list + details drawer.
@@ -26,6 +27,8 @@ export function AdminReviewsPage() {
   const openDrawer = useCallback((reviewId: string) => {
     setDrawerReviewId(reviewId)
   }, [])
+
+  useAdminUrlOpen(openDrawer)
 
   const closeDrawer = useCallback(() => {
     setDrawerReviewId(null)

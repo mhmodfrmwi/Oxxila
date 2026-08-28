@@ -5,12 +5,16 @@ import { Navigate } from 'react-router-dom'
 import { SHOP_PATH } from '../../config/routes'
 import { useOrderConfirmationPage } from '../../hooks/useOrderConfirmationPage'
 import {
-  formatEstimatedDeliveryRange,
   formatOrderDate,
   formatOrderReferenceId,
   formatOrderShippingAddress,
   getOrderTrackingNumber,
 } from '../../utils/orderFormat'
+import {
+  formatEstimatedDeliveryRange,
+  getOrderShippingMethodLabel,
+  hasOrderDeliveryEstimate,
+} from '../../utils/orderDelivery'
 import { formatCartPrice } from '../../utils/formatProductPrice'
 import type { ApiOrder } from '../../types/order'
 import { OrderSummarySection } from '../order/OrderSummarySection'
@@ -60,7 +64,11 @@ export function OrderConfirmationContent() {
   }
 
   const trackingNumber = order ? getOrderTrackingNumber(order) : null
-  const deliveryRange = order ? formatEstimatedDeliveryRange(order) : ''
+  const deliveryRange = order ? formatEstimatedDeliveryRange(order) : null
+  const hasDeliveryEstimate = order ? hasOrderDeliveryEstimate(order) : false
+  const shippingMethodLabel = order
+    ? getOrderShippingMethodLabel(order, t('checkout.confirmation.standardShipping'))
+    : ''
 
   return (
     <>
@@ -104,10 +112,12 @@ export function OrderConfirmationContent() {
                     <span>{trackingNumber}</span>
                   </div>
                 )}
-                <div className="order-confirmation-meta-item">
-                  <strong>{t('checkout.delivery.estimatedDelivery')}</strong>
-                  <span>{deliveryRange}</span>
-                </div>
+                {hasDeliveryEstimate && deliveryRange && (
+                  <div className="order-confirmation-meta-item">
+                    <strong>{t('checkout.delivery.estimatedDelivery')}</strong>
+                    <span>{deliveryRange}</span>
+                  </div>
+                )}
                 <div className="order-confirmation-meta-item">
                   <strong>{t('checkout.confirmation.paymentMethod')}</strong>
                   <span>{translatePaymentMethod(order, t)}</span>
@@ -132,25 +142,28 @@ export function OrderConfirmationContent() {
                     {formatOrderShippingAddress(order)}
                   </p>
 
-                  <div className="order-confirmation-divider" />
+                  {hasDeliveryEstimate && (
+                    <>
+                      <p className="order-confirmation-section-label">
+                        {t('checkout.confirmation.deliveryMethod')}
+                      </p>
+                      <div className="order-confirmation-delivery">
+                        <span className="order-confirmation-delivery-icon" aria-hidden>
+                          <Truck size={18} strokeWidth={1.75} />
+                        </span>
+                        <div>
+                          <p className="order-confirmation-delivery-title">{shippingMethodLabel}</p>
+                          {deliveryRange && (
+                            <p className="order-confirmation-delivery-subtitle">
+                              {t('checkout.confirmation.estimatedArrival', { range: deliveryRange })}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
 
-                  <p className="order-confirmation-section-label">
-                    {t('checkout.confirmation.deliveryMethod')}
-                  </p>
-                  <div className="order-confirmation-delivery">
-                    <span className="order-confirmation-delivery-icon" aria-hidden>
-                      <Truck size={18} strokeWidth={1.75} />
-                    </span>
-                    <div>
-                      <p className="order-confirmation-delivery-title">
-                        {order.shipping.methodName ||
-                          t('checkout.confirmation.standardShipping')}
-                      </p>
-                      <p className="order-confirmation-delivery-subtitle">
-                        {t('checkout.confirmation.estimatedArrival', { range: deliveryRange })}
-                      </p>
-                    </div>
-                  </div>
+                  <div className="order-confirmation-divider" />
 
                   <dl className="order-confirmation-details-list">
                     <div className="order-confirmation-details-row">

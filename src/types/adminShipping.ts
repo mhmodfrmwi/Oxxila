@@ -1,5 +1,6 @@
 // src/types/adminShipping.ts
 import type { ApiAdminOrder } from './adminOrders'
+import type { AdminAuditBlock, ApiAdminAuditBlock } from './adminAudit'
 
 export type AdminCarrierType = 'api' | 'known' | 'internal'
 
@@ -18,6 +19,7 @@ export interface ApiAdminCarrier {
   coverage?: string[]
   createdAt?: string
   updatedAt?: string
+  audit?: ApiAdminAuditBlock | null
 }
 
 /** Normalized courier row for Courier Companies table. */
@@ -35,6 +37,7 @@ export interface AdminCarrierRow {
   apiProvider: 'bosta' | null
   apiBaseUrl: string | null
   hasApiKey: boolean
+  audit: AdminAuditBlock | null
 }
 
 export interface AdminCarrierFormValues {
@@ -42,7 +45,8 @@ export interface AdminCarrierFormValues {
   code: string
   type: AdminCarrierType
   isActive: boolean
-  deliveryDays: string
+  deliveryDaysMin: string
+  deliveryDaysMax: string
   apiKey: string
   apiBaseUrl: string
 }
@@ -51,6 +55,8 @@ export interface AdminCarrierFormErrors {
   name?: string
   code?: string
   deliveryDays?: string
+  deliveryDaysMin?: string
+  deliveryDaysMax?: string
   apiKey?: string
 }
 
@@ -60,6 +66,8 @@ export interface CreateCarrierPayload {
   type: AdminCarrierType
   isActive?: boolean
   deliveryDays?: string
+  deliveryDaysMin?: number
+  deliveryDaysMax?: number
   apiProvider?: 'bosta'
   apiKey?: string
   apiBaseUrl?: string
@@ -68,6 +76,8 @@ export interface CreateCarrierPayload {
 export interface UpdateCarrierPayload {
   name?: string
   deliveryDays?: string
+  deliveryDaysMin?: number
+  deliveryDaysMax?: number
   apiKey?: string
   apiBaseUrl?: string
   isActive?: boolean

@@ -167,7 +167,7 @@ export function AdminRolesManagerCard() {
         <div className="mb-8 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Shield size={19} className="text-[#a394ff]" aria-hidden />
-            <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">
+            <h3 className="admin-card-title">
               {t('admin.roles.title')}
             </h3>
           </div>

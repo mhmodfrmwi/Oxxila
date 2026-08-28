@@ -18,6 +18,7 @@ import {
 import { Button } from '../../ui/Button'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { EmptyState } from '../ui/EmptyState'
+import { AdminInitialsAvatar } from '../ui/AdminInitialsAvatar'
 import { GlassCard } from '../ui/GlassCard'
 import { Skeleton } from '../ui/Skeleton'
 import { StatusBadge } from '../ui/StatusBadge'
@@ -257,12 +258,22 @@ export function ReturnDetailsPanel({ returnId, className, onMutated }: ReturnDet
             </div>
             <div className="min-w-0">
               <FieldLabel>{t('admin.returns.details.customer')}</FieldLabel>
-              <p
-                className="truncate text-sm font-medium leading-5 text-white"
-                title={returnDetail.userEmail ?? undefined}
-              >
-                {returnDetail.userName}
-              </p>
+              <div className="mt-1 flex items-center gap-3">
+                <AdminInitialsAvatar initials={returnDetail.userInitials} />
+                <div className="min-w-0">
+                  <p
+                    className="truncate text-sm font-medium leading-5 text-white"
+                    title={returnDetail.userEmail ?? undefined}
+                  >
+                    {returnDetail.userName}
+                  </p>
+                  {returnDetail.userEmail ? (
+                    <p className="truncate text-xs leading-5 text-white/45">
+                      {returnDetail.userEmail}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
             </div>
           </GlassCard>
 

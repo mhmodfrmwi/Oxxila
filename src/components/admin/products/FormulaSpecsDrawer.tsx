@@ -524,7 +524,7 @@ export function FormulaSpecsDrawer({
               </label>
             </fieldset>
 
-            {/* Clinical configuration */}
+            {/* Pricing & inventory */}
             <section className="space-y-4">
               <h3 className="admin-label text-[8px] tracking-[0.2em] text-white/30">
                 {t('admin.products.formula.clinical')}

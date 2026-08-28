@@ -2,6 +2,7 @@
 
 export const ADMIN_TAB_KEYS = [
   'dashboard',
+  'reports',
   'products',
   'categories',
   'brands',

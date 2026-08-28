@@ -7,16 +7,17 @@ import { InstagramSettingsCard } from '../../components/admin/settings/Instagram
 import { SocialSettingsCard } from '../../components/admin/settings/SocialSettingsCard'
 import { ContentPagesCard } from '../../components/admin/website-content/ContentPagesCard'
 import { HowItWorksSettingsCard } from '../../components/admin/website-content/HowItWorksSettingsCard'
+import { UtilityBarSettingsCard } from '../../components/admin/website-content/UtilityBarSettingsCard'
 import { focusRingClasses } from '../../components/ui/interactionStyles'
 import { cn } from '../../lib/cn'
 
-const TABS = ['contact', 'social', 'instagram', 'howItWorks', 'contentPages'] as const
+const TABS = ['contactSocial', 'utilityBar', 'howItWorks', 'instagram', 'docs'] as const
 
 type WebsiteContentTab = (typeof TABS)[number]
 
 export function AdminWebsiteContentPage() {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<WebsiteContentTab>('contact')
+  const [activeTab, setActiveTab] = useState<WebsiteContentTab>('contactSocial')
 
   return (
     <>
@@ -54,11 +55,16 @@ export function AdminWebsiteContentPage() {
       </div>
 
       <div role="tabpanel">
-        {activeTab === 'contact' ? <ContactSettingsCard /> : null}
-        {activeTab === 'social' ? <SocialSettingsCard /> : null}
-        {activeTab === 'instagram' ? <InstagramSettingsCard /> : null}
+        {activeTab === 'contactSocial' ? (
+          <div className="grid gap-[var(--admin-content-gap)] lg:grid-cols-2 lg:items-start">
+            <ContactSettingsCard />
+            <SocialSettingsCard />
+          </div>
+        ) : null}
+        {activeTab === 'utilityBar' ? <UtilityBarSettingsCard /> : null}
         {activeTab === 'howItWorks' ? <HowItWorksSettingsCard /> : null}
-        {activeTab === 'contentPages' ? <ContentPagesCard /> : null}
+        {activeTab === 'instagram' ? <InstagramSettingsCard /> : null}
+        {activeTab === 'docs' ? <ContentPagesCard /> : null}
       </div>
     </>
   )

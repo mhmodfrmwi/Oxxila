@@ -2,55 +2,49 @@
 import type { ApiOrder } from '../types/order'
 import i18n from '../i18n'
 
-export const ESTIMATED_DELIVERY_BUSINESS_DAYS = {
-  min: 3,
-  max: 5,
-} as const
-
-export interface EstimatedDeliveryWindow {
-  orderDate: Date
-  minDate: Date
-  maxDate: Date
-  businessDays: typeof ESTIMATED_DELIVERY_BUSINESS_DAYS
+export function hasOrderDeliveryEstimate(order: ApiOrder): boolean {
+  return Boolean(order.delivery?.estimatedFrom && order.delivery?.estimatedTo)
 }
 
-export function addBusinessDays(from: Date, businessDays: number): Date {
-  const date = new Date(from)
-  let added = 0
+export function formatEstimatedDeliveryRange(order: ApiOrder): string | null {
+  const delivery = order.delivery
+  if (!delivery) return null
 
-  while (added < businessDays) {
-    date.setDate(date.getDate() + 1)
-    const weekday = date.getDay()
-    if (weekday !== 0 && weekday !== 6) added++
+  if (delivery.deliveryDaysLabel?.trim()) {
+    return delivery.deliveryDaysLabel.trim()
   }
 
-  return date
-}
-
-export function calculateEstimatedDelivery(order: ApiOrder): EstimatedDeliveryWindow {
-  const orderDate = new Date(order.createdAt)
-
-  return {
-    orderDate,
-    minDate: addBusinessDays(orderDate, ESTIMATED_DELIVERY_BUSINESS_DAYS.min),
-    maxDate: addBusinessDays(orderDate, ESTIMATED_DELIVERY_BUSINESS_DAYS.max),
-    businessDays: ESTIMATED_DELIVERY_BUSINESS_DAYS,
+  if (delivery.minBusinessDays != null && delivery.maxBusinessDays != null) {
+    return i18n.t('checkout.delivery.businessDaysRange', {
+      min: delivery.minBusinessDays,
+      max: delivery.maxBusinessDays,
+    })
   }
+
+  return null
 }
 
-export function formatEstimatedDeliveryRange(order: ApiOrder): string {
-  const { businessDays } = calculateEstimatedDelivery(order)
-  return i18n.t('checkout.delivery.businessDaysRange', {
-    min: businessDays.min,
-    max: businessDays.max,
-  })
-}
+export function formatEstimatedDeliveryArrival(order: ApiOrder): string | null {
+  const delivery = order.delivery
+  if (!delivery?.estimatedFrom || !delivery?.estimatedTo) return null
 
-export function formatEstimatedDeliveryArrival(order: ApiOrder): string {
-  const { minDate, maxDate } = calculateEstimatedDelivery(order)
-  const formatter = new Intl.DateTimeFormat('en-US', {
+  const locale = i18n.language?.startsWith('ar') ? 'ar-EG' : 'en-US'
+  const formatter = new Intl.DateTimeFormat(locale, {
     month: 'short',
     day: 'numeric',
   })
-  return `${formatter.format(minDate)} – ${formatter.format(maxDate)}`
+
+  return `${formatter.format(new Date(delivery.estimatedFrom))} – ${formatter.format(new Date(delivery.estimatedTo))}`
+}
+
+export function getOrderShippingMethodLabel(
+  order: ApiOrder,
+  fallback: string,
+): string {
+  return (
+    order.delivery?.carrierName?.trim() ||
+    order.shipment?.carrierName?.trim() ||
+    order.tracking?.carrierName?.trim() ||
+    fallback
+  )
 }

@@ -1,4 +1,5 @@
 // src/types/adminOrders.ts
+import type { AdminAuditBlock, ApiAdminAuditBlock } from './adminAudit'
 
 /** Order fulfillment statuses from the Order model. */
 export type AdminOrderStatus =
@@ -153,6 +154,7 @@ export interface ApiAdminOrder {
     providerStateLabel?: string | null
     driverName?: string | null
   } | null
+  audit?: ApiAdminAuditBlock | null
 }
 
 /** Normalized detail model for the Order Details drawer. */
@@ -177,6 +179,13 @@ export interface AdminOrderDetail {
   trackingSteps: ApiAdminOrderTrackingStep[]
   trackingNumber: string | null
   totalPrice: number
+  subtotal: number
+  shippingPrice: number
+  discountAmount: number
+  storeCreditApplied: number
+  couponCode: string | null
+  /** Full shipping address for invoice / packing slip. */
+  shippingAddress: ApiAdminOrderShippingAddress | null
   /** Carrier committed on the shipment (null when unassigned). */
   carrierName: string | null
   carrierType: 'api' | 'known' | 'internal' | null
@@ -185,6 +194,7 @@ export interface AdminOrderDetail {
   zoneLabel: string | null
   /** Fetched separately via GET /users/:id — nice-to-have, not always loaded. */
   userOrdersCount?: number | null
+  audit: AdminAuditBlock | null
 }
 
 /** POST /api/v1/orders/b2b line item. */

@@ -346,7 +346,7 @@ export function ZoneManager() {
       aria-label={t('admin.shipping.zones.aria')}
     >
       <div>
-        <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">
+        <h3 className="admin-card-title">
           {t('admin.shipping.zones.title')}
         </h3>
         <p className="mt-1 text-xs text-white/40">{t('admin.shipping.zones.subtitle')}</p>

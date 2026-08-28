@@ -30,6 +30,8 @@ interface DataTableProps<T> {
   'aria-label'?: string
   /** Makes rows clickable (e.g. select a row into a split-view detail panel). */
   onRowClick?: (row: T) => void
+  /** Double-click a row (ignored when the event starts on buttons/links/menus). */
+  onRowDoubleClick?: (row: T) => void
   /** Row id (via `getRowId`) that should render as selected/highlighted. */
   selectedRowId?: string | null
 }
@@ -39,6 +41,13 @@ const densityPad = {
   /* Products Management: header/body ~p-24 / first col px-32 */
   spacious: { header: 'px-8 py-6', cell: 'px-8 py-6' },
 } as const
+
+const INTERACTIVE_ROW_TARGET =
+  'button, a, input, select, textarea, label, [role="button"], [role="menuitem"], [role="menu"], [role="listbox"], [role="option"]'
+
+function isInteractiveRowTarget(target: EventTarget | null): boolean {
+  return target instanceof Element && Boolean(target.closest(INTERACTIVE_ROW_TARGET))
+}
 
 export function DataTable<T>({
   columns,
@@ -54,11 +63,13 @@ export function DataTable<T>({
   density = 'default',
   'aria-label': ariaLabel,
   onRowClick,
+  onRowDoubleClick,
   selectedRowId = null,
 }: DataTableProps<T>) {
   const showEmpty = !loading && rows.length === 0
   const headerPad = densityPad[density].header
   const cellPad = densityPad[density].cell
+  const rowInteractive = Boolean(onRowClick || onRowDoubleClick)
 
   return (
     <GlassCard
@@ -120,11 +131,26 @@ export function DataTable<T>({
                 return (
                   <tr
                     key={rowId}
-                    onClick={onRowClick ? () => onRowClick(row) : undefined}
-                    aria-selected={onRowClick ? isSelected : undefined}
+                    onClick={
+                      onRowClick
+                        ? (event) => {
+                            if (isInteractiveRowTarget(event.target)) return
+                            onRowClick(row)
+                          }
+                        : undefined
+                    }
+                    onDoubleClick={
+                      onRowDoubleClick
+                        ? (event) => {
+                            if (isInteractiveRowTarget(event.target)) return
+                            onRowDoubleClick(row)
+                          }
+                        : undefined
+                    }
+                    aria-selected={onRowClick || onRowDoubleClick ? isSelected : undefined}
                     className={cn(
                       'border-b border-white/5 last:border-b-0 hover:bg-white/[0.03]',
-                      onRowClick && 'cursor-pointer',
+                      rowInteractive && 'cursor-pointer',
                       isSelected && 'bg-white/[0.06]',
                     )}
                   >

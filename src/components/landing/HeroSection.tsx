@@ -85,10 +85,10 @@ export function HeroSection() {
           </div>
 
           <div className="mx-auto mt-8 max-w-xl text-center">
-            <h1 className="my-4 font-serif text-4xl font-medium leading-[1.15] text-primary-text md:text-5xl lg:text-6xl">
+            <h1 className="font-hero my-4 text-4xl font-normal leading-[1.15] text-[#5d5a88] md:text-5xl lg:text-6xl">
               {t('home.hero.title')}
             </h1>
-            <p className="mx-auto mt-4 max-w-md font-serif text-sm italic leading-relaxed text-primary-text/80 md:text-base lg:text-lg">
+            <p className="font-hero mx-auto mt-4 max-w-md text-sm font-normal leading-relaxed text-[#9491b8] md:text-base lg:text-lg">
               {t('home.hero.subtitle')}
             </p>
           </div>
@@ -193,7 +193,7 @@ export function HeroSection() {
               width: pctX(888),
             }}
           >
-            <h1 className="font-serif text-[clamp(2.25rem,4vw,58px)] font-normal leading-[1.2] text-[#5d5a88]">
+            <h1 className="font-hero text-[clamp(2.25rem,4vw,58px)] font-normal leading-[1.2] text-[#5d5a88]">
               {t('home.hero.titleLine1')}
               <br />
               {t('home.hero.titleLine2')}
@@ -208,7 +208,7 @@ export function HeroSection() {
               width: pctX(680),
             }}
           >
-            <p className="font-serif text-[clamp(0.875rem,1.25vw,18px)] font-normal leading-[1.2] text-[#9491b8]">
+            <p className="font-hero text-[clamp(0.875rem,1.25vw,18px)] font-normal leading-[1.2] tracking-normal text-[#9491b8]">
               {t('home.hero.subtitleDesktop')}
             </p>
           </div>
@@ -252,7 +252,7 @@ export function HeroSection() {
 
           <Link
             to={SHOP_PATH}
-            className="absolute z-40 flex items-center justify-center rounded-full bg-[#7b65fb] font-serif text-[clamp(0.875rem,1.25vw,18px)] font-normal leading-none text-white transition-colors hover:bg-button-primary-hover hover:text-primary-text"
+            className="font-hero absolute z-40 flex items-center justify-center rounded-full bg-[#7b65fb] text-[clamp(0.875rem,1.25vw,18px)] font-normal leading-none text-white transition-colors hover:bg-button-primary-hover hover:text-primary-text"
             style={{
               left: pctX(432),
               top: pctY(726),
@@ -265,7 +265,7 @@ export function HeroSection() {
 
           <a
             href="#contact"
-            className="absolute z-40 flex items-center justify-center rounded-full border border-[#7b65fb] bg-[#f5f6ff] font-serif text-[clamp(0.875rem,1.25vw,18px)] font-normal leading-none text-[#7b65fb] transition-colors hover:bg-card"
+            className="font-hero absolute z-40 flex items-center justify-center rounded-full border border-[#7b65fb] bg-[#f5f6ff] text-[clamp(0.875rem,1.25vw,18px)] font-normal leading-none text-[#7b65fb] transition-colors hover:bg-card"
             style={{
               left: pctX(728),
               top: pctY(726),

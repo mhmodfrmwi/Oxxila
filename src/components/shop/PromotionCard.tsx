@@ -11,12 +11,17 @@ interface PromotionCardProps {
 
 const imageAspect: Record<ShopPromotion['layout'], string> = {
   compact: 'aspect-[5/4] w-full',
+  // Fill remaining card height so title→image gap stays tight.
   tall: 'relative min-h-[220px] w-full flex-1 lg:min-h-0',
-  wide: 'aspect-[21/9] w-full sm:aspect-[2.15/1]',
+  wide: 'relative min-h-[180px] w-full flex-1 sm:min-h-[200px] lg:min-h-0',
 }
+
+const fillsCardHeight = (layout: ShopPromotion['layout']) =>
+  layout === 'tall' || layout === 'wide'
 
 export function PromotionCard({ promotion, className }: PromotionCardProps) {
   const { title, subtitle, image, imageAlt, href, layout, badge } = promotion
+  const fillHeight = fillsCardHeight(layout)
 
   return (
     <Link
@@ -30,11 +35,11 @@ export function PromotionCard({ promotion, className }: PromotionCardProps) {
         '[@media(hover:hover)]:hover:shadow-lg [@media(hover:hover)]:hover:shadow-black/10',
         'dark:[@media(hover:hover)]:hover:border-border-subtle dark:[@media(hover:hover)]:hover:shadow-none',
         focusRingClasses,
-        layout === 'tall' && 'lg:min-h-0',
+        fillHeight && 'lg:min-h-0',
         className,
       )}
     >
-      <div className="shrink-0 px-6 pt-6 pb-3">
+      <div className="shrink-0 px-6 pt-5 pb-2">
         <h3 className="font-serif text-[length:var(--font-size-small)] font-medium leading-tight text-primary-text sm:text-[length:calc(var(--font-size-small)*1.05)]">
           {title}
         </h3>
@@ -50,8 +55,8 @@ export function PromotionCard({ promotion, className }: PromotionCardProps) {
 
       <div
         className={cn(
-          'mt-auto px-6 pb-6',
-          layout === 'tall' && 'flex min-h-0 flex-1 flex-col',
+          'px-6 pb-5',
+          fillHeight ? 'flex min-h-0 flex-1 flex-col' : 'mt-auto',
         )}
       >
         <div
@@ -65,7 +70,7 @@ export function PromotionCard({ promotion, className }: PromotionCardProps) {
             alt={imageAlt}
             className={cn(
               'object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.04]',
-              layout === 'tall'
+              fillHeight
                 ? 'absolute inset-0 h-full w-full'
                 : 'h-full w-full',
             )}

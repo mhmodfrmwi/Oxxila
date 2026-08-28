@@ -58,10 +58,14 @@ export function useCarrierForm({
     ) => {
       setValues((previous) => ({ ...previous, [key]: value }))
       setErrors((previous) => {
-        const errorKey = key as keyof AdminCarrierFormErrors
-        if (!previous[errorKey]) return previous
         const next = { ...previous }
-        delete next[errorKey]
+        const errorKey = key as keyof AdminCarrierFormErrors
+        if (previous[errorKey]) delete next[errorKey]
+        if (key === 'deliveryDaysMin' || key === 'deliveryDaysMax') {
+          delete next.deliveryDays
+          delete next.deliveryDaysMin
+          delete next.deliveryDaysMax
+        }
         return next
       })
       setSubmitError(null)

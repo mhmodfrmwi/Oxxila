@@ -11,6 +11,7 @@ import {
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { DataTable, type DataTableColumn } from '../ui/DataTable'
+import { AdminPersonCell } from '../ui/AdminPersonCell'
 import { StatusBadge } from '../ui/StatusBadge'
 import { OrderRowActionsMenu } from './OrderRowActionsMenu'
 
@@ -41,29 +42,7 @@ function CustomerCell({
   email: string | null
   initials: string
 }) {
-  return (
-    <div className="flex min-w-[8rem] items-center gap-3">
-      <span
-        className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[rgb(97_95_255_/_0.2)] text-[8px] font-bold text-[#a3b3ff]"
-        aria-hidden
-      >
-        {initials}
-      </span>
-      <div className="min-w-0 flex flex-col">
-        <span className="truncate text-sm font-medium text-[#e2e2e2]" title={name}>
-          {name}
-        </span>
-        {email ? (
-          <span
-            className="truncate text-xs leading-5 text-white/45"
-            title={email}
-          >
-            {email}
-          </span>
-        ) : null}
-      </div>
-    </div>
-  )
+  return <AdminPersonCell name={name} email={email} initials={initials} />
 }
 
 export function OrdersCatalogTable({
@@ -222,6 +201,13 @@ export function OrdersCatalogTable({
       emptyAction={emptyAction}
       aria-label={t('admin.orders.tableAria')}
       className="rounded-[1.6rem]"
+      onRowDoubleClick={
+        onOpenOrder
+          ? (row) => {
+              onOpenOrder(row.id)
+            }
+          : undefined
+      }
       footer={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p

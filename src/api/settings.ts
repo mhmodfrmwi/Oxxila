@@ -6,6 +6,7 @@ export interface ApiContactSettings {
   email: string
   location: string
   whatsapp: string
+  whatsappDialCode: string
   whatsappUrl: string
 }
 
@@ -36,6 +37,19 @@ export interface ApiHowItWorksSettings {
   videoUrl: string
   steps: ApiHowItWorksStep[]
 }
+
+export interface ApiUtilityBarPromo {
+  index?: number
+  title: string
+  subtitle: string
+}
+
+export interface ApiUtilityBarSettings {
+  promos: ApiUtilityBarPromo[]
+  rotateIntervalSeconds: number
+}
+
+export const UTILITY_BAR_MAX_PROMOS = 8
 
 export const INSTAGRAM_SLOT_COUNT = 4
 
@@ -124,6 +138,18 @@ export function updateHowItWorksSettings(
     method: 'PUT',
     auth: true,
     body: payload,
+  })
+}
+
+export function getUtilityBarSettings() {
+  return apiRequest<ApiUtilityBarSettings>('/settings/utility-bar')
+}
+
+export function updateUtilityBarSettings(body: Partial<ApiUtilityBarSettings>) {
+  return apiRequest<ApiUtilityBarSettings>('/settings/utility-bar', {
+    method: 'PUT',
+    auth: true,
+    body,
   })
 }
 

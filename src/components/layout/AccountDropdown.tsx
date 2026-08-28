@@ -116,12 +116,12 @@ export function AccountDropdown({
       aria-label={t('nav.accountMenu')}
       hidden={!open}
       className={cn(
-        'absolute end-0 top-[calc(100%+0.5rem)] z-50 min-w-[13.5rem]',
-        'rounded-2xl border border-border-subtle bg-card py-3 shadow-lg',
+        'absolute end-0 top-[calc(100%+0.5rem)] z-50 min-w-[15rem]',
+        'overflow-hidden rounded-2xl border border-border-subtle bg-card p-1.5 shadow-lg',
         className,
       )}
     >
-      <ul className="flex flex-col gap-0.5 px-2">
+      <ul className="flex flex-col">
         {ACCOUNT_SIDEBAR_NAV.map((item) => {
           const Icon = ACCOUNT_NAV_ICONS[item.id]
           return (
@@ -132,13 +132,15 @@ export function AccountDropdown({
                 tabIndex={open ? 0 : -1}
                 onClick={onClose}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-xl px-3 py-2.5',
-                  'font-serif text-sm text-primary-text transition-colors',
+                  'flex w-full items-center gap-3 rounded-xl px-3.5 py-3',
+                  'font-serif text-sm font-medium text-primary-text transition-colors',
                   'hover:bg-accent/10 hover:text-accent',
                   focusRingClasses,
                 )}
               >
-                <Icon size={18} strokeWidth={1.5} aria-hidden className="shrink-0" />
+                <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-input text-current">
+                  <Icon size={16} strokeWidth={1.5} aria-hidden />
+                </span>
                 <span className="min-w-0 flex-1 truncate text-start">{t(item.labelKey)}</span>
               </Link>
             </li>
@@ -151,13 +153,15 @@ export function AccountDropdown({
             tabIndex={open ? 0 : -1}
             onClick={onClose}
             className={cn(
-              'flex w-full items-center gap-3 rounded-xl px-3 py-2.5',
-              'font-serif text-sm text-primary-text transition-colors',
+              'flex w-full items-center gap-3 rounded-xl px-3.5 py-3',
+              'font-serif text-sm font-medium text-primary-text transition-colors',
               'hover:bg-accent/10 hover:text-accent',
               focusRingClasses,
             )}
           >
-            <CircleDollarSign size={18} strokeWidth={1.5} aria-hidden className="shrink-0" />
+            <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-input text-current">
+              <CircleDollarSign size={16} strokeWidth={1.5} aria-hidden />
+            </span>
             <span className="min-w-0 flex-1 truncate text-start">
               {t('nav.dropdown.giftCards')}
             </span>

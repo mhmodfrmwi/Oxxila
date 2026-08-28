@@ -37,7 +37,7 @@ import {
   WISHLIST_PATH,
   ADMIN_PATH,
 } from './config/routes'
-import { RouteFallback } from './components/ui/RouteFallback'
+import { AppRouteFallback } from './components/ui/AppRouteFallback'
 
 const RequireAdmin = lazy(() =>
   import('./components/admin/RequireAdmin').then((module) => ({
@@ -154,6 +154,16 @@ const AdminDashboardPage = lazy(() =>
     default: module.AdminDashboardPage,
   })),
 )
+const AdminProductSalesReportPage = lazy(() =>
+  import('./pages/admin/AdminProductSalesReportPage').then((module) => ({
+    default: module.AdminProductSalesReportPage,
+  })),
+)
+const AdminSingleProductSalesReportPage = lazy(() =>
+  import('./pages/admin/AdminSingleProductSalesReportPage').then((module) => ({
+    default: module.AdminSingleProductSalesReportPage,
+  })),
+)
 const AdminProductsPage = lazy(() =>
   import('./pages/admin/AdminProductsPage').then((module) => ({
     default: module.AdminProductsPage,
@@ -214,10 +224,15 @@ const AdminWebsiteContentPage = lazy(() =>
     default: module.AdminWebsiteContentPage,
   })),
 )
+const AdminActivityLogPage = lazy(() =>
+  import('./pages/admin/AdminActivityLogPage').then((module) => ({
+    default: module.AdminActivityLogPage,
+  })),
+)
 
 export default function App() {
   return (
-    <Suspense fallback={<RouteFallback />}>
+    <Suspense fallback={<AppRouteFallback />}>
       <Routes>
         <Route path={HOME_PATH} element={<LandingPage />} />
         <Route path={DOCS_PATH} element={<DocsPage />} />
@@ -276,6 +291,11 @@ export default function App() {
           }
         >
           <Route index element={<AdminDashboardPage />} />
+          <Route path="reports" element={<AdminProductSalesReportPage />} />
+          <Route
+            path="reports/products/:productId"
+            element={<AdminSingleProductSalesReportPage />}
+          />
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="categories" element={<AdminCategoriesPage />} />
           <Route path="brands" element={<AdminBrandsPage />} />
@@ -287,6 +307,7 @@ export default function App() {
           <Route path="shipping" element={<AdminShippingPage />} />
           <Route path="returns" element={<AdminReturnsPage />} />
           <Route path="website-content" element={<AdminWebsiteContentPage />} />
+          <Route path="activity-log" element={<AdminActivityLogPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
       </Routes>

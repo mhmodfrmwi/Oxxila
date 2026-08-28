@@ -16,6 +16,7 @@ import { Button } from '../../components/ui/Button'
 import { focusRingClasses } from '../../components/ui/interactionStyles'
 import { useAdminCustomerStats } from '../../hooks/useAdminCustomerStats'
 import { useAdminCustomers } from '../../hooks/useAdminCustomers'
+import { useAdminUrlOpen } from '../../hooks/useAdminUrlOpen'
 import type { CustomerDrawerMode } from '../../hooks/useCustomerDrawer'
 import { cn } from '../../lib/cn'
 import type { AdminCustomerRow } from '../../types/adminCustomers'
@@ -55,6 +56,8 @@ export function AdminCustomersPage() {
   const openDrawer = useCallback((customerId: string) => {
     setDrawerCustomerId(customerId)
   }, [])
+
+  useAdminUrlOpen(openDrawer)
 
   const closeDrawer = useCallback(() => {
     setDrawerCustomerId(null)

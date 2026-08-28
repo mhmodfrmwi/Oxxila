@@ -3,7 +3,7 @@ import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../ui/interactionStyles'
 import { typeSmallClasses } from '../ui/typography'
 
-const CAROUSEL_WIDTH =
+const CARD_WIDTH =
   'w-[100px] shrink-0 min-[480px]:w-[112px] min-[640px]:w-[120px]'
 
 interface CategoryCardImageProps {
@@ -70,12 +70,7 @@ export function ShopCategoryCard({
   return (
     <Link
       to={href}
-      className={cn(
-        'group block',
-        focusRingClasses,
-        isGrid ? 'min-w-0 flex-1' : CAROUSEL_WIDTH,
-        className,
-      )}
+      className={cn('group block', focusRingClasses, CARD_WIDTH, className)}
     >
       <CategoryCardImage src={image} alt={name} />
       <CategoryCardLabel name={name} compact={!isGrid} />

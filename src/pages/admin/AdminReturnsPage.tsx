@@ -8,6 +8,7 @@ import { ReturnsStatusTabs } from '../../components/admin/returns/ReturnsStatusT
 import { EmptyState } from '../../components/admin/ui/EmptyState'
 import { Button } from '../../components/ui/Button'
 import { useAdminReturns } from '../../hooks/useAdminReturns'
+import { useAdminUrlOpen } from '../../hooks/useAdminUrlOpen'
 
 /**
  * Returns Management — list + split detail panel (Milestone 1), approve/reject and
@@ -17,6 +18,8 @@ export function AdminReturnsPage() {
   const { t } = useTranslation()
   const list = useAdminReturns()
   const [selectedReturnId, setSelectedReturnId] = useState<string | null>(null)
+
+  useAdminUrlOpen(setSelectedReturnId)
 
   const failed = Boolean(list.error) && !list.loading && list.returns.length === 0
   const staleError = Boolean(list.error) && list.returns.length > 0

@@ -1,9 +1,11 @@
 // src/components/admin/config/adminNav.ts
 import {
+  ADMIN_ACTIVITY_LOG_PATH,
   ADMIN_BRANDS_PATH,
   ADMIN_CATEGORIES_PATH,
   ADMIN_CUSTOMERS_PATH,
   ADMIN_DASHBOARD_PATH,
+  ADMIN_REPORTS_PATH,
   ADMIN_FAQS_PATH,
   ADMIN_ORDERS_PATH,
   ADMIN_PRODUCTS_PATH,
@@ -14,10 +16,12 @@ import {
   ADMIN_SUBCATEGORIES_PATH,
   ADMIN_WEBSITE_CONTENT_PATH,
 } from '../../../config/routes'
+import iconActivityLog from '../../../assets/admin/icon-activity-log.svg'
 import iconBrands from '../../../assets/admin/icon-brands.svg'
 import iconCategories from '../../../assets/admin/icon-categories.svg'
 import iconCustomers from '../../../assets/admin/icon-customers.svg'
 import iconDashboard from '../../../assets/admin/icon-dashboard.svg'
+import iconReports from '../../../assets/admin/icon-reports.svg'
 import iconFaqs from '../../../assets/admin/icon-faqs.svg'
 import iconOrders from '../../../assets/admin/icon-orders.svg'
 import iconProducts from '../../../assets/admin/icon-products.svg'
@@ -75,6 +79,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     iconSrc: iconDashboard,
     iconSize: 24,
     end: true,
+  },
+  {
+    id: 'reports',
+    labelKey: 'admin.nav.reports',
+    to: ADMIN_REPORTS_PATH,
+    iconSrc: iconReports,
+    iconSize: 24,
   },
   {
     id: 'products',
@@ -141,4 +152,13 @@ export const ADMIN_SETTINGS_NAV: Omit<AdminNavItem, 'iconSrc' | 'iconSize'> & {
   id: 'settings',
   labelKey: 'admin.nav.settings',
   to: ADMIN_SETTINGS_PATH,
+}
+
+/** Super Admin only — not filtered by RBAC tab permissions. */
+export const ADMIN_ACTIVITY_LOG_NAV: AdminNavItem = {
+  id: 'activityLog',
+  labelKey: 'admin.nav.activityLog',
+  to: ADMIN_ACTIVITY_LOG_PATH,
+  iconSrc: iconActivityLog,
+  iconSize: 24,
 }

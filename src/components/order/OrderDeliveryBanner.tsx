@@ -3,7 +3,10 @@ import { CalendarDays } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import type { ApiOrder } from '../../types/order'
-import { formatEstimatedDeliveryArrival } from '../../utils/orderDelivery'
+import {
+  formatEstimatedDeliveryArrival,
+  hasOrderDeliveryEstimate,
+} from '../../utils/orderDelivery'
 import { getOrderTrackingNumber } from '../../utils/orderFormat'
 
 interface OrderDeliveryBannerProps {
@@ -14,6 +17,11 @@ interface OrderDeliveryBannerProps {
 export function OrderDeliveryBanner({ order, className }: OrderDeliveryBannerProps) {
   const { t } = useTranslation()
   const trackingNumber = getOrderTrackingNumber(order)
+  const estimatedArrival = formatEstimatedDeliveryArrival(order)
+
+  if (!hasOrderDeliveryEstimate(order) || !estimatedArrival) {
+    return null
+  }
 
   return (
     <div className={cn('track-order-delivery-banner', className)}>
@@ -25,7 +33,7 @@ export function OrderDeliveryBanner({ order, className }: OrderDeliveryBannerPro
             <p className="track-order-delivery-banner-title">{t('checkout.track.onItsWay')}</p>
             <p className="track-order-delivery-banner-subtitle">
               {t('checkout.track.estimatedDelivery', {
-                date: formatEstimatedDeliveryArrival(order),
+                date: estimatedArrival,
               })}
             </p>
           </div>

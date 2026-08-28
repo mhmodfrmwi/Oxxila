@@ -1,6 +1,7 @@
 /**
- * Typography tokens — New York is the global font family.
+ * Typography tokens — Playfair Display is the global font family.
  * Font tokens are theme-independent; color tokens live in tokens.css.
+ * New York is scoped to the landing hero only (see .font-hero).
  */
 
 @font-face {
@@ -12,9 +13,10 @@
 }
 
 :root {
-  --font-family-base: 'New York', Georgia, 'Times New Roman', serif;
+  --font-family-base: 'Playfair Display', Georgia, serif;
   --font-family-serif: var(--font-family-base);
   --font-family-display: var(--font-family-base);
+  --font-family-hero: 'New York', Georgia, 'Times New Roman', serif;
 
   --font-size-base: 1.25rem;
   --line-height-base: 1.2;
@@ -28,4 +30,8 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+}
+
+.font-hero {
+  font-family: var(--font-family-hero);
 }

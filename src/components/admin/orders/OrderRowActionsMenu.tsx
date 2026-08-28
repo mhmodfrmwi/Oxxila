@@ -1,13 +1,17 @@
 // src/components/admin/orders/OrderRowActionsMenu.tsx
-import { MoreHorizontal } from 'lucide-react'
-import { useEffect, useId, useRef, useState } from 'react'
+import { Eye, RefreshCw, RotateCcw, XCircle } from 'lucide-react'
+import { useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 import { ADMIN_RETURNS_PATH } from '../../../config/routes'
 import type { AdminOrderRow } from '../../../types/adminOrders'
 import { canAdminCancelOrder } from '../../../utils/adminOrdersFormat'
-import { cn } from '../../../lib/cn'
-import { focusRingClasses } from '../../ui/interactionStyles'
+import {
+  AdminMenuItem,
+  AdminMenuLinkItem,
+  AdminMenuTrigger,
+  adminMenuPanelAnchorClass,
+  useAdminMenuDismiss,
+} from '../ui/adminMenu'
 
 interface OrderRowActionsMenuProps {
   order: AdminOrderRow
@@ -27,115 +31,65 @@ export function OrderRowActionsMenu({
   const rootRef = useRef<HTMLDivElement>(null)
   const menuId = useId()
   const canCancel = canAdminCancelOrder(order.orderStatus)
-  // Milestone 3 — orders already tied to a return request deep-link into Returns Management.
   const hasReturnRequests =
     order.orderStatus === 'returned' || order.orderStatus === 'partially_returned'
 
-  useEffect(() => {
-    if (!open) return
-
-    function onPointerDown(event: MouseEvent) {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false)
-      }
-    }
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') setOpen(false)
-    }
-
-    document.addEventListener('mousedown', onPointerDown)
-    document.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.removeEventListener('mousedown', onPointerDown)
-      document.removeEventListener('keydown', onKeyDown)
-    }
-  }, [open])
+  useAdminMenuDismiss(open, setOpen, rootRef)
 
   return (
     <div ref={rootRef} className="relative inline-flex justify-center">
-      <button
-        type="button"
-        aria-haspopup="menu"
+      <AdminMenuTrigger
+        open={open}
         aria-expanded={open}
         aria-controls={menuId}
         onClick={() => setOpen((previous) => !previous)}
-        className={cn(
-          'inline-flex rounded-lg p-2 text-white/70',
-          'transition-colors hover:bg-white/10 hover:text-white',
-          focusRingClasses,
-        )}
         aria-label={t('admin.orders.actionAria', { id: order.orderNumber })}
-      >
-        <MoreHorizontal size={19} aria-hidden />
-      </button>
+      />
 
       {open ? (
-        <div
-          id={menuId}
-          role="menu"
-          className="absolute end-0 top-full z-20 mt-1 min-w-[9.5rem] overflow-hidden rounded-xl border border-white/10 bg-[#1a1c29] py-1 shadow-xl"
-        >
-          <button
-            type="button"
+        <div id={menuId} role="menu" className={adminMenuPanelAnchorClass}>
+          <AdminMenuItem
             role="menuitem"
-            className={cn(
-              'block w-full px-3 py-2 text-start text-xs font-medium text-white/80',
-              'hover:bg-white/10 hover:text-white',
-              focusRingClasses,
-            )}
+            icon={<Eye size={16} aria-hidden />}
             onClick={() => {
               setOpen(false)
               onOpenOrder(order.id)
             }}
           >
             {t('admin.orders.menu.viewDetails')}
-          </button>
-          <button
-            type="button"
+          </AdminMenuItem>
+          <AdminMenuItem
             role="menuitem"
-            className={cn(
-              'block w-full px-3 py-2 text-start text-xs font-medium text-white/80',
-              'hover:bg-white/10 hover:text-white',
-              focusRingClasses,
-            )}
+            icon={<RefreshCw size={16} aria-hidden />}
             onClick={() => {
               setOpen(false)
               onChangeStatus(order)
             }}
           >
             {t('admin.orders.menu.changeStatus')}
-          </button>
+          </AdminMenuItem>
           {hasReturnRequests ? (
-            <Link
-              to={`${ADMIN_RETURNS_PATH}?orderId=${encodeURIComponent(order.id)}`}
+            <AdminMenuLinkItem
               role="menuitem"
+              href={`${ADMIN_RETURNS_PATH}?orderId=${encodeURIComponent(order.id)}`}
+              icon={<RotateCcw size={16} aria-hidden />}
               onClick={() => setOpen(false)}
-              className={cn(
-                'block w-full px-3 py-2 text-start text-xs font-medium text-white/80',
-                'hover:bg-white/10 hover:text-white',
-                focusRingClasses,
-              )}
             >
               {t('admin.orders.menu.viewReturns')}
-            </Link>
+            </AdminMenuLinkItem>
           ) : null}
           {canCancel ? (
-            <button
-              type="button"
+            <AdminMenuItem
               role="menuitem"
-              className={cn(
-                'block w-full px-3 py-2 text-start text-xs font-medium text-support-error',
-                'hover:bg-support-error/10',
-                focusRingClasses,
-              )}
+              variant="danger"
+              icon={<XCircle size={16} aria-hidden />}
               onClick={() => {
                 setOpen(false)
                 onCancelOrder(order)
               }}
             >
               {t('admin.orders.menu.cancel')}
-            </button>
+            </AdminMenuItem>
           ) : null}
         </div>
       ) : null}

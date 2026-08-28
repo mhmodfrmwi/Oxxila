@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react'
 import { useMemo } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import logoSettings from '../../../assets/admin/oxilla-logo-settings.svg'
+import logoMark from '../../../assets/oxxila-logo-mark.svg'
 import { cn } from '../../../lib/cn'
 import { useAdminPermissions } from '../../../hooks/useAdminPermissions'
 import { filterAdminNavItems } from '../../../utils/adminPermissions'
@@ -13,7 +13,7 @@ import {
   adminPageShellStyle,
   resolveAdminPageShell,
 } from '../config/adminPageShell'
-import { ADMIN_NAV_ITEMS, ADMIN_SETTINGS_NAV } from '../config/adminNav'
+import { ADMIN_NAV_ITEMS, ADMIN_ACTIVITY_LOG_NAV, ADMIN_SETTINGS_NAV } from '../config/adminNav'
 import { AdminBrandLogo } from './AdminBrandLogo'
 import { AdminLogoutButton } from './AdminLogoutButton'
 import { AdminNavIcon } from './AdminNavIcon'
@@ -26,7 +26,7 @@ import { AdminSidebar } from './AdminSidebar'
 export function AdminLayout() {
   const { t } = useTranslation()
   const { pathname } = useLocation()
-  const { permissions, canReadTab } = useAdminPermissions()
+  const { permissions, canReadTab, isSuperAdmin } = useAdminPermissions()
   const shell = resolveAdminPageShell(pathname)
 
   const visibleNavItems = useMemo(
@@ -38,7 +38,10 @@ export function AdminLayout() {
 
   const mobileItems = useMemo(
     () => [
-      ...visibleNavItems.map((item) => ({
+      ...(isSuperAdmin
+        ? [...visibleNavItems, ADMIN_ACTIVITY_LOG_NAV]
+        : visibleNavItems
+      ).map((item) => ({
         id: item.id,
         labelKey: item.labelKey,
         to: item.to,
@@ -53,13 +56,13 @@ export function AdminLayout() {
               labelKey: ADMIN_SETTINGS_NAV.labelKey,
               to: ADMIN_SETTINGS_NAV.to,
               end: undefined as boolean | undefined,
-              iconSrc: logoSettings as string | null,
+              iconSrc: logoMark as string | null,
               iconSize: null as 20 | 24 | null,
             },
           ]
         : []),
     ],
-    [showSettings, visibleNavItems],
+    [isSuperAdmin, showSettings, visibleNavItems],
   )
 
   return (

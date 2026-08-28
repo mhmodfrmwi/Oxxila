@@ -14,7 +14,6 @@ import { FadeUp } from '../../ui/FadeUp'
 import { Logo } from '../../ui/Logo'
 import { FooterLinks } from './FooterLinks'
 import { InstagramGrid } from './InstagramGrid'
-import { NewsletterForm } from './NewsletterForm'
 import { SocialLinks } from './SocialLinks'
 
 export function Footer() {
@@ -85,7 +84,6 @@ export function Footer() {
               <p className="mt-4 max-w-sm font-serif text-sm leading-relaxed text-secondary-text sm:text-base">
                 {t('footer.description')}
               </p>
-              <NewsletterForm />
             </div>
 
             <FooterLinks title={t('footer.policies')} links={policyLinks} variant="slide" />

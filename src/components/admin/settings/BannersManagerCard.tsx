@@ -1,10 +1,11 @@
 // src/components/admin/settings/BannersManagerCard.tsx
 import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useToast } from '../../../context/ToastContext'
 import { useAdminBanners } from '../../../hooks/useAdminBanners'
 import type { BannerDrawerMode } from '../../../hooks/useBannerDrawer'
+import { useAdminUrlOpen } from '../../../hooks/useAdminUrlOpen'
 import { cn } from '../../../lib/cn'
 import { ApiError } from '../../../lib/api'
 import type { AdminBannerRow } from '../../../types/adminBanners'
@@ -62,6 +63,9 @@ export function BannersManagerCard() {
   const [deleteTarget, setDeleteTarget] = useState<AdminBannerRow | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [pendingBannerOpenId, setPendingBannerOpenId] = useState<string | null>(null)
+
+  useAdminUrlOpen(setPendingBannerOpenId)
 
   const openCreate = useCallback(() => {
     setDrawerMode('create')
@@ -74,6 +78,15 @@ export function BannersManagerCard() {
     setEditBanner(banner)
     setDrawerOpen(true)
   }, [])
+
+  useEffect(() => {
+    if (!pendingBannerOpenId || loading) return
+    const banner = banners.find((row) => row.id === pendingBannerOpenId)
+    if (banner) {
+      openEdit(banner)
+      setPendingBannerOpenId(null)
+    }
+  }, [banners, loading, openEdit, pendingBannerOpenId])
 
   const closeDrawer = useCallback(() => {
     setDrawerOpen(false)

@@ -7,7 +7,8 @@ import { useAdminContactSettings } from '../../../hooks/useAdminContactSettings'
 import { useAdminPermissions } from '../../../hooks/useAdminPermissions'
 import { cn } from '../../../lib/cn'
 import { buildWhatsAppUrl } from '../../../utils/contactSettings'
-import { Button } from '../../ui/Button'
+import { WHATSAPP_DIAL_CODE_OPTIONS } from '../../../constants/whatsappDialCodes'
+import { AdminButton } from '../ui/AdminButton'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { EmptyState } from '../ui/EmptyState'
 import { GlassCard } from '../ui/GlassCard'
@@ -29,7 +30,7 @@ export function ContactSettingsCard() {
   const canUpdate = can('websiteContent', 'update')
   const { values, loading, saving, error, setField, save, reload } = useAdminContactSettings()
 
-  const previewUrl = buildWhatsAppUrl(values.whatsapp)
+  const previewUrl = buildWhatsAppUrl(values.whatsapp, values.whatsappDialCode)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -67,9 +68,9 @@ export function ContactSettingsCard() {
           title={t('admin.settings.loadErrorTitle')}
           description={error}
           action={
-            <Button type="button" variant="outline" onClick={() => void reload()}>
+            <AdminButton type="button" variant="outline" onClick={() => void reload()}>
               {t('admin.settings.retry')}
-            </Button>
+            </AdminButton>
           }
         />
       ) : (
@@ -122,16 +123,32 @@ export function ContactSettingsCard() {
             <label className={labelClass} htmlFor={`${formId}-whatsapp`}>
               {t('admin.settings.contact.whatsapp')}
             </label>
-            <input
-              id={`${formId}-whatsapp`}
-              type="tel"
-              value={values.whatsapp}
-              disabled={saving}
-              onChange={(event) => setField('whatsapp', event.target.value)}
-              placeholder={t('admin.settings.contact.whatsappPlaceholder')}
-              className={cn(fieldClass, 'mt-2')}
-              autoComplete="tel"
-            />
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+              <select
+                id={`${formId}-whatsapp-dial`}
+                value={values.whatsappDialCode}
+                disabled={saving}
+                onChange={(event) => setField('whatsappDialCode', event.target.value)}
+                className={cn(fieldClass, 'sm:max-w-[11rem]')}
+                aria-label={t('admin.settings.contact.whatsappDialCode')}
+              >
+                {WHATSAPP_DIAL_CODE_OPTIONS.map((option) => (
+                  <option key={option.dialCode} value={option.dialCode}>
+                    +{option.dialCode} {t(option.labelKey)}
+                  </option>
+                ))}
+              </select>
+              <input
+                id={`${formId}-whatsapp`}
+                type="tel"
+                value={values.whatsapp}
+                disabled={saving}
+                onChange={(event) => setField('whatsapp', event.target.value)}
+                placeholder={t('admin.settings.contact.whatsappPlaceholder')}
+                className={cn(fieldClass, 'min-w-0 flex-1')}
+                autoComplete="tel"
+              />
+            </div>
             <p className="mt-2 text-xs leading-5 text-white/45">
               {t('admin.settings.contact.whatsappHint')}
             </p>
@@ -148,7 +165,7 @@ export function ContactSettingsCard() {
             </p>
           ) : null}
 
-          <Button type="submit" disabled={saving || !canUpdate} className="w-full justify-center">
+          <AdminButton type="submit" disabled={saving || !canUpdate} fullWidth>
             {saving ? (
               <>
                 <Loader2 size={16} className="animate-spin" aria-hidden />
@@ -157,7 +174,7 @@ export function ContactSettingsCard() {
             ) : (
               t('admin.settings.contact.save')
             )}
-          </Button>
+          </AdminButton>
         </form>
       )}
     </GlassCard>

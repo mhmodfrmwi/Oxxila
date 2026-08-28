@@ -6,7 +6,7 @@ import { SHOP_PATH } from '../../config/routes'
 import { useOffersCarousel } from '../../hooks/useOffersCarousel'
 import { ContentSection } from '../layout/ContentSection'
 import { ProductSectionEmptyState } from '../product/ProductSectionEmptyState'
-import { CountdownPromoCarousel } from './CountdownPromoCarousel'
+import { PromoCarouselCard } from './PromoCarouselCard'
 
 function OffersSkeleton() {
   return (
@@ -20,7 +20,7 @@ function OffersSkeleton() {
 export function PromoCarouselSection() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { slides, loading, error, isUpcoming } = useOffersCarousel()
+  const { slide, loading, error } = useOffersCarousel()
 
   return (
     <ContentSection aria-label={t('shop.offers.ariaLabel')} padding="compact">
@@ -30,7 +30,7 @@ export function PromoCarouselSection() {
         <p className="py-6 text-center text-sm text-support-error" role="alert">
           {t('shop.offers.loadError')}
         </p>
-      ) : slides.length === 0 ? (
+      ) : !slide ? (
         <ProductSectionEmptyState
           variant="banner"
           icon={Tag}
@@ -40,13 +40,10 @@ export function PromoCarouselSection() {
           onAction={() => navigate(SHOP_PATH)}
         />
       ) : (
-        <CountdownPromoCarousel
-          slides={slides}
-          ariaLabel={
-            isUpcoming
-              ? t('shop.offers.upcomingCarouselAria')
-              : t('shop.offers.carouselAria')
-          }
+        <PromoCarouselCard
+          title={slide.title}
+          targetDate={slide.targetDate}
+          countdownLabel={slide.countdownLabel}
         />
       )}
     </ContentSection>

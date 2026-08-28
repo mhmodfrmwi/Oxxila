@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logoIcon from "../../assets/oxilla logo 1 (Traced).svg";
+import logoIcon from "../../assets/oxxila-logo-mark.svg";
 import logoWordmark from "../../assets/Oxxila.svg";
 
 interface LogoProps {

@@ -24,6 +24,7 @@ import type {
   CreateCarrierPickupPayload,
   UpdateCarrierPayload,
 } from '../types/adminShipping'
+import { mapApiAuditBlock } from './adminAuditFormat'
 import { customerInitials } from './adminOrdersFormat'
 
 export function carrierStatusBadgeTone(isActive: boolean): StatusBadgeTone {
@@ -49,6 +50,7 @@ export function mapApiCarrierToAdminRow(carrier: ApiAdminCarrier): AdminCarrierR
     apiProvider: carrier.apiProvider ?? null,
     apiBaseUrl: carrier.apiBaseUrl?.trim() || null,
     hasApiKey: Boolean(carrier.hasApiKey),
+    audit: mapApiAuditBlock(carrier.audit),
   }
 }
 
@@ -75,25 +77,60 @@ export function filterCarriersByType(
   return carriers.filter((carrier) => carrier.type === typeFilter)
 }
 
+/** Parse stored deliveryDays (e.g. "2-4 business days") into min/max form fields. */
+export function parseDeliveryDaysRange(value: string | null | undefined): {
+  min: string
+  max: string
+} {
+  if (!value?.trim()) return { min: '', max: '' }
+
+  const normalized = value.trim().toLowerCase()
+  if (normalized.includes('same day')) return { min: '0', max: '0' }
+
+  const rangeMatch = normalized.match(/(\d+)\s*[-–]\s*(\d+)/)
+  if (rangeMatch) {
+    return { min: rangeMatch[1], max: rangeMatch[2] }
+  }
+
+  const singleMatch = normalized.match(/(\d+)/)
+  if (singleMatch) {
+    return { min: singleMatch[1], max: singleMatch[1] }
+  }
+
+  return { min: '', max: '' }
+}
+
+/** Serialize min/max inputs into the API deliveryDays string. */
+export function formatDeliveryDaysRange(min: string, max: string): string {
+  const minNum = Number.parseInt(min.trim(), 10)
+  const maxNum = Number.parseInt(max.trim(), 10)
+  if (!Number.isFinite(minNum) || !Number.isFinite(maxNum)) return ''
+  if (minNum === maxNum) return String(minNum)
+  return `${minNum}-${maxNum}`
+}
+
 export function emptyCarrierFormValues(): AdminCarrierFormValues {
   return {
     name: '',
     code: '',
     type: 'known',
     isActive: true,
-    deliveryDays: '',
+    deliveryDaysMin: '',
+    deliveryDaysMax: '',
     apiKey: '',
     apiBaseUrl: '',
   }
 }
 
 export function carrierRowToFormValues(row: AdminCarrierRow): AdminCarrierFormValues {
+  const { min, max } = parseDeliveryDaysRange(row.deliveryDays)
   return {
     name: row.name === '—' ? '' : row.name,
     code: row.code === '—' ? '' : row.code,
     type: row.type,
     isActive: row.isActive,
-    deliveryDays: row.deliveryDays ?? '',
+    deliveryDaysMin: min,
+    deliveryDaysMax: max,
     apiKey: '',
     apiBaseUrl: row.apiBaseUrl ?? '',
   }
@@ -106,13 +143,37 @@ export function validateCarrierForm(
   const errors: AdminCarrierFormErrors = {}
   if (!values.name.trim()) errors.name = 'Name is required.'
   if (mode === 'create' && !values.code.trim()) errors.code = 'Code is required.'
-  if (values.type === 'api') {
-    if (mode === 'create' && !values.apiKey.trim()) {
-      errors.apiKey = 'API key is required for Bosta carriers.'
-    }
-  } else if (!values.deliveryDays.trim()) {
-    errors.deliveryDays = 'Delivery days is required.'
+  if (values.type === 'api' && mode === 'create' && !values.apiKey.trim()) {
+    errors.apiKey = 'API key is required for Bosta carriers.'
   }
+
+  const minRaw = values.deliveryDaysMin.trim()
+  const maxRaw = values.deliveryDaysMax.trim()
+
+  if (!minRaw) errors.deliveryDaysMin = 'Minimum days is required.'
+  if (!maxRaw) errors.deliveryDaysMax = 'Maximum days is required.'
+
+  if (minRaw && maxRaw) {
+    const min = Number.parseInt(minRaw, 10)
+    const max = Number.parseInt(maxRaw, 10)
+
+    if (!Number.isInteger(min) || min < 0) {
+      errors.deliveryDaysMin = 'Enter a valid number of days.'
+    }
+    if (!Number.isInteger(max) || max < 0) {
+      errors.deliveryDaysMax = 'Enter a valid number of days.'
+    }
+    if (
+      Number.isInteger(min) &&
+      Number.isInteger(max) &&
+      min >= 0 &&
+      max >= 0 &&
+      min > max
+    ) {
+      errors.deliveryDays = 'Maximum must be greater than or equal to minimum.'
+    }
+  }
+
   return errors
 }
 
@@ -129,9 +190,9 @@ export function formValuesToCreateCarrierPayload(
     payload.apiProvider = 'bosta'
     payload.apiKey = values.apiKey.trim()
     if (values.apiBaseUrl.trim()) payload.apiBaseUrl = values.apiBaseUrl.trim()
-  } else {
-    payload.deliveryDays = values.deliveryDays.trim()
   }
+  payload.deliveryDaysMin = Number.parseInt(values.deliveryDaysMin.trim(), 10)
+  payload.deliveryDaysMax = Number.parseInt(values.deliveryDaysMax.trim(), 10)
   return payload
 }
 
@@ -142,12 +203,12 @@ export function formValuesToUpdateCarrierPayload(
   const payload: UpdateCarrierPayload = {
     name: values.name.trim(),
     isActive: values.isActive,
+    deliveryDaysMin: Number.parseInt(values.deliveryDaysMin.trim(), 10),
+    deliveryDaysMax: Number.parseInt(values.deliveryDaysMax.trim(), 10),
   }
   if (original.type === 'api') {
     if (values.apiKey.trim()) payload.apiKey = values.apiKey.trim()
     payload.apiBaseUrl = values.apiBaseUrl.trim() || undefined
-  } else {
-    payload.deliveryDays = values.deliveryDays.trim()
   }
   return payload
 }

@@ -10,6 +10,7 @@ import { IconActionButton } from '../../ui/IconActionButton'
 import { ProductBadge } from '../../ui/ProductBadge'
 import { ProductRating } from '../../ui/ProductRating'
 import { formatProductPrice } from '../../../utils/formatProductPrice'
+import { stripLeadingBrandFromName } from '../../../utils/productDisplayName'
 import { PRODUCT_IMAGE_PLACEHOLDER } from '../../../utils/productImage'
 import type { RecommendedProduct } from './recommendedProductsData'
 
@@ -43,6 +44,8 @@ export function ProductCard({
   } = useProductCardActions(product.id)
   const { brand, title, price, originalPrice, rating, reviewCount, image, imageAlt, badge, href } =
     product
+  const displayTitle = stripLeadingBrandFromName(brand, title)
+  const showBrand = Boolean(brand.trim())
   const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null)
   const imageSrc = failedImageUrl === image ? PRODUCT_IMAGE_PLACEHOLDER : image
 
@@ -55,7 +58,7 @@ export function ProductCard({
     <Link
       to={href}
       className={cn('block', focusRingClasses)}
-      aria-label={brand ? `${brand} ${title}` : title}
+      aria-label={showBrand ? `${brand} ${displayTitle}` : displayTitle}
     >
       <div
         className={cn(
@@ -156,16 +159,12 @@ export function ProductCard({
           </div>
 
           <div className="wishlist-product-info">
+            {showBrand ? (
+              <p className="wishlist-product-eyebrow">{brand}</p>
+            ) : null}
             <h3 className="wishlist-product-title">
               <Link to={href} className={cn('hover:underline', focusRingClasses)}>
-                {brand ? (
-                  <>
-                    <span className="wishlist-product-brand">{brand}</span>{' '}
-                    <span className="wishlist-product-name">{title}</span>
-                  </>
-                ) : (
-                  title
-                )}
+                {displayTitle}
               </Link>
             </h3>
 
@@ -225,11 +224,15 @@ export function ProductCard({
             />
           </div>
 
-          <div className="mt-3 space-y-2">
+          <div className="mt-3 space-y-1.5">
+            {showBrand ? (
+              <p className="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-secondary-text">
+                {brand}
+              </p>
+            ) : null}
             <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-snug text-primary-text">
               <Link to={href} className={cn('hover:underline', focusRingClasses)}>
-                <span className="font-semibold">{brand}</span>{' '}
-                <span className="font-normal">{title}</span>
+                {displayTitle}
               </Link>
             </h3>
 

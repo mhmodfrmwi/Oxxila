@@ -120,6 +120,7 @@ export interface AdminReturnRow {
   createdAt: string
   userName: string
   userEmail: string | null
+  userInitials: string
   orderId: string | null
   orderShortLabel: string | null
   refundAmount: number
@@ -149,6 +150,7 @@ export interface AdminReturnDetail {
   adminNote: string | null
   userName: string
   userEmail: string | null
+  userInitials: string
   userPhone: string | null
   orderId: string | null
   orderShortLabel: string | null

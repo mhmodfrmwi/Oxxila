@@ -12,11 +12,15 @@ import {
 import { createPortal } from 'react-dom'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
+import { AdminInitialsAvatar } from './AdminInitialsAvatar'
+import { adminMenuOptionClass, adminMenuPanelClass } from './adminMenu'
 
 export interface SelectOption {
   value: string
   label: string
   disabled?: boolean
+  /** Optional initials for person-style options (actor / customer filters). */
+  initials?: string
 }
 
 export interface SelectProps {
@@ -124,6 +128,7 @@ export function Select({
   const displayLabel = isPlaceholderSelection
     ? (placeholder ?? '')
     : (selected?.label ?? '')
+  const displayInitials = !isPlaceholderSelection ? selected?.initials?.trim() : undefined
 
   const updatePosition = () => {
     const trigger = triggerRef.current
@@ -321,15 +326,13 @@ export function Select({
             onKeyDown={onListKeyDown}
             style={menuStyle}
             className={cn(
+              adminMenuPanelClass,
               'overflow-x-hidden overflow-y-auto outline-none',
-              // Solid panel — glass was too transparent over form fields underneath
-              'rounded-[var(--admin-radius-lg)] border border-white/15 bg-[#151221] py-1',
-              'shadow-[0_20px_48px_rgba(0,0,0,0.65)]',
               'text-sm text-primary-text',
             )}
           >
             {menuOptions.length === 0 ? (
-              <li className="px-3 py-2.5 text-secondary-text" aria-disabled>
+              <li className="mx-1.5 rounded-xl px-3.5 py-3 text-sm text-white/45" aria-disabled>
                 {placeholder ?? '—'}
               </li>
             ) : (
@@ -344,21 +347,11 @@ export function Select({
                     aria-selected={isSelected}
                     aria-disabled={option.disabled || undefined}
                     data-index={index}
-                    className={cn(
-                      'cursor-pointer truncate px-3 py-2.5 transition-colors',
-                      option.disabled && 'cursor-not-allowed opacity-40',
-                      !option.disabled &&
-                        isSelected &&
-                        'bg-[var(--admin-nav-active-bg)] font-medium text-accent',
-                      !option.disabled &&
-                        !isSelected &&
-                        isHighlighted &&
-                        'bg-white/10 text-primary-text',
-                      !option.disabled &&
-                        !isSelected &&
-                        !isHighlighted &&
-                        'text-secondary-text hover:bg-white/5 hover:text-primary-text',
-                    )}
+                    className={adminMenuOptionClass({
+                      disabled: Boolean(option.disabled),
+                      selected: isSelected,
+                      highlighted: isHighlighted,
+                    })}
                     onMouseEnter={() => {
                       if (!option.disabled) setHighlightIndex(index)
                     }}
@@ -367,7 +360,12 @@ export function Select({
                     }}
                     onClick={() => selectIndex(index)}
                   >
-                    {option.label}
+                    <span className="flex min-w-0 items-center gap-2.5">
+                      {option.initials?.trim() ? (
+                        <AdminInitialsAvatar initials={option.initials.trim()} />
+                      ) : null}
+                      <span className="truncate">{option.label}</span>
+                    </span>
                   </li>
                 )
               })
@@ -411,13 +409,14 @@ export function Select({
       >
         <span
           className={cn(
-            'min-w-0 flex-1 truncate',
+            'flex min-w-0 flex-1 items-center gap-2.5',
             isPlaceholderSelection || !displayLabel
               ? 'text-placeholder-text'
               : 'text-primary-text',
           )}
         >
-          {displayLabel || '—'}
+          {displayInitials ? <AdminInitialsAvatar initials={displayInitials} /> : null}
+          <span className="min-w-0 truncate">{displayLabel || '—'}</span>
         </span>
         <ChevronDown
           size={16}

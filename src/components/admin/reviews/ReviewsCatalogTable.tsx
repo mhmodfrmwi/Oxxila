@@ -126,8 +126,8 @@ export function ReviewsCatalogTable({
   const columns = useMemo<DataTableColumn<AdminReviewRow>[]>(
     () => [
       {
-        id: 'patient',
-        header: t('admin.reviews.columns.patient'),
+        id: 'customer',
+        header: t('admin.reviews.columns.customer'),
         cell: (row) => (
           <ReviewerCell
             name={row.reviewerName}

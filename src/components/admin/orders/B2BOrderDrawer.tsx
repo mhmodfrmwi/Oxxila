@@ -9,6 +9,7 @@ import {
   type B2BOrderLineItem,
 } from '../../../hooks/useB2BOrderDrawer'
 import { cn } from '../../../lib/cn'
+import { adminMenuItemClass, adminMenuPanelClass } from '../ui/adminMenu'
 import type { ApiAdminOrder } from '../../../types/adminOrders'
 import type { ApiProduct } from '../../../types/catalog'
 import { focusRingClasses } from '../../ui/interactionStyles'
@@ -136,13 +137,18 @@ function ProductSearchField({
         />
       </div>
       {open && query.trim() ? (
-        <div className="absolute inset-x-0 top-full z-10 mt-1 max-h-56 overflow-y-auto rounded-xl border border-white/10 bg-[#151221] p-1 shadow-xl">
+        <div
+          className={cn(
+            adminMenuPanelClass,
+            'absolute inset-x-0 top-full z-10 mt-2 max-h-64 overflow-y-auto',
+          )}
+        >
           {searching ? (
-            <div className="flex items-center justify-center py-4">
-              <Loader2 size={14} className="animate-spin text-white/40" aria-hidden />
+            <div className="flex items-center justify-center py-5">
+              <Loader2 size={16} className="animate-spin text-white/40" aria-hidden />
             </div>
           ) : results.length === 0 ? (
-            <p className="px-3 py-2 text-xs text-white/40">
+            <p className="px-3.5 py-3 text-sm text-white/40">
               {t('admin.orders.b2b.productNotFound')}
             </p>
           ) : (
@@ -155,7 +161,7 @@ function ProductSearchField({
                   setQuery('')
                   setOpen(false)
                 }}
-                className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-start text-sm text-white/80 hover:bg-white/10"
+                className={cn(adminMenuItemClass(), 'justify-between')}
               >
                 <span className="truncate">{product.name}</span>
                 {typeof product.stock === 'number' ? (

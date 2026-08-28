@@ -30,6 +30,16 @@ export interface ApiOrderTracking {
   carrierName?: string | null
 }
 
+export interface ApiOrderDeliveryEstimate {
+  carrierName: string | null
+  deliveryDaysLabel: string | null
+  minBusinessDays: number
+  maxBusinessDays: number
+  estimatedFrom: string
+  estimatedTo: string
+  assignedAt: string | null
+}
+
 export interface ApiOrder {
   _id: string
   /** Present on detail responses; list responses may omit heavy item payloads. */
@@ -55,7 +65,11 @@ export interface ApiOrder {
   orderStatusLabel: string
   createdAt: string
   tracking: ApiOrderTracking
+  /** Populated after admin assigns a carrier with a delivery window. */
+  delivery?: ApiOrderDeliveryEstimate | null
   shipment?: {
     trackingNumber?: string | null
+    carrierName?: string | null
+    assignedAt?: string | null
   } | null
 }

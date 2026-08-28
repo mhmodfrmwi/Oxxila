@@ -71,7 +71,7 @@ export function ShippingLogisticsCard() {
     >
       <div className="mb-8 flex items-center gap-3">
         <Truck size={19} className="text-[#a394ff]" aria-hidden />
-        <h3 className="font-[family-name:var(--admin-font-display)] text-xl font-normal text-white">
+        <h3 className="admin-card-title">
           {t('admin.settings.shipping.title')}
         </h3>
       </div>
