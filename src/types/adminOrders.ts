@@ -115,6 +115,7 @@ export interface ApiAdminOrder {
         name?: string
         email?: string
         phone?: string
+        avatar?: string | null
       }
     | null
   /** Free-text name for B2B orders not linked to a User. */
@@ -166,6 +167,7 @@ export interface AdminOrderDetail {
   customerName: string
   customerEmail: string | null
   customerPhone: string | null
+  customerAvatar: string | null
   customerInitials: string
   paymentMethod: 'cod' | 'card' | null
   paymentProvider: 'stripe' | 'paymob' | null

@@ -25,7 +25,7 @@ const toneClasses: Record<StatusBadgeTone, string> = {
 }
 
 /**
- * Compact Figma overlay badge — ~10px bold, tight pad, full pill.
+ * Compact Figma overlay badge — ~10px bold, tight pad, soft rectangle (not a full pill).
  * Call sites may still override tone/size via className.
  */
 export function StatusBadge({
@@ -37,8 +37,8 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        'inline-flex max-w-full items-center rounded-full',
-        'px-2 py-0.5 text-[8px] leading-[12px] font-bold tracking-normal uppercase',
+        'inline-flex max-w-full items-center rounded-md',
+        'px-2.5 py-1 text-[10px] leading-none font-bold tracking-[0.04em] uppercase',
         toneClasses[tone],
         className,
       )}

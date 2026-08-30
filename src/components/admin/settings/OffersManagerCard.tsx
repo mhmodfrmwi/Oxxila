@@ -8,6 +8,7 @@ import { cn } from '../../../lib/cn'
 import type { AdminOfferRow } from '../../../types/adminOffers'
 import { Button } from '../../ui/Button'
 import { focusRingClasses } from '../../ui/interactionStyles'
+import { AdminButton } from '../ui/AdminButton'
 import { DataTable, type DataTableColumn } from '../ui/DataTable'
 import { EmptyState } from '../ui/EmptyState'
 import { DeleteAllOffersDialog } from './DeleteAllOffersDialog'
@@ -234,31 +235,20 @@ export function OffersManagerCard() {
             <h3 className="admin-card-title">
               {t('admin.settings.offers.title')}
             </h3>
-            <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-              <button
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              <AdminButton
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={openDeleteAll}
                 disabled={!canDeleteAll}
-                className={cn(
-                  'text-sm font-semibold text-support-error',
-                  'transition-opacity hover:opacity-80',
-                  'disabled:pointer-events-none disabled:opacity-40',
-                  focusRingClasses,
-                )}
+                className="border-support-error/35 text-support-error hover:bg-support-error/10"
               >
                 {t('admin.settings.offers.deleteAll.action')}
-              </button>
-              <button
-                type="button"
-                onClick={openCreate}
-                className={cn(
-                  'text-sm font-semibold text-[#a394ff]',
-                  'transition-opacity hover:opacity-80',
-                  focusRingClasses,
-                )}
-              >
+              </AdminButton>
+              <AdminButton type="button" size="sm" onClick={openCreate}>
                 {t('admin.settings.offers.createOffer')}
-              </button>
+              </AdminButton>
             </div>
           </div>
         }

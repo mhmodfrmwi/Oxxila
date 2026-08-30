@@ -1,5 +1,5 @@
 // src/components/admin/orders/OrderDetailsDrawer.tsx
-import { FileText, Loader2, User, XCircle } from 'lucide-react'
+import { FileText, Loader2, XCircle } from 'lucide-react'
 import { useCallback, useId, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useToast } from '../../../context/ToastContext'
@@ -328,9 +328,20 @@ export function OrderDetailsDrawer({
               padding="none"
             >
               <div className="flex items-center gap-4">
-                <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(163,148,255,0.2)] text-[#a394ff]">
-                  <User size={19} aria-hidden />
-                </span>
+                {order.customerAvatar ? (
+                  <img
+                    src={order.customerAvatar}
+                    alt=""
+                    className="size-12 shrink-0 rounded-2xl object-cover"
+                  />
+                ) : (
+                  <span
+                    className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(163,148,255,0.2)] text-sm font-bold text-[#a394ff]"
+                    aria-hidden
+                  >
+                    {order.customerInitials}
+                  </span>
+                )}
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-base font-bold leading-6 text-white">
                     {order.customerName}

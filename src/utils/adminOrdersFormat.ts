@@ -218,6 +218,7 @@ export function mapApiOrderToAdminDetail(order: ApiAdminOrder): AdminOrderDetail
     customerName,
     customerEmail: user?.email?.trim() || null,
     customerPhone: user?.phone?.trim() || null,
+    customerAvatar: user?.avatar?.trim() || null,
     customerInitials: customerInitials(customerName === '—' ? '' : customerName),
     paymentMethod: order.paymentMethod ?? null,
     paymentProvider: order.paymentProvider ?? null,
