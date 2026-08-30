@@ -3267,6 +3267,24 @@
             "unknown": "Unable to delete the offer. Please try again."
           }
         },
+        "deleteAll": {
+          "action": "Delete All Offers",
+          "title": "Delete All Offers",
+          "description": "This will permanently remove every product offer.",
+          "countLabel": "{{count}} offer(s) will be deleted.",
+          "warning": "All offers will be permanently deleted. Discounted prices will be cleared from every affected product.",
+          "confirm": "Delete All Offers",
+          "deleting": "Deleting…",
+          "success": "Deleted {{count}} offer(s) successfully",
+          "errors": {
+            "badRequest": "Offers cannot be deleted right now.",
+            "unauthorized": "Your session expired. Please sign in again.",
+            "forbidden": "You do not have permission to delete offers.",
+            "conflict": "Offers cannot be deleted in their current state.",
+            "server": "A server error occurred while deleting offers.",
+            "unknown": "Unable to delete all offers. Please try again."
+          }
+        },
         "emptyTitle": "No offers yet",
         "emptyDescription": "Product offers will appear here once created.",
         "loadErrorTitle": "Unable to load offers",

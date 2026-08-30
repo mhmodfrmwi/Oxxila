@@ -2,7 +2,7 @@
 import { isAbortError } from '../lib/isAbortError'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { deleteAdminOffer, getAdminOffers } from '../api/admin/offers'
+import { deleteAdminOffer, deleteAllAdminOffers, getAdminOffers } from '../api/admin/offers'
 import { useToast } from '../context/ToastContext'
 import { ApiError } from '../lib/api'
 import type { ApiPagination } from '../lib/api'
@@ -29,6 +29,8 @@ export function useAdminOffers() {
   const [page, setPageState] = useState(DEFAULT_PAGE)
   const [deletingOfferId, setDeletingOfferId] = useState<string | null>(null)
   const deletingOfferIdRef = useRef<string | null>(null)
+  const [deletingAll, setDeletingAll] = useState(false)
+  const deletingAllRef = useRef(false)
   const [state, setState] = useState<AsyncState>({
     offers: [],
     pagination: null,
@@ -130,7 +132,7 @@ export function useAdminOffers() {
   /** Rethrows so the confirm dialog can surface a translated message inline. */
   const deleteOffer = useCallback(
     async (offerId: string) => {
-      if (deletingOfferIdRef.current) return
+      if (deletingOfferIdRef.current || deletingAllRef.current) return
       deletingOfferIdRef.current = offerId
       setDeletingOfferId(offerId)
 
@@ -151,6 +153,41 @@ export function useAdminOffers() {
     [reload, t, toast],
   )
 
+  /** Rethrows so the confirm dialog can surface a translated message inline. */
+  const deleteAllOffers = useCallback(async () => {
+    if (deletingAllRef.current || deletingOfferIdRef.current) return
+    deletingAllRef.current = true
+    setDeletingAll(true)
+
+    try {
+      const response = await deleteAllAdminOffers()
+      const deletedCount = response.data?.deletedCount ?? 0
+      setState((previous) => ({
+        ...previous,
+        offers: [],
+        pagination: previous.pagination
+          ? {
+              ...previous.pagination,
+              currentPage: 1,
+              numberOfPages: 1,
+              totalDocuments: 0,
+              nextPage: null,
+              prevPage: null,
+              results: 0,
+            }
+          : null,
+      }))
+      setPageState(DEFAULT_PAGE)
+      reload()
+      toast.success(
+        t('admin.settings.offers.deleteAll.success', { count: deletedCount }),
+      )
+    } finally {
+      deletingAllRef.current = false
+      setDeletingAll(false)
+    }
+  }, [reload, t, toast])
+
   return {
     offers: state.offers,
     pagination: state.pagination,
@@ -158,9 +195,11 @@ export function useAdminOffers() {
     error: state.error,
     page,
     deletingOfferId,
+    deletingAll,
     setPage,
     reload,
     upsertOffer,
     deleteOffer,
+    deleteAllOffers,
   }
 }

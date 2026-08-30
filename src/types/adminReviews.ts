@@ -67,6 +67,7 @@ export interface ApiAdminReviewDetail {
     images?: string[]
     price?: number
     priceAfterDiscount?: number | null
+    offerEndsAt?: string | null
   } | null
 }
 

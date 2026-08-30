@@ -10,6 +10,7 @@ import { Button } from '../../ui/Button'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { DataTable, type DataTableColumn } from '../ui/DataTable'
 import { EmptyState } from '../ui/EmptyState'
+import { DeleteAllOffersDialog } from './DeleteAllOffersDialog'
 import { DeleteOfferDialog } from './DeleteOfferDialog'
 import { OfferDrawer } from './OfferDrawer'
 
@@ -26,15 +27,18 @@ export function OffersManagerCard() {
     error,
     page,
     deletingOfferId,
+    deletingAll,
     setPage,
     reload,
     upsertOffer,
     deleteOffer,
+    deleteAllOffers,
   } = useAdminOffers()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerMode, setDrawerMode] = useState<OfferDrawerMode>('create')
   const [editOfferId, setEditOfferId] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AdminOfferRow | null>(null)
+  const [deleteAllOpen, setDeleteAllOpen] = useState(false)
 
   const openCreate = useCallback(() => {
     setDrawerMode('create')
@@ -59,6 +63,14 @@ export function OffersManagerCard() {
 
   const closeDelete = useCallback(() => {
     setDeleteTarget(null)
+  }, [])
+
+  const openDeleteAll = useCallback(() => {
+    setDeleteAllOpen(true)
+  }, [])
+
+  const closeDeleteAll = useCallback(() => {
+    setDeleteAllOpen(false)
   }, [])
 
   const handleSaved = useCallback(
@@ -172,8 +184,10 @@ export function OffersManagerCard() {
   const staleError = Boolean(error) && offers.length > 0
   const currentPage = pagination?.currentPage ?? page
   const totalPages = Math.max(pagination?.numberOfPages ?? 1, 1)
+  const totalOffers = pagination?.totalDocuments ?? offers.length
   const canGoPrev = currentPage > 1
   const canGoNext = currentPage < totalPages && totalPages > 1
+  const canDeleteAll = !loading && !deletingAll && totalOffers > 0
 
   if (failed) {
     return (
@@ -220,17 +234,32 @@ export function OffersManagerCard() {
             <h3 className="admin-card-title">
               {t('admin.settings.offers.title')}
             </h3>
-            <button
-              type="button"
-              onClick={openCreate}
-              className={cn(
-                'text-sm font-semibold text-[#a394ff]',
-                'transition-opacity hover:opacity-80',
-                focusRingClasses,
-              )}
-            >
-              {t('admin.settings.offers.createOffer')}
-            </button>
+            <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+              <button
+                type="button"
+                onClick={openDeleteAll}
+                disabled={!canDeleteAll}
+                className={cn(
+                  'text-sm font-semibold text-support-error',
+                  'transition-opacity hover:opacity-80',
+                  'disabled:pointer-events-none disabled:opacity-40',
+                  focusRingClasses,
+                )}
+              >
+                {t('admin.settings.offers.deleteAll.action')}
+              </button>
+              <button
+                type="button"
+                onClick={openCreate}
+                className={cn(
+                  'text-sm font-semibold text-[#a394ff]',
+                  'transition-opacity hover:opacity-80',
+                  focusRingClasses,
+                )}
+              >
+                {t('admin.settings.offers.createOffer')}
+              </button>
+            </div>
           </div>
         }
         footer={
@@ -279,6 +308,14 @@ export function OffersManagerCard() {
         submitting={deleteTarget != null && deletingOfferId === deleteTarget.id}
         onClose={closeDelete}
         onConfirm={deleteOffer}
+      />
+
+      <DeleteAllOffersDialog
+        open={deleteAllOpen}
+        submitting={deletingAll}
+        offerCount={totalOffers}
+        onClose={closeDeleteAll}
+        onConfirm={deleteAllOffers}
       />
     </>
   )

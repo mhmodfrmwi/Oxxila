@@ -175,7 +175,11 @@ export function mapApiProductToProductDetail(product: ApiProduct): ProductDetail
     tags: buildTags(product),
     stockCount: product.stock ?? 0,
     deliveryEstimate,
-    discountPercent: resolveDiscountPercent(product.price, product.priceAfterDiscount),
+    discountPercent: resolveDiscountPercent(
+      product.price,
+      product.priceAfterDiscount,
+      product.offerEndsAt,
+    ),
   }
 }
 

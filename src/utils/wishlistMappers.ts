@@ -11,6 +11,7 @@ function toApiProductShape(product: WishlistProduct): ApiProduct {
     images: product.images ?? [],
     price: product.price,
     priceAfterDiscount: product.priceAfterDiscount ?? null,
+    offerEndsAt: product.offerEndsAt ?? null,
     slug: product.slug,
     concerns: [],
     isBestSeller: product.isBestSeller ?? false,

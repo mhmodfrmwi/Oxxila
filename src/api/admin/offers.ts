@@ -90,3 +90,12 @@ export function deleteAdminOffer(
     signal: options?.signal,
   })
 }
+
+/** DELETE /api/v1/offers — remove every offer and clear product discounts. */
+export function deleteAllAdminOffers(options?: { signal?: AbortSignal }) {
+  return apiRequest<{ deletedCount: number }>('/offers', {
+    method: 'DELETE',
+    auth: true,
+    signal: options?.signal,
+  })
+}

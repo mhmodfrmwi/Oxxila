@@ -10,6 +10,7 @@ export type WishlistProduct = Pick<
   | 'images'
   | 'price'
   | 'priceAfterDiscount'
+  | 'offerEndsAt'
   | 'stock'
   | 'isActive'
 > &

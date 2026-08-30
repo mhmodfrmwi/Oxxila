@@ -88,9 +88,10 @@ export function mapApiReviewToAdminDetail(
       name: review.product?.name?.trim() || '—',
       image: productImage,
       price:
-        review.product?.priceAfterDiscount ??
-        review.product?.price ??
-        null,
+        review.product?.offerEndsAt &&
+        new Date(review.product.offerEndsAt).getTime() > Date.now()
+          ? (review.product?.priceAfterDiscount ?? review.product?.price ?? null)
+          : (review.product?.price ?? null),
     },
   }
 }
