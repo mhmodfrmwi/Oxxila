@@ -46,10 +46,8 @@ export interface PaymentSessionResponse {
   provider: 'stripe' | 'paymob'
   totalPrice: number
   expiresAt: string
-  /** Stripe Checkout Session URL */
-  url?: string
-  /** Paymob hosted iframe URL */
-  iframeUrl?: string
+  /** Stripe Checkout or Paymob Unified Checkout URL */
+  url: string
 }
 
 export function createCodOrder(

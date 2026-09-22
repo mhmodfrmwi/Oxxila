@@ -259,8 +259,7 @@ pollPaymentSession(id: string) {
 ```typescript
 export interface PaymentSessionDto {
   sessionId: string;
-  url: string;       // Stripe
-  iframeUrl?: string; // Paymob
+  url: string; // Stripe Checkout or Paymob Unified Checkout
 }
 
 export interface PaymentSessionStatusDto {

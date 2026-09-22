@@ -455,9 +455,7 @@ export function usePaymentPage() {
         addressId: selectedAddressId,
       })
       const paymentSessionId = String(response.data?.paymentSessionId ?? '').trim()
-      // Stripe returns `url`; Paymob returns `iframeUrl`
-      const checkoutUrl =
-        response.data?.url?.trim() || response.data?.iframeUrl?.trim() || ''
+      const checkoutUrl = response.data?.url?.trim() || ''
       if (!paymentSessionId || !checkoutUrl) {
         throw new ApiError('Payment provider did not return a checkout URL', 502)
       }

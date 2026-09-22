@@ -131,7 +131,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...rest,
     headers: requestHeaders,
-    credentials: withCredentials ? 'include' : 'same-origin',
+    credentials: 'include',
     body:
       body === undefined
         ? undefined
