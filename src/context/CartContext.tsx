@@ -157,7 +157,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, user } = useAuth()
   const userId = user?.id ?? null
   const toast = useToast()
-  const [serverCart, setServerCart] = useState<ApiCart | null>(null)
+  const [serverCart, setServerCartRaw] = useState<ApiCart | null>(null)
+  // Accounts with older carts can hold lines whose product was since deleted (product: null) or
+  // that lack image data; drop/patch those so one bad line can't blank the whole app.
+  const setServerCart = useCallback((next: ApiCart | null) => {
+    setServerCartRaw(
+      next
+        ? {
+            ...next,
+            couponCode: next.couponCode ?? null,
+            subtotal: next.subtotal ?? 0,
+            totalPrice: next.totalPrice ?? 0,
+            discountAmount: next.discountAmount ?? 0,
+            storeCreditBalance: next.storeCreditBalance ?? 0,
+            storeCreditApplied: next.storeCreditApplied ?? 0,
+            items: (next.items ?? [])
+              .filter((item) => item && item._id && item.product)
+              .map((item) => ({
+                ...item,
+                product: { ...item.product, images: item.product.images ?? [], stock: item.product.stock ?? 0 },
+              })),
+          }
+        : null,
+    )
+  }, [])
   const [guestLines, setGuestLines] = useState<GuestCartLine[]>(readGuestLines)
   // null until the guest lines are priced — the page shows a skeleton, never a false "empty" cart.
   const [guestCart, setGuestCart] = useState<ApiCart | null>(null)

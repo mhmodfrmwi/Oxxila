@@ -37,6 +37,7 @@ import {
   WISHLIST_PATH,
   ADMIN_PATH,
 } from './config/routes'
+import { AppErrorBoundary } from './components/ui/AppErrorBoundary'
 import { AppRouteFallback } from './components/ui/AppRouteFallback'
 
 const RequireAdmin = lazy(() =>
@@ -232,6 +233,7 @@ const AdminActivityLogPage = lazy(() =>
 
 export default function App() {
   return (
+    <AppErrorBoundary>
     <Suspense fallback={<AppRouteFallback />}>
       <Routes>
         <Route path={HOME_PATH} element={<LandingPage />} />
@@ -312,5 +314,6 @@ export default function App() {
         </Route>
       </Routes>
     </Suspense>
+    </AppErrorBoundary>
   )
 }
