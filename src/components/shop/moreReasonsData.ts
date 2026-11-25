@@ -1,9 +1,9 @@
 // src/components/shop/moreReasonsData.ts
-import promoNewArrivals from '../../assets/shop/more-reasons/new-arrivals.png'
-import promoBestSellers from '../../assets/shop/more-reasons/best-sellers.png'
-import promoTopRated from '../../assets/shop/more-reasons/top-rated.png'
-import promoOffers from '../../assets/shop/more-reasons/offers-discounts.png'
-import promoDermatologist from '../../assets/shop/more-reasons/dermatologist.png'
+import promoNewArrivals from '../../assets/shop/more-reasons/new-arrivals.webp'
+import promoBestSellers from '../../assets/shop/more-reasons/best-sellers.webp'
+import promoTopRated from '../../assets/shop/more-reasons/top-rated.webp'
+import promoOffers from '../../assets/shop/more-reasons/offers-discounts.webp'
+import promoDermatologist from '../../assets/shop/more-reasons/dermatologist.webp'
 import { getCollectionHref } from '../../config/collections'
 
 export type PromotionLayout = 'compact' | 'tall' | 'wide'

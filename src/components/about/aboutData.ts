@@ -13,8 +13,8 @@ import {
   Truck,
   Warehouse,
 } from 'lucide-react'
-import aboutHeroImage from '../../assets/about/about-hero.jpg'
-import aboutSphereImage from '../../assets/about/about-sphere.png'
+import aboutHeroImage from '../../assets/about/about-hero.webp'
+import aboutSphereImage from '../../assets/about/about-sphere.webp'
 
 export { aboutHeroImage, aboutSphereImage }
 

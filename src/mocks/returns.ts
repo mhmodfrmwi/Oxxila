@@ -11,15 +11,15 @@
  */
 import type { EligibleReturnOrder, ReturnRequest } from '../api/returns'
 import type { ShippingDistrict, ShippingGovernorate } from '../api/shipping'
-import ctaProduct1 from '../assets/landing/sections/cta-image0_110_5881.png'
-import ctaProduct2 from '../assets/landing/sections/cta-image1_110_5881.png'
+import ctaProduct1 from '../assets/landing/sections/cta-image0_110_5881.webp'
+import ctaProduct2 from '../assets/landing/sections/cta-image1_110_5881.webp'
 import ctaProduct3 from '../assets/landing/sections/cta-image2_110_5881.jpg'
 import ctaProduct4 from '../assets/landing/sections/cta-image3_110_5881.jpg'
-import ctaProduct5 from '../assets/landing/sections/cta-image4_110_5881.png'
-import heroProductLeft from '../assets/landing/sections/hero-image3_110_4575.png'
-import heroProductRight from '../assets/landing/sections/hero-image2_110_4575.png'
+import ctaProduct5 from '../assets/landing/sections/cta-image4_110_5881.webp'
+import heroProductLeft from '../assets/landing/sections/hero-image3_110_4575.webp'
+import heroProductRight from '../assets/landing/sections/hero-image2_110_4575.webp'
 import concernAcne from '../assets/landing/image0_47_362.png'
-import concernPigmentation from '../assets/landing/image1_47_362.jpg'
+import concernPigmentation from '../assets/landing/image1_47_362.webp'
 import concernSensitive from '../assets/landing/image2_47_362.png'
 
 const img = {

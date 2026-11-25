@@ -1,5 +1,5 @@
 // src/utils/skinConcernImages.ts
-import concernAcne from '../assets/landing/image5_47_362.png'
+import concernAcne from '../assets/landing/image5_47_362.webp'
 import concernPigmentation from '../assets/landing/frame.svg'
 import concernSensitive from '../assets/landing/frame2.svg'
 import concernDrought from '../assets/landing/frame3.svg'

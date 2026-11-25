@@ -44,7 +44,7 @@ export function mapBannerToShopHeroSlide(
   const title = banner.title?.trim()
   return {
     id: banner.id,
-    image: resolveProductImageUrl(banner.image),
+    image: resolveProductImageUrl(banner.image, 1400),
     imageAlt: title || 'Promotional banner',
     href: resolveBannerHref(banner, categories),
   }

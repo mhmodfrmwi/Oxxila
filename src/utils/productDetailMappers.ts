@@ -34,7 +34,7 @@ function parseDelimitedList(value: string | undefined | null): string[] {
 function mapImages(images: readonly string[], productName: string): ProductImage[] {
   const sources = images.length > 0 ? images : ['']
   return sources.map((src, index) => ({
-    src: resolveProductImageUrl(src),
+    src: resolveProductImageUrl(src, 1200),
     alt: index === 0 ? `${productName} — front` : `${productName} — view ${index + 1}`,
   }))
 }
