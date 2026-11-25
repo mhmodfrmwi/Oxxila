@@ -181,11 +181,12 @@ export function FilterSidebar({
 
   return (
     <>
-      {/* Desktop sidebar — full page height, page scrolls (no inner scrollbar) */}
+      {/* Desktop sidebar — pinned while the product grid scrolls; scrolls on its own when taller than the screen */}
       <aside
         className={cn(
           'hidden w-full shrink-0 lg:block lg:max-w-[24.25rem]',
           'lg:rounded-small lg:bg-card lg:p-medium',
+          'lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100dvh-2rem)] lg:overflow-y-auto lg:overscroll-contain',
           className,
         )}
         aria-label={t('catalogBrowse.filters')}
