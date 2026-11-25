@@ -39,25 +39,30 @@ export function useLandingCatalog(): LandingCatalogState {
 
     async function loadCatalog() {
       try {
-        const [productsResponse, categoriesResponse, brandsResponse, bestSellersResponse] =
-          await Promise.all([
-            getProducts({ limit: 100 }),
-            getCategories({ limit: 100 }),
-            getBrands({ limit: 100 }),
-            getProducts({ isBestSeller: true, limit: 5 }),
-          ])
+        // Independent requests: one slow/failed call must not blank the others (e.g. brands).
+        const results = await Promise.allSettled([
+          getProducts({ limit: 100 }),
+          getCategories({ limit: 100 }),
+          getBrands({ limit: 100 }),
+          getProducts({ isBestSeller: true, limit: 5 }),
+        ])
 
         if (cancelled) return
 
-        const products = productsResponse.data ?? []
-        const bestSellerProducts = bestSellersResponse.data ?? []
+        const failed = results.filter((result) => result.status === 'rejected')
+        if (failed.length === results.length) throw (failed[0] as PromiseRejectedResult).reason
+
+        const [productsResult, categoriesResult, brandsResult, bestSellersResult] = results
+        const products = productsResult.status === 'fulfilled' ? (productsResult.value.data ?? []) : []
+        const bestSellerProducts =
+          bestSellersResult.status === 'fulfilled' ? (bestSellersResult.value.data ?? []) : []
 
         setState({
           loading: false,
           error: null,
           products,
-          categories: categoriesResponse.data ?? [],
-          brands: brandsResponse.data ?? [],
+          categories: categoriesResult.status === 'fulfilled' ? (categoriesResult.value.data ?? []) : [],
+          brands: brandsResult.status === 'fulfilled' ? (brandsResult.value.data ?? []) : [],
           bestSellers: buildBestSellers(bestSellerProducts.length > 0 ? bestSellerProducts : products),
           skinConcerns: buildSkinConcerns(),
           featuredImages: buildFeaturedImages(products),
