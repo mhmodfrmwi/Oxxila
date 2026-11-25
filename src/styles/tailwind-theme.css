@@ -3,9 +3,48 @@
 @theme inline {
   --font-sans: var(--font-family-base);
   --font-serif: var(--font-family-base);
+  --font-display: var(--font-family-display);
 
+  /* Figma type scale — "Base" stays on body only since text-base is a Tailwind default. */
+  --text-heading-1: var(--font-size-heading-1);
+  --text-heading-1--line-height: var(--line-height-heading-1);
+  --text-heading-2: var(--font-size-heading-2);
+  --text-heading-2--line-height: var(--line-height-heading-2);
+  --text-heading-3: var(--font-size-heading-3);
+  --text-heading-3--line-height: var(--line-height-heading-3);
+  --text-heading-4: var(--font-size-heading-4);
+  --text-heading-4--line-height: var(--line-height-heading-4);
+  --text-heading-5: var(--font-size-heading-5);
+  --text-heading-5--line-height: var(--line-height-heading-5);
+  --text-heading-6: var(--font-size-heading-6);
+  --text-heading-6--line-height: var(--line-height-heading-6);
+  --text-extra-large: var(--font-size-extra-large);
+  --text-extra-large--line-height: var(--line-height-extra-large);
+  --text-large: var(--font-size-large);
+  --text-large--line-height: var(--line-height-large);
   --text-small: var(--font-size-small);
   --text-small--line-height: var(--line-height-small);
+  --text-extra-small: var(--font-size-extra-small);
+  --text-extra-small--line-height: var(--line-height-extra-small);
+
+  /* Figma Responsive/breakpoint — additive; Tailwind's default sm…2xl are untouched. */
+  --breakpoint-tablet: 48rem;
+  --breakpoint-desktop: 90rem;
+
+  /* Figma Numbers/Gaps */
+  --spacing-extra-small: var(--gap-extra-small);
+  --spacing-small: var(--gap-small);
+  --spacing-medium: var(--gap-medium);
+  --spacing-large: var(--gap-large);
+  --spacing-extra-large: var(--gap-extra-large);
+  --spacing-huge: var(--gap-huge);
+
+  /* Figma Numbers/Corners */
+  --radius-extra-small: var(--corner-extra-small);
+  --radius-small: var(--corner-small);
+  --radius-medium: var(--corner-medium);
+  --radius-large: var(--corner-large);
+  --radius-extra-large: var(--corner-extra-large);
 
   /* Backgrounds */
   --color-background: var(--background);
@@ -95,17 +134,8 @@ html[dir='rtl'] .marquee-track.animate-marquee {
 }
 
 @utility container-content {
-  margin-inline: auto;
-  max-width: 1340px;
-  padding-inline: 1rem;
-
-  @media (width >= 640px) {
-    padding-inline: 1.25rem;
-  }
-
-  @media (width >= 1024px) {
-    padding-inline: 1.5rem;
-  }
+  width: 100%;
+  padding-inline: var(--page-gutter);
 }
 
 /** Typography/small — buttons & nav links */
@@ -114,6 +144,6 @@ html[dir='rtl'] .marquee-track.animate-marquee {
   font-size: var(--font-size-small);
   line-height: var(--line-height-small);
   font-weight: var(--font-weight-regular);
-  letter-spacing: 0;
+  letter-spacing: var(--letter-spacing-base);
   text-align: center;
 }

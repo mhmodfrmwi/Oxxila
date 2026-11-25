@@ -1,29 +1,31 @@
 /**
  * Oxilla design tokens — source of truth from Figma.
+ * Colors mirror the "Colors Variables" collection (Light / Dark modes); names noted where they differ.
  * Theme colors apply ONLY via [data-theme] on <html> (see src/theme/applyTheme.ts).
  * Do not pair :root with light tokens — it leaks light values when data-theme="dark".
+ * Tokens marked "project-only" have no Figma variable; keep them until the design defines one.
  */
 
 [data-theme='light'] {
   color-scheme: light;
 
   /* Background */
-  --background: #f5f6ff;
-  --card-background: #ffffff;
-  --surface-muted: #e8e4f0;
-  --surface-subtle: #f7f7fb;
-  --input-background: #f0edff;
+  --background: #f5f6ff; /* Background/background-color */
+  --card-background: #ffffff; /* Background/card-on-background */
+  --surface-muted: #e8e4f0; /* project-only */
+  --surface-subtle: #f7f7fb; /* project-only */
+  --input-background: #f0edff; /* project-only */
 
   /* Text */
   --primary-text: #5d5a88;
   --secondary-text: #9491b8;
-  --placeholder-text: #cccccc;
-  --helper-text: #b5b5b5;
+  --placeholder-text: #b3b3b3; /* Typography/text-placeholder */
+  --helper-text: #b5b5b5; /* Typography/text-helper */
   --text-on-color: #ffffff;
 
   /* Border */
-  --border-interactive: #464646;
-  --border-subtle: #e5e7eb;
+  --border-interactive: #cacaca;
+  --border-subtle: #e5e7eb; /* project-only */
 
   /* Links */
   --primary-link: #0280e0;
@@ -50,7 +52,7 @@
   --support-warning: #f1c21b;
   --support-info: #0043ce;
 
-  /* Brand accents */
+  /* Brand accents — project-only */
   --accent: #7b65fb;
   --accent-muted: #c0b5de;
   --accent-soft: #8b7cf8;
@@ -68,8 +70,8 @@
   --input-background: #171b2e;
 
   /* Text */
-  --primary-text: #c0bcf2;
-  --secondary-text: #9a9a9a;
+  --primary-text: #ffffff;
+  --secondary-text: #aea7ff;
   --placeholder-text: #cccccc;
   --helper-text: #b5b5b5;
   --text-on-color: #ffffff;
@@ -108,4 +110,54 @@
   --accent-muted: #9886ff;
   --accent-soft: #a78bfa;
   --accent-glow: rgb(123 101 251 / 0.25);
+}
+
+/* Theme-independent dimension tokens — Figma "Numbers" + "Responsive" collections. */
+:root {
+  /* Numbers/Corners */
+  --corner-extra-small: 8px;
+  --corner-small: 16px;
+  --corner-medium: 24px;
+  --corner-large: 50px;
+  --corner-extra-large: 100px;
+
+  /* Numbers/Gaps */
+  --gap-extra-small: 8px;
+  --gap-small: 16px;
+  --gap-medium: 24px;
+  --gap-large: 32px;
+  --gap-extra-large: 40px;
+  --gap-huge: 80px;
+
+  /* Page side padding: Figma's 80px at 1440 wide, kept proportional on every screen. */
+  --page-gutter: max(16px, calc(100vw * 80 / 1440));
+
+  /* Catalog product grid — Figma 413:16491 / mobile 413:19442 */
+  --catalog-card-gap: 12px;
+  --catalog-sidebar-width: 24.25rem; /* 388px */
+  --catalog-card-shadow: 0 10px 28px -18px rgb(0 0 0 / 0.18);
+  --catalog-card-shadow-dark: 0 10px 28px -16px rgb(0 0 0 / 0.55);
+
+  /* Responsive/Grid — Mobile mode */
+  --grid-columns: 4;
+  --grid-margin: 16px;
+  --grid-gutter: 8px;
+}
+
+/* Tablet — mirrors --breakpoint-tablet */
+@media (width >= 768px) {
+  :root {
+    --grid-columns: 8;
+    --grid-margin: 24px;
+    --grid-gutter: 16px;
+  }
+}
+
+/* Desktop — mirrors --breakpoint-desktop */
+@media (width >= 1440px) {
+  :root {
+    --grid-columns: 12;
+    --grid-margin: 80px;
+    --grid-gutter: 16px;
+  }
 }

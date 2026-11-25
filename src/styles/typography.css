@@ -1,35 +1,278 @@
 /**
- * Typography tokens — Playfair Display is the global font family.
+ * Typography tokens — Figma "Responsive/Text/*" + "Tokens/Typography/*" scale.
+ * Font families intentionally override Figma: Nohemi (Latin text), Soligant (Latin headings),
+ * IBM Plex Sans Arabic (Arabic).
  * Font tokens are theme-independent; color tokens live in tokens.css.
- * New York is scoped to the landing hero only (see .font-hero).
  */
 
+/*
+ * Nohemi — freeware by Rajesh Rajput (personal + commercial use, no redistribution).
+ * Served as WOFF: the license forbids modifying the files, so no WOFF2 conversion.
+ */
 @font-face {
-  font-family: 'New York';
-  src: url('/fonts/new-york.otf') format('opentype');
+  font-family: 'Nohemi';
+  src: url('/fonts/nohemi/Nohemi-Thin.woff') format('woff');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/nohemi/Nohemi-ExtraLight.woff') format('woff');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/nohemi/Nohemi-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/nohemi/Nohemi-Regular.woff') format('woff');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/nohemi/Nohemi-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/nohemi/Nohemi-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/nohemi/Nohemi-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/nohemi/Nohemi-ExtraBold.woff') format('woff');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/nohemi/Nohemi-Black.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * Soligant — display face for headings / hero only (©ReyreyBlue, commercial license required).
+ * TODO: confirm the project holds a commercial web license for Soligant.
+ * Single Regular cut; the 100–900 range stops browsers from synthesizing a faux bold.
+ * The file maps ASCII punctuation (& ? . - …) to empty glyphs, so unicode-range keeps it to letters,
+ * digits and space and lets punctuation fall back to the serif display stack instead of vanishing.
+ */
+@font-face {
+  font-family: 'Soligant';
+  src: url('/fonts/soligant/Soligant.otf') format('opentype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020, U+0030-0039, U+0041-005A, U+0061-007A;
+}
+
+/*
+ * IBM Plex Sans Arabic (OFL-1.1, @ibm/plex-sans-arabic 1.1.0). Upright only — no italics exist.
+ * unicode-range limits it to Arabic script so Latin glyphs always resolve to Nohemi, in any locale.
+ */
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic/IBMPlexSansArabic-Thin.woff2') format('woff2');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+2010-2011, U+204F, U+2E41,
+    U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic/IBMPlexSansArabic-ExtraLight.woff2') format('woff2');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+2010-2011, U+204F, U+2E41,
+    U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic/IBMPlexSansArabic-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+2010-2011, U+204F, U+2E41,
+    U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic/IBMPlexSansArabic-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+2010-2011, U+204F, U+2E41,
+    U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic/IBMPlexSansArabic-Text.woff2') format('woff2');
+  font-weight: 450;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+2010-2011, U+204F, U+2E41,
+    U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic/IBMPlexSansArabic-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+2010-2011, U+204F, U+2E41,
+    U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic/IBMPlexSansArabic-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+2010-2011, U+204F, U+2E41,
+    U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  src: url('/fonts/ibm-plex-sans-arabic/IBMPlexSansArabic-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+2010-2011, U+204F, U+2E41,
+    U+FB50-FDFF, U+FE70-FEFF;
+}
+
 :root {
-  --font-family-base: 'Playfair Display', Georgia, serif;
+  --font-family-latin: 'Nohemi';
+  --font-family-latin-display: 'Soligant';
+  --font-family-arabic: 'IBM Plex Sans Arabic';
+  --font-family-fallback: system-ui, -apple-system, 'Segoe UI', Roboto, Tahoma, Arial, sans-serif;
+  --font-family-fallback-display: Georgia, 'Times New Roman', serif;
+
+  /* Mixed content resolves per glyph: Latin → Nohemi / Soligant, Arabic → IBM Plex Sans Arabic. */
+  --font-family-base: var(--font-family-latin), var(--font-family-arabic),
+    var(--font-family-fallback);
+  --font-family-display: var(--font-family-latin-display), var(--font-family-arabic),
+    var(--font-family-fallback-display);
+
+  /* Legacy aliases — consumed by Tailwind font-serif, .font-hero and feature stylesheets. */
   --font-family-serif: var(--font-family-base);
-  --font-family-display: var(--font-family-base);
-  --font-family-hero: 'New York', Georgia, 'Times New Roman', serif;
-
-  --font-size-base: 1.25rem;
-  --line-height-base: 1.2;
-
-  /* Typography/small — buttons, nav links */
+  --font-family-hero: var(--font-family-display);
   --font-family-small: var(--font-family-base);
-  --font-size-small: 1rem;
-  --line-height-small: 1.2;
 
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+
+  /* Figma text styles all use 0% letter spacing. */
+  --letter-spacing-base: 0;
+
+  /* Figma "Responsive" collection — Mobile mode (< 768px) */
+  --font-size-heading-1: 2.25rem; /* 36 */
+  --font-size-heading-2: 2rem; /* 32 */
+  --font-size-heading-3: 1.75rem; /* 28 */
+  --font-size-heading-4: 1.5625rem; /* 25 */
+  --font-size-heading-5: 1.375rem; /* 22 */
+  --font-size-heading-6: 1.25rem; /* 20 */
+  --font-size-extra-large: 1.125rem; /* 18 */
+  --font-size-large: 1rem; /* 16 */
+  --font-size-base: 0.9375rem; /* 15 */
+  --font-size-small: 0.875rem; /* 14 — buttons, nav links */
+  --font-size-extra-small: 0.75rem; /* 12 */
+
+  --line-height-heading-1: 1.2;
+  --line-height-heading-2: 1.5;
+  --line-height-heading-3: 1.5;
+  --line-height-heading-4: 1.5;
+  --line-height-heading-5: 1.5;
+  --line-height-heading-6: 1.5;
+  --line-height-extra-large: 1.2;
+  --line-height-large: 1.2;
+  --line-height-base: 1.2;
+  --line-height-small: 1.2;
+  --line-height-extra-small: 1.2;
+}
+
+/* Arabic-first stack so system fallbacks prefer Arabic faces; glyph routing is unchanged. */
+:root:lang(ar) {
+  --font-family-base: var(--font-family-arabic), var(--font-family-latin),
+    var(--font-family-fallback);
+  --font-family-display: var(--font-family-arabic), var(--font-family-latin-display),
+    var(--font-family-fallback-display);
+}
+
+/* Tablet mode — mirrors --breakpoint-tablet (Figma Responsive/breakpoint = 768) */
+@media (width >= 768px) {
+  :root {
+    --font-size-heading-1: 2.75rem; /* 44 */
+    --font-size-heading-2: 2.4375rem; /* 39 */
+    --font-size-heading-3: 2.1875rem; /* 35 */
+    --font-size-heading-4: 1.9375rem; /* 31 */
+    --font-size-heading-5: 1.75rem; /* 28 */
+    --font-size-heading-6: 1.5625rem; /* 25 */
+    --font-size-extra-large: 1.375rem; /* 22 */
+    --font-size-large: 1.25rem; /* 20 */
+    --font-size-base: 1.125rem; /* 18 */
+    --font-size-small: 1rem; /* 16 */
+    --font-size-extra-small: 0.875rem; /* 14 */
+  }
+}
+
+/* Desktop mode — mirrors --breakpoint-desktop (Figma Responsive/breakpoint = 1440) */
+@media (width >= 1440px) {
+  :root {
+    --font-size-heading-1: 3.25rem; /* 52 */
+    --font-size-heading-2: 2.875rem; /* 46 */
+    --font-size-heading-3: 2.5625rem; /* 41 */
+    --font-size-heading-4: 2.25rem; /* 36 */
+    --font-size-heading-5: 2rem; /* 32 */
+    --font-size-heading-6: 1.8125rem; /* 29 */
+    --font-size-extra-large: 1.625rem; /* 26 */
+    --font-size-large: 1.4375rem; /* 23 */
+    --font-size-base: 1.25rem; /* 20 */
+    --font-size-small: 1.125rem; /* 18 */
+    --font-size-extra-small: 1rem; /* 16 */
+  }
 }
 
 .font-hero {

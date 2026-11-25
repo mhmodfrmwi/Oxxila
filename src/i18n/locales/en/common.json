@@ -1,8 +1,8 @@
 {
   "nav": {
     "home": "Home",
-    "shop": "Shop",
-    "categories": "Categories",
+    "shop": "Explore",
+    "categories": "Products",
     "docs": "Docs",
     "cart": "Cart",
     "profile": "Profile",
@@ -38,7 +38,23 @@
   },
   "search": {
     "label": "Search",
-    "placeholder": "Search for..."
+    "placeholder": "Search for...",
+    "popular": "Popular right now",
+    "recent": "Recent searches",
+    "clear": "Clear search",
+    "suggestions": "Search suggestions",
+    "brand": "Brand",
+    "category": "Category",
+    "noMatches": "We couldn't find “{{query}}”. Try another word, or browse everything below.",
+    "seeAll": "See all results for “{{query}}”",
+    "browseAll": "Browse our products",
+    "page": {
+      "title": "Search products",
+      "resultsFor": "Results for {{terms}}",
+      "empty": "Type in the search bar above, or browse by skin concern from the shop page.",
+      "noResults": "We couldn't find any matching products.",
+      "noResultsHint": "Check the spelling, try a more general word, or browse the full catalog."
+    }
   },
   "language": {
     "label": "Language",
@@ -47,7 +63,9 @@
     "switcher": "Language switcher"
   },
   "theme": {
-    "changeTheme": "Change Theme"
+    "changeTheme": "Change Theme",
+    "light": "Light",
+    "dark": "Dark"
   },
   "footer": {
     "description": "Discover clinically proven skincare products designed to help you achieve healthy, glowing skin.",
@@ -219,9 +237,6 @@
       "previousSlide": "Previous slide",
       "nextSlide": "Next slide"
     },
-    "trustedBy": {
-      "ariaLabel": "Trusted by leading companies"
-    },
     "skinConcerns": {
       "title": "Shop by skin concern",
       "titleCompact": "Skin concerns",
@@ -238,7 +253,7 @@
     },
     "bestSellers": {
       "title": "Oxxila best seller",
-      "subtitle": "Our most loved products, trusted by thousands",
+      "subtitle": "Our most-loved products, trusted by thousands",
       "badge": "Best seller",
       "viewAll": "View all products",
       "carouselAria": "Product carousel",
@@ -293,7 +308,58 @@
     "typeOfCategory": "Type of Category",
     "chooseCategoryFirst": "Choose a category first",
     "loadingTypes": "Loading types…",
-    "noTypes": "No types available."
+    "noTypes": "No types available.",
+    "showMore": "more",
+    "priceAll": "All",
+    "priceLowToHigh": "Low to high",
+    "priceHighToLow": "High to low",
+    "availableOnly": "Available only",
+    "ratingAria": "{{rating}} star rating and up",
+    "sections": {
+      "sensitivity": "Sensitivity",
+      "categories": "Categories",
+      "concerns": "Concerns",
+      "offers": "Offers",
+      "brand": "Brand",
+      "price": "Price",
+      "productRating": "Product Rating",
+      "availability": "Availability"
+    },
+    "options": {
+      "sensitivity": {
+        "sensitiveSkin": "Sensitive Skin"
+      },
+      "concerns": {
+        "acne": "Acne",
+        "pigmentation": "Pigmentation",
+        "sensitiveSkin": "Sensitive Skin",
+        "dryness": "Dryness",
+        "wrinkles": "Wrinkles",
+        "widePores": "Wide Pores"
+      },
+      "offers": {
+        "onSale": "On Sale",
+        "bestSeller": "Best Seller",
+        "todayOffers": "Today's Offers"
+      }
+    }
+  },
+  "breadcrumb": {
+    "aria": "Breadcrumb",
+    "home": "Home",
+    "categories": "Categories"
+  },
+  "categoriesLanding": {
+    "title": "Categories",
+    "subtitle": "Browse our full catalog by category.",
+    "noCategories": "No categories available."
+  },
+  "catalogCollections": {
+    "newArrivals": "New Arrivals",
+    "bestSellers": "Best Sellers",
+    "trending": "Trending",
+    "offers": "Offers",
+    "featured": "Featured"
   },
   "categorySort": {
     "label": "Sort products",
@@ -301,6 +367,26 @@
     "priceAsc": "Price: Low to High",
     "priceDesc": "Price: High to Low",
     "rating": "Top Rated"
+  },
+  "catalogBrowse": {
+    "filters": "Filters",
+    "clearAll": "Clear all",
+    "applyFilters": "Apply",
+    "closeFilters": "Close filters",
+    "openFilters": "Open filters",
+    "activeFilters": "{{count}} active",
+    "resultsRange": "Showing {{from}}–{{to}} of {{total}} products",
+    "resultsRangeNamed": "Showing {{from}}–{{to}} of {{total}} for “{{query}}”",
+    "paginationAria": "Product pages",
+    "back": "Back",
+    "next": "Next",
+    "page": "Page {{number}}",
+    "empty": "No products found.",
+    "loadError": "Unable to load products.",
+    "categoryNotFound": "Category not found.",
+    "browsingHistoryTitle": "For customers who viewed the goods in your browsing history also saw",
+    "relatedBrowsingTitle": "Previously browsed related",
+    "browsingHistoryAria": "Browsing history products"
   },
   "utilityBar": {
     "fallbacks": {
@@ -311,6 +397,14 @@
       "returns": {
         "title": "Return within 20 days",
         "subtitle": "from purchase date"
+      },
+      "trusted": {
+        "title": "Dermatologist-trusted skincare",
+        "subtitle": "Authentic products only"
+      },
+      "delivery": {
+        "title": "Fast delivery across Egypt",
+        "subtitle": "2–5 business days"
       }
     }
   },
@@ -376,11 +470,14 @@
     },
     "recommended": {
       "title": "Recommended for you",
-      "ariaLabel": "Recommended products"
+      "ariaLabel": "Recommended products",
+      "subtitlePersonal": "Picked from what you've been browsing",
+      "subtitleGuest": "Our most-loved products right now"
     },
     "previouslyBrowsed": {
       "title": "Previously browsed products",
-      "ariaLabel": "Previously browsed products"
+      "ariaLabel": "Previously browsed products",
+      "subtitle": "Pick up where you left off"
     },
     "offers": {
       "ariaLabel": "Sale promotions",
@@ -423,6 +520,12 @@
     },
     "product": {
       "addToWishlist": "Add to wishlist"
+    },
+    "reason": {
+      "category": "Same category",
+      "subCategory": "Similar type",
+      "brand": "Same brand",
+      "concerns": "For your skin concern"
     }
   },
   "productDetail": {
@@ -473,6 +576,9 @@
     "outOfStock": "Out of stock",
     "availabilityUnknown": "Availability unknown",
     "tags": "Tags",
+    "reviewsCount_zero": "No reviews yet",
+    "reviewsCount_one": "{{count}} review",
+    "reviewsCount_other": "{{count}} reviews",
     "badge": {
       "bestSeller": "Best seller",
       "certified": "Certified",
@@ -564,7 +670,12 @@
     "moreFromBrand": "More from {{brand}}",
     "moreFromBrandFallback": "More from this brand",
     "previouslyBrowsedRelated": "Previously browsed related",
-    "previouslyBrowsedRelatedAria": "Previously browsed related products"
+    "previouslyBrowsedRelatedAria": "Previously browsed related products",
+    "related": {
+      "title": "You may also like",
+      "subtitle": "Similar skin concerns and product types"
+    },
+    "previouslyBrowsedSubtitle": "Pick up where you left off"
   },
   "cart": {
     "title": "Shopping Cart",
@@ -601,12 +712,14 @@
     "lineTotal": "Total:",
     "empty": {
       "title": "Your cart is empty",
-      "description": "Browse our shop and add products to your bag. Your selections will appear here."
+      "description": "Browse our shop and add products to your bag. Your selections will appear here.",
+      "quickLinks": "Shop shortcuts"
     },
     "shipping": {
       "to": "Shipping to",
       "addAddress": "Add a shipping address in account settings",
-      "changeAddress": "Change address"
+      "changeAddress": "Change address",
+      "guestNote": "Shipping is calculated at checkout from your delivery address."
     },
     "summary": {
       "title": "Order Summary",
@@ -628,7 +741,15 @@
       "removeError": "Could not remove coupon",
       "proceedToCheckout": "Proceed to checkout",
       "payNow": "Pay Now",
-      "qty": "Qty: {{count}}"
+      "qty": "Qty: {{count}}",
+      "creditAvailable": "{{amount}} return credit available",
+      "couponPending": "Saved. It will be applied automatically after you sign in at checkout.",
+      "couponSaves": "You'll save {{amount}} with this code. It's only counted as used once your order is placed.",
+      "couponFreeShipping": "This code gives you free shipping. It's only counted as used once your order is placed.",
+      "couponSavesPercent": "{{percent}}% off — you'll save {{amount}}. The code is only counted as used once your order is placed.",
+      "off": "off",
+      "couponApplied": "Code applied",
+      "youSave": "You save {{amount}}"
     },
     "trust": {
       "securePayment": "Secure payment SSL",
@@ -641,7 +762,24 @@
     "recentlyViewed": "Products recently viewed",
     "recentlyViewedAria": "Products recently viewed",
     "buyAgain": "Buy again",
-    "buyAgainAria": "Buy again products"
+    "buyAgainAria": "Buy again products",
+    "toast": {
+      "added": "Added to cart",
+      "viewCart": "View cart",
+      "removed": "Removed from cart",
+      "addError": "Unable to add to cart",
+      "tryAgain": "Please try again.",
+      "couponApplied": "Coupon applied",
+      "couponRemoved": "Coupon removed",
+      "couponSignIn": "Sign in at checkout to use a promo code.",
+      "couponSaved": "Code saved — it will be applied when you sign in"
+    },
+    "card": {
+      "added": "Added",
+      "inCart": "{{count}} in cart",
+      "increase": "Increase quantity",
+      "decrease": "Decrease quantity"
+    }
   },
   "checkout": {
     "title": "Checkout",
@@ -733,7 +871,18 @@
       "orderPlaced": "Order placed",
       "redirecting": "Redirecting to payment",
       "paymentFailed": "Payment failed",
-      "loadingShipping": "Please wait while shipping zones load, then try again."
+      "loadingShipping": "Please wait while shipping zones load, then try again.",
+      "addNewAddress": "Add new address",
+      "selectAddress": "Select a delivery address",
+      "phoneLabel": "Phone number",
+      "phonePlaceholder": "01xxxxxxxxx",
+      "phoneRequired": "Enter a phone number so the courier can reach you",
+      "phoneInvalid": "Enter a valid phone number (8–15 digits)",
+      "saveAddress": "Save this address to my addresses",
+      "saveAddressHint": "Next time you can pick it from your saved addresses.",
+      "stripeHint": "Visa & Mastercard",
+      "paymobHint": "Cards & mobile wallets",
+      "codHint": "Pay in cash when you receive your order"
     },
     "callback": {
       "ariaLabel": "Payment verification",
@@ -778,7 +927,10 @@
       "orderDate": "Order Date",
       "totalAmount": "Total Amount",
       "trackOrder": "Track your order",
-      "orderStatus": "Order Status"
+      "orderStatus": "Order Status",
+      "loading": "Confirming your order…",
+      "deliveryTitle": "Delivery",
+      "deliveryDefault": "We usually deliver within 2–5 business days."
     },
     "track": {
       "title": "Track Order",
@@ -799,7 +951,57 @@
       "totalPaid": "Total Paid",
       "temperatureNote": "This package contains temperature-sensitive ingredients. Please unbox and store at room temperature upon delivery.",
       "loadError": "Unable to load order tracking.",
-      "cancelError": "Unable to cancel order."
+      "cancelError": "Unable to cancel order.",
+      "returnOrder": "Return items",
+      "status": {
+        "pending": "Pending",
+        "confirmed": "Confirmed",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "out_for_delivery": "Out for delivery",
+        "failed_attempt": "Delivery attempt failed",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled",
+        "returned": "Returned",
+        "partially_returned": "Partially returned"
+      },
+      "banner": {
+        "received": {
+          "title": "We've received your order"
+        },
+        "preparing": {
+          "title": "We're preparing your order"
+        },
+        "onItsWay": {
+          "title": "Your order is on its way!",
+          "subtitle": "The courier will contact you before delivery."
+        },
+        "failedAttempt": {
+          "title": "Delivery attempt unsuccessful",
+          "subtitle": "The courier couldn't reach you. Keep your phone nearby — they'll try again."
+        },
+        "delivered": {
+          "title": "Your order was delivered",
+          "subtitle": "Delivered on {{date}}.",
+          "subtitleNoDate": "Enjoy your products!",
+          "returnUntil": "You can request a return until {{date}}."
+        },
+        "returned": {
+          "title": "This order was returned",
+          "subtitle": "Your return has been processed."
+        },
+        "cancelled": {
+          "title": "This order was cancelled",
+          "subtitle": "Cancelled on {{date}}.",
+          "subtitleNoDate": "No charges will be made for cancelled orders."
+        }
+      },
+      "paymentStatus": {
+        "pending": "Payment pending",
+        "paid": "Paid",
+        "refunded": "Refunded",
+        "failed": "Payment failed"
+      }
     },
     "status": {
       "approved": "Approved",
@@ -825,7 +1027,8 @@
       "successTitle": "Login successful",
       "welcomeBack": "Welcome back, {{name}}!",
       "failedTitle": "Login failed",
-      "failedFallback": "Unable to log in. Please try again."
+      "failedFallback": "Unable to log in. Please try again.",
+      "checkoutPrompt": "Sign in to complete your order — your cart is saved and will be waiting for you."
     },
     "register": {
       "formAria": "Registration form",
@@ -1149,6 +1352,10 @@
         "server": "A server error occurred while clearing the wishlist. Please try again.",
         "unknown": "Unable to clear the wishlist. Please try again."
       }
+    },
+    "toast": {
+      "added": "Saved to your wishlist",
+      "removed": "Removed from your wishlist"
     }
   },
   "returnsHistory": {
@@ -1208,8 +1415,7 @@
       "activityLog": "Activity Log",
       "settings": "Oxxila Settings",
       "logout": "Log out",
-      "logoutFailed": "Unable to log out. Please try again.",
-      "websiteContent": "Website Content"
+      "logoutFailed": "Unable to log out. Please try again."
     },
     "permissionDenied": {
       "title": "Access denied",
@@ -1568,8 +1774,10 @@
         "editTitle": "Edit Category",
         "subtitle": "Category Manager",
         "name": "Category name",
+        "nameEn": "English name",
+        "nameAr": "Arabic name",
         "slug": "Slug",
-        "slugHint": "Slug is generated from the name when the category is created.",
+        "slugHint": "Slug is generated from the English name when the category is saved.",
         "image": "Image",
         "uploadImage": "Upload image",
         "removeImage": "Remove selected image",
@@ -1655,8 +1863,10 @@
         "editTitle": "Edit Brand",
         "subtitle": "Brand Manager",
         "name": "Brand name",
+        "nameEn": "English name",
+        "nameAr": "Arabic name",
         "slug": "Slug",
-        "slugHint": "Slug is generated from the name when the brand is created.",
+        "slugHint": "Slug is generated from the English name when the brand is saved.",
         "logo": "Logo",
         "uploadLogo": "Upload logo",
         "removeLogo": "Remove selected logo",
@@ -1750,8 +1960,10 @@
         "editTitle": "Edit Subcategory",
         "subtitle": "Subcategory Manager",
         "name": "Subcategory name",
+        "nameEn": "English name",
+        "nameAr": "Arabic name",
         "slug": "Slug",
-        "slugHint": "Slug is generated from the name when the subcategory is created.",
+        "slugHint": "Slug is generated from the English name when the subcategory is saved.",
         "image": "Image",
         "uploadImage": "Upload image",
         "removeImage": "Remove selected image",
@@ -1972,6 +2184,8 @@
         "removeImage": "Remove image",
         "galleryHint": "{{count}} / {{max}} images",
         "metaTitle": "Meta Title Override",
+        "nameEn": "English product name",
+        "nameAr": "Arabic product name",
         "sensitivity": "Sensitivity",
         "sensitiveSkin": "Sensitive skin",
         "clinical": "Pricing & Inventory",
@@ -2071,7 +2285,9 @@
           "editSaving": "Saving…",
           "updateSuccess": "FAQ question updated",
           "updateFailed": "Unable to update FAQ question"
-        }
+        },
+        "langAr": "Arabic",
+        "langEn": "English"
       }
     },
     "orders": {
@@ -2994,7 +3210,11 @@
         "title": "Top utility bar",
         "subtitle": "Rotating promo slides above the navbar — they cycle automatically on every page.",
         "promoTitle": "Title",
+        "promoTitleEn": "Title (English)",
+        "promoTitleAr": "Title (Arabic)",
         "promoSubtitle": "Subtitle",
+        "promoSubtitleEn": "Subtitle (English)",
+        "promoSubtitleAr": "Subtitle (Arabic)",
         "titlePlaceholder": "Free shipping over 50 EGP orders",
         "subtitlePlaceholder": "Limited-time offer",
         "slideLabel": "Slide {{number}}",
@@ -3012,6 +3232,8 @@
         "title": "How it works",
         "subtitle": "Landing video section title, thumbnail, and three steps.",
         "sectionTitle": "Section title",
+        "sectionTitleEn": "Section title (English)",
+        "sectionTitleAr": "Section title (Arabic)",
         "videoBlock": "Video",
         "videoUrl": "Video URL",
         "noThumbnail": "Empty",
@@ -3020,7 +3242,11 @@
         "stepsHeading": "Steps",
         "stepLabel": "Step {{number}}",
         "stepTitle": "Step title",
+        "stepTitleEn": "Step title (English)",
+        "stepTitleAr": "Step title (Arabic)",
         "stepDescription": "Step description",
+        "stepDescriptionEn": "Step description (English)",
+        "stepDescriptionAr": "Step description (Arabic)",
         "save": "Save How it works",
         "saving": "Saving…",
         "saveSuccess": "How it works settings updated successfully",
@@ -3445,7 +3671,25 @@
           "updateSuccess": "Admin updated successfully",
           "loadErrorTitle": "Unable to load admin"
         }
+      },
+      "delivery": {
+        "title": "Delivery time note",
+        "subtitle": "Shown to shoppers after checkout and in the confirmation email. The courier is assigned later from Shipping.",
+        "messageAr": "Message (Arabic)",
+        "messageEn": "Message (English)",
+        "minDays": "From (days)",
+        "maxDays": "To (days)",
+        "save": "Save",
+        "saving": "Saving…",
+        "saveSuccess": "Delivery note saved",
+        "saveError": "Unable to save the delivery note",
+        "daysOrder": "“To” days must be greater than or equal to “From” days."
       }
     }
+  },
+  "common": {
+    "previous": "Previous",
+    "next": "Next",
+    "loading": "Loading…"
   }
 }

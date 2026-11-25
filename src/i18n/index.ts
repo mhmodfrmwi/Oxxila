@@ -9,7 +9,8 @@ import arCommon from './locales/ar/common.json'
 export const SUPPORTED_LANGUAGES = ['en', 'ar'] as const
 export type AppLanguage = (typeof SUPPORTED_LANGUAGES)[number]
 
-export const DEFAULT_LANGUAGE: AppLanguage = 'en'
+/** Arabic is the primary storefront language; first visits open in Arabic. */
+export const DEFAULT_LANGUAGE: AppLanguage = 'ar'
 
 export const LANGUAGE_META: Record<
   AppLanguage,
@@ -47,7 +48,8 @@ void i18n
       escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator'],
+      // Only a saved user choice overrides the Arabic default (no browser sniffing).
+      order: ['localStorage'],
       caches: ['localStorage'],
       lookupLocalStorage: STORAGE_KEYS.language,
     },

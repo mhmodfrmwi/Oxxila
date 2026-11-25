@@ -1,8 +1,8 @@
 {
   "nav": {
     "home": "الرئيسية",
-    "shop": "المتجر",
-    "categories": "الفئات",
+    "shop": "استكشف",
+    "categories": "المنتجات",
     "docs": "المستندات",
     "cart": "السلة",
     "profile": "الملف الشخصي",
@@ -38,7 +38,23 @@
   },
   "search": {
     "label": "بحث",
-    "placeholder": "ابحث عن..."
+    "placeholder": "ابحث عن...",
+    "popular": "الأكثر رواجًا الآن",
+    "recent": "عمليات البحث الأخيرة",
+    "clear": "مسح البحث",
+    "suggestions": "اقتراحات البحث",
+    "brand": "علامة",
+    "category": "فئة",
+    "noMatches": "لم نجد نتائج لـ «{{query}}». جرّب كلمة أخرى أو تصفح كل المنتجات بالأسفل.",
+    "seeAll": "عرض كل نتائج «{{query}}»",
+    "browseAll": "تصفح منتجاتنا",
+    "page": {
+      "title": "البحث في المنتجات",
+      "resultsFor": "نتائج {{terms}}",
+      "empty": "اكتب في شريط البحث بالأعلى أو تصفح حسب مشكلة البشرة من صفحة المتجر.",
+      "noResults": "لم نجد منتجات مطابقة.",
+      "noResultsHint": "تأكد من الإملاء أو جرّب كلمة أعم أو تصفح كل المنتجات."
+    }
   },
   "language": {
     "label": "اللغة",
@@ -47,7 +63,9 @@
     "switcher": "مبدّل اللغة"
   },
   "theme": {
-    "changeTheme": "تغيير المظهر"
+    "changeTheme": "تغيير المظهر",
+    "light": "فاتح",
+    "dark": "داكن"
   },
   "footer": {
     "description": "اكتشف منتجات العناية بالبشرة المثبتة سريريًا والمصممة لمساعدتك على الحصول على بشرة صحية ومشرقة.",
@@ -219,9 +237,6 @@
       "previousSlide": "الشريحة السابقة",
       "nextSlide": "الشريحة التالية"
     },
-    "trustedBy": {
-      "ariaLabel": "موثوق من قبل شركات رائدة"
-    },
     "skinConcerns": {
       "title": "تسوق حسب مشكلة البشرة",
       "titleCompact": "مشاكل البشرة",
@@ -293,7 +308,58 @@
     "typeOfCategory": "نوع الفئة",
     "chooseCategoryFirst": "اختر فئة أولاً",
     "loadingTypes": "جاري تحميل الأنواع…",
-    "noTypes": "لا توجد أنواع متاحة."
+    "noTypes": "لا توجد أنواع متاحة.",
+    "showMore": "المزيد",
+    "priceAll": "الكل",
+    "priceLowToHigh": "من الأقل للأعلى",
+    "priceHighToLow": "من الأعلى للأقل",
+    "availableOnly": "المتوفر فقط",
+    "ratingAria": "تقييم {{rating}} نجوم فأعلى",
+    "sections": {
+      "sensitivity": "الحساسية",
+      "categories": "الفئات",
+      "concerns": "المشاكل",
+      "offers": "العروض",
+      "brand": "العلامة",
+      "price": "السعر",
+      "productRating": "تقييم المنتج",
+      "availability": "التوفر"
+    },
+    "options": {
+      "sensitivity": {
+        "sensitiveSkin": "بشرة حساسة"
+      },
+      "concerns": {
+        "acne": "حب الشباب",
+        "pigmentation": "التصبغات",
+        "sensitiveSkin": "بشرة حساسة",
+        "dryness": "الجفاف",
+        "wrinkles": "التجاعيد",
+        "widePores": "المسام الواسعة"
+      },
+      "offers": {
+        "onSale": "تخفيضات",
+        "bestSeller": "الأكثر مبيعًا",
+        "todayOffers": "عروض اليوم"
+      }
+    }
+  },
+  "breadcrumb": {
+    "aria": "مسار التنقل",
+    "home": "الرئيسية",
+    "categories": "الفئات"
+  },
+  "categoriesLanding": {
+    "title": "الفئات",
+    "subtitle": "تصفح الكتالوج الكامل حسب الفئة.",
+    "noCategories": "لا توجد فئات متاحة."
+  },
+  "catalogCollections": {
+    "newArrivals": "وصل حديثًا",
+    "bestSellers": "الأكثر مبيعًا",
+    "trending": "الأكثر رواجًا",
+    "offers": "العروض",
+    "featured": "مميز"
   },
   "categorySort": {
     "label": "ترتيب المنتجات",
@@ -301,6 +367,26 @@
     "priceAsc": "السعر: من الأقل إلى الأعلى",
     "priceDesc": "السعر: من الأعلى إلى الأقل",
     "rating": "الأعلى تقييمًا"
+  },
+  "catalogBrowse": {
+    "filters": "الفلاتر",
+    "clearAll": "مسح الكل",
+    "applyFilters": "تطبيق",
+    "closeFilters": "إغلاق الفلاتر",
+    "openFilters": "فتح الفلاتر",
+    "activeFilters": "{{count}} نشط",
+    "resultsRange": "عرض {{from}}–{{to}} من {{total}} منتج",
+    "resultsRangeNamed": "عرض {{from}}–{{to}} من {{total}} لـ «{{query}}»",
+    "paginationAria": "صفحات المنتجات",
+    "back": "السابق",
+    "next": "التالي",
+    "page": "صفحة {{number}}",
+    "empty": "لا توجد منتجات.",
+    "loadError": "تعذر تحميل المنتجات.",
+    "categoryNotFound": "الفئة غير موجودة.",
+    "browsingHistoryTitle": "عملاء شاهدوا منتجات من سجل تصفحك شاهدوا أيضًا",
+    "relatedBrowsingTitle": "منتجات ذات صلة بتصفحك السابق",
+    "browsingHistoryAria": "منتجات من سجل التصفح"
   },
   "utilityBar": {
     "fallbacks": {
@@ -311,6 +397,14 @@
       "returns": {
         "title": "إرجاع خلال 20 يومًا",
         "subtitle": "من تاريخ الشراء"
+      },
+      "trusted": {
+        "title": "عناية بالبشرة موثوقة من أطباء الجلدية",
+        "subtitle": "منتجات أصلية فقط"
+      },
+      "delivery": {
+        "title": "توصيل سريع في أنحاء مصر",
+        "subtitle": "خلال 2–5 أيام عمل"
       }
     }
   },
@@ -376,11 +470,14 @@
     },
     "recommended": {
       "title": "موصى به لك",
-      "ariaLabel": "منتجات موصى بها"
+      "ariaLabel": "منتجات موصى بها",
+      "subtitlePersonal": "مختارة من تصفحك الأخير",
+      "subtitleGuest": "أكثر منتجاتنا حبًا الآن"
     },
     "previouslyBrowsed": {
       "title": "منتجات تصفحتها سابقًا",
-      "ariaLabel": "منتجات تصفحتها سابقًا"
+      "ariaLabel": "منتجات تصفحتها سابقًا",
+      "subtitle": "أكمل من حيث توقفت"
     },
     "offers": {
       "ariaLabel": "عروض التخفيضات",
@@ -423,6 +520,12 @@
     },
     "product": {
       "addToWishlist": "أضف إلى المفضلة"
+    },
+    "reason": {
+      "category": "نفس الفئة",
+      "subCategory": "نوع مشابه",
+      "brand": "نفس العلامة",
+      "concerns": "لمشكلة بشرتك"
     }
   },
   "productDetail": {
@@ -473,6 +576,12 @@
     "outOfStock": "غير متوفر",
     "availabilityUnknown": "التوفر غير معروف",
     "tags": "الوسوم",
+    "reviewsCount_zero": "لا توجد تقييمات",
+    "reviewsCount_one": "تقييم واحد",
+    "reviewsCount_two": "تقييمان",
+    "reviewsCount_few": "{{count}} تقييمات",
+    "reviewsCount_many": "{{count}} تقييمًا",
+    "reviewsCount_other": "{{count}} تقييم",
     "badge": {
       "bestSeller": "الأكثر مبيعًا",
       "certified": "معتمد",
@@ -564,7 +673,12 @@
     "moreFromBrand": "المزيد من {{brand}}",
     "moreFromBrandFallback": "المزيد من هذه العلامة",
     "previouslyBrowsedRelated": "منتجات ذات صلة تصفحتها سابقًا",
-    "previouslyBrowsedRelatedAria": "منتجات ذات صلة تصفحتها سابقًا"
+    "previouslyBrowsedRelatedAria": "منتجات ذات صلة تصفحتها سابقًا",
+    "related": {
+      "title": "قد يعجبك أيضًا",
+      "subtitle": "مشاكل بشرة وأنواع منتجات مشابهة"
+    },
+    "previouslyBrowsedSubtitle": "أكمل من حيث توقفت"
   },
   "cart": {
     "title": "سلة التسوق",
@@ -601,12 +715,14 @@
     "lineTotal": "الإجمالي:",
     "empty": {
       "title": "سلتك فارغة",
-      "description": "تصفح متجرنا وأضف منتجات إلى حقيبتك. ستظهر اختياراتك هنا."
+      "description": "تصفح متجرنا وأضف منتجات إلى حقيبتك. ستظهر اختياراتك هنا.",
+      "quickLinks": "اختصارات التسوق"
     },
     "shipping": {
       "to": "الشحن إلى",
       "addAddress": "أضف عنوان شحن من إعدادات الحساب",
-      "changeAddress": "تغيير العنوان"
+      "changeAddress": "تغيير العنوان",
+      "guestNote": "يُحسب الشحن عند إتمام الطلب حسب عنوان التوصيل."
     },
     "summary": {
       "title": "ملخص الطلب",
@@ -628,7 +744,15 @@
       "removeError": "تعذر إزالة القسيمة",
       "proceedToCheckout": "المتابعة إلى الدفع",
       "payNow": "ادفع الآن",
-      "qty": "الكمية: {{count}}"
+      "qty": "الكمية: {{count}}",
+      "creditAvailable": "رصيد إرجاع متاح بقيمة {{amount}}",
+      "couponPending": "تم الحفظ. سيُطبَّق الكود تلقائيًا بعد تسجيل دخولك عند الدفع.",
+      "couponSaves": "ستوفّر {{amount}} بهذا الكود. يُسجَّل استخدامه بعد إتمام طلبك فقط.",
+      "couponFreeShipping": "يمنحك هذا الكود شحنًا مجانيًا. يُسجَّل استخدامه بعد إتمام طلبك فقط.",
+      "couponSavesPercent": "خصم {{percent}}٪ — ستوفّر {{amount}}. يُسجَّل استخدام الكود بعد إتمام طلبك فقط.",
+      "off": "خصم",
+      "couponApplied": "تم تطبيق الكود",
+      "youSave": "توفّر {{amount}}"
     },
     "trust": {
       "securePayment": "دفع آمن SSL",
@@ -641,7 +765,28 @@
     "recentlyViewed": "منتجات شاهدتها مؤخرًا",
     "recentlyViewedAria": "منتجات شاهدتها مؤخرًا",
     "buyAgain": "اشترِ مرة أخرى",
-    "buyAgainAria": "منتجات اشترِ مرة أخرى"
+    "buyAgainAria": "منتجات اشترِ مرة أخرى",
+    "toast": {
+      "added": "تمت الإضافة إلى السلة",
+      "viewCart": "عرض السلة",
+      "removed": "تمت الإزالة من السلة",
+      "addError": "تعذر الإضافة إلى السلة",
+      "tryAgain": "يرجى المحاولة مرة أخرى.",
+      "couponApplied": "تم تطبيق القسيمة",
+      "couponRemoved": "تمت إزالة القسيمة",
+      "couponSignIn": "سجّل الدخول عند الدفع لاستخدام رمز ترويجي.",
+      "couponSaved": "تم حفظ الكود — سيُطبَّق عند تسجيل الدخول"
+    },
+    "card": {
+      "added": "تمت الإضافة",
+      "inCart": "{{count}} في السلة",
+      "increase": "زيادة الكمية",
+      "decrease": "تقليل الكمية"
+    },
+    "itemCount_zero": "لا توجد عناصر",
+    "itemCount_two": "عنصران",
+    "itemCount_few": "{{count}} عناصر",
+    "itemCount_many": "{{count}} عنصرًا"
   },
   "checkout": {
     "title": "إتمام الشراء",
@@ -733,7 +878,18 @@
       "orderPlaced": "تم تقديم الطلب",
       "redirecting": "جاري التحويل إلى الدفع",
       "paymentFailed": "فشل الدفع",
-      "loadingShipping": "يرجى الانتظار حتى يتم تحميل مناطق الشحن، ثم حاول مرة أخرى."
+      "loadingShipping": "يرجى الانتظار حتى يتم تحميل مناطق الشحن، ثم حاول مرة أخرى.",
+      "addNewAddress": "إضافة عنوان جديد",
+      "selectAddress": "اختر عنوان التوصيل",
+      "phoneLabel": "رقم الهاتف",
+      "phonePlaceholder": "01xxxxxxxxx",
+      "phoneRequired": "أدخل رقم هاتف ليتمكن المندوب من التواصل معك",
+      "phoneInvalid": "أدخل رقم هاتف صحيح (من 8 إلى 15 رقمًا)",
+      "saveAddress": "احفظ هذا العنوان ضمن عناويني",
+      "saveAddressHint": "في المرة القادمة يمكنك اختياره من عناويني المحفوظة.",
+      "stripeHint": "فيزا وماستركارد",
+      "paymobHint": "بطاقات ومحافظ إلكترونية",
+      "codHint": "ادفع نقدًا عند استلام طلبك"
     },
     "callback": {
       "ariaLabel": "التحقق من الدفع",
@@ -778,7 +934,10 @@
       "orderDate": "تاريخ الطلب",
       "totalAmount": "المبلغ الإجمالي",
       "trackOrder": "تتبع طلبك",
-      "orderStatus": "حالة الطلب"
+      "orderStatus": "حالة الطلب",
+      "loading": "جارٍ تأكيد طلبك…",
+      "deliveryTitle": "التوصيل",
+      "deliveryDefault": "نوصّل عادةً خلال ٢ إلى ٥ أيام عمل."
     },
     "track": {
       "title": "تتبع الطلب",
@@ -799,7 +958,57 @@
       "totalPaid": "المبلغ المدفوع",
       "temperatureNote": "تحتوي هذه الطرد على مكونات حساسة لدرجة الحرارة. يرجى فتحها وتخزينها في درجة حرارة الغرفة عند الاستلام.",
       "loadError": "تعذر تحميل تتبع الطلب.",
-      "cancelError": "تعذر إلغاء الطلب."
+      "cancelError": "تعذر إلغاء الطلب.",
+      "returnOrder": "إرجاع المنتجات",
+      "status": {
+        "pending": "قيد الانتظار",
+        "confirmed": "تم التأكيد",
+        "processing": "قيد التجهيز",
+        "shipped": "تم الشحن",
+        "out_for_delivery": "خرج للتوصيل",
+        "failed_attempt": "فشلت محاولة التوصيل",
+        "delivered": "تم التوصيل",
+        "cancelled": "ملغي",
+        "returned": "تم الإرجاع",
+        "partially_returned": "إرجاع جزئي"
+      },
+      "banner": {
+        "received": {
+          "title": "استلمنا طلبك"
+        },
+        "preparing": {
+          "title": "نجهّز طلبك الآن"
+        },
+        "onItsWay": {
+          "title": "طلبك في الطريق إليك!",
+          "subtitle": "سيتواصل معك المندوب قبل التوصيل."
+        },
+        "failedAttempt": {
+          "title": "لم تنجح محاولة التوصيل",
+          "subtitle": "لم يتمكن المندوب من الوصول إليك. ابقَ قريبًا من هاتفك، وسيحاول مرة أخرى."
+        },
+        "delivered": {
+          "title": "تم توصيل طلبك",
+          "subtitle": "تم التوصيل في {{date}}.",
+          "subtitleNoDate": "نتمنى أن تعجبك منتجاتك!",
+          "returnUntil": "يمكنك طلب إرجاع حتى {{date}}."
+        },
+        "returned": {
+          "title": "تم إرجاع هذا الطلب",
+          "subtitle": "تمت معالجة طلب الإرجاع."
+        },
+        "cancelled": {
+          "title": "تم إلغاء هذا الطلب",
+          "subtitle": "تم الإلغاء في {{date}}.",
+          "subtitleNoDate": "لن يتم خصم أي مبالغ مقابل الطلبات الملغاة."
+        }
+      },
+      "paymentStatus": {
+        "pending": "الدفع معلّق",
+        "paid": "مدفوع",
+        "refunded": "تم الاسترداد",
+        "failed": "فشل الدفع"
+      }
     },
     "status": {
       "approved": "موافق عليه",
@@ -825,7 +1034,8 @@
       "successTitle": "تم تسجيل الدخول بنجاح",
       "welcomeBack": "مرحبًا بعودتك، {{name}}!",
       "failedTitle": "فشل تسجيل الدخول",
-      "failedFallback": "تعذر تسجيل الدخول. يرجى المحاولة مرة أخرى."
+      "failedFallback": "تعذر تسجيل الدخول. يرجى المحاولة مرة أخرى.",
+      "checkoutPrompt": "سجّل الدخول لإتمام طلبك — سلتك محفوظة وستكون في انتظارك."
     },
     "register": {
       "formAria": "نموذج التسجيل",
@@ -1018,7 +1228,11 @@
       "confirmCancel": "تأكيد الإلغاء",
       "cancelling": "جاري الإلغاء...",
       "cancelSuccess": "تم إلغاء الطلب بنجاح",
-      "cancelError": "تعذر إلغاء الطلب"
+      "cancelError": "تعذر إلغاء الطلب",
+      "itemCount_zero": "لا توجد عناصر",
+      "itemCount_two": "عنصران",
+      "itemCount_few": "{{count}} عناصر",
+      "itemCount_many": "{{count}} عنصرًا"
     },
     "addresses": {
       "title": "عناويني",
@@ -1149,6 +1363,14 @@
         "server": "حدث خطأ في الخادم أثناء إفراغ قائمة الأمنيات. يرجى المحاولة مرة أخرى.",
         "unknown": "تعذر إفراغ قائمة الأمنيات. يرجى المحاولة مرة أخرى."
       }
+    },
+    "itemCount_zero": "لا توجد منتجات",
+    "itemCount_two": "منتجان",
+    "itemCount_few": "{{count}} منتجات",
+    "itemCount_many": "{{count}} منتجًا",
+    "toast": {
+      "added": "تمت الإضافة إلى المفضلة",
+      "removed": "تمت الإزالة من المفضلة"
     }
   },
   "returnsHistory": {
@@ -1208,8 +1430,7 @@
       "activityLog": "سجل النشاط",
       "settings": "إعدادات أوكسيلا",
       "logout": "تسجيل الخروج",
-      "logoutFailed": "تعذر تسجيل الخروج. يرجى المحاولة مرة أخرى.",
-      "websiteContent": "محتوى الموقع"
+      "logoutFailed": "تعذر تسجيل الخروج. يرجى المحاولة مرة أخرى."
     },
     "permissionDenied": {
       "title": "تم رفض الوصول",
@@ -1468,7 +1689,8 @@
         "unitsSold_few": "{{formatted}} وحدات مباعة",
         "unitsSold_many": "{{formatted}} وحدة مباعة",
         "emptyTitle": "لا توجد منتجات رائدة",
-        "emptyDescription": "ستظهر الأفضل مبيعًا بعد تسجيل المبيعات."
+        "emptyDescription": "ستظهر الأفضل مبيعًا بعد تسجيل المبيعات.",
+        "unitsSold_two": "{{formatted}} وحدة مباعة"
       },
       "lowStock": {
         "title": "تنبيهات انخفاض المخزون",
@@ -1487,7 +1709,8 @@
           "low": "مخزون منخفض",
           "critical": "حرج",
           "outOfStock": "نفد المخزون"
-        }
+        },
+        "left_two": "متبقي {{count}}"
       },
       "recentOrders": {
         "title": "أحدث الطلبات",
@@ -1574,8 +1797,10 @@
         "editTitle": "تعديل فئة",
         "subtitle": "إدارة الفئات",
         "name": "اسم الفئة",
+        "nameEn": "الاسم بالإنجليزية",
+        "nameAr": "الاسم بالعربية",
         "slug": "المعرّف",
-        "slugHint": "يُنشأ المعرّف تلقائيًا من الاسم عند إنشاء الفئة.",
+        "slugHint": "يُنشأ المعرّف تلقائيًا من الاسم الإنجليزي عند حفظ الفئة.",
         "image": "الصورة",
         "uploadImage": "رفع صورة",
         "removeImage": "إزالة الصورة المحددة",
@@ -1661,8 +1886,10 @@
         "editTitle": "تعديل علامة",
         "subtitle": "إدارة العلامات التجارية",
         "name": "اسم العلامة",
+        "nameEn": "الاسم بالإنجليزية",
+        "nameAr": "الاسم بالعربية",
         "slug": "المعرّف",
-        "slugHint": "يُنشأ المعرّف تلقائيًا من الاسم عند إنشاء العلامة.",
+        "slugHint": "يُنشأ المعرّف تلقائيًا من الاسم الإنجليزي عند حفظ العلامة.",
         "logo": "الشعار",
         "uploadLogo": "رفع شعار",
         "removeLogo": "إزالة الشعار المحدد",
@@ -1756,8 +1983,10 @@
         "editTitle": "تعديل فئة فرعية",
         "subtitle": "إدارة الفئات الفرعية",
         "name": "اسم الفئة الفرعية",
+        "nameEn": "الاسم بالإنجليزية",
+        "nameAr": "الاسم بالعربية",
         "slug": "المعرّف",
-        "slugHint": "يُنشأ المعرّف تلقائيًا من الاسم عند إنشاء الفئة الفرعية.",
+        "slugHint": "يُنشأ المعرّف تلقائيًا من الاسم الإنجليزي عند حفظ الفئة الفرعية.",
         "image": "الصورة",
         "uploadImage": "رفع صورة",
         "removeImage": "إزالة الصورة المحددة",
@@ -1978,6 +2207,8 @@
         "removeImage": "إزالة الصورة",
         "galleryHint": "{{count}} / {{max}} صور",
         "metaTitle": "عنوان التعريف",
+        "nameEn": "اسم المنتج بالإنجليزية",
+        "nameAr": "اسم المنتج بالعربية",
         "sensitivity": "الحساسية",
         "sensitiveSkin": "بشرة حساسة",
         "clinical": "التسعير والمخزون",
@@ -2077,7 +2308,9 @@
           "editSaving": "جارٍ الحفظ…",
           "updateSuccess": "تم تحديث السؤال الشائع",
           "updateFailed": "تعذر تحديث السؤال الشائع"
-        }
+        },
+        "langAr": "عربي",
+        "langEn": "إنجليزي"
       }
     },
     "orders": {
@@ -2342,7 +2575,15 @@
           "submitting": "جارٍ التحديث…",
           "success": "تم تحديث حالة التتبع بنجاح",
           "bostaNote": "شحنات Bosta تُحدَّث تلقائيًا عبر webhook — التحديث اليدوي معطّل."
-        }
+        },
+        "itemsCount_zero": "لا توجد منتجات",
+        "itemsCount_two": "منتجان",
+        "itemsCount_few": "{{count}} منتجات",
+        "itemsCount_many": "{{count}} منتجًا",
+        "ordersCount_zero": "لا توجد طلبات",
+        "ordersCount_two": "طلبان",
+        "ordersCount_few": "{{count}} طلبات",
+        "ordersCount_many": "{{count}} طلبًا"
       },
       "b2b": {
         "title": "إضافة طلب جديد (B2B)",
@@ -2713,7 +2954,11 @@
         "contactUnavailable": "لا يوجد بريد إلكتروني لهذا العميل.",
         "loadErrorTitle": "تعذّر تحميل العميل",
         "emptyTitle": "العميل غير موجود",
-        "emptyDescription": "تعذّر تحميل هذا العميل."
+        "emptyDescription": "تعذّر تحميل هذا العميل.",
+        "ordersCount_zero": "لا توجد طلبات",
+        "ordersCount_two": "طلبان",
+        "ordersCount_few": "{{count}} طلبات",
+        "ordersCount_many": "{{count}} طلبًا"
       }
     },
     "reviews": {
@@ -3008,7 +3253,11 @@
         "title": "شريط العروض العلوي",
         "subtitle": "شرائح عروض تتقلب تلقائيًا فوق شريط التنقل — في كل الصفحات.",
         "promoTitle": "العنوان",
+        "promoTitleEn": "العنوان (إنجليزي)",
+        "promoTitleAr": "العنوان (عربي)",
         "promoSubtitle": "العنوان الفرعي",
+        "promoSubtitleEn": "العنوان الفرعي (إنجليزي)",
+        "promoSubtitleAr": "العنوان الفرعي (عربي)",
         "titlePlaceholder": "شحن مجاني للطلبات فوق 50 جنيه",
         "subtitlePlaceholder": "عرض لفترة محدودة",
         "slideLabel": "شريحة {{number}}",
@@ -3026,15 +3275,21 @@
         "title": "كيف يعمل",
         "subtitle": "عنوان قسم الفيديو والصورة المصغرة وثلاث خطوات في الصفحة الرئيسية.",
         "sectionTitle": "عنوان القسم",
+        "sectionTitleEn": "عنوان القسم (إنجليزي)",
+        "sectionTitleAr": "عنوان القسم (عربي)",
         "videoBlock": "الفيديو",
         "videoUrl": "رابط الفيديو",
         "noThumbnail": "فارغ",
-        "uploadThumbnail": "Thumbnail",
+        "uploadThumbnail": "الصورة المصغرة",
         "thumbnailSaved": "الصورة الحالية",
         "stepsHeading": "الخطوات",
         "stepLabel": "الخطوة {{number}}",
         "stepTitle": "عنوان الخطوة",
+        "stepTitleEn": "عنوان الخطوة (إنجليزي)",
+        "stepTitleAr": "عنوان الخطوة (عربي)",
         "stepDescription": "وصف الخطوة",
+        "stepDescriptionEn": "وصف الخطوة (إنجليزي)",
+        "stepDescriptionAr": "وصف الخطوة (عربي)",
         "save": "حفظ كيف يعمل",
         "saving": "جارٍ الحفظ…",
         "saveSuccess": "تم تحديث إعدادات كيف يعمل بنجاح",
@@ -3459,7 +3714,25 @@
           "updateSuccess": "تم تحديث المشرف بنجاح",
           "loadErrorTitle": "تعذّر تحميل المشرف"
         }
+      },
+      "delivery": {
+        "title": "ملاحظة وقت التوصيل",
+        "subtitle": "تظهر للعميل بعد إتمام الطلب وفي رسالة التأكيد. يتم تحديد شركة الشحن لاحقًا من قسم الشحن.",
+        "messageAr": "الرسالة (بالعربية)",
+        "messageEn": "الرسالة (بالإنجليزية)",
+        "minDays": "من (أيام)",
+        "maxDays": "إلى (أيام)",
+        "save": "حفظ",
+        "saving": "جارٍ الحفظ…",
+        "saveSuccess": "تم حفظ ملاحظة التوصيل",
+        "saveError": "تعذر حفظ ملاحظة التوصيل",
+        "daysOrder": "يجب أن يكون «إلى» أكبر من أو يساوي «من»."
       }
     }
+  },
+  "common": {
+    "previous": "السابق",
+    "next": "التالي",
+    "loading": "جارٍ التحميل…"
   }
 }
