@@ -1,53 +1,110 @@
 /* src/styles/payment.css */
 .checkout-stepper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
   margin-bottom: 1.5rem;
 }
 
-.checkout-stepper-step {
+.checkout-stepper-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.checkout-stepper-item {
+  --node: 2rem;
+  position: relative;
   display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .checkout-stepper-item {
+    --node: 2.5rem;
+  }
+}
+
+/* Bar joining this step to the next one (runs under the circles so there are no gaps) */
+.checkout-stepper-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--node) / 2 - 2px);
+  inset-inline-start: 50%;
+  width: 100%;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--primary-button-hover);
+}
+
+[data-theme='dark'] .checkout-stepper-item:not(:last-child)::after {
+  background: color-mix(in srgb, var(--primary-button) 25%, var(--card-background));
+}
+
+.checkout-stepper-item--complete:not(:last-child)::after {
+  background: var(--primary-button);
+}
+
+.checkout-stepper-step {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.8125rem;
+  min-width: 0;
+  max-width: 100%;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.2;
   color: var(--secondary-text);
 }
 
-.checkout-stepper-step--active {
+@media (min-width: 640px) {
+  .checkout-stepper-step {
+    font-size: 0.875rem;
+  }
+}
+
+.checkout-stepper-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.checkout-stepper-item--active .checkout-stepper-step {
   color: var(--primary-text);
   font-weight: var(--font-weight-semibold);
 }
 
-.checkout-stepper-step--complete {
-  color: var(--primary-link);
+.checkout-stepper-item--complete .checkout-stepper-step {
+  color: var(--primary-text);
 }
 
 .checkout-stepper-index {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: var(--node);
+  height: var(--node);
   border-radius: 9999px;
-  border: 1.5px solid var(--border-subtle);
-  font-size: 0.75rem;
-  font-weight: var(--font-weight-medium);
+  background: var(--primary-button-hover);
+  color: var(--primary-button);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-semibold);
 }
 
-.checkout-stepper-step--active .checkout-stepper-index,
-.checkout-stepper-step--complete .checkout-stepper-index {
-  border-color: var(--primary-button);
+[data-theme='dark'] .checkout-stepper-index {
+  background: color-mix(in srgb, var(--primary-button) 25%, var(--card-background));
+}
+
+.checkout-stepper-item--active .checkout-stepper-index,
+.checkout-stepper-item--complete .checkout-stepper-index {
   background: var(--primary-button);
-  color: var(--icon-on-color);
+  color: var(--icon-on-color, #fff);
 }
 
-.checkout-stepper-divider {
-  width: 2.5rem;
-  height: 1px;
-  background: var(--border-subtle);
+.checkout-stepper-item--active .checkout-stepper-index {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-button) 22%, transparent);
 }
 
 .payment-back-link {

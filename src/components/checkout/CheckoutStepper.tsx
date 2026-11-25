@@ -1,4 +1,5 @@
 // src/components/checkout/CheckoutStepper.tsx
+import { Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
@@ -35,46 +36,44 @@ export function CheckoutStepper({ currentStep, className }: CheckoutStepperProps
 
   return (
     <nav className={cn('checkout-stepper', className)} aria-label={t('checkout.progress')}>
-      {steps.map((step, index) => {
-        const isActive = step.id === currentStep
-        const isComplete = index < currentIndex
-        const label = t(step.labelKey)
+      <ol className="checkout-stepper-list">
+        {steps.map((step, index) => {
+          const isActive = step.id === currentStep
+          const isComplete = index < currentIndex
+          const label = t(step.labelKey)
+          const body = (
+            <>
+              <span className="checkout-stepper-index" aria-hidden>
+                {isComplete ? <Check size={16} strokeWidth={2.75} /> : index + 1}
+              </span>
+              <span className="checkout-stepper-label">{label}</span>
+            </>
+          )
 
-        return (
-          <div key={step.id} className="flex items-center gap-2">
-            {index > 0 && <div className="checkout-stepper-divider" aria-hidden />}
-            {isComplete && step.path ? (
-              <Link
-                to={step.path}
-                className={cn(
-                  'checkout-stepper-step checkout-stepper-step--complete',
-                  focusRingClasses,
-                  'rounded-sm',
-                )}
-              >
-                <span className="checkout-stepper-index" aria-hidden>
-                  {index + 1}
-                </span>
-                <span>{label}</span>
-              </Link>
-            ) : (
-              <div
-                className={cn(
-                  'checkout-stepper-step',
-                  (isActive || isComplete) && 'checkout-stepper-step--active',
-                  isComplete && 'checkout-stepper-step--complete',
-                )}
-                aria-current={isActive ? 'step' : undefined}
-              >
-                <span className="checkout-stepper-index" aria-hidden>
-                  {index + 1}
-                </span>
-                <span>{label}</span>
-              </div>
-            )}
-          </div>
-        )
-      })}
+          return (
+            <li
+              key={step.id}
+              className={cn(
+                'checkout-stepper-item',
+                isActive && 'checkout-stepper-item--active',
+                isComplete && 'checkout-stepper-item--complete',
+              )}
+              aria-current={isActive ? 'step' : undefined}
+            >
+              {isComplete && step.path ? (
+                <Link
+                  to={step.path}
+                  className={cn('checkout-stepper-step', focusRingClasses, 'rounded-sm')}
+                >
+                  {body}
+                </Link>
+              ) : (
+                <div className="checkout-stepper-step">{body}</div>
+              )}
+            </li>
+          )
+        })}
+      </ol>
     </nav>
   )
 }
