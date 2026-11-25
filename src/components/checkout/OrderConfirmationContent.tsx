@@ -88,7 +88,7 @@ export function OrderConfirmationContent() {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 260, damping: 18 }}
               >
-                <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <path className="order-confirmation-check-path" d="M5 12.5l4.2 4.2L19 7" />
                 </svg>
               </motion.div>

@@ -25,15 +25,15 @@
 
 .track-order-title {
   font-family: var(--font-family-serif, var(--font-family-base));
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-size: clamp(1.75rem, 4.2vw, 3.25rem);
   font-weight: var(--font-weight-medium);
-  line-height: 1.15;
+  line-height: 1.2;
   color: var(--primary-text);
 }
 
 .track-order-date {
-  margin-top: 0.375rem;
-  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  font-size: clamp(0.9375rem, 1.6vw, 1.4375rem);
   color: var(--secondary-text);
 }
 
@@ -77,22 +77,19 @@
 }
 
 .track-order-stepper-card {
-  margin-bottom: 1.25rem;
-  padding: 1.5rem 1rem 1.75rem;
+  margin-bottom: 1.5rem;
+  padding: 1.75rem 1rem 1.5rem;
+  box-shadow: none;
+}
+
+@media (min-width: 768px) {
+  .track-order-stepper-card {
+    padding: 2rem 2rem 1.75rem;
+  }
 }
 
 .track-order-status .order-confirmation-status-track {
   max-width: none;
-}
-
-.track-order-status .order-confirmation-status-step--upcoming .order-confirmation-status-node {
-  border-color: rgb(123 101 251 / 0.2);
-  background: rgb(123 101 251 / 0.08);
-  color: rgb(123 101 251 / 0.55);
-}
-
-.track-order-status .order-confirmation-status-step--upcoming:not(:last-child)::after {
-  background: rgb(123 101 251 / 0.18);
 }
 
 .track-order-delivery-banner {
@@ -100,9 +97,12 @@
   position: relative;
   overflow: hidden;
   margin-bottom: 1.5rem;
-  border-radius: 1rem;
+  border-radius: 0 var(--corner-medium, 1.5rem) var(--corner-medium, 1.5rem) 0;
   background: color-mix(in srgb, var(--banner-color) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--banner-color) 18%, transparent);
+}
+
+[dir='rtl'] .track-order-delivery-banner {
+  border-radius: var(--corner-medium, 1.5rem) 0 0 var(--corner-medium, 1.5rem);
 }
 
 /* Status tones: shipped = brand, delivered = success, failed attempt = warning, cancelled = error */
@@ -115,7 +115,7 @@
   position: absolute;
   inset-block: 0;
   inset-inline-start: 0;
-  width: 0.35rem;
+  width: 0.5rem;
   background: var(--banner-color);
 }
 
@@ -125,36 +125,51 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem 1.5rem;
-  padding: 1.125rem 1.25rem;
-  padding-inline-start: 1.5rem;
+  padding: 1.5rem 1.5rem 1.5rem 2rem;
+  padding-inline: 2rem 1.5rem;
+  min-height: 6rem;
 }
 
 .track-order-delivery-banner-left {
   display: flex;
-  align-items: flex-start;
-  gap: 0.875rem;
+  align-items: center;
+  gap: 1rem;
   color: var(--banner-color);
 }
 
+.track-order-delivery-banner-left > svg {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .track-order-delivery-banner-left > svg {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
 .track-order-delivery-banner-title {
-  font-size: 0.9375rem;
-  font-weight: var(--font-weight-semibold);
+  font-size: clamp(1.0625rem, 2vw, 1.625rem);
+  line-height: 1.2;
+  font-weight: var(--font-weight-regular, 400);
   color: var(--banner-color);
 }
 
 .track-order-delivery-banner-subtitle {
-  margin-top: 0.125rem;
-  font-size: 0.8125rem;
+  margin-top: 0.375rem;
+  font-size: clamp(0.8125rem, 1.4vw, 1.125rem);
   color: var(--secondary-text);
 }
 
 .track-order-delivery-banner-right {
-  text-align: right;
+  text-align: end;
 }
 
 .track-order-delivery-banner-tracking-label {
-  font-size: 0.625rem;
-  font-weight: var(--font-weight-semibold);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-regular, 400);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--secondary-text);
@@ -163,8 +178,8 @@
 .track-order-delivery-banner-tracking-value {
   margin-top: 0.25rem;
   font-family: var(--font-family-serif, var(--font-family-base));
-  font-size: 1.125rem;
-  font-weight: var(--font-weight-medium);
+  font-size: clamp(1.0625rem, 2vw, 1.625rem);
+  font-weight: var(--font-weight-regular, 400);
   color: var(--primary-text);
 }
 
@@ -175,18 +190,24 @@
 
 @media (min-width: 1024px) {
   .track-order-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
+    grid-template-columns: minmax(0, 2fr) minmax(20rem, 1fr);
     align-items: start;
-    gap: 1.5rem;
+    gap: 2.5rem;
   }
 }
 
 .track-order-shipping-card {
-  border-radius: 1rem;
-  border: 1px solid var(--border-subtle);
+  border-radius: var(--corner-medium, 1.5rem);
+  border: none;
   background: var(--card-background);
-  box-shadow: 0 4px 24px rgb(93 90 136 / 0.08);
+  box-shadow: none;
   padding: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .track-order-shipping-card {
+    padding: 2rem 1.5rem;
+  }
 }
 
 [data-theme='dark'] .track-order-shipping-card {
@@ -199,17 +220,17 @@
   gap: 0.625rem;
   margin-bottom: 1.25rem;
   font-family: var(--font-family-serif, var(--font-family-base));
-  font-size: 1.0625rem;
-  font-weight: var(--font-weight-medium);
+  font-size: clamp(1.125rem, 1.8vw, 1.625rem);
+  font-weight: var(--font-weight-regular, 400);
   color: var(--primary-text);
 }
 
 .track-order-summary-card {
-  border-radius: 1rem;
-  border: 1px solid var(--border-subtle);
+  border-radius: var(--corner-medium, 1.5rem);
+  border: none;
   background: var(--card-background);
-  box-shadow: 0 4px 24px rgb(93 90 136 / 0.08);
-  padding: 1.5rem;
+  box-shadow: none;
+  padding: 1rem 1.5rem;
 }
 
 [data-theme='dark'] .track-order-summary-card {
@@ -225,7 +246,10 @@
 
 .track-order-cancel-btn {
   margin-top: 1rem;
-  min-height: 3rem;
+  min-height: 3.25rem;
+  width: 100%;
+  max-width: 15.5rem;
+  border-radius: 2.5rem;
   border-color: var(--support-error);
   background: var(--support-error);
   color: white;
@@ -281,4 +305,15 @@
     width: 100%;
     text-align: left;
   }
+}
+
+.track-order-return-btn {
+  border-color: var(--primary-button);
+  background: var(--primary-button);
+  color: var(--icon-on-color, #fff);
+}
+
+.track-order-return-btn:hover:not(:disabled) {
+  background: var(--primary-button-hover-strong, #6a54ea);
+  border-color: var(--primary-button-hover-strong, #6a54ea);
 }

@@ -6,11 +6,10 @@ import { formatOrderDate, formatOrderReferenceId } from '../../utils/orderFormat
 
 interface OrderPageHeaderProps {
   order: ApiOrder
-  trackingNumber?: string | null
   className?: string
 }
 
-export function OrderPageHeader({ order, trackingNumber, className }: OrderPageHeaderProps) {
+export function OrderPageHeader({ order, className }: OrderPageHeaderProps) {
   const { t, i18n } = useTranslation()
 
   return (
@@ -22,23 +21,6 @@ export function OrderPageHeader({ order, trackingNumber, className }: OrderPageH
         <p className="track-order-date">
           {t('checkout.track.placedOn', { date: formatOrderDate(order.createdAt, i18n.language) })}
         </p>
-      </div>
-
-      <div className="track-order-header-meta">
-        {trackingNumber && (
-          <div className="track-order-header-meta-item">
-            <span className="track-order-header-meta-label">
-              {t('checkout.track.trackingNumber')}
-            </span>
-            <span className="track-order-header-meta-value">{trackingNumber}</span>
-          </div>
-        )}
-        <div className="track-order-header-meta-item">
-          <span className="track-order-header-meta-label">
-            {t('checkout.track.currentStatus')}
-          </span>
-          <span className="track-order-status-badge">{t(`checkout.track.status.${order.orderStatus}`, { defaultValue: order.orderStatusLabel })}</span>
-        </div>
       </div>
     </header>
   )

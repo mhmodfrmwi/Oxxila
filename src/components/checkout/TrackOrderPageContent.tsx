@@ -5,7 +5,6 @@ import { Link, Navigate } from 'react-router-dom'
 import { HOME_PATH, ACCOUNT_ORDERS_PATH, SHOP_PATH } from '../../config/routes'
 import { useTrackOrderPage } from '../../hooks/useTrackOrderPage'
 import { cn } from '../../lib/cn'
-import { getOrderTrackingNumber } from '../../utils/orderFormat'
 import { OrderDeliveryBanner } from '../order/OrderDeliveryBanner'
 import { OrderPageHeader } from '../order/OrderPageHeader'
 import { OrderShippingInfoCard } from '../order/OrderShippingInfoCard'
@@ -58,8 +57,6 @@ export function TrackOrderPageContent() {
     return <Navigate to={SHOP_PATH} replace />
   }
 
-  const trackingNumber = order ? getOrderTrackingNumber(order) : null
-
   return (
     <>
       <div className="container-content pb-8 sm:pb-10">
@@ -86,7 +83,7 @@ export function TrackOrderPageContent() {
           <FormMessage message={error} />
         ) : order ? (
           <div className="mx-auto max-w-5xl">
-            <OrderPageHeader order={order} trackingNumber={trackingNumber} />
+            <OrderPageHeader order={order} />
 
             <div className="order-confirmation-card track-order-stepper-card">
               <OrderStatusStepper order={order} variant="track" showTitle={false} />
@@ -113,9 +110,9 @@ export function TrackOrderPageContent() {
                 {canReturn && (
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="primary"
                     fullWidth
-                    className="track-order-cancel-btn"
+                    className="track-order-cancel-btn track-order-return-btn"
                     onClick={handleReturnOrder}
                   >
                     {t('checkout.track.returnOrder')}
