@@ -1,7 +1,8 @@
 // src/components/category/CategoryToolbar.tsx
-import { ChevronDown, SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
+import { Dropdown } from '../ui/Dropdown'
 import { focusRingClasses } from '../ui/interactionStyles'
 import type { SortOption } from './categoryData'
 
@@ -31,21 +32,24 @@ function SortSelect({
 }) {
   const { t } = useTranslation()
 
+  const options = [
+    { value: 'newest', label: t('categorySort.newest') },
+    { value: 'price-asc', label: t('categorySort.priceAsc') },
+    { value: 'price-desc', label: t('categorySort.priceDesc') },
+    { value: 'rating', label: t('categorySort.rating') },
+  ]
+
   return (
-    <label className={cn('relative block', className)}>
-      <span className="sr-only">{t('categorySort.label')}</span>
-      <select
-        value={sort}
-        onChange={(event) => onSortChange(event.target.value as SortOption)}
-        className="catalog-sort-select"
-      >
-        <option value="newest">{t('categorySort.newest')}</option>
-        <option value="price-asc">{t('categorySort.priceAsc')}</option>
-        <option value="price-desc">{t('categorySort.priceDesc')}</option>
-        <option value="rating">{t('categorySort.rating')}</option>
-      </select>
-      <ChevronDown className="catalog-sort-chevron" strokeWidth={1.75} aria-hidden />
-    </label>
+    <Dropdown
+      className={className}
+      options={options}
+      value={sort}
+      onChange={(next) => onSortChange(next as SortOption)}
+      ariaLabel={t('categorySort.label')}
+      unstyled
+      triggerClassName="catalog-sort-select"
+      panelMinWidth
+    />
   )
 }
 
