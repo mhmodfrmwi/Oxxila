@@ -7,7 +7,7 @@ import { cn } from '../../lib/cn'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { useToast } from '../../context/ToastContext'
-import { LOGIN_PATH, PAYMENT_PATH } from '../../config/routes'
+import { goToCheckout } from '../../utils/authReturnTo'
 import { ApiError, getAccessToken } from '../../lib/api'
 import { useProductCardActions } from '../../hooks/useProductCardActions'
 import { Button } from '../ui/Button'
@@ -107,10 +107,13 @@ function translateBadge(badge: string | undefined, t: (key: string) => string) {
   if (!badge) return undefined
   switch (badge) {
     case 'Best seller':
+    case 'bestSeller':
       return t('productDetail.badge.bestSeller')
     case 'Certified':
+    case 'certified':
       return t('productDetail.badge.certified')
     case 'Bundle':
+    case 'bundle':
       return t('productDetail.badge.bundle')
     default:
       return badge
@@ -123,8 +126,13 @@ function translateTag(tag: string, t: (key: string) => string) {
       return t('productDetail.tag.sensitiveSkin')
     case 'Certified':
       return t('productDetail.badge.certified')
-    default:
-      return tag
+    default: {
+      // Skin-concern slugs ("wide-pores") come from the API untranslated.
+      const key = `home.skinConcerns.items.${tag}`
+      const translated = t(key)
+      if (translated !== key) return translated
+      return tag.replace(/-/g, ' ')
+    }
   }
 }
 
@@ -177,7 +185,6 @@ export function ProductHero({
     advantages,
     composition,
     images,
-    beforeAfterImages,
     sizes,
     shades,
     categoryName,
@@ -225,15 +232,8 @@ export function ProductHero({
 
   const badgeLabel = translateBadge(badge, t)
 
-  function requireAuth(): boolean {
-    if (isAuthenticated && getAccessToken()) return true
-    toast.error(t('productDetail.auth.signInRequired'), t('productDetail.auth.signInRequiredDetail'))
-    navigate(LOGIN_PATH)
-    return false
-  }
-
+  // Guests can add to cart (localStorage cart); sign-in is only required at checkout.
   async function handleAddToCart() {
-    if (!requireAuth()) return
 
     if (!product.id?.trim()) {
       setCartMessage(t('productDetail.cart.missingId'))
@@ -267,7 +267,6 @@ export function ProductHero({
   }
 
   async function handleOneClickCheckout() {
-    if (!requireAuth()) return
     if (!product.id?.trim() || isOutOfStock || checkoutLoading) return
 
     const safeQuantity = Math.min(Math.max(1, quantity), maxQuantity)
@@ -277,7 +276,7 @@ export function ProductHero({
 
     try {
       await addToCart(product.id, safeQuantity)
-      navigate(PAYMENT_PATH)
+      goToCheckout(navigate, isAuthenticated && Boolean(getAccessToken()))
     } catch (error) {
       setCartMessage(
         error instanceof ApiError ? error.message : t('productDetail.cart.failed'),
@@ -345,7 +344,9 @@ export function ProductHero({
 
             {badgeLabel && (
               <div className="mb-2.5">
-                <ProductBadge>{badgeLabel}</ProductBadge>
+                <ProductBadge kind={badge} size="md">
+                  {badgeLabel}
+                </ProductBadge>
               </div>
             )}
 
@@ -397,30 +398,6 @@ export function ProductHero({
                   activeIndex={activeImageIndex}
                   onSelect={setActiveImageIndex}
                 />
-              </section>
-            )}
-
-            {beforeAfterImages.length > 0 && (
-              <section
-                className="product-detail-ba-section"
-                aria-label={t('productDetail.beforeAfterAria')}
-              >
-                <p className="product-detail-section-label">{t('productDetail.beforeAfter')}</p>
-                <ul className="product-detail-media-thumbs flex flex-wrap">
-                  {beforeAfterImages.map((image, index) => (
-                    <li key={`${image.src}-ba-${index}`}>
-                      <div className="product-card-frame product-detail-ba-thumb overflow-hidden border border-border-subtle">
-                        <img
-                          src={image.src}
-                          alt={image.alt}
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                          draggable={false}
-                        />
-                      </div>
-                    </li>
-                  ))}
-                </ul>
               </section>
             )}
 
@@ -559,11 +536,11 @@ export function ProductHero({
               {tags.length > 0 && (
                 <div className="col-span-2">
                   <dt>{t('productDetail.tags')}</dt>
-                  <dd className="mt-1 flex flex-wrap gap-1.5">
+                  <dd className="mt-2 flex flex-wrap gap-2">
                     {tags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-md bg-surface-muted px-2 py-0.5 text-xs leading-4 text-primary-text"
+                        className="rounded-full border border-border-subtle bg-surface-muted px-3 py-1 text-xs leading-4 text-primary-text"
                       >
                         {translateTag(tag, t)}
                       </span>

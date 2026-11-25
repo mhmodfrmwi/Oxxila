@@ -31,7 +31,6 @@ export interface ProductDetail {
   advantages: string[]
   composition: string[]
   images: ProductImage[]
-  beforeAfterImages: ProductImage[]
   sizes: string[]
   shades?: string[]
   sku: string

@@ -1,4 +1,5 @@
 import { Star } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { formatReviewCount } from '../../utils/formatReviewCount'
 
@@ -50,15 +51,17 @@ export function ProductRating({
   starSize = 12,
   variant = 'card',
 }: ProductRatingProps) {
+  const { t } = useTranslation()
+  const reviewsLabel = t('productDetail.reviewsCount', { count: reviewCount })
   if (variant === 'detail') {
     return (
       <div
         className={cn('product-detail-rating flex flex-wrap items-center gap-x-3 gap-y-1', className)}
-        aria-label={`${rating} out of 5 stars, ${formatReviewCount(reviewCount)} reviews`}
+        aria-label={`${rating}/5 · ${reviewsLabel}`}
       >
         <StarRow rating={rating} size={starSize} gapClassName="gap-[3px]" />
         <span className="product-detail-rating-reviews">
-          {formatReviewCount(reviewCount)} reviews
+          {reviewsLabel}
         </span>
       </div>
     )
@@ -68,7 +71,7 @@ export function ProductRating({
     return (
       <div
         className={cn('flex shrink-0 items-center gap-1 text-xs', className)}
-        aria-label={`${rating} out of 5 stars, ${formatReviewCount(reviewCount)} reviews`}
+        aria-label={`${rating}/5 · ${reviewsLabel}`}
       >
         <Star
           size={starSize}

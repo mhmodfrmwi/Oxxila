@@ -1,12 +1,18 @@
 // src/hooks/useProductPageData.ts
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getProductFaqs, getProductReviewStats, getProductReviews, getProducts } from '../api/catalog'
+import {
+  getProductFaqs,
+  getProductReviewStats,
+  getProductReviews,
+  getProducts,
+  getRelatedProducts,
+} from '../api/catalog'
 import type { ReviewsSectionProps } from '../components/product/reviews/types'
 import type { FAQItem } from '../components/product/QuestionsSafetySection'
 import type { ProductDetail } from '../types/productDetail'
 import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
-import type { ApiReview } from '../types/catalog'
+import type { ApiProduct, ApiReview } from '../types/catalog'
 import { useAuth } from '../context/AuthContext'
 import { ApiError } from '../lib/api'
 import { useLandingCatalogContext } from './useLandingCatalogContext'
@@ -14,7 +20,9 @@ import {
   buildMoreFromBrandProducts,
   buildReconciledReviewsSectionData,
   mapApiProductToProductDetail,
+  mapApiProductToRecommendedProduct,
 } from '../utils/productDetailMappers'
+import { recordGuestView } from '../utils/guestBrowsingHistory'
 import { resolveProductBySlug } from '../utils/resolveProductBySlug'
 
 export type ProductPageErrorKind = 'not_found' | 'load_failed' | null
@@ -38,6 +46,8 @@ export interface ProductPageDataState {
     'averageRating' | 'totalReviews' | 'distribution' | 'reviews' | 'reviewsTotalDocuments'
   >
   moreFromBrandProducts: RecommendedProduct[]
+  /** Server-ranked "you may also like" for this product (same concerns / sub-category first). */
+  relatedProducts: RecommendedProduct[]
   hasMoreReviews: boolean
   refreshReviews: () => Promise<void>
   loadMoreReviews: () => Promise<void>
@@ -79,6 +89,7 @@ const missingSlugState: ProductPageDataState = {
   faqs: [],
   reviewsData: emptyReviewsData,
   moreFromBrandProducts: [],
+  relatedProducts: [],
   hasMoreReviews: false,
   refreshReviews: noopAsync,
   loadMoreReviews: noopAsync,
@@ -113,6 +124,8 @@ export function useProductPageData(slug: string | undefined): ProductPageDataSta
   const localeRef = useRef(locale)
   const productIdRef = useRef<string | null>(null)
   const productRef = useRef<ProductDetail | null>(null)
+  // Raw API product, so text/names can be re-localized when the language switches.
+  const apiProductRef = useRef<ApiProduct | null>(null)
   const reviewsPageRef = useRef(1)
   const reviewsTotalRef = useRef(0)
   const apiReviewsRef = useRef<ApiReview[]>([])
@@ -130,7 +143,15 @@ export function useProductPageData(slug: string | undefined): ProductPageDataSta
   const [faqs, setFaqs] = useState<FAQItem[]>([])
   const [reviewsData, setReviewsData] = useState(emptyReviewsData)
   const [moreFromBrandProducts, setMoreFromBrandProducts] = useState<RecommendedProduct[]>([])
+  const [relatedProducts, setRelatedProducts] = useState<RecommendedProduct[]>([])
   const [hasMoreReviews, setHasMoreReviews] = useState(false)
+
+  // Language switch: re-map the already-loaded product (no refetch) so description, tabs and
+  // names follow the active language immediately.
+  useEffect(() => {
+    const raw = apiProductRef.current
+    if (raw) setProduct(mapApiProductToProductDetail(raw))
+  }, [locale])
 
   useEffect(() => {
     catalogProductsRef.current = catalogProducts
@@ -263,6 +284,7 @@ export function useProductPageData(slug: string | undefined): ProductPageDataSta
       setFaqs([])
       setReviewsData(emptyReviewsData)
       setMoreFromBrandProducts([])
+      setRelatedProducts([])
       setHasMoreReviews(false)
       reviewsPageRef.current = 1
       reviewsTotalRef.current = 0
@@ -277,9 +299,27 @@ export function useProductPageData(slug: string | undefined): ProductPageDataSta
         if (cancelled) return
 
         const mappedProduct = mapApiProductToProductDetail(apiProduct)
+        apiProductRef.current = apiProduct
         setProduct(mappedProduct)
         setProductId(apiProduct._id)
         setLoading(false)
+
+        // Signed-in views are recorded server-side by GET /products/:id; guests keep a local list.
+        if (!isAuthenticated) recordGuestView(apiProduct._id)
+
+        void getRelatedProducts(apiProduct._id, 12)
+          .then((response) => {
+            if (!cancelled) {
+              setRelatedProducts(
+                (response.data ?? []).map((item) =>
+                  mapApiProductToRecommendedProduct(item, localeRef.current),
+                ),
+              )
+            }
+          })
+          .catch(() => {
+            if (!cancelled) setRelatedProducts([])
+          })
 
         const brandId = apiProduct.brand?._id
         if (brandId) {
@@ -344,6 +384,7 @@ export function useProductPageData(slug: string | undefined): ProductPageDataSta
         setProductId(null)
         setFaqs([])
         setMoreFromBrandProducts([])
+        setRelatedProducts([])
         setReviewsData(emptyReviewsData)
         setError(resolved.message)
         setErrorKind(resolved.kind)
@@ -386,6 +427,7 @@ export function useProductPageData(slug: string | undefined): ProductPageDataSta
     faqs,
     reviewsData,
     moreFromBrandProducts,
+    relatedProducts,
     hasMoreReviews,
     refreshReviews,
     loadMoreReviews,

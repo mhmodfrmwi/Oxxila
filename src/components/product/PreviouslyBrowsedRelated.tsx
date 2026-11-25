@@ -1,6 +1,5 @@
 // src/components/product/PreviouslyBrowsedRelated.tsx
 import { useTranslation } from 'react-i18next'
-import { useAuth } from '../../context/AuthContext'
 import { ContentSection } from '../layout/ContentSection'
 import { SectionHeader } from '../landing/SectionHeader'
 import { ProductCarousel } from '../shop/recommended/ProductCarousel'
@@ -11,14 +10,13 @@ export interface PreviouslyBrowsedRelatedProps {
   loading?: boolean
 }
 
+/** Recently viewed products (account history, or localStorage for guests). */
 export function PreviouslyBrowsedRelated({
   products,
   loading = false,
 }: PreviouslyBrowsedRelatedProps) {
   const { t } = useTranslation()
-  const { isAuthenticated } = useAuth()
 
-  if (!isAuthenticated) return null
   if (!loading && products.length === 0) return null
 
   return (
@@ -26,6 +24,7 @@ export function PreviouslyBrowsedRelated({
       <SectionHeader
         id="previously-browsed-related-heading"
         title={t('productDetail.previouslyBrowsedRelated')}
+        subtitle={t('productDetail.previouslyBrowsedSubtitle')}
         size="compact"
       />
       {loading && products.length === 0 ? (

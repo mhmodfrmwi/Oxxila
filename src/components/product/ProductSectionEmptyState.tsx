@@ -30,7 +30,7 @@ export function ProductSectionEmptyState({
       role="status"
     >
       <div className="product-section-empty-icon" aria-hidden>
-        <Icon size={26} strokeWidth={1.5} />
+        <Icon size={28} strokeWidth={1.5} />
       </div>
       <div className="product-section-empty-copy">
         <h3 className="product-section-empty-title">{title}</h3>
@@ -38,8 +38,8 @@ export function ProductSectionEmptyState({
         {actionLabel && onAction && (
           <Button
             type="button"
-            variant={variant === 'default' ? 'primary' : 'outline'}
-            pill={variant !== 'default'}
+            variant="primary"
+            pill
             className="product-section-empty-action"
             onClick={onAction}
           >

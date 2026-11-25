@@ -22,9 +22,22 @@ export function ReviewCard({
   const titleId = review.title ? `review-title-${review.id}` : undefined
 
   return (
-    <article aria-labelledby={titleId}>
-      <div className="review-card-header">
-        <StarDisplay rating={review.rating} size={14} className="review-card-stars" />
+    <article aria-labelledby={titleId} className="review-card">
+      <div className="review-card-top">
+        <div className="review-card-reviewer">
+          {review.avatar ? (
+            <img src={review.avatar} alt="" className="review-card-avatar" loading="lazy" />
+          ) : (
+            // Initials fallback keeps every card visually anchored when no photo exists.
+            <span className="review-card-avatar review-card-avatar--initials" aria-hidden>
+              {(review.name || '?').trim().charAt(0).toUpperCase()}
+            </span>
+          )}
+          <div className="min-w-0">
+            {review.name && <span className="review-card-name">{review.name}</span>}
+            <StarDisplay rating={review.rating} size={13} className="review-card-stars" />
+          </div>
+        </div>
         {review.date && (
           <time className="review-card-date" dateTime={review.date}>
             {review.date}
@@ -33,21 +46,15 @@ export function ReviewCard({
       </div>
 
       {review.title && (
-        <h3 id={titleId} className="review-card-title">
+        <h3 id={titleId} className="review-card-title" dir="auto">
           {review.title}
         </h3>
       )}
 
-      <p className="review-card-comment">{review.comment}</p>
-
-      {(review.name || review.avatar) && (
-        <div className="review-card-reviewer">
-          {review.avatar && (
-            <img src={review.avatar} alt="" className="review-card-avatar" loading="lazy" />
-          )}
-          {review.name && <span className="review-card-name">{review.name}</span>}
-        </div>
-      )}
+      {/* dir="auto": an Arabic review in an English page (or the reverse) reads in its own direction. */}
+      <p className="review-card-comment" dir="auto">
+        {review.comment}
+      </p>
 
       <div className="review-card-footer">
         <button

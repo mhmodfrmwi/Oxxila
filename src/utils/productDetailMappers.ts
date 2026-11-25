@@ -1,9 +1,11 @@
+import { isArabicLocale } from './activeLocale'
 import { PRODUCTS_PATH, SEARCH_PATH, SHOP_PATH } from '../config/routes'
 import { categoryBrowsePath } from './categoryBrowseParams'
 import type { ProductDetail, ProductImage } from '../types/productDetail'
 import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
 import type { ApiProduct, ApiReview } from '../types/catalog'
 import type { RatingDistribution, Review } from '../components/product/reviews/types'
+import { catalogDisplayName } from './catalogDisplayName'
 import { resolveProductImageUrl } from './productImage'
 import { resolveDiscountPercent, resolveProductPricing } from './productPricing'
 
@@ -63,10 +65,11 @@ function extractVariants(catalog: unknown): { sizes: string[]; shades?: string[]
   }
 }
 
+/** Stable badge keys — translate in UI with `t('shop.product.badge.<key>')`. */
 function resolveProductBadge(product: ApiProduct): string | undefined {
-  if (product.isBestSeller) return 'Best seller'
-  if (product.isCertified) return 'Certified'
-  if (product.isBundle) return 'Bundle'
+  if (product.isBestSeller) return 'bestSeller'
+  if (product.isCertified) return 'certified'
+  if (product.isBundle) return 'bundle'
   return undefined
 }
 
@@ -91,7 +94,8 @@ function formatOfferEndsLabel(value: string | null | undefined): string | undefi
 
 function buildTags(product: ApiProduct): string[] {
   const tags = new Set<string>()
-  if (product.category?.name) tags.add(product.category.name)
+  const categoryName = catalogDisplayName(product.category, undefined, 'category')
+  if (categoryName) tags.add(categoryName)
   product.concerns?.forEach((concern) => tags.add(concern))
   if (product.isSensitiveSkin) tags.add('Sensitive skin')
   if (product.isCertified) tags.add('Certified')
@@ -106,28 +110,39 @@ function readOptionalString(record: Record<string, unknown>, keys: string[]): st
   return undefined
 }
 
-export function mapApiProductToRecommendedProduct(product: ApiProduct): RecommendedProduct {
+export function mapApiProductToRecommendedProduct(
+  product: ApiProduct,
+  locale?: string | null,
+): RecommendedProduct {
   const { price, originalPrice } = resolveProductPricing(product)
+  const title = catalogDisplayName(product, locale, 'product')
 
   return {
     id: product._id,
-    brand: product.brand?.name ?? '',
-    title: product.name,
+    brand: catalogDisplayName(product.brand, locale, 'brand'),
+    title,
     price,
     originalPrice,
     rating: product.ratingsAverage ?? 0,
     reviewCount: product.ratingsQuantity ?? 0,
     image: resolveProductImageUrl(product.images?.[0]),
-    imageAlt: product.name,
+    imageAlt: title,
     badge: resolveProductBadge(product),
     href: `${PRODUCTS_PATH}/${product.slug}`,
     stock: product.stock,
+    reason: product.recommendationReason,
   }
+}
+
+function pickLocalized(ar: string | undefined | null, en: string | undefined | null): string {
+  if (isArabicLocale() && ar?.trim()) return ar
+  return en ?? ''
 }
 
 export function mapApiProductToProductDetail(product: ApiProduct): ProductDetail {
   const { price, originalPrice } = resolveProductPricing(product)
-  const images = mapImages(product.images ?? [], product.name)
+  const title = catalogDisplayName(product, undefined, 'product')
+  const images = mapImages(product.images ?? [], title)
   const variants = extractVariants(product.catalog)
   const productRecord = product as ApiProduct & Record<string, unknown>
   const deliveryEstimate = readOptionalString(productRecord, [
@@ -140,34 +155,38 @@ export function mapApiProductToProductDetail(product: ApiProduct): ProductDetail
     id: product._id,
     slug: product.slug,
     href: `${PRODUCTS_PATH}/${product.slug}`,
-    brand: product.brand?.name?.trim() ?? '',
+    brand: catalogDisplayName(product.brand, undefined, 'brand'),
     brandLogo: product.brand?.logo
       ? resolveProductImageUrl(product.brand.logo)
       : undefined,
     brandHref: product.brand?._id
       ? `${SEARCH_PATH}?brand=${encodeURIComponent(product.brand._id)}`
       : undefined,
-    title: product.name,
+    title,
     price,
     originalPrice,
     rating: product.ratingsAverage ?? 0,
     reviewCount: product.ratingsQuantity ?? 0,
     image: resolveProductImageUrl(product.images?.[0]),
-    imageAlt: product.name,
+    imageAlt: title,
     badge: resolveProductBadge(product),
     offerEndsAt: resolveOfferEndsAt(product.offerEndsAt),
     offerEndsLabel: formatOfferEndsLabel(product.offerEndsAt),
     soldCount: product.soldCount != null && product.soldCount > 0 ? product.soldCount : undefined,
-    subCategoryName: product.subCategory?.[0]?.name,
-    categoryName: product.category?.name ?? '',
+    subCategoryName: catalogDisplayName(
+      product.subCategory?.[0],
+      undefined,
+      'subcategory',
+    ),
+    categoryName: catalogDisplayName(product.category, undefined, 'category'),
     categoryHref: product.category?.slug
       ? categoryBrowsePath(product.category.slug)
       : SHOP_PATH,
-    description: product.description ?? '',
-    advantages: parseDelimitedList(product.advantages),
-    composition: parseDelimitedList(product.composition),
+    // Arabic copy in Arabic; English (the original field) otherwise or when no Arabic exists.
+    description: pickLocalized(product.descriptionAr, product.description),
+    advantages: parseDelimitedList(pickLocalized(product.advantagesAr, product.advantages)),
+    composition: parseDelimitedList(pickLocalized(product.compositionAr, product.composition)),
     images,
-    beforeAfterImages: [],
     sizes: variants.sizes,
     shades: variants.shades,
     sku: product._id,
@@ -189,7 +208,7 @@ export function buildMoreFromBrandProducts(
 ): RecommendedProduct[] {
   return products
     .filter((product) => product._id !== currentProductId)
-    .map(mapApiProductToRecommendedProduct)
+    .map((product) => mapApiProductToRecommendedProduct(product))
 }
 
 export function buildCatalogProductsForCategory(
@@ -198,7 +217,7 @@ export function buildCatalogProductsForCategory(
 ): RecommendedProduct[] {
   return products
     .filter((product) => product.category?.slug === categorySlug)
-    .map(mapApiProductToRecommendedProduct)
+    .map((product) => mapApiProductToRecommendedProduct(product))
 }
 
 function formatReviewDate(value: string | undefined, locale = 'en'): string {

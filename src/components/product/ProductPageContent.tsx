@@ -12,6 +12,7 @@ import { MoreFromMACCosmetics } from './MoreFromMACCosmetics'
 import { PreviouslyBrowsedRelated } from './PreviouslyBrowsedRelated'
 import { ProductHero } from './ProductHero'
 import { ProductPageErrorState } from './ProductPageErrorState'
+import { RelatedProducts } from './RelatedProducts'
 import { QuestionsSafetySection } from './QuestionsSafetySection'
 import { ReviewsSection } from './reviews/ReviewsSection'
 import { WriteReviewDialog } from './WriteReviewDialog'
@@ -41,6 +42,7 @@ export function ProductPageContent() {
     faqs,
     reviewsData,
     moreFromBrandProducts,
+    relatedProducts,
     brandName,
     hasMoreReviews,
     refreshReviews,
@@ -119,6 +121,7 @@ export function ProductPageContent() {
       </div>
 
       <MoreFromMACCosmetics brandName={brandName} products={moreFromBrandProducts} />
+      <RelatedProducts products={relatedProducts} />
       <PreviouslyBrowsedRelated products={relatedBrowsed} loading={browsedLoading} />
 
       <AskSpecialistDialog
