@@ -1,0 +1,49 @@
+name: Deploy frontend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Lint currently has existing errors; report them but don't block deploys.
+      # Remove continue-on-error once lint is clean.
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build
+        env:
+          # vite.config.ts reads BASE_URL and fails the build if it is missing.
+          BASE_URL: ${{ vars.BASE_URL }}
+        run: npm run build
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "${{ secrets.VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      # The deploy key only runs /usr/local/bin/oxxila-deploy on the server, which
+      # unpacks this tarball into the oxxilapharma.com web root (keeping a backup).
+      - name: Deploy
+        run: tar -czf - -C dist . | ssh -i ~/.ssh/deploy_key "root@${{ secrets.VPS_HOST }}" frontend
