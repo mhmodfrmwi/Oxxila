@@ -17,6 +17,7 @@ import { AuthCard } from './AuthCard'
 import { FormMessage } from './FormMessage'
 import { PasswordStrength } from './PasswordStrength'
 import { SocialLoginButtons } from './SocialLoginButtons'
+import { peekReturnTo } from '../../utils/authReturnTo'
 
 export function RegisterForm() {
   const { t } = useTranslation()
@@ -50,9 +51,10 @@ export function RegisterForm() {
       await register({ name, email, phone, password: nextPassword })
       const successMessage = t('auth.register.successMessage')
       toast.success(t('auth.register.successTitle'), successMessage)
+      // Keep the checkout return path (stored in sessionStorage) for the login step.
       navigate('/login', {
         replace: true,
-        state: { message: successMessage },
+        state: { message: successMessage, from: peekReturnTo() ?? undefined },
       })
     } catch (err) {
       const message =
@@ -66,16 +68,16 @@ export function RegisterForm() {
 
   return (
     <AuthCard activeTab="signup" imagePosition="left">
-      <header className="mb-8">
-        <Heading variant="page-lg">{t('auth.register.title')}</Heading>
-        <p className="mt-2 font-serif text-xl text-secondary-text">
+      <header className="mb-6 sm:mb-8">
+        <Heading variant="page-lg" className="auth-title">{t('auth.register.title')}</Heading>
+        <p className="mt-2 font-serif text-base sm:text-xl text-secondary-text">
           {t('auth.register.subtitle')}
         </p>
       </header>
 
       {error && <div className="mb-4"><FormMessage message={error} /></div>}
 
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit} noValidate>
         <InputField
           label={t('auth.register.fullName')}
           type="text"

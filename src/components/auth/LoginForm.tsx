@@ -7,6 +7,7 @@ import { useToast } from '../../context/ToastContext'
 import { ApiError } from '../../lib/api'
 import { getOAuthErrorMessage, getOAuthSearchParams } from '../../utils/oauth'
 import { consumeOAuthError } from '../../utils/oauthBootstrap'
+import { consumeReturnTo, peekReturnTo } from '../../utils/authReturnTo'
 import { resolvePostLoginPath } from '../../utils/postLoginRedirect'
 import {
   hasFieldErrors,
@@ -40,7 +41,8 @@ export function LoginForm() {
   const returnTo =
     typeof (location.state as { from?: unknown } | null)?.from === 'string'
       ? (location.state as { from: string }).from
-      : null
+      : peekReturnTo()
+  const checkoutReason = (location.state as { reason?: unknown } | null)?.reason === 'checkout'
   const [oauthError] = useState(() => readOAuthError(location.state))
   const [error, setError] = useState(() =>
     (location.state as { sessionExpired?: boolean } | null)?.sessionExpired
@@ -48,15 +50,18 @@ export function LoginForm() {
       : '',
   )
   const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({})
-  const [success, setSuccess] = useState(
-    (location.state as { message?: string; sessionExpired?: boolean } | null)?.sessionExpired
-      ? ''
-      : ((location.state as { message?: string } | null)?.message ?? ''),
-  )
+  const [success, setSuccess] = useState(() => {
+    if ((location.state as { sessionExpired?: boolean } | null)?.sessionExpired) return ''
+    const message = (location.state as { message?: string } | null)?.message
+    if (message) return message
+    // Guest came from "Checkout": reassure them the cart is kept.
+    return checkoutReason ? t('auth.login.checkoutPrompt') : ''
+  })
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (isAuthenticated) {
+      consumeReturnTo()
       navigate(resolvePostLoginPath(user?.role, returnTo), { replace: true })
     }
   }, [isAuthenticated, navigate, returnTo, user?.role])
@@ -90,6 +95,7 @@ export function LoginForm() {
     try {
       const nextUser = await login({ email, password })
       toast.success(t('auth.login.successTitle'), t('auth.login.welcomeBack', { name: nextUser.name }))
+      consumeReturnTo()
       navigate(resolvePostLoginPath(nextUser.role, returnTo), { replace: true })
     } catch (err) {
       const message =
@@ -103,9 +109,9 @@ export function LoginForm() {
 
   return (
     <AuthCard activeTab="login" imagePosition="right">
-      <header className="mb-8">
-        <Heading variant="page-lg">{t('auth.login.title')}</Heading>
-        <p className="mt-2 font-serif text-xl italic text-accent-muted">{t('auth.login.subtitle')}</p>
+      <header className="mb-6 sm:mb-8">
+        <Heading variant="page-lg" className="auth-title">{t('auth.login.title')}</Heading>
+        <p className="mt-2 font-serif text-base sm:text-xl italic text-accent-muted">{t('auth.login.subtitle')}</p>
       </header>
 
       {(error || oauthError) && (
@@ -115,7 +121,7 @@ export function LoginForm() {
       )}
       {success && <div className="mb-4"><FormMessage message={success} type="success" /></div>}
 
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit} noValidate>
           <InputField
             label={t('auth.fields.email')}
             type="email"

@@ -10,6 +10,7 @@ import {
 } from '../utils/oauth'
 import { consumeOAuthError } from '../utils/oauthBootstrap'
 import { resolvePostLoginPath } from '../utils/postLoginRedirect'
+import { consumeReturnTo } from '../utils/authReturnTo'
 
 /** Fallback OAuth handler when bootstrap did not run (e.g. client-side navigation). */
 export function useOAuthCallback() {
@@ -31,7 +32,7 @@ export function useOAuthCallback() {
     if (accessToken) {
       handledRef.current = true
       setSession(accessToken, user)
-      const nextPath = resolvePostLoginPath(user?.role)
+      const nextPath = resolvePostLoginPath(user?.role, consumeReturnTo())
       clearOAuthUrl(nextPath)
       if (location.pathname !== nextPath) {
         navigate(nextPath, { replace: true })

@@ -17,7 +17,7 @@ export function AuthCard({ activeTab, children, imagePosition }: AuthCardProps) 
   const flipImage = activeTab === 'login'
 
   return (
-    <article className="flex w-full flex-col overflow-hidden rounded-3xl bg-card shadow-xl max-lg:rounded-none lg:min-h-[780px] lg:flex-row">
+    <article className="flex flex-col overflow-hidden rounded-3xl bg-card shadow-xl max-lg:rounded-none max-lg:shadow-none lg:mx-[var(--page-gutter)] lg:min-h-[780px] lg:flex-row">
       {imagePosition === 'left' && (
         <AuthVisual activeTab={activeTab} className={visualOrder} flipImage={flipImage} />
       )}
@@ -25,7 +25,7 @@ export function AuthCard({ activeTab, children, imagePosition }: AuthCardProps) 
       <section
         className={[
           formOrder,
-          'flex flex-1 flex-col justify-center px-5 py-8 sm:px-8 sm:py-10 lg:flex-[0.85] lg:px-10 lg:py-12 xl:px-14',
+          'flex flex-1 flex-col justify-center px-5 py-6 sm:px-8 sm:py-10 lg:flex-[0.85] lg:px-10 lg:py-12 xl:px-14',
         ].join(' ')}
         aria-label={
           activeTab === 'login' ? t('auth.login.formAria') : t('auth.register.formAria')

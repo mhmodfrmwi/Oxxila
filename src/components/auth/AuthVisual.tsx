@@ -22,7 +22,8 @@ export function AuthVisual({
   return (
     <aside
       className={[
-        "relative w-full max-lg:px-4 max-lg:pb-5 sm:max-lg:px-5 lg:flex-[1.15] lg:p-0",
+        // Decorative panel: desktop only. Stacked under the form on phones it just added ~400px of scrolling.
+        "relative hidden w-full lg:block lg:flex-[1.15] lg:p-0",
         className,
       ].join(" ")}
       aria-label={t("auth.visual.ariaLabel")}
