@@ -8,7 +8,6 @@ import { BrandStores } from '../components/shop/brand-stores/BrandStores'
 import { MoreReasonsSection } from '../components/shop/MoreReasonsSection'
 import { RecommendedProductsSection } from '../components/shop/recommended/RecommendedProductsSection'
 import { PreviouslyBrowsedProductsSection } from '../components/shop/previously-browsed/PreviouslyBrowsedProductsSection'
-import { ShopCategoriesStrip } from '../components/shop/ShopCategoriesStrip'
 import { ShopHeroCarousel } from '../components/shop/ShopHeroCarousel'
 
 export function ShopPage() {
@@ -16,7 +15,7 @@ export function ShopPage() {
     <Layout>
       <PageBleed>
         <ShopHeroCarousel />
-        <ShopCategoriesStrip />
+        {/* TODO: <ShopCategoriesStrip /> is temporarily hidden; re-add it here when needed */}
         <MoreReasonsSection />
         <RecommendedProductsSection />
         <PreviouslyBrowsedProductsSection />

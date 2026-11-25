@@ -5,8 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { sendContactMessage } from '../../../api/settings'
 import { ApiError } from '../../../lib/api'
 import { cn } from '../../../lib/cn'
-import { gradientCtaClasses } from '../../ui/buttonStyles'
-import { typeSmallClasses } from '../../ui/typography'
 
 type FieldName = 'name' | 'email' | 'message'
 
@@ -23,17 +21,23 @@ interface FormErrors {
 }
 
 const inputBase = [
-  'peer min-h-11 h-14 w-full rounded-2xl border px-4 pt-5 pb-1.5 text-sm outline-none transition-all duration-300 sm:text-base',
-  'bg-input text-primary-text placeholder-transparent',
-  'border-transparent focus:border-accent-soft/50 focus:ring-2 focus:ring-accent-soft/25',
-  'disabled:cursor-not-allowed disabled:opacity-60',
+  'landing-fixed-text peer h-14 w-full rounded-2xl border px-4 pt-6 pb-2 outline-none transition-[border-color,box-shadow] duration-300 [--landing-size:0.9375rem] sm:px-5 lg:h-[74px] lg:rounded-[20px] lg:[--landing-size:1.0625rem]',
+  'bg-background text-primary-text placeholder-transparent',
+  'border-transparent focus:border-button-primary/50 focus:ring-2 focus:ring-button-primary/25',
+  'disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none',
 ].join(' ')
 
 const labelBase = [
-  'pointer-events-none absolute start-4 text-placeholder-text transition-all duration-200',
-  'top-1/2 -translate-y-1/2 text-sm',
-  'peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-accent-soft',
-  'peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs',
+  'landing-fixed-text pointer-events-none absolute start-4 text-placeholder-text transition-all duration-200 motion-reduce:transition-none [--landing-size:0.9375rem] sm:start-5 lg:[--landing-size:1.0625rem]',
+  'top-1/2 -translate-y-1/2',
+  'peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-xs! peer-focus:text-button-primary',
+  'peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs!',
+].join(' ')
+
+const textareaLabelBase = [
+  'landing-fixed-text pointer-events-none absolute start-4 top-4 text-placeholder-text transition-all duration-200 motion-reduce:transition-none [--landing-size:0.9375rem] sm:start-5 lg:top-5 lg:[--landing-size:1.0625rem]',
+  'peer-focus:top-2.5 peer-focus:text-xs! peer-focus:text-button-primary',
+  'peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:text-xs!',
 ].join(' ')
 
 interface FloatingFieldProps {
@@ -70,7 +74,7 @@ function FloatingField({
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `contact-${id}-error` : undefined}
           onChange={(e) => onChange(e.target.value)}
-          className={cn(inputBase, 'h-auto min-h-[7.5rem] resize-y py-4')}
+          className={cn(inputBase, 'h-[120px] min-h-[120px] resize-y pt-8 lg:h-[150px] lg:min-h-[150px]')}
         />
       ) : (
         <input
@@ -86,7 +90,7 @@ function FloatingField({
           className={inputBase}
         />
       )}
-      <label htmlFor={`contact-${id}`} className={labelBase}>
+      <label htmlFor={`contact-${id}`} className={isTextarea ? textareaLabelBase : labelBase}>
         {label}
       </label>
       {error && (
@@ -173,7 +177,7 @@ export function ContactForm() {
       onSubmit={(event) => {
         void handleSubmit(event)
       }}
-      className="mx-auto w-full max-w-xl space-y-4 px-0 sm:px-0"
+      className="landing-type mx-auto flex w-full max-w-[454px] flex-col gap-3 sm:gap-4 lg:gap-6"
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
@@ -221,10 +225,11 @@ export function ContactForm() {
         type="submit"
         disabled={submitting}
         className={cn(
-          'flex h-14 w-full min-h-11 items-center justify-center gap-2 rounded-full px-8 text-on-emphasis',
-          typeSmallClasses,
-          gradientCtaClasses,
-          'disabled:cursor-not-allowed disabled:opacity-60',
+          'landing-fixed-text flex h-12 w-full items-center justify-center gap-2 rounded-full px-9 [--landing-size:0.9375rem] sm:h-14 lg:h-[70px] lg:[--landing-size:1.0625rem]',
+          'bg-button-primary text-on-emphasis',
+          'transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg hover:shadow-button-primary/35',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card',
+          'disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none motion-reduce:hover:translate-y-0',
         )}
       >
         {submitting ? t('home.contact.sending') : t('home.contact.send')}

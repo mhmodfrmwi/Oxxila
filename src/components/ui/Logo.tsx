@@ -7,13 +7,18 @@ interface LogoProps {
   linkTo?: string;
   /** Icon mark only */
   variant?: "full" | "icon";
+  /** "header" matches the Figma header lockup (32×33 mark, 6px gap, 26px wordmark) from md up. */
+  size?: "default" | "header";
 }
 
 export function Logo({
   className = "",
   linkTo = "/home",
   variant = "full",
+  size = "default",
 }: LogoProps) {
+  const isHeader = size === "header";
+
   if (variant === "icon") {
     const icon = (
       <img
@@ -42,20 +47,34 @@ export function Logo({
 
   const content = (
     <span
-      className={["inline-flex items-center gap-2.5", className]
+      className={[
+        "inline-flex items-center gap-1.5 min-[400px]:gap-2.5",
+        isHeader && "md:gap-1.5",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
     >
       <img
         src={logoIcon}
         alt=""
-        className="h-8 w-8 shrink-0 object-contain"
+        className={[
+          "h-7 w-7 shrink-0 object-contain min-[400px]:h-8 min-[400px]:w-8",
+          isHeader && "md:h-[33px]",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         aria-hidden
       />
       <img
         src={logoWordmark}
         alt="Oxxila"
-        className="h-6 w-auto object-contain sm:h-7"
+        className={[
+          "h-5 w-auto object-contain min-[400px]:h-6 sm:h-7",
+          isHeader && "md:h-[26px]",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       />
     </span>
   );

@@ -38,7 +38,7 @@ export function InputField({
           id={id}
           type={inputType}
           className={cn(
-            'w-full rounded-xl px-4 py-3.5 text-base',
+            'w-full rounded-xl px-4 py-3 text-base sm:py-3.5',
             'bg-input text-primary-text placeholder:text-placeholder-text',
             'focus:outline-none focus:ring-2 focus:ring-button-primary/50',
             showPasswordToggle && 'pe-11',

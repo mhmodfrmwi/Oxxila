@@ -1,8 +1,9 @@
-import { ArrowUpRight } from 'lucide-react'
+// src/components/landing/CategoryCard.tsx
 import { Link } from 'react-router-dom'
+import arrowUpRightIcon from '../../assets/landing/home/arrow-up-right.svg'
 import { cn } from '../../lib/cn'
 import { cardHoverLiftClasses, focusRingClasses } from '../ui/interactionStyles'
-import { Heading } from '../ui/Heading'
+import { MaskIcon } from '../ui/MaskIcon'
 
 interface CategoryCardProps {
   name: string
@@ -12,8 +13,7 @@ interface CategoryCardProps {
   className?: string
 }
 
-const CAROUSEL_WIDTH =
-  'w-[min(200px,78vw)] shrink-0 min-[480px]:w-[210px]'
+const CAROUSEL_WIDTH = 'w-[min(200px,52vw)] shrink-0 sm:w-[220px]'
 
 export function CategoryCard({
   name,
@@ -26,29 +26,34 @@ export function CategoryCard({
 
   const content = (
     <>
-      <div className="flex items-center justify-between gap-2 px-4 pt-4 pb-3 sm:px-5 sm:pt-5 sm:pb-3.5">
-        <Heading variant="card-sm" className="min-w-0 leading-snug">
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="landing-type landing-text-base line-clamp-2 min-w-0 self-center text-primary-text [overflow-wrap:anywhere]">
           {name}
-        </Heading>
+        </h3>
         <span
           className={cn(
-            'flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
-            'bg-button-primary-hover text-icon-secondary',
-            'transition-colors duration-200 ease-out',
-            'group-hover:bg-button-primary group-hover:text-on-emphasis',
-            'dark:bg-button-primary/70 dark:text-on-emphasis',
-            'dark:group-hover:bg-button-primary',
+            'flex size-8 shrink-0 items-center justify-center rounded-full',
+            'bg-button-secondary text-icon-on-emphasis',
+            'transition-colors duration-200 ease-out motion-reduce:transition-none',
+            'group-hover:bg-button-primary',
           )}
           aria-hidden
         >
-          <ArrowUpRight size={15} strokeWidth={2.25} className="rtl:-scale-x-100" />
+          <MaskIcon
+            src={arrowUpRightIcon}
+            width={13.5}
+            height={13.5001}
+            frame={24}
+            className="rtl:-scale-x-100"
+          />
         </span>
       </div>
-      <div className="px-4 pb-4 sm:px-5 sm:pb-5">
+      {/* mt-auto keeps images aligned across a row when some titles wrap to two lines. */}
+      <div className="mt-auto overflow-hidden rounded-extra-small">
         <img
           src={image}
           alt={name}
-          className="aspect-square w-full rounded-2xl object-cover"
+          className="aspect-[168/156] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transition-none"
           loading="lazy"
           draggable={false}
         />
@@ -57,19 +62,17 @@ export function CategoryCard({
   )
 
   const cardClassName = cn(
-    'group relative flex flex-col overflow-hidden rounded-3xl',
-    'bg-card border border-transparent',
+    'group relative flex flex-col gap-2 overflow-hidden rounded-medium bg-card p-4',
     'motion-reduce:transition-none',
-    'dark:border-transparent dark:bg-[#2d2b3d] dark:shadow-none',
     cardHoverLiftClasses,
     focusRingClasses,
-    isCarousel ? CAROUSEL_WIDTH : 'h-full min-w-0 w-full',
+    isCarousel ? cn(CAROUSEL_WIDTH, 'h-full') : 'h-full min-w-0 w-full',
     className,
   )
 
   if (href) {
     return (
-      <Link to={href} className={cardClassName}>
+      <Link to={href} className={cardClassName} draggable={false}>
         {content}
       </Link>
     )

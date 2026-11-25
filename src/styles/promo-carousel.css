@@ -68,7 +68,7 @@
   margin: 0;
   max-width: 32%;
   color: var(--promo-title);
-  font-family: Poppins, var(--font-family-base), sans-serif;
+  font-family: var(--font-family-base);
   font-size: var(--promo-display);
   font-weight: 700;
   letter-spacing: 0;
@@ -124,7 +124,7 @@
   margin: 0;
   margin-bottom: 0.10em;
   color: var(--promo-label);
-  font-family: Poppins, var(--font-family-base), sans-serif;
+  font-family: var(--font-family-base);
   font-size: var(--promo-caption);
   font-weight: 400;
   letter-spacing: 0;
@@ -135,7 +135,7 @@
 .promo-countdown-card__time {
   margin: 0;
   color: var(--promo-timer);
-  font-family: Poppins, var(--font-family-base), sans-serif;
+  font-family: var(--font-family-base);
   font-size: var(--promo-display);
   font-weight: 700;
   font-variant-numeric: tabular-nums;

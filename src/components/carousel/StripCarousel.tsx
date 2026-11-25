@@ -1,6 +1,7 @@
 // src/components/carousel/StripCarousel.tsx
 import { motion } from 'framer-motion'
 import { useCallback, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { useHorizontalWheel } from '../../hooks/useHorizontalWheel'
 import { CarouselFrame } from './CarouselFrame'
 import { carouselTransition } from './carouselMotion'
 import { StripCarouselControls } from './StripCarouselControls'
@@ -67,6 +68,7 @@ export function StripCarousel<T>({
 
   const goPrev = useCallback(() => goTo(activeIndex - 1), [activeIndex, goTo])
   const goNext = useCallback(() => goTo(activeIndex + 1), [activeIndex, goTo])
+  const onWheel = useHorizontalWheel({ onNext: goNext, onPrev: goPrev })
 
   if (items.length === 0) return null
 
@@ -77,7 +79,8 @@ export function StripCarousel<T>({
       <div ref={viewportRef} className="overflow-hidden">
         <motion.div
           ref={trackRef}
-          className="flex gap-4"
+          className="flex cursor-grab touch-pan-y gap-4 active:cursor-grabbing"
+          onWheel={onWheel}
           animate={{ x: -activeIndex * stepPx }}
           transition={carouselTransition}
           drag="x"
@@ -93,8 +96,10 @@ export function StripCarousel<T>({
             dragDistanceRef.current = Math.abs(info.offset.x)
           }}
           onDragEnd={(_, info) => {
-            if (info.offset.x < -SWIPE_THRESHOLD) goNext()
-            else if (info.offset.x > SWIPE_THRESHOLD) goPrev()
+            const swipe = info.offset.x + info.velocity.x * 0.15
+            if (Math.abs(swipe) < SWIPE_THRESHOLD || stepPx === 0) return
+            const steps = Math.max(1, Math.round(Math.abs(swipe) / stepPx))
+            goTo(activeIndex + (swipe < 0 ? steps : -steps))
           }}
           onClickCapture={(event) => {
             // Prevent accidental link navigation after a swipe gesture.

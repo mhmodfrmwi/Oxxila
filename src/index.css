@@ -3,6 +3,7 @@
 @import './styles/promo-banner.css';
 @import './styles/product-card.css';
 @import './styles/category-filters.css';
+@import './styles/catalog-page.css';
 @import './styles/product-detail.css';
 @import './styles/cart.css';
 @import './styles/add-address.css';
@@ -16,7 +17,9 @@
 @import './styles/returns-history.css';
 @import './styles/wishlist-page.css';
 @import './styles/promo-carousel.css';
+@import './styles/site-header.css';
 @import 'tailwindcss';
 @import './styles/tailwind-theme.css';
+@import './styles/landing.css';
 @import './styles/admin-tokens.css';
 @import './styles/base.css';

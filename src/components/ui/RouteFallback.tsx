@@ -1,12 +1,17 @@
 // src/components/ui/RouteFallback.tsx
+import { Layout } from '../layout/Layout'
+import { BrandLoader } from './BrandLoader'
+
+/**
+ * Storefront route-chunk fallback: header + utility bar stay visible (same Layout the
+ * page will mount), with the branded Oxxila loader in the content area.
+ */
 export function RouteFallback() {
   return (
-    <div
-      className="container-content flex min-h-[40vh] items-center justify-center py-16"
-      aria-busy="true"
-      aria-label="Loading page"
-    >
-      <div className="h-10 w-10 animate-spin rounded-full border-2 border-border-subtle border-t-button-primary" />
-    </div>
+    <Layout>
+      <div className="container-content" aria-busy="true">
+        <BrandLoader />
+      </div>
+    </Layout>
   )
 }

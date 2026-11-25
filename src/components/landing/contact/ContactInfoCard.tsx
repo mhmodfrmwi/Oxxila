@@ -12,6 +12,19 @@ interface ContactInfoCardProps {
   external?: boolean
 }
 
+/** Narrow grid cells wrap emails; break after "@" rather than mid-domain. */
+function withEmailBreak(value: string) {
+  const at = value.indexOf('@')
+  if (at === -1) return value
+  return (
+    <>
+      {value.slice(0, at + 1)}
+      <wbr />
+      {value.slice(at + 1)}
+    </>
+  )
+}
+
 export function ContactInfoCard({
   icon,
   label,
@@ -23,26 +36,27 @@ export function ContactInfoCard({
   const content = (
     <>
       <span
-        className={[
-          'flex h-11 w-11 shrink-0 items-center justify-center rounded-full border',
-          'border-accent-soft/30 text-accent-soft',
-          'transition-colors duration-300 group-hover:border-accent-soft group-hover:bg-accent-soft/10',
-        ].join(' ')}
+        className="flex size-7 shrink-0 items-center justify-center text-icon-secondary transition-transform duration-300 group-hover:scale-110 motion-reduce:transition-none max-sm:[&>*]:scale-[0.85] sm:size-8"
         aria-hidden
       >
         {icon}
       </span>
-      <span className="min-w-0 text-left">
-        <span className="block text-sm font-medium text-accent-soft">{label}</span>
-        <span className="mt-0.5 block text-sm text-primary-text sm:text-base">{value}</span>
+      <span className="landing-type min-w-0 text-start">
+        <span className="landing-fixed-text block text-primary-text [--landing-size:0.875rem] sm:[--landing-size:1rem] lg:[--landing-size:1.125rem]">
+          {label}
+        </span>
+        <span
+          className="landing-fixed-text mt-1 block text-helper-text [--landing-size:0.75rem] [overflow-wrap:anywhere] max-[359px]:[--landing-size:0.6875rem] sm:[--landing-size:0.8125rem] lg:[--landing-size:0.875rem]"
+          dir="auto"
+        >
+          {withEmailBreak(value)}
+        </span>
       </span>
     </>
   )
 
-  const className = [
-    'group flex items-center gap-4 rounded-2xl p-3 transition-all duration-300',
-    'hover:-translate-y-0.5 hover:bg-card/60',
-  ].join(' ')
+  const className =
+    'group flex items-center gap-2 rounded-2xl sm:gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary'
 
   return (
     <motion.div
@@ -55,9 +69,7 @@ export function ContactInfoCard({
         <a
           href={href}
           className={className}
-          {...(external
-            ? { target: '_blank', rel: 'noopener noreferrer' }
-            : {})}
+          {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
         >
           {content}
         </a>

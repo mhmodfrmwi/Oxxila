@@ -1,0 +1,44 @@
+/**
+ * Header typography (Navbar + UtilityBar) — Figma "Header" 110:4574.
+ * Figma sets Latin text in New York, a light serif; Nohemi's x-height is ~15% taller, its advance
+ * wider and its Regular stroke heavier, so English text is scaled down and set one step lighter to
+ * match the design's visual size. Line boxes keep Figma's absolute line-height so row heights match.
+ */
+.site-header {
+  --header-font-scale: 0.85;
+  --header-font-weight: 300;
+}
+
+.site-header:lang(ar) {
+  --header-font-scale: 0.9;
+  --header-font-weight: var(--font-weight-regular);
+}
+
+.site-header__text-base {
+  font-size: calc(var(--font-size-base) * var(--header-font-scale));
+  line-height: calc(var(--font-size-base) * var(--line-height-base));
+  font-weight: var(--header-font-weight);
+  letter-spacing: var(--letter-spacing-base);
+}
+
+.site-header__text-small {
+  font-size: calc(var(--font-size-small) * var(--header-font-scale));
+  line-height: calc(var(--font-size-small) * var(--line-height-small));
+  font-weight: var(--header-font-weight);
+  letter-spacing: var(--letter-spacing-base);
+}
+
+.site-header__text-xs {
+  font-size: calc(var(--font-size-extra-small) * var(--header-font-scale));
+  line-height: calc(var(--font-size-extra-small) * var(--line-height-extra-small));
+  font-weight: var(--header-font-weight);
+  letter-spacing: var(--letter-spacing-base);
+}
+
+/* Reserves the promo's two-line height so rotating slides don't collapse the row. */
+.site-header__promo {
+  min-height: calc(
+    var(--font-size-base) * var(--line-height-base) + var(--font-size-extra-small) *
+      var(--line-height-extra-small)
+  );
+}

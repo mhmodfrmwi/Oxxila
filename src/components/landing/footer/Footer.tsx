@@ -1,4 +1,5 @@
 // src/components/landing/footer/Footer.tsx
+import { MotionConfig } from 'framer-motion'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getCollectionHref } from '../../../config/collections'
@@ -8,6 +9,7 @@ import {
   RETURNS_HISTORY_PATH,
   SHOP_PATH,
   TERMS_PATH,
+  TRACK_ORDER_PATH,
 } from '../../../config/routes'
 import { FooterSettingsProvider } from '../../../context/FooterSettingsContext'
 import { FadeUp } from '../../ui/FadeUp'
@@ -61,47 +63,49 @@ export function Footer() {
         to: `${DOCS_PATH}#shipping-policy`,
       },
       { label: t('footer.shoppingLinks.returns'), to: RETURNS_HISTORY_PATH },
+      { label: t('footer.shoppingLinks.trackOrder'), to: TRACK_ORDER_PATH },
     ],
     [t],
   )
 
   return (
-    <footer className="relative bg-background text-primary-text">
+    <footer className="landing-type landing-band text-primary-text [--landing-band-bg:var(--background)]">
       <FooterSettingsProvider>
-      <div
-        className="h-px w-full bg-gradient-to-r from-transparent via-accent-soft to-transparent"
-        aria-hidden
-      />
+        <MotionConfig reducedMotion="user">
+          <div className="px-[var(--page-gutter)] pt-[45px] pb-10 md:pt-20 lg:pt-[120px] lg:pb-8">
+            <div className="flex flex-col md:grid md:grid-cols-3 md:gap-x-10 md:gap-y-12 lg:grid-cols-[minmax(0,515fr)_minmax(0,230fr)_minmax(0,222fr)_252px] lg:gap-x-0">
+              <FadeUp className="flex flex-col items-center text-center md:col-span-3 md:items-start md:text-start lg:col-span-1 lg:pe-10">
+                <Logo linkTo={HOME_PATH} size="header" />
+                <p className="landing-text-base mt-6 max-w-[271px] text-secondary-text md:max-w-[386px] lg:landing-text-small">
+                  {t('footer.description')}
+                </p>
+              </FadeUp>
 
-      <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-5 sm:py-12 lg:px-6 lg:py-16">
-        <FadeUp>
-          <div className="grid grid-cols-1 gap-10 min-[769px]:grid-cols-2 min-[769px]:gap-12 min-[1025px]:grid-cols-4 min-[1025px]:gap-10 xl:gap-14">
-            <div className="min-[769px]:col-span-2 min-[1025px]:col-span-1">
-              <Logo
-                linkTo={HOME_PATH}
-                className="dark:[&_img:nth-child(2)]:brightness-0 dark:[&_img:nth-child(2)]:invert"
-              />
-              <p className="mt-4 max-w-sm font-serif text-sm leading-relaxed text-secondary-text sm:text-base">
-                {t('footer.description')}
-              </p>
+              {/* Mobile Figma lists Shopping before Policies; desktop keeps Policies first. */}
+              <FadeUp delay={0.08} className="max-md:order-2 lg:pe-6">
+                <FooterLinks title={t('footer.policies')} links={policyLinks} />
+              </FadeUp>
+
+              <FadeUp delay={0.16} className="max-md:order-1 max-md:mt-10 lg:pe-6">
+                <FooterLinks title={t('footer.shopping')} links={shoppingLinks} />
+              </FadeUp>
+
+              <FadeUp delay={0.24} className="mt-6 max-md:order-3 md:mt-0">
+                <InstagramGrid />
+              </FadeUp>
             </div>
 
-            <FooterLinks title={t('footer.policies')} links={policyLinks} variant="slide" />
-            <FooterLinks title={t('footer.shopping')} links={shoppingLinks} variant="underline" />
-
-            <div className="min-[769px]:col-span-2 min-[1025px]:col-span-1 min-[1025px]:max-w-[280px] min-[1025px]:justify-self-end">
-              <InstagramGrid />
+            <div className="mt-16 md:mt-20 lg:mt-[100px]">
+              <hr className="hidden h-px border-0 bg-border-interactive md:block" />
+              <div className="flex flex-col items-center gap-6 md:flex-row md:justify-between md:pt-8">
+                <p className="text-center text-small text-secondary-text md:text-start">
+                  {t('footer.copyright')}
+                </p>
+                <SocialLinks className="justify-center" />
+              </div>
             </div>
           </div>
-        </FadeUp>
-
-        <div className="mt-12 border-t border-border-subtle pt-8 lg:mt-14">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-secondary-text">{t('footer.copyright')}</p>
-            <SocialLinks />
-          </div>
-        </div>
-      </div>
+        </MotionConfig>
       </FooterSettingsProvider>
     </footer>
   )

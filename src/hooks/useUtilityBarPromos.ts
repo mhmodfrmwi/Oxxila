@@ -1,8 +1,13 @@
 // src/hooks/useUtilityBarPromos.ts
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getUtilityBarSettings, type ApiUtilityBarSettings } from '../api/settings'
+import {
+  getUtilityBarSettings,
+  type ApiUtilityBarPromo,
+  type ApiUtilityBarSettings,
+} from '../api/settings'
 import type { UtilityPromo } from '../components/layout/UtilityBar'
+import { cmsLocaleText } from '../utils/cmsLocaleText'
 import {
   getUtilityBarCache,
   setUtilityBarCache,
@@ -11,6 +16,13 @@ import {
 export { invalidateUtilityBarCache } from '../utils/utilityBarCache'
 
 const DEFAULT_ROTATE_SECONDS = 6
+
+const FALLBACK_KEYS = [
+  'shipping',
+  'returns',
+  'trusted',
+  'delivery',
+] as const
 
 async function loadUtilityBarSettings(): Promise<ApiUtilityBarSettings | null> {
   const { cachedSettings, loadPromise } = getUtilityBarCache()
@@ -32,22 +44,52 @@ async function loadUtilityBarSettings(): Promise<ApiUtilityBarSettings | null> {
   return loadPromise
 }
 
+function promoForLocale(
+  promo: ApiUtilityBarPromo,
+  locale: string,
+  fallback: UtilityPromo,
+): UtilityPromo {
+  return {
+    title:
+      cmsLocaleText(
+        { en: promo.titleEn, ar: promo.titleAr, legacy: promo.title },
+        locale,
+        { crossFallback: false },
+      ) || fallback.title,
+    subtitle:
+      cmsLocaleText(
+        {
+          en: promo.subtitleEn,
+          ar: promo.subtitleAr,
+          legacy: promo.subtitle,
+        },
+        locale,
+        { crossFallback: false },
+      ) || fallback.subtitle,
+  }
+}
+
 function resolvePromos(
   settings: ApiUtilityBarSettings | null,
   fallbacks: UtilityPromo[],
+  locale: string,
 ): UtilityPromo[] {
-  const fromApi = (settings?.promos ?? [])
-    .map((promo) => ({
-      title: promo.title?.trim() ?? '',
-      subtitle: promo.subtitle?.trim() ?? '',
-    }))
-    .filter((promo) => promo.title)
+  const apiPromos = settings?.promos ?? []
+  if (apiPromos.length === 0) return fallbacks
 
-  return fromApi.length > 0 ? fromApi : fallbacks
+  return apiPromos
+    .map((promo, index) => {
+      const fallback = fallbacks[index] ?? fallbacks[index % fallbacks.length] ?? {
+        title: '',
+        subtitle: '',
+      }
+      return promoForLocale(promo, locale, fallback)
+    })
+    .filter((promo) => promo.title)
 }
 
 export function useUtilityBarPromos() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { cachedSettings } = getUtilityBarCache()
   const [settings, setSettings] = useState<ApiUtilityBarSettings | null>(cachedSettings)
 
@@ -62,22 +104,17 @@ export function useUtilityBarPromos() {
   }, [])
 
   const fallbacks = useMemo<UtilityPromo[]>(
-    () => [
-      {
-        title: t('utilityBar.fallbacks.shipping.title'),
-        subtitle: t('utilityBar.fallbacks.shipping.subtitle'),
-      },
-      {
-        title: t('utilityBar.fallbacks.returns.title'),
-        subtitle: t('utilityBar.fallbacks.returns.subtitle'),
-      },
-    ],
+    () =>
+      FALLBACK_KEYS.map((key) => ({
+        title: t(`utilityBar.fallbacks.${key}.title`),
+        subtitle: t(`utilityBar.fallbacks.${key}.subtitle`),
+      })),
     [t],
   )
 
   const promos = useMemo(
-    () => resolvePromos(settings, fallbacks),
-    [settings, fallbacks],
+    () => resolvePromos(settings, fallbacks, i18n.language),
+    [settings, fallbacks, i18n.language],
   )
 
   const rotateIntervalMs =

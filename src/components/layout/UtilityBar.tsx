@@ -1,26 +1,37 @@
 // src/components/layout/UtilityBar.tsx
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCallback, useEffect, useState, type KeyboardEvent } from 'react'
+import { Sun } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { Moon, Package, Search } from 'lucide-react'
-import { SEARCH_PATH } from '../../config/routes'
+import deliveryReturnIcon from '../../assets/header/delivery-return-01.svg'
+import moneyReceiveIcon from '../../assets/header/money-receive-circle.svg'
+import moonIcon from '../../assets/header/moon.svg'
+import packageDeliveredIcon from '../../assets/header/package-delivered.svg'
+import truckIcon from '../../assets/header/truck.svg'
 import { useTheme } from '../../context/ThemeContext'
 import { useUtilityBarPromos } from '../../hooks/useUtilityBarPromos'
 import { useCarouselAutoplay } from '../../hooks/useCarouselAutoplay'
+import { cn } from '../../lib/cn'
+import { SearchAutocomplete } from './SearchAutocomplete'
 import { LanguageSwitcher } from '../ui/LanguageSwitcher'
-import { typeSmallClasses } from '../ui/typography'
+import { MaskIcon } from '../ui/MaskIcon'
 
 export interface UtilityPromo {
   title: string
   subtitle: string
 }
 
+/** Figma "ads" slides, in order; promos cycle through them by index. */
+const PROMO_ICONS = [
+  { src: truckIcon, width: 28.1667, height: 22.8333 },
+  { src: moneyReceiveIcon, width: 28.1667, height: 28.1667 },
+  { src: deliveryReturnIcon, width: 28.1671, height: 28.1667 },
+  { src: packageDeliveredIcon, width: 26.8335, height: 28.1667, flipped: true },
+] as const
+
 export function UtilityBar() {
   const { t } = useTranslation()
   const { theme, toggleTheme } = useTheme()
-  const navigate = useNavigate()
-  const [searchValue, setSearchValue] = useState('')
   const { promos, rotateIntervalMs } = useUtilityBarPromos()
   const [activeIndex, setActiveIndex] = useState(0)
 
@@ -39,92 +50,74 @@ export function UtilityBar() {
   })
 
   const activePromo = promos[activeIndex] ?? promos[0]
-
-  function submitSearch() {
-    const keyword = searchValue.trim()
-    if (!keyword) return
-    navigate(`${SEARCH_PATH}?keyword=${encodeURIComponent(keyword)}`)
-  }
-
-  function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      submitSearch()
-    }
-  }
+  const promoIcon = PROMO_ICONS[activeIndex % PROMO_ICONS.length]
 
   return (
-    <section className="border-b border-border-subtle bg-background">
-      <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-3 py-2.5 sm:px-4 sm:py-3 min-[769px]:flex-row min-[769px]:items-center min-[769px]:justify-between min-[769px]:gap-4 lg:px-6">
+    <section className="site-header bg-background">
+      <div className="grid grid-cols-1 items-center gap-3 px-[var(--page-gutter)] py-2.5 sm:py-3 md:grid-cols-[minmax(0,1fr)_auto] md:gap-x-large md:gap-y-small lg:pt-small lg:pb-medium xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)_minmax(0,1fr)]">
         <div
-          className="flex min-w-0 items-center gap-3"
+          className="site-header__promo relative flex min-w-0 items-center overflow-hidden"
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
+          aria-live="polite"
+          aria-atomic="true"
         >
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-input text-icon-secondary">
-            <Package size={18} aria-hidden />
-          </div>
-          <div
-            className="relative min-h-[2.75rem] min-w-0 overflow-hidden"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={`${activeIndex}-${activePromo.title}`}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.28, ease: 'easeOut' }}
-                className="min-w-0"
-              >
-                <p
-                  className={['truncate text-primary-text', typeSmallClasses, 'text-start'].join(
-                    ' ',
-                  )}
-                >
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={`${activeIndex}-${activePromo.title}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.28, ease: 'easeOut' }}
+              className="flex min-w-0 items-center gap-small"
+            >
+              <MaskIcon
+                src={promoIcon.src}
+                width={promoIcon.width}
+                height={promoIcon.height}
+                frame={32}
+                className={cn('text-icon-secondary', 'flipped' in promoIcon && '-scale-y-100')}
+              />
+              <div className="min-w-0 text-start">
+                <p className="site-header__text-base truncate text-primary-text">
                   {activePromo.title}
                 </p>
-                <p className="truncate text-[length:var(--font-size-small)] leading-[var(--line-height-small)] text-secondary-text">
+                <p className="site-header__text-xs truncate text-secondary-text">
                   {activePromo.subtitle}
                 </p>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        <div className="relative w-full min-[769px]:max-w-sm min-[769px]:flex-1">
-          <label htmlFor="site-search" className="sr-only">
-            {t('search.label')}
-          </label>
-          <Search
-            size={18}
-            className="absolute start-3 top-1/2 -translate-y-1/2 text-secondary-text"
-            aria-hidden
-          />
-          <input
-            id="site-search"
-            type="search"
-            placeholder={t('search.placeholder')}
-            value={searchValue}
-            onChange={(event) => setSearchValue(event.target.value)}
-            onKeyDown={handleSearchKeyDown}
-            className="h-11 w-full rounded-full bg-input py-2.5 ps-10 pe-4 text-[length:var(--font-size-small)] leading-[var(--line-height-small)] text-primary-text placeholder:text-placeholder-text focus:outline-none focus:ring-2 focus:ring-button-primary/50"
-          />
-        </div>
+        <SearchAutocomplete className="w-full md:col-span-2 md:row-start-2 xl:col-span-1 xl:col-start-2 xl:row-start-1" />
 
-        <div className="flex w-full items-center justify-between gap-3 min-[769px]:w-auto min-[769px]:min-w-[280px] min-[769px]:justify-end min-[1025px]:min-w-[300px]">
+        <div className="flex min-w-0 items-center justify-between gap-3 md:col-start-2 md:row-start-1 md:justify-end md:gap-extra-large xl:col-start-3">
           <LanguageSwitcher />
           <button
             type="button"
             onClick={toggleTheme}
-            className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 text-start min-[769px]:flex-initial"
+            className="flex min-h-11 min-w-0 items-center gap-1.5 text-start"
           >
-            <Moon size={30} strokeWidth={1.75} className="text-secondary-text" aria-hidden />
+            {theme === 'dark' ? (
+              <span className="inline-flex size-8 shrink-0 items-center justify-center text-icon-secondary" aria-hidden>
+                <Sun size={32} strokeWidth={1.5} />
+              </span>
+            ) : (
+              <MaskIcon
+                src={moonIcon}
+                width={26.8334}
+                height={26.8334}
+                frame={32}
+                className="text-icon-secondary"
+              />
+            )}
             <span className="flex flex-col items-start">
-              <span className={typeSmallClasses}>{t('theme.changeTheme')}</span>
-              <strong className="capitalize text-[length:var(--font-size-small)] leading-[var(--line-height-small)] font-normal text-secondary-text">
-                {theme}
+              <span className="site-header__text-base text-primary-text">
+                {t('theme.changeTheme')}
+              </span>
+              <strong className="site-header__text-xs text-secondary-text">
+                {theme === 'dark' ? t('theme.dark') : t('theme.light')}
               </strong>
             </span>
           </button>

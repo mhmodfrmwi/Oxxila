@@ -1,0 +1,138 @@
+/**
+ * Home page + footer — Figma "Landing page" 47:362 / 51:1215, "Footers V5" 166:4893.
+ * Figma sets Latin copy in a light serif, so English Nohemi runs one step lighter at Figma's sizes.
+ * Declared as utilities so responsive variants work (e.g. lg:landing-text-xs).
+ */
+@utility landing-type {
+  --landing-font-scale: 1;
+  --landing-font-weight: 300;
+
+  &:lang(ar) {
+    --landing-font-weight: var(--font-weight-regular);
+  }
+}
+
+@utility landing-text-xl {
+  font-family: var(--font-family-base);
+  font-size: calc(var(--font-size-extra-large) * var(--landing-font-scale, 1));
+  line-height: calc(var(--font-size-extra-large) * var(--line-height-extra-large));
+  font-weight: var(--landing-font-weight, var(--font-weight-regular));
+  letter-spacing: var(--letter-spacing-base);
+}
+
+@utility landing-text-large {
+  font-family: var(--font-family-base);
+  font-size: calc(var(--font-size-large) * var(--landing-font-scale, 1));
+  line-height: calc(var(--font-size-large) * var(--line-height-large));
+  font-weight: var(--landing-font-weight, var(--font-weight-regular));
+  letter-spacing: var(--letter-spacing-base);
+}
+
+@utility landing-text-base {
+  font-family: var(--font-family-base);
+  font-size: calc(var(--font-size-base) * var(--landing-font-scale, 1));
+  line-height: calc(var(--font-size-base) * var(--line-height-base));
+  font-weight: var(--landing-font-weight, var(--font-weight-regular));
+  letter-spacing: var(--letter-spacing-base);
+}
+
+@utility landing-text-small {
+  font-family: var(--font-family-base);
+  font-size: calc(var(--font-size-small) * var(--landing-font-scale, 1));
+  line-height: calc(var(--font-size-small) * var(--line-height-small));
+  font-weight: var(--landing-font-weight, var(--font-weight-regular));
+  letter-spacing: var(--letter-spacing-base);
+}
+
+@utility landing-text-xs {
+  font-family: var(--font-family-base);
+  font-size: calc(var(--font-size-extra-small) * var(--landing-font-scale, 1));
+  line-height: calc(var(--font-size-extra-small) * var(--line-height-extra-small));
+  font-weight: var(--landing-font-weight, var(--font-weight-regular));
+  letter-spacing: var(--letter-spacing-base);
+}
+
+/* Fixed-size copy for fixed-width components (best-seller card); set --landing-size per element. */
+@utility landing-fixed-text {
+  font-family: var(--font-family-base);
+  font-size: calc(var(--landing-size, 1rem) * var(--landing-font-scale, 1));
+  line-height: 1.2;
+  font-weight: var(--landing-font-weight, var(--font-weight-regular));
+  letter-spacing: var(--letter-spacing-base);
+}
+
+@layer components {
+  /*
+   * Figma bands run edge to edge, so the fill is painted 100vw wide behind the section; this escapes
+   * `main`'s padding on pages that don't bleed (the layout root clips horizontal overflow).
+   */
+  .landing-band {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .landing-band::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset-block: 0;
+    left: 50%;
+    width: 100vw;
+    translate: -50% 0;
+    background: var(--landing-band-bg, var(--card-background));
+  }
+
+  /*
+   * Best-seller carousel edge fade — Figma "Rectangle 4341" overlay (110:5894).
+   * Narrow viewports keep the centre card clear; the full Figma ramp only fits the 1254px fan.
+   */
+  .best-seller-fade {
+    background: linear-gradient(
+      to right,
+      var(--card-background) 0%,
+      transparent 6%,
+      transparent 94%,
+      var(--card-background) 100%
+    );
+  }
+
+  @media (width >= 640px) {
+    .best-seller-fade {
+      background: linear-gradient(
+        to right,
+        var(--card-background) 0%,
+        transparent 14%,
+        transparent 86%,
+        var(--card-background) 100%
+      );
+    }
+  }
+
+  @media (width >= 1024px) {
+    .best-seller-fade {
+      background: linear-gradient(
+        to right,
+        var(--card-background) 4.153%,
+        transparent 50.521%,
+        var(--card-background) 96.006%
+      );
+    }
+  }
+
+  /* Mobile footer accordion — animates to intrinsic height without measuring. */
+  .footer-accordion-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 300ms ease-out;
+  }
+
+  .footer-accordion-panel[data-open='true'] {
+    grid-template-rows: 1fr;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .footer-accordion-panel {
+      transition: none;
+    }
+  }
+}

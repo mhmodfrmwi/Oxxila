@@ -1,4 +1,5 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+// src/components/ui/Pagination.tsx
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from './interactionStyles'
 
@@ -30,47 +31,57 @@ function getPageNumbers(current: number, total: number): (number | 'ellipsis')[]
 }
 
 export function Pagination({ currentPage, totalPages, onPageChange, className }: PaginationProps) {
+  const { t } = useTranslation()
   if (totalPages <= 1) return null
 
   const pages = getPageNumbers(currentPage, totalPages)
   const canGoPrev = currentPage > 1
   const canGoNext = currentPage < totalPages
 
-  const navButtonClass = cn(
-    'inline-flex items-center gap-1 rounded-button px-3 py-2 text-sm text-secondary-text',
-    'transition-colors hover:text-primary-text',
+  // Figma Pagination (V3) 413:19396 — Back / pages / Next
+  const controlClass = cn(
+    'inline-flex min-h-11 items-center justify-center rounded-extra-small bg-card px-2.5 py-2.5',
+    'font-display text-extra-small leading-[1.2]',
+    'transition-colors',
     'disabled:pointer-events-none disabled:opacity-40',
     focusRingClasses,
   )
 
   const pageButtonClass = (isActive: boolean) =>
     cn(
-      'flex h-9 min-w-9 items-center justify-center rounded-full px-2 text-sm transition-colors',
+      'flex size-8 min-h-11 min-w-11 shrink-0 items-center justify-center rounded-extra-small sm:size-8 sm:min-h-8 sm:min-w-8',
+      'font-display text-extra-small leading-[1.2]',
+      'transition-colors',
       focusRingClasses,
       isActive
-        ? 'bg-button-primary font-medium text-on-emphasis'
-        : 'text-secondary-text hover:bg-input hover:text-primary-text',
+        ? 'bg-button-primary text-card'
+        : 'border border-background bg-card text-icon-primary hover:bg-surface-muted',
     )
 
   return (
-    <nav aria-label="Pagination" className={cn('flex items-center justify-center gap-1 sm:gap-2', className)}>
+    <nav
+      aria-label={t('catalogBrowse.paginationAria')}
+      className={cn(
+        'flex flex-wrap items-center justify-center gap-2 pb-8 sm:gap-[15px]',
+        className,
+      )}
+    >
       <button
         type="button"
-        className={navButtonClass}
+        className={cn(controlClass, 'text-helper-text hover:text-primary-text')}
         disabled={!canGoPrev}
         onClick={() => onPageChange(currentPage - 1)}
-        aria-label="Previous page"
+        aria-label={t('catalogBrowse.back')}
       >
-        <ChevronLeft size={16} aria-hidden />
-        <span className="hidden sm:inline">Prev</span>
+        {t('catalogBrowse.back')}
       </button>
 
-      <div className="flex items-center gap-0.5 sm:gap-1">
+      <div className="flex max-w-full flex-wrap items-center justify-center gap-[5px]">
         {pages.map((page, index) =>
           page === 'ellipsis' ? (
             <span
               key={`ellipsis-${index}`}
-              className="flex h-9 w-9 items-center justify-center text-sm text-secondary-text"
+              className="flex size-8 min-h-11 min-w-11 items-center justify-center rounded-extra-small bg-card font-display text-extra-small text-icon-primary sm:min-h-8 sm:min-w-8"
               aria-hidden
             >
               …
@@ -81,7 +92,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
               type="button"
               className={pageButtonClass(page === currentPage)}
               onClick={() => onPageChange(page)}
-              aria-label={`Page ${page}`}
+              aria-label={t('catalogBrowse.page', { number: page })}
               aria-current={page === currentPage ? 'page' : undefined}
             >
               {page}
@@ -92,13 +103,12 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
 
       <button
         type="button"
-        className={navButtonClass}
+        className={cn(controlClass, 'text-button-primary hover:text-button-primary/80')}
         disabled={!canGoNext}
         onClick={() => onPageChange(currentPage + 1)}
-        aria-label="Next page"
+        aria-label={t('catalogBrowse.next')}
       >
-        <span className="hidden sm:inline">Next</span>
-        <ChevronRight size={16} aria-hidden />
+        {t('catalogBrowse.next')}
       </button>
     </nav>
   )

@@ -12,12 +12,11 @@ interface ProductPromoCardProps {
 }
 
 const bannerShellClasses = [
-  'promo-banner block overflow-hidden rounded-card',
-  'h-[min(360px,78vw)] w-[min(900px,96vw)]',
-  'min-[640px]:h-[min(400px,68vw)] min-[640px]:w-[min(900px,96vw)]',
-  /* ~8% smaller on laptop/small desktop; full size from 1536px */
-  'min-[769px]:h-[396px] min-[769px]:w-[828px]',
-  'min-[1536px]:h-[430px] min-[1536px]:w-[900px]',
+  'promo-banner relative block overflow-hidden rounded-card',
+  /* One proportion on every screen (matches the banner artwork), so all slides share a height and
+     the carousel never leaves empty space under shorter banners. */
+  'h-auto aspect-[828/396] w-[min(828px,96vw)]',
+  'min-[1536px]:aspect-[900/430] min-[1536px]:w-[900px]',
   'border border-[color:var(--promo-border)] bg-[color:var(--promo-bg)]',
   'shadow-xl [box-shadow:0_20px_40px_var(--promo-shadow)]',
   'transition-[transform,box-shadow] duration-300 ease-out',
@@ -71,6 +70,7 @@ export function ProductPromoCard({
         target="_blank"
         rel="noopener noreferrer"
         className={classNames}
+       
         aria-label={slide.imageAlt}
       >
         <BannerImage slide={slide} />

@@ -1,8 +1,11 @@
 // src/components/landing/how-it-works/HowItWorksAccordion.tsx
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import arrowDownIcon from '../../../assets/landing/home/arrow-down.svg'
+import arrowUpIcon from '../../../assets/landing/home/arrow-up.svg'
 import type { HowItWorksStepView } from '../../../hooks/useHowItWorksSettings'
+import { cn } from '../../../lib/cn'
+import { MaskIcon } from '../../ui/MaskIcon'
 
 interface HowItWorksAccordionProps {
   steps: HowItWorksStepView[]
@@ -10,53 +13,47 @@ interface HowItWorksAccordionProps {
   onOpenChange: (id: string) => void
 }
 
-export function HowItWorksAccordion({
-  steps,
-  openId,
-  onOpenChange,
-}: HowItWorksAccordionProps) {
+export function HowItWorksAccordion({ steps, openId, onOpenChange }: HowItWorksAccordionProps) {
   const { t } = useTranslation()
 
   return (
-    <div className="space-y-4" role="region" aria-label={t('home.howItWorks.stepsAria')}>
+    <div className="flex flex-col gap-4" role="region" aria-label={t('home.howItWorks.stepsAria')}>
       {steps.map((step) => {
         const isOpen = openId === step.id
+        const panelId = `how-it-works-panel-${step.id}`
 
         return (
-          <motion.div
+          <div
             key={step.id}
-            initial={false}
-            className={[
-              'overflow-hidden rounded-3xl border transition-colors duration-300',
+            className={cn(
+              'overflow-hidden rounded-[32px] border transition-colors duration-300 motion-reduce:transition-none lg:rounded-large',
               isOpen
-                ? 'border-transparent bg-card shadow-lg shadow-black/5 dark:shadow-[0_8px_40px_var(--accent-glow)]'
-                : 'border-border-subtle bg-transparent hover:border-accent-soft/40',
-            ].join(' ')}
+                ? 'border-transparent bg-card'
+                : 'border-border-interactive bg-background hover:border-button-primary',
+            )}
           >
             <button
               type="button"
-              className="flex w-full items-center justify-between gap-3 px-4 py-4 text-start min-[481px]:gap-4 min-[481px]:px-5 min-[481px]:py-5 sm:px-6 sm:py-6"
+              className="flex w-full items-center justify-between gap-3 px-5 py-4 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-button-primary sm:px-6 sm:py-5 lg:px-7 lg:py-6"
               aria-expanded={isOpen}
+              aria-controls={panelId}
               onClick={() => onOpenChange(isOpen ? '' : step.id)}
             >
-              <span className="min-w-0 font-serif text-base font-medium text-primary-text min-[481px]:text-lg sm:text-xl">
+              <span className="min-w-0 font-display text-base leading-snug font-normal text-primary-text sm:text-[17px] lg:truncate lg:text-lg">
                 {step.title}
               </span>
-
               <span
-                className={[
-                  'flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all duration-300',
-                  isOpen
-                    ? 'bg-button-primary text-on-emphasis'
-                    : 'bg-accent-soft/10 text-accent-soft',
-                ].join(' ')}
+                className={cn(
+                  'flex shrink-0 items-center justify-center rounded-extra-large p-1.5 transition-colors duration-300 motion-reduce:transition-none',
+                  isOpen ? 'bg-button-secondary text-icon-on-emphasis' : 'text-icon-primary',
+                )}
                 aria-hidden
               >
-                <ChevronDown
-                  size={20}
-                  className={['transition-transform duration-300', isOpen ? 'rotate-180' : ''].join(
-                    ' ',
-                  )}
+                <MaskIcon
+                  src={isOpen ? arrowUpIcon : arrowDownIcon}
+                  width={16}
+                  height={8.6}
+                  frame={28}
                 />
               </span>
             </button>
@@ -64,21 +61,20 @@ export function HowItWorksAccordion({
             <AnimatePresence initial={false}>
               {isOpen && (
                 <motion.div
+                  id={panelId}
                   key="content"
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.35, ease: 'easeInOut' }}
                 >
-                  <div className="px-5 pb-5 sm:px-6 sm:pb-6">
-                    <p className="text-sm leading-relaxed text-secondary-text sm:text-base">
-                      {step.description}
-                    </p>
-                  </div>
+                  <p className="landing-type landing-fixed-text px-5 pb-5 text-secondary-text leading-relaxed! [--landing-size:0.875rem] sm:px-6 lg:px-7 lg:pb-6 lg:[--landing-size:1rem]">
+                    {step.description}
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </div>
         )
       })}
     </div>

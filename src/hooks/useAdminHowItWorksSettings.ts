@@ -7,12 +7,15 @@ import {
 } from '../api/settings'
 
 export interface HowItWorksStepForm {
-  title: string
-  description: string
+  titleEn: string
+  titleAr: string
+  descriptionEn: string
+  descriptionAr: string
 }
 
 export interface HowItWorksSettingsForm {
-  title: string
+  titleEn: string
+  titleAr: string
   videoUrl: string
   thumbnailImage: string
   steps: HowItWorksStepForm[]
@@ -21,10 +24,16 @@ export interface HowItWorksSettingsForm {
 const STEP_COUNT = 3
 
 const emptySteps = (): HowItWorksStepForm[] =>
-  Array.from({ length: STEP_COUNT }, () => ({ title: '', description: '' }))
+  Array.from({ length: STEP_COUNT }, () => ({
+    titleEn: '',
+    titleAr: '',
+    descriptionEn: '',
+    descriptionAr: '',
+  }))
 
 const EMPTY_FORM: HowItWorksSettingsForm = {
-  title: '',
+  titleEn: '',
+  titleAr: '',
   videoUrl: '',
   thumbnailImage: '',
   steps: emptySteps(),
@@ -34,13 +43,16 @@ function toForm(data: ApiHowItWorksSettings): HowItWorksSettingsForm {
   const steps = emptySteps()
   data.steps?.slice(0, STEP_COUNT).forEach((step, index) => {
     steps[index] = {
-      title: step.title ?? '',
-      description: step.description ?? '',
+      titleEn: step.titleEn || step.title || '',
+      titleAr: step.titleAr || '',
+      descriptionEn: step.descriptionEn || step.description || '',
+      descriptionAr: step.descriptionAr || '',
     }
   })
 
   return {
-    title: data.title ?? '',
+    titleEn: data.titleEn || data.title || '',
+    titleAr: data.titleAr || '',
     videoUrl: data.videoUrl ?? '',
     thumbnailImage: data.thumbnailImage ?? '',
     steps,
@@ -78,7 +90,7 @@ export function useAdminHowItWorksSettings() {
   }, [load])
 
   const setField = useCallback(
-    (field: 'title' | 'videoUrl' | 'thumbnailImage', value: string) => {
+    (field: 'titleEn' | 'titleAr' | 'videoUrl' | 'thumbnailImage', value: string) => {
       setValues((prev) => ({ ...prev, [field]: value }))
       if (field === 'thumbnailImage') {
         setThumbnailPreview(value.trim() || null)
@@ -111,12 +123,15 @@ export function useAdminHowItWorksSettings() {
     try {
       const response = await updateHowItWorksSettings(
         {
-          title: values.title.trim(),
+          titleEn: values.titleEn.trim(),
+          titleAr: values.titleAr.trim(),
           videoUrl: values.videoUrl.trim(),
           thumbnailImage: values.thumbnailImage.trim(),
-          steps: values.steps.map(({ title, description }) => ({
-            title: title.trim(),
-            description: description.trim(),
+          steps: values.steps.map((step) => ({
+            titleEn: step.titleEn.trim(),
+            titleAr: step.titleAr.trim(),
+            descriptionEn: step.descriptionEn.trim(),
+            descriptionAr: step.descriptionAr.trim(),
           })),
         },
         thumbnailFile,

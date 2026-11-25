@@ -1,10 +1,13 @@
 // src/components/landing/contact/ContactSection.tsx
-import { Mail, MapPin, Phone } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getContactSettings } from '../../../api/settings'
+import callIcon from '../../../assets/landing/home/call.svg'
+import locationIcon from '../../../assets/landing/home/location.svg'
+import mailIcon from '../../../assets/landing/home/mail.svg'
 import { buildWhatsAppUrl } from '../../../utils/contactSettings'
 import { FadeUp } from '../../ui/FadeUp'
+import { MaskIcon } from '../../ui/MaskIcon'
 import { SectionHeader } from '../SectionHeader'
 import {
   contactInfo as fallbackContactInfo,
@@ -94,27 +97,29 @@ export function ContactSection() {
   )
 
   return (
-    <section id="contact" className="relative overflow-hidden bg-background py-10 sm:py-14 lg:py-20">
-      <div className="relative container-content">
-        <FadeUp>
-          <SectionHeader title={t('home.contact.title')} align="center" />
+    <section
+      id="contact"
+      aria-labelledby="contact-heading"
+      className="landing-band scroll-mt-24 py-12 sm:py-16 lg:py-20"
+    >
+      <div className="relative container-content flex flex-col items-center gap-6 lg:gap-8">
+        <FadeUp className="w-full">
+          <SectionHeader id="contact-heading" title={t('home.contact.title')} align="center" />
         </FadeUp>
 
-        <div className="mt-8 lg:mt-12">
-          <ContactForm />
-        </div>
+        <ContactForm />
 
-        <div className="mx-auto mt-10 grid max-w-6xl gap-5 sm:mt-12 min-[769px]:grid-cols-2 min-[769px]:gap-6 min-[1024px]:grid-cols-4 min-[1024px]:gap-8 lg:gap-10">
+        <div className="mt-4 grid w-full max-w-md grid-cols-2 gap-x-4 gap-y-5 sm:mt-6 sm:gap-x-8 md:flex md:w-auto md:max-w-none md:flex-wrap md:items-center md:justify-center md:gap-x-12 lg:gap-x-16">
           {visibleItems.map((item, index) => {
             const icon =
               item.id === 'call' ? (
-                <Phone size={20} strokeWidth={1.5} />
+                <MaskIcon src={callIcon} width={24.4} height={24.4} frame={28} />
               ) : item.id === 'email' ? (
-                <Mail size={20} strokeWidth={1.5} />
+                <MaskIcon src={mailIcon} width={25.1} height={21.6} frame={28} />
               ) : item.id === 'whatsapp' ? (
-                <WhatsAppIcon size={20} />
+                <WhatsAppIcon size={23} />
               ) : (
-                <MapPin size={20} strokeWidth={1.5} />
+                <MaskIcon src={locationIcon} width={20.4} height={25.1} frame={28} />
               )
 
             return (

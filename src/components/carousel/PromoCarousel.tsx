@@ -137,7 +137,7 @@ export function PromoCarousel<T>({
         </motion.div>
       </div>
 
-      <div className="relative z-40 mt-3 sm:mt-4">
+      <div className="relative mt-3 sm:mt-4">
         <PromoCarouselControls
           count={total}
           activeIndex={activeSlide}

@@ -1,9 +1,9 @@
 // src/components/shop/moreReasonsData.ts
-import promoNewArrivals from '../../assets/Rectangle 4347.png'
-import promoTrending from '../../assets/Rectangle 4347(1).png'
-import promoBestSellers from '../../assets/Rectangle 4347(2).png'
-import promoOffers from '../../assets/Rectangle 4347(3).png'
-import promoDermatologist from '../../assets/Rectangle 4347(4).png'
+import promoNewArrivals from '../../assets/shop/more-reasons/new-arrivals.png'
+import promoBestSellers from '../../assets/shop/more-reasons/best-sellers.png'
+import promoTopRated from '../../assets/shop/more-reasons/top-rated.png'
+import promoOffers from '../../assets/shop/more-reasons/offers-discounts.png'
+import promoDermatologist from '../../assets/shop/more-reasons/dermatologist.png'
 import { getCollectionHref } from '../../config/collections'
 
 export type PromotionLayout = 'compact' | 'tall' | 'wide'
@@ -17,8 +17,13 @@ export interface ShopPromotion {
   href: string
   layout: PromotionLayout
   badge?: string
-  /** Large-screen grid placement */
+  /** Large-screen grid placement — Figma Frame 42 (269:8557) */
   gridClassName: string
+  /**
+   * Figma image fills that crop taller source art into a short frame.
+   * Applied as absolute img classes inside the image slot.
+   */
+  imageCropClassName?: string
 }
 
 export const shopPromotions: ShopPromotion[] = [
@@ -36,7 +41,7 @@ export const shopPromotions: ShopPromotion[] = [
     id: 'best-sellers',
     title: 'Best Sellers',
     subtitle: 'Fill your cart',
-    image: promoTrending,
+    image: promoBestSellers,
     imageAlt: 'Best selling skincare products',
     href: getCollectionHref('best-sellers'),
     layout: 'compact',
@@ -46,7 +51,7 @@ export const shopPromotions: ShopPromotion[] = [
     id: 'top-rated',
     title: 'Top Rated',
     subtitle: 'stay in trend',
-    image: promoBestSellers,
+    image: promoTopRated,
     imageAlt: 'Top rated skincare collection',
     href: getCollectionHref('trending'),
     layout: 'tall',
@@ -60,6 +65,8 @@ export const shopPromotions: ShopPromotion[] = [
     imageAlt: 'Special offers and discounts',
     href: getCollectionHref('offers'),
     layout: 'wide',
+    // Figma 269:8577 — tall source cropped into the wide frame
+    imageCropClassName: 'absolute left-0 top-[-78.07%] h-[331.65%] w-full max-w-none',
     gridClassName: 'lg:col-start-3 lg:row-start-1',
   },
   {
@@ -70,6 +77,8 @@ export const shopPromotions: ShopPromotion[] = [
     imageAlt: 'Dermatologist recommended skincare',
     href: getCollectionHref('featured'),
     layout: 'wide',
+    // Figma 269:8562 — tall source cropped into the wide frame
+    imageCropClassName: 'absolute left-0 top-[-182.58%] h-[331.65%] w-full max-w-none',
     gridClassName: 'lg:col-start-3 lg:row-start-2',
   },
 ]

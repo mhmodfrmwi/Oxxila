@@ -29,7 +29,7 @@ export function SelectField({
         <select
           id={id}
           className={cn(
-            'w-full appearance-none rounded-xl px-4 py-3.5 pr-11 text-base',
+            'w-full appearance-none rounded-xl py-3.5 ps-4 pe-11 text-base',
             'bg-card text-primary-text',
             'border border-border-subtle',
             'focus:outline-none focus:ring-2 focus:ring-button-primary/50',
@@ -44,7 +44,7 @@ export function SelectField({
         </select>
         <ChevronDown
           size={18}
-          className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-secondary-text"
+          className="pointer-events-none absolute end-4 top-1/2 -translate-y-1/2 text-secondary-text"
           aria-hidden
         />
       </div>

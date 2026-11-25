@@ -1,2 +1,2 @@
-/** Playfair Display at Text/Small — inherits global font via type-small */
+/** Figma Text/Small — inherits the global font stack via type-small */
 export const typeSmallClasses = 'type-small'

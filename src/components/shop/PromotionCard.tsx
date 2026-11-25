@@ -7,47 +7,64 @@ import type { ShopPromotion } from './moreReasonsData'
 interface PromotionCardProps {
   promotion: ShopPromotion
   className?: string
+  /** Desktop bento vs equal-sized mobile/tablet carousel cards. */
+  presentation?: 'grid' | 'carousel'
 }
 
-const imageAspect: Record<ShopPromotion['layout'], string> = {
-  compact: 'aspect-[5/4] w-full',
-  // Fill remaining card height so title→image gap stays tight.
-  tall: 'relative min-h-[220px] w-full flex-1 lg:min-h-0',
-  wide: 'relative min-h-[180px] w-full flex-1 sm:min-h-[200px] lg:min-h-0',
-}
-
-const fillsCardHeight = (layout: ShopPromotion['layout']) =>
-  layout === 'tall' || layout === 'wide'
-
-export function PromotionCard({ promotion, className }: PromotionCardProps) {
-  const { title, subtitle, image, imageAlt, href, layout, badge } = promotion
-  const fillHeight = fillsCardHeight(layout)
+export function PromotionCard({
+  promotion,
+  className,
+  presentation = 'grid',
+}: PromotionCardProps) {
+  const { title, subtitle, image, imageAlt, href, badge, imageCropClassName } =
+    promotion
+  const isCarousel = presentation === 'carousel'
 
   return (
     <Link
       to={href}
+      draggable={false}
       className={cn(
-        'group flex h-full min-h-0 cursor-pointer flex-col overflow-hidden rounded-card bg-card',
-        'border border-transparent shadow-md shadow-black/[0.06]',
-        'dark:border-border-subtle dark:shadow-none',
+        'group flex min-h-0 cursor-pointer flex-col overflow-hidden bg-card',
         'transition-[transform,box-shadow] duration-500 ease-out',
-        '[@media(hover:hover)]:hover:scale-[1.02]',
-        '[@media(hover:hover)]:hover:shadow-lg [@media(hover:hover)]:hover:shadow-black/10',
-        'dark:[@media(hover:hover)]:hover:border-border-subtle dark:[@media(hover:hover)]:hover:shadow-none',
+        '[@media(hover:hover)]:hover:scale-[1.015]',
         focusRingClasses,
-        fillHeight && 'lg:min-h-0',
+        isCarousel
+          ? // Equal flex items — peek next card via 70vw / 40vw widths
+            'snap-start w-[70vw] max-w-[260px] shrink-0 grow-0 basis-[70vw] max-[379px]:max-w-[220px] gap-1.5 rounded-[12px] px-3 py-3 sm:w-[40vw] sm:max-w-none sm:basis-[40vw]'
+          : 'h-full gap-2 rounded-small px-4 py-4 rtl:gap-3 rtl:px-5 rtl:py-5',
         className,
       )}
     >
-      <div className="shrink-0 px-6 pt-5 pb-2">
-        <h3 className="font-serif text-[length:var(--font-size-small)] font-medium leading-tight text-primary-text sm:text-[length:calc(var(--font-size-small)*1.05)]">
+      <div
+        className={cn(
+          'shrink-0 leading-[1.2]',
+          isCarousel && 'min-h-[2.5rem]',
+        )}
+      >
+        <h3
+          className={cn(
+            // Arabic falls back to a plain sans, so it needs weight + size to carry the card.
+            'font-display font-normal text-primary-text rtl:font-bold rtl:leading-snug',
+            isCarousel
+              ? 'line-clamp-2 text-[length:calc(var(--font-size-extra-small)*1.05)] sm:text-extra-small'
+              : 'text-small rtl:text-[1.125rem]',
+          )}
+        >
           {title}
         </h3>
-        <p className="mt-1 text-[length:calc(var(--font-size-small)*0.85)] leading-[var(--line-height-small)] text-secondary-text sm:text-[length:calc(var(--font-size-small)*0.9)]">
+        <p
+          className={cn(
+            'font-display font-normal text-secondary-text rtl:mt-0.5 rtl:font-medium',
+            isCarousel
+              ? 'mt-0.5 line-clamp-2 text-[11px] leading-snug sm:text-[length:calc(var(--font-size-extra-small)*0.9)]'
+              : 'text-extra-small rtl:text-[0.9375rem]',
+          )}
+        >
           {subtitle}
         </p>
         {badge && (
-          <span className="mt-2 inline-flex rounded-full bg-button-primary px-2.5 py-0.5 text-[length:calc(var(--font-size-small)*0.75)] text-on-emphasis">
+          <span className="mt-2 inline-flex rounded-full bg-button-primary px-2.5 py-0.5 text-extra-small text-on-emphasis">
             {badge}
           </span>
         )}
@@ -55,28 +72,24 @@ export function PromotionCard({ promotion, className }: PromotionCardProps) {
 
       <div
         className={cn(
-          'px-6 pb-5',
-          fillHeight ? 'flex min-h-0 flex-1 flex-col' : 'mt-auto',
+          'relative w-full overflow-hidden',
+          isCarousel
+            ? 'aspect-square shrink-0 rounded-[6px]'
+            : 'min-h-0 flex-1 rounded-extra-small',
         )}
       >
-        <div
+        <img
+          src={image}
+          alt={imageAlt}
+          draggable={false}
           className={cn(
-            'relative overflow-hidden rounded-input',
-            imageAspect[layout],
+            'pointer-events-none transition-transform duration-500 ease-out group-hover:scale-[1.03]',
+            isCarousel || !imageCropClassName
+              ? 'absolute inset-0 size-full object-cover object-center'
+              : imageCropClassName,
           )}
-        >
-          <img
-            src={image}
-            alt={imageAlt}
-            className={cn(
-              'object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.04]',
-              fillHeight
-                ? 'absolute inset-0 h-full w-full'
-                : 'h-full w-full',
-            )}
-            loading="lazy"
-          />
-        </div>
+          loading="lazy"
+        />
       </div>
     </Link>
   )

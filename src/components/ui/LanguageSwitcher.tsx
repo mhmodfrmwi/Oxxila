@@ -1,7 +1,8 @@
 // src/components/ui/LanguageSwitcher.tsx
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import langIcon from '../../assets/Lang-image.png'
+import egyptFlag from '../../assets/header/flag-eg.svg'
+import ukFlag from '../../assets/header/flag-gb.png'
 import {
   LANGUAGE_META,
   SUPPORTED_LANGUAGES,
@@ -10,7 +11,6 @@ import {
 } from '../../i18n'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from './interactionStyles'
-import { typeSmallClasses } from './typography'
 
 interface LanguageSwitcherProps {
   className?: string
@@ -30,6 +30,7 @@ export function LanguageSwitcher({ className, compact = false }: LanguageSwitche
       : 'en'
 
   const currentLabel = LANGUAGE_META[currentLanguage].nativeLabel
+  const currentFlag = currentLanguage === 'ar' ? egyptFlag : ukFlag
 
   useEffect(() => {
     if (!open) return
@@ -64,8 +65,8 @@ export function LanguageSwitcher({ className, compact = false }: LanguageSwitche
       <button
         type="button"
         className={cn(
-          'flex min-h-11 min-w-0 items-center gap-2.5 text-start',
-          compact ? 'w-full' : 'flex-1 min-[769px]:flex-initial',
+          'flex min-h-11 min-w-0 items-center gap-1.5 text-start',
+          compact && 'w-full',
           focusRingClasses,
           'rounded-lg',
         )}
@@ -76,16 +77,14 @@ export function LanguageSwitcher({ className, compact = false }: LanguageSwitche
         onClick={() => setOpen((value) => !value)}
       >
         <img
-          src={langIcon}
+          src={currentFlag}
           alt=""
-          className="h-7 w-9 shrink-0 rounded-full object-cover"
+          className="size-8 shrink-0 rounded-full object-cover"
           aria-hidden
         />
         <span className="flex flex-col items-start">
-          <span className={typeSmallClasses}>{t('language.label')}</span>
-          <strong className="text-[length:var(--font-size-small)] leading-[var(--line-height-small)] font-normal text-secondary-text">
-            {currentLabel}
-          </strong>
+          <span className="site-header__text-base text-primary-text">{t('language.label')}</span>
+          <strong className="site-header__text-xs text-secondary-text">{currentLabel}</strong>
         </span>
       </button>
 
@@ -95,7 +94,9 @@ export function LanguageSwitcher({ className, compact = false }: LanguageSwitche
           role="listbox"
           aria-label={t('language.switcher')}
           className={cn(
-            'absolute end-0 top-full z-50 mt-2 min-w-[10rem] overflow-hidden',
+            // Align to start so the menu opens toward the center (switcher sits on the
+            // start side of the utility row). end-0 pushed it off the viewport edge.
+            'absolute start-0 top-full z-50 mt-2 min-w-[10rem] max-w-[calc(100vw-2rem)] overflow-hidden',
             'rounded-2xl border border-border-subtle bg-card p-1.5 shadow-lg',
           )}
         >

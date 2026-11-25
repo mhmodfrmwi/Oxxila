@@ -1,18 +1,20 @@
 // src/components/landing/best-seller/CarouselControls.tsx
 import { useTranslation } from 'react-i18next'
+import { cn } from '../../../lib/cn'
 
 interface CarouselControlsProps {
   count: number
   activeIndex: number
   onSelect: (index: number) => void
+  className?: string
 }
 
-export function CarouselControls({ count, activeIndex, onSelect }: CarouselControlsProps) {
+export function CarouselControls({ count, activeIndex, onSelect, className }: CarouselControlsProps) {
   const { t } = useTranslation()
 
   return (
     <div
-      className="flex items-center justify-center gap-1"
+      className={cn('flex items-center justify-center p-[5px]', className)}
       role="tablist"
       aria-label={t('home.bestSellers.carouselAria')}
     >
@@ -26,15 +28,15 @@ export function CarouselControls({ count, activeIndex, onSelect }: CarouselContr
             aria-selected={isActive}
             aria-label={t('home.bestSellers.goToProduct', { number: index + 1 })}
             onClick={() => onSelect(index)}
-            className="flex min-h-11 min-w-11 items-center justify-center rounded-full"
+            className="group flex h-6 items-center justify-center rounded-full px-[5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary"
           >
             <span
-              className={[
-                'block h-2 rounded-full transition-all duration-300 ease-out',
+              className={cn(
+                'block h-[15px] rounded-extra-large transition-[width,background-color] duration-300 ease-out motion-reduce:transition-none',
                 isActive
-                  ? 'w-8 bg-button-primary'
-                  : 'w-2 bg-accent-muted/60 hover:bg-button-primary/60 dark:bg-on-emphasis/20 dark:hover:bg-on-emphasis/40',
-              ].join(' ')}
+                  ? 'w-[42px] bg-button-primary'
+                  : 'w-[15px] bg-button-secondary group-hover:bg-button-primary/60',
+              )}
             />
           </button>
         )

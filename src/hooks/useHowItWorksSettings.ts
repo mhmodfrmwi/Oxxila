@@ -1,11 +1,12 @@
 // src/hooks/useHowItWorksSettings.ts
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   getHowItWorksSettings,
   type ApiHowItWorksSettings,
 } from '../api/settings'
 import { howItWorksThumb } from '../components/landing/landingData'
+import { cmsLocaleText } from '../utils/cmsLocaleText'
 
 export interface HowItWorksStepView {
   id: string
@@ -40,6 +41,7 @@ function buildI18nFallback(
 function mapApiToView(
   data: ApiHowItWorksSettings,
   fallback: HowItWorksView,
+  locale: string,
 ): HowItWorksView {
   const steps =
     data.steps?.length > 0
@@ -47,14 +49,41 @@ function mapApiToView(
           const fallbackStep = fallback.steps[index]
           return {
             id: String(step.index ?? index),
-            title: step.title?.trim() || fallbackStep?.title || '',
-            description: step.description?.trim() || fallbackStep?.description || '',
+            title:
+              cmsLocaleText(
+                {
+                  en: step.titleEn,
+                  ar: step.titleAr,
+                  legacy: step.title,
+                },
+                locale,
+                { crossFallback: false },
+              ) ||
+              fallbackStep?.title ||
+              '',
+            description:
+              cmsLocaleText(
+                {
+                  en: step.descriptionEn,
+                  ar: step.descriptionAr,
+                  legacy: step.description,
+                },
+                locale,
+                { crossFallback: false },
+              ) ||
+              fallbackStep?.description ||
+              '',
           }
         })
       : fallback.steps
 
   return {
-    title: data.title?.trim() || fallback.title,
+    title:
+      cmsLocaleText(
+        { en: data.titleEn, ar: data.titleAr, legacy: data.title },
+        locale,
+        { crossFallback: false },
+      ) || fallback.title,
     thumbnailImage: data.thumbnailImage?.trim() || fallback.thumbnailImage,
     videoUrl: data.videoUrl?.trim() || '',
     steps,
@@ -62,8 +91,8 @@ function mapApiToView(
 }
 
 export function useHowItWorksSettings() {
-  const { t } = useTranslation()
-  const [data, setData] = useState<HowItWorksView>(() => buildI18nFallback(t))
+  const { t, i18n } = useTranslation()
+  const [apiData, setApiData] = useState<ApiHowItWorksSettings | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -72,10 +101,10 @@ export function useHowItWorksSettings() {
     void (async () => {
       try {
         const response = await getHowItWorksSettings()
-        if (cancelled || !response.data) return
-        setData(mapApiToView(response.data, buildI18nFallback(t)))
+        if (cancelled) return
+        setApiData(response.data ?? null)
       } catch {
-        if (!cancelled) setData(buildI18nFallback(t))
+        if (!cancelled) setApiData(null)
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -84,7 +113,13 @@ export function useHowItWorksSettings() {
     return () => {
       cancelled = true
     }
-  }, [t])
+  }, [])
+
+  const data = useMemo(() => {
+    const fallback = buildI18nFallback(t)
+    if (!apiData) return fallback
+    return mapApiToView(apiData, fallback, i18n.language)
+  }, [apiData, i18n.language, t])
 
   return { data, loading }
 }

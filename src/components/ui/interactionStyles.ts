@@ -10,5 +10,5 @@ export const cardHoverLiftClasses = [
   'dark:[@media(hover:hover)]:hover:shadow-lg dark:[@media(hover:hover)]:hover:shadow-black/25',
 ].join(' ')
 
-/** Bottom margin for shop-style section headers */
-export const shopSectionHeaderSpacingClasses = 'mb-5 sm:mb-6 lg:mb-8'
+/** Bottom margin for shop-style section headers — Figma Gaps/small (16px) */
+export const shopSectionHeaderSpacingClasses = 'mb-4'

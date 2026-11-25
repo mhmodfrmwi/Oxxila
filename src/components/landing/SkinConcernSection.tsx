@@ -7,9 +7,11 @@ import { CategoryCard } from './CategoryCard'
 import { useLandingCatalogContext } from '../../hooks/useLandingCatalogContext'
 import { SectionHeader } from './SectionHeader'
 import { cn } from '../../lib/cn'
+import { FadeUp } from '../ui/FadeUp'
 
-const TABLET_GRID_BREAKPOINT = '(min-width: 640px)'
-const LARGE_GRID_BREAKPOINT = '(min-width: 1024px)'
+// Below this the six-up row squeezes cards under ~180px; the home page swipes instead of stacking.
+const GRID_BREAKPOINT = '(min-width: 1200px)'
+const COMPACT_TABLET_GRID_BREAKPOINT = '(min-width: 640px)'
 
 function concernLabel(t: (key: string) => string, id: string, fallback: string) {
   const key = `home.skinConcerns.items.${id}`
@@ -21,10 +23,10 @@ function ConcernSkeleton({ layout }: { layout: 'grid' | 'carousel' }) {
   return (
     <div
       className={cn(
-        'h-[min(280px,72vw)] animate-pulse rounded-3xl bg-surface-muted/70 dark:bg-surface-subtle/30',
+        'animate-pulse rounded-medium bg-card',
         layout === 'carousel'
-          ? 'w-[min(200px,78vw)] shrink-0 min-[480px]:w-[210px]'
-          : 'min-w-0 w-full',
+          ? 'aspect-[200/228] w-[min(200px,52vw)] shrink-0 sm:w-[220px]'
+          : 'aspect-[200/228] min-w-0 w-full',
       )}
       aria-hidden
     />
@@ -36,24 +38,20 @@ function ConcernGrid({ columns }: { columns: 3 | 6 }) {
   const { skinConcerns, loading } = useLandingCatalogContext()
 
   return (
-    <div
-      className={cn(
-        'grid gap-4',
-        columns === 6 ? 'grid-cols-3 gap-4 lg:grid-cols-6 lg:gap-5' : 'grid-cols-3 gap-4',
-      )}
-    >
+    <div className={cn('grid gap-4', columns === 6 ? 'grid-cols-6' : 'grid-cols-3')}>
       {loading
         ? Array.from({ length: 6 }).map((_, index) => (
             <ConcernSkeleton key={index} layout="grid" />
           ))
-        : skinConcerns.map((concern) => (
-            <CategoryCard
-              key={concern.id}
-              name={concernLabel(t, concern.id, concern.name)}
-              image={concern.image}
-              href={concern.href}
-              layout="grid"
-            />
+        : skinConcerns.map((concern, index) => (
+            <FadeUp key={concern.id} className="min-w-0" delay={index * 0.06}>
+              <CategoryCard
+                name={concernLabel(t, concern.id, concern.name)}
+                image={concern.image}
+                href={concern.href}
+                layout="grid"
+              />
+            </FadeUp>
           ))}
     </div>
   )
@@ -106,34 +104,36 @@ export function SkinConcernSection({
   className,
 }: SkinConcernSectionProps) {
   const { t } = useTranslation()
-  const isTabletGrid = useMediaQuery(TABLET_GRID_BREAKPOINT)
-  const isLargeGrid = useMediaQuery(LARGE_GRID_BREAKPOINT)
+  const isGrid = useMediaQuery(GRID_BREAKPOINT)
+  const isTablet = useMediaQuery(COMPACT_TABLET_GRID_BREAKPOINT)
   const resolvedTitle = title ?? t('home.skinConcerns.titleCompact')
+  const isDefault = size === 'default'
 
   return (
     <ContentSection
       aria-labelledby="skin-concerns-heading"
       className={className}
-      padding={size === 'default' ? 'spacious' : 'default'}
+      padding={isDefault ? 'compact' : 'default'}
     >
-      <SectionHeader
-        id="skin-concerns-heading"
-        align={align}
-        title={resolvedTitle}
-        subtitle={subtitle}
-        size={size}
-        className={align === 'center' ? 'mx-auto [&_p]:mx-auto [&_p]:text-secondary-text' : undefined}
-      />
+      <FadeUp>
+        <SectionHeader
+          id="skin-concerns-heading"
+          align={align}
+          title={resolvedTitle}
+          subtitle={subtitle}
+          size={isDefault ? 'medium' : 'compact'}
+        />
+      </FadeUp>
 
-      <div className={cn(size === 'default' && 'mt-8 min-[1025px]:pt-6')}>
-        {isLargeGrid ? (
+      <FadeUp className={cn(isDefault && 'mt-6 sm:mt-8 lg:mt-10')} delay={0.1}>
+        {isGrid ? (
           <ConcernGrid columns={6} />
-        ) : isTabletGrid ? (
+        ) : !isDefault && isTablet ? (
           <ConcernGrid columns={3} />
         ) : (
           <ConcernCarousel />
         )}
-      </div>
+      </FadeUp>
     </ContentSection>
   )
 }

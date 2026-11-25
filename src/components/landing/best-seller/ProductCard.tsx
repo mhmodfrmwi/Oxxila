@@ -1,13 +1,19 @@
 // src/components/landing/best-seller/ProductCard.tsx
+import { ProductBadge } from '../../ui/ProductBadge'
 import { motion } from 'framer-motion'
-import { Heart, ShoppingBag, Star } from 'lucide-react'
-import type { MouseEvent } from 'react'
+import { useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import favouriteIcon from '../../../assets/landing/home/favourite.svg'
+import basketIcon from '../../../assets/landing/home/shopping-basket.svg'
+import starIcon from '../../../assets/landing/home/star-fill.svg'
 import { PRODUCTS_PATH } from '../../../config/routes'
 import { useProductCardActions } from '../../../hooks/useProductCardActions'
+import { cn } from '../../../lib/cn'
 import { formatProductPrice } from '../../../utils/formatProductPrice'
 import { formatReviewCount } from '../../../utils/formatReviewCount'
+import { MaskIcon } from '../../ui/MaskIcon'
+import type { CoverflowLayout } from './coverflowLayout'
 
 export interface BestSellerProduct {
   id: string
@@ -25,57 +31,66 @@ interface ProductCardProps {
   product: BestSellerProduct
   offset: number
   isActive: boolean
-  isMobile: boolean
+  /** +1 / -1 for the fan's last move; 0 before any move. */
+  direction: number
+  layout: CoverflowLayout
   onSelect: () => void
 }
 
-function getCardMotion(offset: number, isMobile: boolean) {
-  if (isMobile) {
-    return offset === 0
-      ? { x: 0, scale: 1, rotate: 0, opacity: 1, zIndex: 30 }
-      : { x: offset * 40, scale: 0.92, rotate: 0, opacity: 0, zIndex: 0 }
-  }
+const MOVE_TRANSITION = { duration: 0.6, ease: 'easeInOut' } as const
+/** Jump straight to the new slot and fade in, so a wrapping card never sweeps back across the fan. */
+const WRAP_TRANSITION = { duration: 0, opacity: { duration: 0.45, ease: 'easeOut', delay: 0.15 } } as const
 
+function getCardMotion(offset: number, { steps, cardWidth }: CoverflowLayout) {
   const distance = Math.abs(offset)
-  if (distance > 2) {
+  const direction = Math.sign(offset)
+
+  if (distance >= steps.length) {
+    const last = steps[steps.length - 1]
     return {
-      x: offset * 200,
-      scale: 0.6,
-      rotate: offset > 0 ? 8 : -8,
+      x: direction * (last.x + cardWidth),
+      y: last.y,
+      rotate: direction * last.rotate,
+      scale: last.scale,
       opacity: 0,
-      zIndex: 0,
     }
   }
 
-  const scale = distance === 0 ? 1 : distance === 1 ? 0.9 : 0.75
-  const opacity = distance === 0 ? 1 : distance === 1 ? 0.8 : 0.2
-  const rotate = offset === 0 ? 0 : offset > 0 ? 8 : -8
-  const x = offset * 190
-
-  return { x, scale, rotate, opacity, zIndex: 30 - distance * 10 }
+  const step = steps[distance]
+  return {
+    x: direction * step.x,
+    y: step.y,
+    rotate: direction * step.rotate,
+    scale: step.scale,
+    opacity: step.opacity,
+  }
 }
 
-export function ProductCard({
-  product,
-  offset,
-  isActive,
-  isMobile,
-  onSelect,
-}: ProductCardProps) {
-  const { t } = useTranslation()
-  const {
-    wishlisted,
-    wishlistPending,
-    addingToCart,
-    handleAddToCart,
-    handleWishlistToggle,
-  } = useProductCardActions(product.id)
-  const motionProps = getCardMotion(offset, isMobile)
-  const isVisible = isMobile ? offset === 0 : Math.abs(offset) <= 2
+const actionButtonClasses = cn(
+  'relative z-20 flex size-9 items-center justify-center rounded-[20px]',
+  'bg-button-secondary text-icon-on-emphasis',
+  'transition-[background-color,transform] duration-200 hover:scale-110 hover:bg-button-primary',
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary',
+  'disabled:pointer-events-none disabled:opacity-60 motion-reduce:transition-none motion-reduce:hover:scale-100',
+)
+
+export function ProductCard({ product, offset, isActive, direction, layout, onSelect }: ProductCardProps) {
+  const { t, i18n } = useTranslation()
+  const { wishlisted, wishlistPending, addingToCart, handleAddToCart, handleWishlistToggle } =
+    useProductCardActions(product.id)
+  const [prevOffset, setPrevOffset] = useState(offset)
+  const [wrapped, setWrapped] = useState(false)
+  if (offset !== prevOffset) {
+    setPrevOffset(offset)
+    // Moving forward shrinks every offset; a card whose offset grew instead wrapped around the loop.
+    setWrapped(direction !== 0 && (offset - prevOffset) * direction > 0)
+  }
+  const motionProps = getCardMotion(offset, layout)
+  const isVisible = Math.abs(offset) < layout.steps.length
+  const { originalPrice } = product
+  const hasDiscount = originalPrice != null && originalPrice > product.price
 
   function onWishlistClick(event: MouseEvent<HTMLButtonElement>) {
-    event.preventDefault()
-    event.stopPropagation()
     void handleWishlistToggle(event)
   }
 
@@ -83,123 +98,123 @@ export function ProductCard({
     void handleAddToCart(event)
   }
 
-  const cardContent = (
-    <div
-      className={[
-        'overflow-hidden rounded-[24px] border p-3',
-        'bg-card/90 shadow-xl shadow-black/5 backdrop-blur-sm',
-        'border-border-subtle/80',
-        'transition-shadow duration-300',
-        isActive ? 'shadow-accent/10' : '',
-        product.slug ? 'cursor-pointer' : '',
-      ].join(' ')}
-    >
-      <div className="relative overflow-hidden rounded-2xl bg-surface-muted">
-        <span className="absolute start-3 top-3 z-10 rounded-full bg-accent-muted/70 px-2.5 py-1 text-[10px] font-semibold tracking-wide text-primary-text uppercase">
-          {t('home.bestSellers.badge')}
-        </span>
-
-        <div className="overflow-hidden">
-          <img
-            src={product.image}
-            alt={product.title}
-            className="aspect-[4/5] w-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-105"
-            loading="lazy"
-            draggable={false}
-          />
-        </div>
-
-        <button
-          type="button"
-          aria-label={
-            wishlisted
-              ? t('wishlist.removeFromWishlist')
-              : t('home.bestSellers.addToWishlist')
-          }
-          aria-pressed={wishlisted}
-          disabled={wishlistPending}
-          onClick={onWishlistClick}
-          className={[
-            'absolute bottom-3 start-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
-            'bg-card/90 text-icon-secondary shadow-md',
-            'transition-all duration-200 hover:scale-110 hover:bg-button-primary hover:text-on-emphasis',
-            'disabled:pointer-events-none disabled:opacity-60',
-            wishlisted ? 'bg-button-primary text-on-emphasis' : '',
-          ].join(' ')}
-        >
-          <Heart size={16} aria-hidden fill={wishlisted ? 'currentColor' : 'none'} />
-        </button>
-
-        <button
-          type="button"
-          aria-label={t('actions.addToCart')}
-          onClick={onCartClick}
-          disabled={addingToCart}
-          className={[
-            'absolute end-3 bottom-3 z-10 flex h-11 w-11 items-center justify-center rounded-full',
-            'bg-card/90 text-icon-secondary shadow-md',
-            'transition-all duration-200 hover:scale-110 hover:bg-button-primary hover:text-on-emphasis',
-            'disabled:pointer-events-none disabled:opacity-60',
-          ].join(' ')}
-        >
-          <ShoppingBag size={16} aria-hidden />
-        </button>
-      </div>
-
-      <div className="space-y-2.5 pt-3">
-        <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-snug font-medium text-primary-text">
-          {product.title}
-        </h3>
-
-        <div className="flex items-end justify-between gap-2">
-          <div className="flex items-baseline gap-2">
-            <span className="text-base font-bold text-primary-text">
-              {formatProductPrice(product.price)}
-            </span>
-            {product.originalPrice != null && product.originalPrice > product.price && (
-              <span className="text-sm text-secondary-text line-through">
-                {formatProductPrice(product.originalPrice)}
-              </span>
-            )}
-          </div>
-
-          <div className="flex shrink-0 items-center gap-1 text-xs text-secondary-text">
-            <Star size={12} className="fill-support-warning text-support-warning" aria-hidden />
-            <span>
-              {product.rating} ({formatReviewCount(product.reviewCount)})
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  function onTitleLinkClick(event: MouseEvent<HTMLAnchorElement>) {
+    event.stopPropagation()
+    if (!isActive) {
+      event.preventDefault()
+      onSelect()
+    }
+  }
 
   return (
     <motion.article
-      layout
-      animate={motionProps}
-      transition={{ duration: 0.6, ease: 'easeInOut' }}
-      className={[
-        'absolute top-0 left-1/2 w-[min(260px,85vw)] -translate-x-1/2 sm:w-[280px]',
-        'group/card',
-        !isVisible ? 'pointer-events-none' : '',
-        !product.slug ? 'cursor-pointer' : '',
-      ].join(' ')}
-      style={{ zIndex: motionProps.zIndex }}
-      onClick={onSelect}
-      whileHover={isActive ? { y: -8 } : undefined}
-    >
-      {product.slug ? (
-        <Link
-          to={`${PRODUCTS_PATH}/${product.slug}`}
-          className="block"
-          onClick={(event) => event.stopPropagation()}
-        >
-          {cardContent}
-        </Link>
-      ) : (
-        cardContent
+      initial={false}
+      animate={wrapped ? { ...motionProps, opacity: [0, motionProps.opacity] } : motionProps}
+      transition={wrapped ? WRAP_TRANSITION : MOVE_TRANSITION}
+      className={cn(
+        'group/card self-start justify-self-center [grid-area:1/1]',
+        !isVisible && 'pointer-events-none',
+        !product.slug && 'cursor-pointer',
       )}
+      style={{ width: layout.cardWidth, zIndex: 30 - Math.abs(offset) * 10 }}
+      onClick={onSelect}
+      aria-hidden={!isVisible}
+    >
+      <div
+        dir={i18n.dir()}
+        className={cn(
+          'relative flex flex-col gap-2 overflow-hidden rounded-small bg-background p-2',
+          'transition-[transform,box-shadow] duration-300 ease-out motion-reduce:transition-none',
+          isActive && 'shadow-[0_18px_40px_-22px_rgb(0_0_0/0.35)]',
+          isActive &&
+            '[@media(hover:hover)]:group-hover/card:-translate-y-2 [@media(hover:hover)]:group-hover/card:shadow-xl [@media(hover:hover)]:group-hover/card:shadow-black/10',
+        )}
+      >
+        <div className="relative px-[5px] py-2">
+          <div className="relative aspect-[202/234] overflow-hidden rounded-medium bg-surface-muted">
+            <img
+              src={product.image}
+              alt={product.title}
+              className="absolute inset-0 size-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-105 motion-reduce:transition-none"
+              loading="lazy"
+              draggable={false}
+            />
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-between p-2">
+              <button
+                type="button"
+                aria-label={
+                  wishlisted ? t('wishlist.removeFromWishlist') : t('home.bestSellers.addToWishlist')
+                }
+                aria-pressed={wishlisted}
+                disabled={wishlistPending}
+                onClick={onWishlistClick}
+                tabIndex={isActive ? 0 : -1}
+                className={cn(actionButtonClasses, wishlisted && 'bg-button-primary')}
+              >
+                <MaskIcon src={favouriteIcon} width={21.4992} height={19.5003} frame={24} />
+              </button>
+              <button
+                type="button"
+                aria-label={t('actions.addToCart')}
+                disabled={addingToCart}
+                onClick={onCartClick}
+                tabIndex={isActive ? 0 : -1}
+                className={actionButtonClasses}
+              >
+                <MaskIcon src={basketIcon} width={20.5} height={21.5} frame={24} />
+              </button>
+            </div>
+          </div>
+          <span className="pointer-events-none absolute right-3 top-3 z-10">
+            <ProductBadge kind="bestSeller" size="sm">
+              {t('home.bestSellers.badge')}
+            </ProductBadge>
+          </span>
+        </div>
+
+        <div className="landing-type flex flex-col gap-2 px-1 pb-1">
+          <h3
+            className="landing-fixed-text line-clamp-2 min-h-[2.4em] text-primary-text [--landing-size:1rem] [overflow-wrap:anywhere]"
+            title={product.title}
+          >
+            {product.slug ? (
+              <Link
+                to={`${PRODUCTS_PATH}/${product.slug}`}
+                onClick={onTitleLinkClick}
+                tabIndex={isActive ? 0 : -1}
+                draggable={false}
+                className="after:absolute after:inset-0 after:z-10 after:content-[''] focus-visible:outline-none focus-visible:after:rounded-small focus-visible:after:ring-2 focus-visible:after:ring-button-primary"
+              >
+                {product.title}
+              </Link>
+            ) : (
+              product.title
+            )}
+          </h3>
+
+          <div className="flex flex-wrap items-center justify-between gap-x-2.5 gap-y-1">
+            <p className="flex items-baseline gap-1.5">
+              <span className="landing-fixed-text text-icon-primary [--landing-size:1rem]">
+                {formatProductPrice(product.price)}
+              </span>
+              {hasDiscount && (
+                <span className="landing-fixed-text text-helper-text line-through [--landing-size:0.8125rem]">
+                  {formatProductPrice(originalPrice)}
+                </span>
+              )}
+            </p>
+            <div className="flex shrink-0 items-center gap-1.5 text-helper-text">
+              <img src={starIcon} alt="" width={16} height={16} className="size-4" />
+              <span className="landing-fixed-text [--landing-size:0.8125rem]">
+                {product.rating}{' '}
+                <span className="landing-fixed-text [--landing-size:0.75rem]">
+                  ({formatReviewCount(product.reviewCount)})
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </motion.article>
   )
 }

@@ -7,7 +7,7 @@ import { ProductPromoCard } from './ProductPromoCard'
 function BannerSkeleton() {
   return (
     <div
-      className="mx-auto h-[min(360px,78vw)] w-[min(900px,96vw)] animate-pulse rounded-card bg-surface-muted min-[640px]:h-[min(400px,68vw)] min-[640px]:w-[min(900px,96vw)] min-[769px]:h-[396px] min-[769px]:w-[828px] min-[1536px]:h-[430px] min-[1536px]:w-[900px]"
+      className="mx-auto aspect-[828/396] w-[min(828px,96vw)] animate-pulse rounded-card bg-surface-muted min-[1536px]:aspect-[900/430] min-[1536px]:w-[900px]"
       aria-hidden
     />
   )
@@ -37,6 +37,7 @@ export function ShopHeroCarousel() {
             items={slides}
             getItemKey={(slide) => slide.id}
             ariaLabel={t('shop.banner.ariaLabel')}
+            trackHeightClassName="h-[min(46.5vw,396px)] min-[1536px]:h-[430px]"
             renderSlide={(slide, { isActive }) => (
               <ProductPromoCard slide={slide} isActive={isActive} />
             )}

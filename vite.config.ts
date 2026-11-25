@@ -68,6 +68,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      allowedHosts: ['.ngrok-free.app', '.ngrok-free.dev', '.ngrok.app', '.ngrok.io'],
       proxy: proxyConfig,
     },
   }

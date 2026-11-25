@@ -1,5 +1,6 @@
 // src/hooks/useCategoryProducts.ts
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getProducts } from '../api/catalog'
 import type { SortOption } from '../components/category/categoryData'
 import { getFiltersQueryKey, type FilterState } from '../components/category/filters/filterState'
@@ -85,11 +86,13 @@ export function useCategoryProducts(
     isCertified?: boolean
   },
 ) {
+  const { i18n } = useTranslation()
   const [state, setState] = useState<CategoryProductsState>(emptyState)
   const filtersKey = getFiltersQueryKey(filters)
   const enabled = options?.enabled !== false
   const isCertified = options?.isCertified === true
   const clientFilter = requiresClientProductFilter(filters)
+  const locale = i18n.language
 
   useEffect(() => {
     if (!enabled) return
@@ -121,7 +124,9 @@ export function useCategoryProducts(
           setState({
             loading: false,
             error: null,
-            products: pageSlice.map(mapApiProductToRecommendedProduct),
+            products: pageSlice.map((product) =>
+              mapApiProductToRecommendedProduct(product, locale),
+            ),
             pagination,
           })
           return
@@ -133,7 +138,9 @@ export function useCategoryProducts(
         setState({
           loading: false,
           error: null,
-          products: (response.data ?? []).map(mapApiProductToRecommendedProduct),
+          products: (response.data ?? []).map((product) =>
+            mapApiProductToRecommendedProduct(product, locale),
+          ),
           pagination: response.pagination ?? null,
         })
       } catch (error) {
@@ -152,7 +159,18 @@ export function useCategoryProducts(
     return () => {
       cancelled = true
     }
-  }, [categoryId, filtersKey, sort, page, limit, enabled, isCertified, clientFilter, filters])
+  }, [
+    categoryId,
+    filtersKey,
+    sort,
+    page,
+    limit,
+    enabled,
+    isCertified,
+    clientFilter,
+    filters,
+    locale,
+  ])
 
   return state
 }

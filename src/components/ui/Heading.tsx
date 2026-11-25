@@ -5,6 +5,8 @@ type HeadingVariant =
   | 'page'
   | 'page-lg'
   | 'section'
+  | 'section-lg'
+  | 'section-md'
   | 'section-compact'
   | 'card'
   | 'card-sm'
@@ -12,21 +14,27 @@ type HeadingVariant =
   | 'hero-lg'
 
 const variantClasses: Record<HeadingVariant, string> = {
-  page: 'font-serif text-3xl font-medium text-primary-text sm:text-4xl',
-  'page-lg': 'font-serif text-4xl font-medium text-primary-text sm:text-[2.75rem]',
-  section: 'font-serif text-3xl font-medium text-primary-text md:text-4xl lg:text-5xl',
-  'section-compact':
-    'font-serif text-[length:calc(var(--font-size-base)*1.6)] font-medium text-primary-text sm:text-3xl lg:text-4xl',
-  card: 'font-serif text-lg font-medium text-primary-text',
-  'card-sm': 'font-serif text-sm font-medium text-primary-text sm:text-base',
-  hero: 'font-serif text-4xl font-medium leading-[1.15] text-primary-text md:text-5xl lg:text-6xl',
-  'hero-lg': 'font-serif text-5xl font-medium leading-[1.15] text-primary-text xl:text-6xl 2xl:text-7xl',
+  page: 'font-display text-3xl font-medium text-primary-text sm:text-4xl',
+  'page-lg': 'font-display text-4xl font-medium text-primary-text sm:text-[2.75rem]',
+  section: 'font-display text-3xl font-medium text-primary-text md:text-4xl lg:text-5xl',
+  /** Figma Heading1 — responsive 36 / 44 / 52px */
+  'section-lg': 'font-display text-heading-1 font-normal text-primary-text',
+  /** Figma Heading4 — responsive 25 / 31 / 36px */
+  'section-md': 'font-display text-heading-4 font-normal text-primary-text',
+  /** Figma Heading5 — responsive 22 / 28 / 32px (shop section titles) */
+  'section-compact': 'font-display text-heading-5 font-normal text-primary-text',
+  card: 'font-display text-lg font-medium text-primary-text',
+  'card-sm': 'font-display text-sm font-medium text-primary-text sm:text-base',
+  hero: 'font-display text-4xl font-medium leading-[1.15] text-primary-text md:text-5xl lg:text-6xl',
+  'hero-lg': 'font-display text-5xl font-medium leading-[1.15] text-primary-text xl:text-6xl 2xl:text-7xl',
 }
 
 const defaultElement: Record<HeadingVariant, ElementType> = {
   page: 'h1',
   'page-lg': 'h1',
   section: 'h2',
+  'section-lg': 'h2',
+  'section-md': 'h2',
   'section-compact': 'h2',
   card: 'h3',
   'card-sm': 'h3',
