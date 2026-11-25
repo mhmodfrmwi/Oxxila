@@ -252,13 +252,15 @@ export function Navbar() {
               </span>
             )}
           </Link>
+          {/* Desktop: a hairline separates the shopping icons from the account area. */}
+          <span className="mx-1 hidden h-6 w-px shrink-0 bg-border-subtle lg:block" aria-hidden />
           {isAuthenticated ? (
             <>
               <div ref={accountMenuRef} className="relative min-w-0">
                 <button
                   type="button"
                   // Phones: a plain 36px avatar target, same size as the cart icon next to it.
-                  className={`${authActionClass} max-w-full max-sm:min-h-9 max-sm:min-w-9 max-sm:justify-center`}
+                  className={`${authActionClass} max-w-full max-sm:min-h-9 max-sm:min-w-9 max-sm:justify-center sm:gap-3 sm:rounded-xl sm:px-2 sm:transition-colors sm:hover:bg-input`}
                   aria-label={t('nav.openAccountMenu')}
                   aria-haspopup="menu"
                   aria-expanded={accountOpen}
@@ -276,9 +278,13 @@ export function Navbar() {
                     alt={name}
                     loading={avatarLoading}
                   />
-                  <span className="site-header__text-xs hidden min-w-0 max-w-[8rem] truncate sm:inline">
-                    {name}
+                  <span className="hidden min-w-0 flex-col items-start leading-tight sm:flex">
+                    <span className="site-header__text-xs text-secondary-text">{t('nav.hello')}</span>
+                    <span className="site-header__text-xs max-w-[11rem] truncate font-semibold text-primary-text">
+                      {name}
+                    </span>
                   </span>
+                  <ChevronDown size={14} aria-hidden className="hidden shrink-0 text-secondary-text sm:block" />
                 </button>
                 <AccountDropdown
                   id={accountMenuId}
@@ -293,16 +299,14 @@ export function Navbar() {
               {/* Phones: logout lives in the menu; the header keeps just account + cart. */}
               <button
                 type="button"
-                className={`${authActionClass} max-sm:hidden`}
+                className={`${authActionClass} size-11 shrink-0 justify-center rounded-full hover:bg-input max-sm:hidden`}
+                title={authLoading ? t('nav.loggingOut') : t('nav.logOut')}
                 onClick={() => void handleLogout()}
                 disabled={authLoading}
                 aria-busy={authLoading}
                 aria-label={authLoading ? t('nav.loggingOut') : t('nav.logOut')}
               >
-                <LogOut size={18} aria-hidden />
-                <span className="site-header__text-xs hidden sm:inline">
-                  {authLoading ? t('nav.loggingOut') : t('nav.logOut')}
-                </span>
+                <LogOut size={20} strokeWidth={1.6} aria-hidden className="rtl:-scale-x-100" />
               </button>
             </>
           ) : (

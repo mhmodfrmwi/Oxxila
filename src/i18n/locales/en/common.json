@@ -18,6 +18,7 @@
     "shoppingBagWithCount": "Shopping bag, {{count}} items",
     "accountMenu": "Account menu",
     "openAccountMenu": "Open account menu",
+    "hello": "Welcome back",
     "dropdown": {
       "account": "Account",
       "myOrders": "My Orders",

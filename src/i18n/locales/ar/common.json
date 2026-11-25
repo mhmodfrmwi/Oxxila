@@ -18,6 +18,7 @@
     "shoppingBagWithCount": "حقيبة التسوق، {{count}} عناصر",
     "accountMenu": "قائمة الحساب",
     "openAccountMenu": "فتح قائمة الحساب",
+    "hello": "أهلًا بك",
     "dropdown": {
       "account": "الحساب",
       "myOrders": "طلباتي",
