@@ -10,6 +10,7 @@ import {
   hasOrderDeliveryEstimate,
 } from '../../utils/orderDelivery'
 import { formatOrderShippingAddressLines } from '../../utils/orderFormat'
+import { ShippingContactDetails } from './ShippingContactDetails'
 
 interface OrderShippingInfoCardProps {
   order: ApiOrder
@@ -41,14 +42,7 @@ export function OrderShippingInfoCard({
         <h2>{t('checkout.track.shippingInfo')}</h2>
       </div>
 
-      <p className="order-confirmation-section-label">{t('checkout.track.shippingTo')}</p>
-      <p className="order-confirmation-recipient">{recipientName}</p>
-      <div className="order-confirmation-address">
-        {addressLines.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
-        {phone && <p className="mt-2">{phone}</p>}
-      </div>
+      <ShippingContactDetails name={recipientName} phone={phone} addressLines={addressLines} />
 
       {hasDeliveryEstimate && (
         <>

@@ -9,12 +9,13 @@ import { useOrderConfirmationPage } from '../../hooks/useOrderConfirmationPage'
 import {
   formatOrderDate,
   formatOrderReferenceId,
-  formatOrderShippingAddress,
+  formatOrderShippingAddressLines,
   getOrderTrackingNumber,
 } from '../../utils/orderFormat'
 import { formatCartPrice } from '../../utils/formatProductPrice'
 import type { ApiOrder } from '../../types/order'
 import { OrderSummarySection } from '../order/OrderSummarySection'
+import { ShippingContactDetails } from '../order/ShippingContactDetails'
 import { FormMessage } from '../auth/FormMessage'
 import { Footer } from '../landing/footer/Footer'
 import { BrandLoader } from '../ui/BrandLoader'
@@ -114,18 +115,14 @@ export function OrderConfirmationContent() {
                   <p className="order-confirmation-section-label">
                     {t('checkout.confirmation.shippingTo')}
                   </p>
-                  <p className="order-confirmation-recipient">
-                    {customerName || t('checkout.confirmation.customer')}
-                  </p>
                   {/* The phone typed at checkout for THIS order — not the account phone. */}
-                  {order.shippingAddress.phone && (
-                    <p className="order-confirmation-address" dir="ltr" style={{ textAlign: 'start' }}>
-                      {order.shippingAddress.phone}
-                    </p>
-                  )}
-                  <p className="order-confirmation-address">
-                    {formatOrderShippingAddress(order)}
-                  </p>
+                  <ShippingContactDetails
+                    name={customerName || t('checkout.confirmation.customer')}
+                    phone={order.shippingAddress.phone}
+                    addressLines={formatOrderShippingAddressLines(order)}
+                  />
+
+                  <div className="order-confirmation-divider" />
 
                   {/* No courier/shipping method yet (it's assigned from the dashboard): show the
                       general delivery window instead, editable in dashboard settings. */}

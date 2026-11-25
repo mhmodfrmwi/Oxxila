@@ -2,7 +2,7 @@
   "nav": {
     "home": "Home",
     "shop": "Explore",
-    "categories": "Products",
+    "categories": "Shop",
     "docs": "Docs",
     "cart": "Cart",
     "profile": "Profile",
@@ -348,7 +348,7 @@
   "breadcrumb": {
     "aria": "Breadcrumb",
     "home": "Home",
-    "categories": "Categories"
+    "categories": "Shop"
   },
   "categoriesLanding": {
     "title": "Categories",
@@ -385,8 +385,8 @@
     "empty": "No products found.",
     "loadError": "Unable to load products.",
     "categoryNotFound": "Category not found.",
-    "browsingHistoryTitle": "For customers who viewed the goods in your browsing history also saw",
-    "relatedBrowsingTitle": "Previously browsed related",
+    "browsingHistoryTitle": "Picked for you, based on what you viewed",
+    "relatedBrowsingTitle": "Related to what you viewed",
     "browsingHistoryAria": "Browsing history products"
   },
   "utilityBar": {
@@ -922,6 +922,9 @@
       "paymentMethod": "Payment Method",
       "deliveryAddress": "Delivery Address",
       "shippingTo": "Shipping To",
+      "recipientLabel": "Recipient",
+      "phoneLabel": "Phone",
+      "addressLabel": "Address",
       "customer": "Customer",
       "deliveryMethod": "Delivery Method",
       "standardShipping": "Standard Shipping",

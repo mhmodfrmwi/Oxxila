@@ -2,7 +2,7 @@
   "nav": {
     "home": "الرئيسية",
     "shop": "استكشف",
-    "categories": "المنتجات",
+    "categories": "المتجر",
     "docs": "المستندات",
     "cart": "السلة",
     "profile": "الملف الشخصي",
@@ -348,7 +348,7 @@
   "breadcrumb": {
     "aria": "مسار التنقل",
     "home": "الرئيسية",
-    "categories": "الفئات"
+    "categories": "المتجر"
   },
   "categoriesLanding": {
     "title": "الفئات",
@@ -385,7 +385,7 @@
     "empty": "لا توجد منتجات.",
     "loadError": "تعذر تحميل المنتجات.",
     "categoryNotFound": "الفئة غير موجودة.",
-    "browsingHistoryTitle": "عملاء شاهدوا منتجات من سجل تصفحك شاهدوا أيضًا",
+    "browsingHistoryTitle": "مختارة لك بناءً على ما شاهدته",
     "relatedBrowsingTitle": "منتجات ذات صلة بتصفحك السابق",
     "browsingHistoryAria": "منتجات من سجل التصفح"
   },
@@ -929,6 +929,9 @@
       "paymentMethod": "طريقة الدفع",
       "deliveryAddress": "عنوان التوصيل",
       "shippingTo": "الشحن إلى",
+      "recipientLabel": "المستلم",
+      "phoneLabel": "رقم الهاتف",
+      "addressLabel": "العنوان",
       "customer": "العميل",
       "deliveryMethod": "طريقة التوصيل",
       "standardShipping": "شحن قياسي",

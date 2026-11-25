@@ -82,7 +82,7 @@ export function TrackOrderPageContent() {
         ) : error ? (
           <FormMessage message={error} />
         ) : order ? (
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-4xl">
             <OrderPageHeader order={order} />
 
             <div className="order-confirmation-card track-order-stepper-card">
