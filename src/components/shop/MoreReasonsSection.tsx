@@ -54,7 +54,7 @@ export function MoreReasonsSection() {
               ? 'grid-cols-[minmax(0,4fr)_minmax(0,2fr)_minmax(0,2fr)]'
               : 'grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,4fr)]',
             'grid-rows-2',
-            'h-[min(535px,42vw)] min-h-[420px]',
+            'h-[clamp(420px,38vw,780px)]',
           ].join(' ')}
         >
           {promotions.map((promotion) => (
