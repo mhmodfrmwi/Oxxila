@@ -7,7 +7,7 @@ interface ProductBadgeProps {
   /** Kept for callers; every kind uses the same brand pill. */
   kind?: ProductBadgeKind | string
   /** sm = product cards, md = product page / large cards. */
-  size?: 'sm' | 'md'
+  size?: 'xs' | 'sm' | 'md'
   className?: string
 }
 
@@ -17,7 +17,11 @@ export function ProductBadge({ children, size = 'md', className }: ProductBadgeP
     <span
       className={cn(
         'inline-flex items-center rounded-full whitespace-nowrap',
-        size === 'sm' ? 'px-3 py-1 text-[11px]' : 'px-3.5 py-1.5 text-xs',
+        size === 'xs'
+          ? 'px-2 py-[3px] text-[10px]'
+          : size === 'sm'
+            ? 'px-3 py-1 text-[11px]'
+            : 'px-3.5 py-1.5 text-xs',
         'font-semibold tracking-wide uppercase',
         'bg-button-primary-hover text-primary-text',
         'dark:bg-button-primary dark:text-on-emphasis',

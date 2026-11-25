@@ -3,8 +3,6 @@ import { Check, Heart, Loader2, Minus, Plus, ShoppingBag } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import favouriteIcon from '../../../assets/landing/home/favourite.svg'
-import basketIcon from '../../../assets/landing/home/shopping-basket.svg'
 import starIcon from '../../../assets/landing/home/star-fill.svg'
 import { useProductCardActions } from '../../../hooks/useProductCardActions'
 import { cn } from '../../../lib/cn'
@@ -14,7 +12,6 @@ import { stripLeadingBrandFromName } from '../../../utils/productDisplayName'
 import { PRODUCT_IMAGE_PLACEHOLDER } from '../../../utils/productImage'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import { IconActionButton } from '../../ui/IconActionButton'
-import { MaskIcon } from '../../ui/MaskIcon'
 import { ProductBadge } from '../../ui/ProductBadge'
 import { ProductRating } from '../../ui/ProductRating'
 import type { RecommendedProduct } from './recommendedProductsData'
@@ -35,19 +32,6 @@ interface ProductCardProps {
  */
 const carouselWidthClasses = 'w-[clamp(184px,58vw,248px)] shrink-0'
 
-/** Figma action frames — 32×32 carousel; grid/mobile ≥40px for touch. */
-const actionButtonClasses = cn(
-  'flex items-center justify-center rounded-[20px] p-2',
-  'bg-button-secondary text-icon-on-emphasis',
-  'transition-[background-color,transform] duration-200 hover:scale-105 hover:bg-button-primary',
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary',
-  'disabled:pointer-events-none disabled:opacity-60 motion-reduce:transition-none motion-reduce:hover:scale-100',
-)
-
-/** One action size for every card layout (rail and grid) so icons never differ between sections. */
-const carouselActionSize = 'size-9'
-/** Phones: 36px so the heart + stepper fit a ~165px card; sm+: roomy 44px touch targets. */
-const gridActionSize = 'size-9'
 
 export function ProductCard({
   product,
@@ -192,8 +176,6 @@ export function ProductCard({
     )
   }
 
-  const actionSize = isGrid ? gridActionSize : carouselActionSize
-  const iconFrame = 20
 
   // Same visual language as landing best-seller cards.
   // No hover lift / background glow — static soft shadow only.
@@ -246,7 +228,22 @@ export function ProductCard({
               }}
             />
 
-            {/* Overlay layer: wishlist heart bottom-start, cart/stepper bottom-end. */}
+            {/* Only products that really are best sellers / certified / bundles get a badge. */}
+            {badge ? (
+              <span
+                className={cn(
+                  'pointer-events-none absolute z-10',
+                  // The brand logo is printed top-left on the photos, so badge top-right, heart top-left (each in its own corner).
+                  'right-2 top-2 sm:right-2.5 sm:top-2.5',
+                )}
+              >
+                <ProductBadge kind={badge} size="xs">
+                  {badgeLabel}
+                </ProductBadge>
+              </span>
+            ) : null}
+
+            {/* Wishlist heart: frosted circle on the same top row as the badge, in the opposite corner. */}
             <div className="pointer-events-none absolute inset-0 z-20">
               <button
                 type="button"
@@ -259,106 +256,21 @@ export function ProductCard({
                   void handleWishlistToggle(event)
                 }}
                 className={cn(
-                  actionButtonClasses,
-                  actionSize,
-                  'pointer-events-auto absolute bottom-2 start-2',
-                  wishlisted && 'bg-button-primary',
+                  'pointer-events-auto absolute left-2 top-2 flex size-8 items-center justify-center rounded-full sm:left-2.5 sm:top-2.5 sm:size-9',
+                  'shadow-[0_2px_10px_rgb(0_0_0/0.18)] backdrop-blur-sm',
+                  'transition-[background-color,transform,color] duration-200 hover:scale-105 active:scale-95',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary',
+                  'disabled:pointer-events-none disabled:opacity-60 motion-reduce:transition-none motion-reduce:hover:scale-100',
+                  wishlisted
+                    ? 'bg-button-primary text-white'
+                    : 'bg-white/90 text-[#5d5a88] hover:bg-white hover:text-button-primary',
                 )}
               >
-                <MaskIcon
-                  src={favouriteIcon}
-                  width={20}
-                  height={18}
-                  frame={iconFrame}
-                />
+                <Heart size={16} strokeWidth={1.9} className={wishlisted ? 'fill-current' : undefined} aria-hidden />
               </button>
-              <div className="pointer-events-auto absolute bottom-2 end-2 flex">
-              {justAdded ? (
-                <span
-                  role="status"
-                  className={cn(
-                    'relative z-20 flex h-9 items-center gap-1 rounded-[20px] bg-support-success px-3 text-xs font-medium text-white',
-                    'animate-[card-added-in_0.25s_ease-out] motion-reduce:animate-none',
-                  )}
-                >
-                  <Check size={16} strokeWidth={2.5} aria-hidden />
-                  {t('cart.card.added')}
-                </span>
-              ) : cartQuantity > 0 ? (
-                <div
-                  className={cn(
-                    'relative z-20 flex items-center gap-0.5 rounded-[20px] bg-button-primary p-0.5 text-white',
-                    'h-9',
-                  )}
-                  role="group"
-                  aria-label={t('cart.card.inCart', { count: cartQuantity })}
-                >
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      void handleDecrement(event)
-                    }}
-                    disabled={updatingQty}
-                    aria-label={t('cart.card.decrease')}
-                    className="flex aspect-square h-full items-center justify-center rounded-full transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white disabled:opacity-60"
-                  >
-                    <Minus size={14} strokeWidth={2.5} aria-hidden />
-                  </button>
-                  <span className="min-w-5 text-center text-sm font-semibold tabular-nums" aria-live="polite">
-                    {updatingQty ? <Loader2 size={14} className="mx-auto animate-spin" aria-hidden /> : cartQuantity}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      void handleIncrement(event)
-                    }}
-                    disabled={updatingQty || (product.stock != null && cartQuantity >= product.stock)}
-                    aria-label={t('cart.card.increase')}
-                    className="flex aspect-square h-full items-center justify-center rounded-full transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white disabled:opacity-40"
-                  >
-                    <Plus size={14} strokeWidth={2.5} aria-hidden />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  aria-label={outOfStock ? t('wishlist.outOfStock') : t('actions.addToCart')}
-                  disabled={addingToCart || outOfStock}
-                  onClick={(event) => {
-                    void handleAddToCart(event)
-                  }}
-                  className={cn(actionButtonClasses, actionSize)}
-                >
-                  {addingToCart ? (
-                    <Loader2 size={18} className="animate-spin" aria-hidden />
-                  ) : (
-                    <MaskIcon
-                      src={basketIcon}
-                      width={20}
-                      height={20}
-                      frame={iconFrame}
-                    />
-                  )}
-                </button>
-              )}
-              </div>
             </div>
           </div>
 
-          {/* Only products that really are best sellers / certified / bundles get a badge. */}
-          {badge ? (
-            <span
-              className={cn(
-                'pointer-events-none absolute z-10 top-3',
-                // The brand logo is printed top-left on the photos, so the badge sits top-right.
-                isGrid ? 'right-3' : 'right-3 top-3',
-              )}
-            >
-              <ProductBadge kind={badge} size={isGrid ? 'md' : 'sm'}>
-                {badgeLabel}
-              </ProductBadge>
-            </span>
-          ) : null}
         </div>
 
         <div
@@ -427,6 +339,76 @@ export function ProductCard({
                 </span>
               </span>
             </div>
+          </div>
+
+          {/* Full-width cart action: button -> "Added" flash -> quantity stepper */}
+          <div className="relative z-20 pt-1">
+            {justAdded ? (
+              <span
+                role="status"
+                className={cn(
+                  'flex h-10 w-full items-center justify-center gap-1.5 rounded-full bg-support-success text-sm font-medium text-white',
+                  'animate-[card-added-in_0.25s_ease-out] motion-reduce:animate-none',
+                )}
+              >
+                <Check size={16} strokeWidth={2.5} aria-hidden />
+                {t('cart.card.added')}
+              </span>
+            ) : cartQuantity > 0 ? (
+              <div
+                className="flex h-10 w-full items-center justify-between rounded-full bg-button-primary p-1 text-white"
+                role="group"
+                aria-label={t('cart.card.inCart', { count: cartQuantity })}
+              >
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    void handleDecrement(event)
+                  }}
+                  disabled={updatingQty}
+                  aria-label={t('cart.card.decrease')}
+                  className="flex aspect-square h-full items-center justify-center rounded-full transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white disabled:opacity-60"
+                >
+                  <Minus size={16} strokeWidth={2.5} aria-hidden />
+                </button>
+                <span className="min-w-6 text-center text-sm font-semibold tabular-nums" aria-live="polite">
+                  {updatingQty ? <Loader2 size={14} className="mx-auto animate-spin" aria-hidden /> : cartQuantity}
+                </span>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    void handleIncrement(event)
+                  }}
+                  disabled={updatingQty || (product.stock != null && cartQuantity >= product.stock)}
+                  aria-label={t('cart.card.increase')}
+                  className="flex aspect-square h-full items-center justify-center rounded-full transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white disabled:opacity-40"
+                >
+                  <Plus size={16} strokeWidth={2.5} aria-hidden />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                disabled={addingToCart || outOfStock}
+                onClick={(event) => {
+                  void handleAddToCart(event)
+                }}
+                className={cn(
+                  'flex h-10 w-full items-center justify-center gap-2 rounded-full text-sm font-medium',
+                  'bg-button-primary text-on-emphasis transition-[background-color,transform] duration-200',
+                  'hover:bg-button-primary-hover-strong hover:brightness-95 active:scale-[0.98]',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card',
+                  'disabled:cursor-not-allowed disabled:opacity-55 motion-reduce:transition-none',
+                )}
+              >
+                {addingToCart ? (
+                  <Loader2 size={16} className="animate-spin" aria-hidden />
+                ) : (
+                  <ShoppingBag size={16} strokeWidth={1.75} aria-hidden />
+                )}
+                {outOfStock ? t('wishlist.outOfStock') : t('actions.addToCart')}
+              </button>
+            )}
           </div>
         </div>
       </div>

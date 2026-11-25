@@ -139,6 +139,12 @@ export function ProductCard({ product, offset, isActive, direction, layout, onSe
               loading="lazy"
               draggable={false}
             />
+            {/* Inside the image frame so it always sits a clear 10px from the top/right edges. */}
+            <span className="pointer-events-none absolute right-2.5 top-2.5 z-10">
+              <ProductBadge kind="bestSeller" size="sm">
+                {t('home.bestSellers.badge')}
+              </ProductBadge>
+            </span>
             <div className="absolute inset-x-0 bottom-0 flex items-center justify-between p-2">
               <button
                 type="button"
@@ -165,11 +171,6 @@ export function ProductCard({ product, offset, isActive, direction, layout, onSe
               </button>
             </div>
           </div>
-          <span className="pointer-events-none absolute right-3 top-3 z-10">
-            <ProductBadge kind="bestSeller" size="sm">
-              {t('home.bestSellers.badge')}
-            </ProductBadge>
-          </span>
         </div>
 
         <div className="landing-type flex flex-col gap-2 px-1 pb-1">
