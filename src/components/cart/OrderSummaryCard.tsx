@@ -1,10 +1,11 @@
 // src/components/cart/OrderSummaryCard.tsx
-import { ChevronRight } from 'lucide-react'
+import { Check, ChevronRight, Ticket, Truck, X } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { ApiError } from '../../lib/api'
 import type { ApiCart, ApiCartItem } from '../../types/cart'
+import { catalogDisplayName } from '../../utils/catalogDisplayName'
 import { formatCartPrice } from '../../utils/formatProductPrice'
 import { PRODUCT_IMAGE_PLACEHOLDER, resolveProductImageUrl } from '../../utils/productImage'
 import { Button } from '../ui/Button'
@@ -32,6 +33,12 @@ interface OrderSummaryCardProps {
   onCtaClick?: () => void
   ctaDisabled?: boolean
   showPromo?: boolean
+  /** Code a guest entered; it is applied automatically after sign-in. */
+  pendingCoupon?: string | null
+  /** Replaces the default "saved" note under the promo field (e.g. how much it saves). */
+  couponNote?: string | null
+  /** Percent off shown next to the discount row, e.g. 10 → "Discount (10%)". */
+  discountPercent?: number | null
   showTrustBadges?: boolean
   trustBadgeVariant?: 'cart' | 'payment'
   footerNote?: string
@@ -57,7 +64,8 @@ function SummaryRow({
 }
 
 function OrderReviewItem({ item }: { item: ApiCartItem }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const name = catalogDisplayName(item.product, i18n.language, 'product')
   const imageSrc = resolveProductImageUrl(item.product.images[0]) ?? PRODUCT_IMAGE_PLACEHOLDER
   const lineTotal = item.price * item.quantity
 
@@ -73,7 +81,7 @@ function OrderReviewItem({ item }: { item: ApiCartItem }) {
         }}
       />
       <div className="min-w-0">
-        <p className="payment-review-item-name">{item.product.name}</p>
+        <p className="payment-review-item-name">{name}</p>
         <p className="payment-review-item-qty">
           {t('cart.summary.qty', { count: item.quantity })}
         </p>
@@ -98,6 +106,9 @@ export function OrderSummaryCard({
   onCtaClick,
   ctaDisabled,
   showPromo,
+  pendingCoupon = null,
+  couponNote = null,
+  discountPercent = null,
   showTrustBadges = true,
   trustBadgeVariant = 'cart',
   footerNote,
@@ -107,7 +118,11 @@ export function OrderSummaryCard({
   const { t } = useTranslation()
   const [promoDraft, setPromoDraft] = useState('')
   const [promoError, setPromoError] = useState<string | null>(null)
-  const promoCode = cart.couponCode ?? promoDraft
+  const promoCode = cart.couponCode ?? pendingCoupon ?? promoDraft
+  const hasCoupon = Boolean(cart.couponCode || pendingCoupon)
+  // Applied (signed-in) coupons carry their value in the cart; guest previews pass it in.
+  const percentOff =
+    discountPercent ?? (cart.couponCode && cart.discountType === 'percentage' ? cart.discountValue : null)
   const isReview = mode === 'review'
   const isConfirmation = mode === 'confirmation'
   const resolvedTitle =
@@ -172,6 +187,18 @@ export function OrderSummaryCard({
         {resolvedTitle}
       </Heading>
 
+      {/* Figma 2804:23267 — available return/store credit banner (cart step only). */}
+      {!isReview && !isConfirmation && (cart.storeCreditBalance ?? 0) > 0 && (
+        <p className="cart-credit-banner mb-5">
+          <Truck size={20} aria-hidden className="shrink-0" />
+          <span>
+            {t('cart.summary.creditAvailable', {
+              amount: formatCartPrice(cart.storeCreditBalance),
+            })}
+          </span>
+        </p>
+      )}
+
       {showLineItems && cart.items.length > 0 && (
         <ul
           className={cn(isReview ? 'payment-order-items' : 'mb-5')}
@@ -185,12 +212,18 @@ export function OrderSummaryCard({
 
       <div className={cn(isReview ? 'payment-order-summary-rows' : 'space-y-3')}>
         <SummaryRow
-          label={t('cart.summary.subtotal')}
+          label={
+            !isReview && !isConfirmation
+              ? `${t('cart.summary.subtotal')} · ${t('cart.itemCount', { count: cart.items.reduce((n, i) => n + i.quantity, 0) })}`
+              : t('cart.summary.subtotal')
+          }
           value={formatCartPrice(subtotal)}
         />
         {discountAmount > 0 && (
           <SummaryRow
-            label={t('cart.summary.discount')}
+            label={
+              percentOff ? `${t('cart.summary.discount')} (${percentOff}%)` : t('cart.summary.discount')
+            }
             value={`-${formatCartPrice(discountAmount)}`}
             valueClassName="text-support-success"
           />
@@ -216,39 +249,75 @@ export function OrderSummaryCard({
 
       {resolvedShowPromo && (
         <div className="mt-5">
-          <label htmlFor="cart-promo-code" className="sr-only">
-            {t('cart.summary.promoCode')}
-          </label>
-          <div className="cart-promo-field">
-            <input
-              id="cart-promo-code"
-              type="text"
-              value={promoCode}
-              onChange={(event) => setPromoDraft(event.target.value)}
-              placeholder={t('cart.summary.promoPlaceholder')}
-              className="cart-promo-input"
-              disabled={couponLoading}
-            />
-            {cart.couponCode ? (
+          {hasCoupon ? (
+            // Applied/saved code → a "coupon ticket": percent badge, code, savings, remove.
+            <div className="cart-coupon-ticket" data-pending={pendingCoupon ? 'true' : 'false'}>
+              <div className="cart-coupon-ticket-badge" aria-hidden>
+                {percentOff ? (
+                  <>
+                    <span className="cart-coupon-ticket-percent">{percentOff}%</span>
+                    <span className="cart-coupon-ticket-off">{t('cart.summary.off')}</span>
+                  </>
+                ) : (
+                  <Ticket size={26} strokeWidth={1.6} />
+                )}
+              </div>
+              <div className="cart-coupon-ticket-body">
+                <span className="cart-coupon-ticket-label">
+                  <Check size={13} strokeWidth={3} aria-hidden />
+                  {t('cart.summary.couponApplied')}
+                </span>
+                <span className="cart-coupon-ticket-code" dir="ltr">
+                  {promoCode}
+                </span>
+                {discountAmount > 0 && (
+                  <span className="cart-coupon-ticket-saving">
+                    {t('cart.summary.youSave', { amount: formatCartPrice(discountAmount) })}
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
-                className="cart-promo-apply"
+                className="cart-coupon-ticket-remove"
                 onClick={() => void handleRemoveCoupon()}
                 disabled={couponLoading}
+                aria-label={t('cart.summary.remove')}
               >
-                {t('cart.summary.remove')}
+                <X size={16} aria-hidden />
               </button>
-            ) : (
-              <button
-                type="button"
-                className="cart-promo-apply"
-                onClick={() => void handleApplyCoupon()}
-                disabled={couponLoading || !promoCode.trim()}
-              >
-                {t('cart.summary.apply')}
-              </button>
-            )}
-          </div>
+            </div>
+          ) : (
+            <>
+              <label htmlFor="cart-promo-code" className="sr-only">
+                {t('cart.summary.promoCode')}
+              </label>
+              <div className="cart-promo-field">
+                <Ticket size={18} aria-hidden className="shrink-0 text-secondary-text" />
+                <input
+                  id="cart-promo-code"
+                  type="text"
+                  value={promoCode}
+                  onChange={(event) => setPromoDraft(event.target.value)}
+                  placeholder={t('cart.summary.promoPlaceholder')}
+                  className="cart-promo-input"
+                  disabled={couponLoading}
+                />
+                <button
+                  type="button"
+                  className="cart-promo-apply"
+                  onClick={() => void handleApplyCoupon()}
+                  disabled={couponLoading || !promoCode.trim()}
+                >
+                  {t('cart.summary.apply')}
+                </button>
+              </div>
+            </>
+          )}
+          {pendingCoupon && (
+            <p className="mt-2 text-xs leading-5 text-secondary-text">
+              {couponNote ?? t('cart.summary.couponPending')}
+            </p>
+          )}
           {promoError && (
             <p className="mt-2 text-xs text-support-error" role="alert">
               {promoError}
@@ -269,7 +338,7 @@ export function OrderSummaryCard({
           type="button"
           variant="primary"
           fullWidth
-          pill={isReview}
+          pill
           className={cn(isReview ? 'payment-pay-btn' : 'cart-checkout-btn', 'mt-5')}
           disabled={buttonDisabled}
           onClick={onCtaClick}

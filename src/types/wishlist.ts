@@ -17,6 +17,8 @@ export type WishlistProduct = Pick<
   Partial<
     Pick<
       ApiProduct,
+      | 'nameEn'
+      | 'nameAr'
       | 'brand'
       | 'category'
       | 'subCategory'

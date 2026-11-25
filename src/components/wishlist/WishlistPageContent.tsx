@@ -2,8 +2,8 @@
 import { ArrowLeft, Heart } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, Navigate } from 'react-router-dom'
-import { LOGIN_PATH, MY_ACCOUNT_PATH, SHOP_PATH } from '../../config/routes'
+import { Link } from 'react-router-dom'
+import { MY_ACCOUNT_PATH, SHOP_PATH } from '../../config/routes'
 import { useAuth } from '../../context/AuthContext'
 import { useWishlist } from '../../context/WishlistContext'
 import { cn } from '../../lib/cn'
@@ -60,15 +60,11 @@ export function WishlistPageContent() {
   const products = useMemo(() => mapWishlistItemsToRecommended(items), [items])
   const hasItems = products.length > 0
 
-  if (!isAuthenticated) {
-    return <Navigate to={LOGIN_PATH} replace />
-  }
-
   return (
     <>
       <div className="container-content wishlist-page">
         <Link
-          to={MY_ACCOUNT_PATH}
+          to={isAuthenticated ? MY_ACCOUNT_PATH : SHOP_PATH}
           className={cn('wishlist-back', focusRingClasses, 'rounded-sm')}
         >
           <ArrowLeft size={16} strokeWidth={1.5} aria-hidden className="rtl:-scale-x-100" />

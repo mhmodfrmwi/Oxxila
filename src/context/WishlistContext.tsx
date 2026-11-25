@@ -16,6 +16,8 @@ import {
   getWishlist,
   removeFromWishlist as removeFromWishlistRequest,
 } from '../api/wishlist'
+import { getProductById } from '../api/catalog'
+import { STORAGE_KEYS } from '../config/storage'
 import { ApiError } from '../lib/api'
 import type { WishlistItem } from '../types/wishlist'
 import { useAuth } from './AuthContext'
@@ -36,6 +38,38 @@ interface WishlistContextValue {
 }
 
 const WishlistContext = createContext<WishlistContextValue | null>(null)
+
+const OBJECT_ID = /^[a-f\d]{24}$/i
+
+function readGuestIds(): string[] {
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(STORAGE_KEYS.guestWishlist) ?? '[]')
+    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string' && OBJECT_ID.test(id)) : []
+  } catch {
+    return []
+  }
+}
+
+function writeGuestIds(ids: string[]) {
+  try {
+    if (ids.length) localStorage.setItem(STORAGE_KEYS.guestWishlist, JSON.stringify(ids))
+    else localStorage.removeItem(STORAGE_KEYS.guestWishlist)
+  } catch {
+    // storage unavailable — the in-memory list still works for this visit
+  }
+}
+
+/** Hydrate guest ids into wishlist items via the public product endpoint. */
+async function loadGuestItems(ids: string[]): Promise<WishlistItem[]> {
+  const settled = await Promise.allSettled(ids.map((id) => getProductById(id)))
+  const items: WishlistItem[] = []
+  settled.forEach((result, index) => {
+    if (result.status !== 'fulfilled' || !result.value.data) return
+    const p = result.value.data
+    items.push({ _id: ids[index], product: p })
+  })
+  return items
+}
 
 function productIdFromItem(item: WishlistItem): string | null {
   const product = item.product
@@ -70,6 +104,10 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   const [optimisticAddedIds, setOptimisticAddedIds] = useState<string[]>([])
   const fetchGenerationRef = useRef(0)
   const clearingWishlistRef = useRef(false)
+  // Guests keep their wishlist in localStorage — no account needed to save a product.
+  const [guestIds, setGuestIds] = useState<string[]>(readGuestIds)
+  const [guestItems, setGuestItems] = useState<WishlistItem[]>([])
+  const [guestLoading, setGuestLoading] = useState(false)
 
   const refreshWishlist = useCallback(async () => {
     if (!isAuthenticated || !userId) {
@@ -140,9 +178,54 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated, userId])
 
+  useEffect(() => {
+    if (isAuthenticated) return
+    if (!guestIds.length) {
+      setGuestItems([])
+      return
+    }
+    let cancelled = false
+    setGuestLoading(true)
+    loadGuestItems(guestIds)
+      .then((loaded) => {
+        if (!cancelled) setGuestItems(loaded)
+      })
+      .finally(() => {
+        if (!cancelled) setGuestLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [isAuthenticated, guestIds])
+
+  // On login, fold the guest wishlist into the account (best effort), then clear it locally.
+  useEffect(() => {
+    if (!isAuthenticated || !userId) return
+    const pending = readGuestIds()
+    if (!pending.length) return
+    let cancelled = false
+    void (async () => {
+      for (const id of pending.slice().reverse()) {
+        try {
+          await addToWishlistRequest(id)
+        } catch {
+          // a removed/inactive product must not block the rest
+        }
+      }
+      writeGuestIds([])
+      if (!cancelled) {
+        setGuestIds([])
+        void refreshWishlist()
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [isAuthenticated, userId, refreshWishlist])
+
   const resolvedItems = useMemo(
-    () => (isAuthenticated && userId ? items : []),
-    [isAuthenticated, userId, items],
+    () => (isAuthenticated && userId ? items : guestItems),
+    [isAuthenticated, userId, items, guestItems],
   )
 
   const productIds = useMemo(() => {
@@ -155,12 +238,23 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   }, [resolvedItems])
 
   const isWishlisted = useCallback(
-    (productId: string) => productIds.has(productId) || optimisticAddedIds.includes(productId),
-    [productIds, optimisticAddedIds],
+    (productId: string) =>
+      isAuthenticated
+        ? productIds.has(productId) || optimisticAddedIds.includes(productId)
+        : guestIds.includes(productId),
+    [isAuthenticated, productIds, optimisticAddedIds, guestIds],
   )
 
   const removeItem = useCallback(
     async (productId: string) => {
+      if (!isAuthenticated) {
+        const next = guestIds.filter((id) => id !== productId)
+        writeGuestIds(next)
+        setGuestIds(next)
+        setGuestItems((current) => current.filter((item) => item.product._id !== productId))
+        toast.success(t('wishlist.toast.removed'))
+        return
+      }
       const previous = items
       setItems((current) =>
         current.filter((item) => productIdFromItem(item) !== productId),
@@ -171,7 +265,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
       try {
         const response = await removeFromWishlistRequest(productId)
         setItems(response.data?.items ?? [])
-        toast.success('Removed from wishlist')
+        toast.success(t('wishlist.toast.removed'))
       } catch (err) {
         setItems(previous)
         toast.error(
@@ -183,14 +277,21 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         setPendingProductId(null)
       }
     },
-    [items, toast],
+    [guestIds, isAuthenticated, items, t, toast],
   )
 
   const toggleWishlist = useCallback(
     async (productId: string) => {
       if (!isAuthenticated) {
-        toast.error('Sign in required', 'Please sign in to manage your wishlist.')
-        throw new ApiError('Unauthorized', 401)
+        if (guestIds.includes(productId)) {
+          await removeItem(productId)
+          return
+        }
+        const next = [productId, ...guestIds]
+        writeGuestIds(next)
+        setGuestIds(next)
+        toast.success(t('wishlist.toast.added'))
+        return
       }
 
       if (pendingProductId === productId) return
@@ -216,7 +317,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
       try {
         const response = await addToWishlistRequest(productId)
         setItems(response.data?.items ?? [])
-        toast.success('Added to wishlist')
+        toast.success(t('wishlist.toast.added'))
       } catch (err) {
         setItems(previous)
         toast.error(
@@ -231,22 +332,24 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     },
     [
       isAuthenticated,
+      guestIds,
       items,
       optimisticAddedIds,
       pendingProductId,
       productIds,
       removeItem,
+      t,
       toast,
     ],
   )
 
   const clearWishlist = useCallback(async () => {
     if (!isAuthenticated) {
-      toast.error(
-        t('wishlist.signInRequired'),
-        t('wishlist.signInRequiredDetail'),
-      )
-      throw new ApiError('Unauthorized', 401)
+      writeGuestIds([])
+      setGuestIds([])
+      setGuestItems([])
+      toast.success(t('wishlist.clear.success'))
+      return
     }
     if (clearingWishlistRef.current) return
 
@@ -270,7 +373,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     () => ({
       items: resolvedItems,
       itemCount: resolvedItems.length,
-      loading: isAuthenticated ? loading : false,
+      loading: isAuthenticated ? loading : guestLoading,
       clearingWishlist,
       error: isAuthenticated ? error : null,
       pendingProductId,
@@ -284,6 +387,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
       resolvedItems,
       isAuthenticated,
       loading,
+      guestLoading,
       clearingWishlist,
       error,
       pendingProductId,

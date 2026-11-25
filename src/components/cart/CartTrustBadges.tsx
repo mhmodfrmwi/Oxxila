@@ -26,10 +26,13 @@ export function CartTrustBadges({ className, variant = 'cart' }: CartTrustBadges
         ]
 
   return (
-    <ul className={cn('mt-5 grid grid-cols-3 gap-3', className)}>
+    // Figma 2804:23279 — stacked rows, icon in a filled secondary circle.
+    <ul className={cn('mt-6 flex flex-col gap-4', className)}>
       {badges.map(({ icon: Icon, label }) => (
         <li key={label} className={itemClass}>
-          <Icon size={18} strokeWidth={1.5} aria-hidden />
+          <span className="cart-trust-badge-icon" aria-hidden>
+            <Icon size={14} strokeWidth={2} />
+          </span>
           <span>{label}</span>
         </li>
       ))}

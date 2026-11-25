@@ -1,8 +1,10 @@
 // src/components/cart/CartPageContent.tsx
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Navigate, useNavigate } from 'react-router-dom'
-import { HOME_PATH, LOGIN_PATH, PAYMENT_PATH } from '../../config/routes'
+import { useNavigate } from 'react-router-dom'
+import { HOME_PATH } from '../../config/routes'
+import { goToCheckout } from '../../utils/authReturnTo'
+import { formatCartPrice } from '../../utils/formatProductPrice'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { useBrowsingHistory } from '../../hooks/useBrowsingHistory'
@@ -25,7 +27,7 @@ import { ClearCartDialog } from './ClearCartDialog'
 import { OrderSummaryCard } from './OrderSummaryCard'
 
 export function CartPageContent() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const {
@@ -42,6 +44,9 @@ export function CartPageContent() {
     applyCoupon,
     removeCoupon,
     refreshCart,
+    pendingCoupon,
+    couponPreview,
+    couponPreviewError,
   } = useCart()
   const { primaryAddress, loading: addressLoading } = useCartAddresses()
   const { products: browsingProducts, loading: browsingLoading } = useBrowsingHistory(6)
@@ -64,9 +69,30 @@ export function CartPageContent() {
 
   const itemCountLabel = t('cart.itemCount', { count: itemCount })
 
-  if (!isAuthenticated) {
-    return <Navigate to={LOGIN_PATH} replace />
-  }
+  // Guest with a saved code: show the discount in the summary now. It is only a preview — the
+  // code is recorded as used once an order is actually placed.
+  const guestCouponActive = Boolean(pendingCoupon && couponPreview && couponPreview.discountAmount > 0)
+  const summaryCart =
+    cart && pendingCoupon && couponPreview
+      ? {
+          ...cart,
+          couponCode: null,
+          discountAmount: couponPreview.discountAmount,
+          totalPrice: couponPreview.totalPrice,
+        }
+      : cart
+  const couponNote = pendingCoupon
+    ? couponPreviewError
+      ? couponPreviewError
+      : couponPreview?.freeShipping
+        ? t('cart.summary.couponFreeShipping')
+        : guestCouponActive
+          ? t(couponPreview!.discountType === 'percentage' ? 'cart.summary.couponSavesPercent' : 'cart.summary.couponSaves', {
+              amount: formatCartPrice(couponPreview!.discountAmount, i18n.language),
+              percent: couponPreview!.discountValue,
+            })
+          : null
+    : null
 
   async function handleQuantityChange(itemId: string, quantity: number) {
     setActionError(null)
@@ -90,7 +116,7 @@ export function CartPageContent() {
 
   return (
     <>
-      <div className="container-content pb-8 sm:pb-10">
+      <div className="container-content mx-auto max-w-[1240px] pb-8 sm:pb-10">
         <Breadcrumb
           className="mb-5 sm:mb-6"
           items={[
@@ -104,7 +130,7 @@ export function CartPageContent() {
         ) : loadError && !cart ? (
           <div className="space-y-4" role="alert">
             <header className="mb-5 sm:mb-6">
-              <Heading variant="page" className="mb-2">
+              <Heading variant="page" className="cart-page-title mb-1">
                 {t('cart.title')}
               </Heading>
             </header>
@@ -117,7 +143,7 @@ export function CartPageContent() {
           <>
             <header className="mb-5 flex flex-wrap items-start justify-between gap-3 sm:mb-6">
               <div>
-                <Heading variant="page" className="mb-2">
+                <Heading variant="page" className="cart-page-title mb-1">
                   {t('cart.title')}
                 </Heading>
                 {hasItems && (
@@ -140,12 +166,15 @@ export function CartPageContent() {
               )}
             </header>
 
+            {/* Guests have no saved address yet — it's collected at checkout. */}
             {hasItems && (
-              <CartShippingBar
-                address={primaryAddress}
-                loading={addressLoading}
-                className="mb-6 sm:mb-8"
-              />
+              <div className="mb-5 sm:mb-6">
+                {isAuthenticated ? (
+                  <CartShippingBar address={primaryAddress} loading={addressLoading} />
+                ) : (
+                  <p className="cart-shipping-bar text-secondary-text">{t('cart.shipping.guestNote')}</p>
+                )}
+              </div>
             )}
 
             {actionError && (
@@ -159,7 +188,7 @@ export function CartPageContent() {
             ) : (
               <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-10">
                 <section aria-label={t('cart.itemsAria')} className="min-w-0">
-                  <div className="rounded-2xl border border-border-subtle bg-card px-4 shadow-sm shadow-black/[0.03] dark:shadow-black/20 sm:px-5">
+                  <div className="cart-items-list">
                     {items.map((item) => (
                       <CartItemRow
                         key={item._id}
@@ -183,12 +212,21 @@ export function CartPageContent() {
 
                 {cart && (
                   <OrderSummaryCard
-                    cart={cart}
+                    cart={summaryCart ?? cart}
                     couponLoading={couponLoading}
                     checkoutDisabled={Boolean(updatingItemId)}
                     onApplyCoupon={applyCoupon}
                     onRemoveCoupon={removeCoupon}
-                    onCtaClick={() => navigate(PAYMENT_PATH)}
+                    // Guests can enter a code too: it is saved and applied after they sign in.
+                    showPromo
+                    pendingCoupon={pendingCoupon}
+                    couponNote={couponNote}
+                    discountPercent={
+                      pendingCoupon && couponPreview?.discountType === 'percentage'
+                        ? couponPreview.discountValue
+                        : null
+                    }
+                    onCtaClick={() => goToCheckout(navigate, isAuthenticated)}
                   />
                 )}
               </div>

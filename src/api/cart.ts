@@ -60,3 +60,44 @@ export function removeCoupon() {
     auth: true,
   })
 }
+
+export interface GuestCartLine {
+  productId: string
+  quantity: number
+}
+
+/** POST /cart/preview — price a guest (localStorage) cart. Public; line `_id` = product id. */
+export function previewGuestCart(items: GuestCartLine[]) {
+  return apiRequest<ApiCart>('/cart/preview', {
+    method: 'POST',
+    body: { items },
+  })
+}
+
+/** POST /cart/merge — fold the guest cart into the signed-in user's cart. */
+export function mergeGuestCart(items: GuestCartLine[]) {
+  return apiRequest<ApiCart>('/cart/merge', {
+    method: 'POST',
+    auth: true,
+    body: { items },
+  })
+}
+
+export interface GuestCouponPreview {
+  couponCode: string
+  discountType: 'percentage' | 'fixed' | 'freeShipping'
+  /** Percent for percentage coupons, EGP for fixed ones. */
+  discountValue?: number
+  freeShipping: boolean
+  discountAmount: number
+  subtotal: number
+  totalPrice: number
+}
+
+/** POST /cart/coupon/preview — how much a code would save a guest. Does NOT consume the code. */
+export function previewGuestCoupon(code: string, items: GuestCartLine[]) {
+  return apiRequest<GuestCouponPreview>('/cart/coupon/preview', {
+    method: 'POST',
+    body: { code, items },
+  })
+}

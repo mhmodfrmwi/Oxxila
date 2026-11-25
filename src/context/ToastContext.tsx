@@ -18,11 +18,14 @@ export interface ToastInput {
   description?: string
   variant?: ToastVariant
   durationMs?: number
+  /** Optional inline action, e.g. "View cart" after adding a product. */
+  action?: { label: string; onClick: () => void }
 }
 
 interface ToastItem extends Required<Pick<ToastInput, 'title' | 'variant' | 'durationMs'>> {
   id: string
   description?: string
+  action?: ToastInput['action']
 }
 
 interface ToastContextValue {
@@ -71,6 +74,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         description: input.description,
         variant: input.variant ?? 'info',
         durationMs: input.durationMs ?? DEFAULT_DURATION_MS,
+        action: input.action,
       }
 
       setToasts((current) => [...current, item].slice(-4))
@@ -127,6 +131,22 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 <p className="mt-0.5 text-xs text-secondary-text">{item.description}</p>
               )}
             </div>
+            {item.action && (
+              <button
+                type="button"
+                onClick={() => {
+                  item.action?.onClick()
+                  dismiss(item.id)
+                }}
+                className={cn(
+                  'shrink-0 self-center rounded-full bg-button-primary px-3 py-1.5 text-xs font-medium text-white',
+                  'transition-opacity hover:opacity-90',
+                  focusRingClasses,
+                )}
+              >
+                {item.action.label}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => dismiss(item.id)}

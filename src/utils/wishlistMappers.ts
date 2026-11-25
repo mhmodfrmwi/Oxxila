@@ -8,6 +8,8 @@ function toApiProductShape(product: WishlistProduct): ApiProduct {
   return {
     _id: product._id,
     name: product.name,
+    nameEn: product.nameEn ?? product.name,
+    nameAr: product.nameAr ?? '',
     images: product.images ?? [],
     price: product.price,
     priceAfterDiscount: product.priceAfterDiscount ?? null,
