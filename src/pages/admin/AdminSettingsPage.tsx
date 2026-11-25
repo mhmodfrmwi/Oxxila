@@ -5,6 +5,7 @@ import { AdminRolesCard } from '../../components/admin/settings/AdminRolesCard'
 import { AdminRolesManagerCard } from '../../components/admin/settings/AdminRolesManagerCard'
 import { BannersManagerCard } from '../../components/admin/settings/BannersManagerCard'
 import { CartRecoveryCard } from '../../components/admin/settings/CartRecoveryCard'
+import { DeliveryNoteCard } from '../../components/admin/settings/DeliveryNoteCard'
 import { CouponManagerCard } from '../../components/admin/settings/CouponManagerCard'
 import { OffersManagerCard } from '../../components/admin/settings/OffersManagerCard'
 import { PaymentGatewaysCard } from '../../components/admin/settings/PaymentGatewaysCard'
@@ -36,6 +37,7 @@ export function AdminSettingsPage() {
         </div>
 
         <div className="flex w-full shrink-0 flex-col gap-[var(--admin-content-gap-tight)] xl:w-[var(--admin-rail-width)]">
+          <DeliveryNoteCard />
           <CartRecoveryCard />
           {canManageRoles ? <AdminRolesManagerCard /> : null}
           {canManageRoles ? <AdminRolesCard /> : null}

@@ -112,7 +112,7 @@ export function FormulaSpecsDrawer({
   const faqs = useFormulaSpecsFaqs({
     open,
     productId,
-    productName: drawer.values.name || null,
+    productName: drawer.values.nameEn || drawer.values.nameAr || null,
   })
 
   useEffect(() => {
@@ -488,22 +488,42 @@ export function FormulaSpecsDrawer({
               ) : null}
             </section>
 
-            {/* Meta title (= product name) */}
+            {/* Product names (EN + AR) */}
             <div className="space-y-2">
-              <label htmlFor={`${formId}-name`} className={labelClass}>
-                {t('admin.products.formula.metaTitle')}
+              <label htmlFor={`${formId}-nameEn`} className={labelClass}>
+                {t('admin.products.formula.nameEn')}
               </label>
               <input
-                id={`${formId}-name`}
-                className={cn(fieldClass, drawer.errors.name && 'border-support-error')}
-                value={drawer.values.name}
-                onChange={(event) => drawer.setField('name', event.target.value)}
+                id={`${formId}-nameEn`}
+                className={cn(fieldClass, drawer.errors.nameEn && 'border-support-error')}
+                value={drawer.values.nameEn}
+                onChange={(event) => drawer.setField('nameEn', event.target.value)}
                 maxLength={200}
-                aria-invalid={drawer.errors.name ? true : undefined}
+                aria-invalid={drawer.errors.nameEn ? true : undefined}
               />
-              {drawer.errors.name ? (
+              {drawer.errors.nameEn ? (
                 <p className="text-xs text-support-error" role="alert">
-                  {drawer.errors.name}
+                  {drawer.errors.nameEn}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor={`${formId}-nameAr`} className={labelClass}>
+                {t('admin.products.formula.nameAr')}
+              </label>
+              <input
+                id={`${formId}-nameAr`}
+                dir="rtl"
+                className={cn(fieldClass, drawer.errors.nameAr && 'border-support-error')}
+                value={drawer.values.nameAr}
+                onChange={(event) => drawer.setField('nameAr', event.target.value)}
+                maxLength={200}
+                aria-invalid={drawer.errors.nameAr ? true : undefined}
+              />
+              {drawer.errors.nameAr ? (
+                <p className="text-xs text-support-error" role="alert">
+                  {drawer.errors.nameAr}
                 </p>
               ) : null}
             </div>
@@ -671,30 +691,42 @@ export function FormulaSpecsDrawer({
                 ['advantages', 'advPlaceholder'],
                 ['composition', 'compPlaceholder'],
               ] as const
-            ).map(([field, placeholderKey]) => (
-              <div key={field} className="space-y-2">
-                <label htmlFor={`${formId}-${field}`} className={labelClass}>
-                  {t(`admin.products.formula.${field}`)}
-                </label>
-                <textarea
-                  id={`${formId}-${field}`}
-                  rows={field === 'composition' ? 3 : 4}
-                  maxLength={2000}
-                  className={cn(
-                    fieldClass,
-                    'min-h-[4rem] resize-y',
-                    drawer.errors[field] && 'border-support-error',
-                  )}
-                  placeholder={t(`admin.products.formula.${placeholderKey}`)}
-                  value={drawer.values[field]}
-                  onChange={(event) => drawer.setField(field, event.target.value)}
-                  aria-invalid={drawer.errors[field] ? true : undefined}
-                />
-                {drawer.errors[field] ? (
-                  <p className="text-xs text-support-error" role="alert">
-                    {drawer.errors[field]}
-                  </p>
-                ) : null}
+            ).map(([base, placeholderKey]) => (
+              <div key={base} className="space-y-3">
+                {/* English copy (existing field) + Arabic copy: the storefront shows the one matching its language. */}
+                {([base, `${base}Ar`] as const).map((field) => {
+                  const isAr = field.endsWith('Ar')
+                  return (
+                    <div key={field} className="space-y-2">
+                      <label htmlFor={`${formId}-${field}`} className={labelClass}>
+                        {t(`admin.products.formula.${base}`)}{' '}
+                        <span className="text-white/45">
+                          ({isAr ? t('admin.products.formula.langAr') : t('admin.products.formula.langEn')})
+                        </span>
+                      </label>
+                      <textarea
+                        id={`${formId}-${field}`}
+                        dir={isAr ? 'rtl' : 'ltr'}
+                        rows={base === 'composition' ? 3 : 4}
+                        maxLength={2000}
+                        className={cn(
+                          fieldClass,
+                          'min-h-[4rem] resize-y',
+                          drawer.errors[field] && 'border-support-error',
+                        )}
+                        placeholder={isAr ? '' : t(`admin.products.formula.${placeholderKey}`)}
+                        value={drawer.values[field]}
+                        onChange={(event) => drawer.setField(field, event.target.value)}
+                        aria-invalid={drawer.errors[field] ? true : undefined}
+                      />
+                      {drawer.errors[field] ? (
+                        <p className="text-xs text-support-error" role="alert">
+                          {drawer.errors[field]}
+                        </p>
+                      ) : null}
+                    </div>
+                  )
+                })}
               </div>
             ))}
 

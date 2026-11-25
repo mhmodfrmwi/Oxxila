@@ -81,9 +81,10 @@
   --primary-link-active: #8b5cf6;
 
   /* Canonical Admin shell = Settings Figma 937:21865 × 0.8 */
-  --admin-font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --admin-font-display: "Playfair Display", Georgia, serif;
-  --admin-font-brand: "Poppins", "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Figma's Inter / Playfair Display / Poppins are replaced app-wide by the shared stacks. */
+  --admin-font-sans: var(--font-family-base);
+  --admin-font-display: var(--font-family-display);
+  --admin-font-brand: var(--font-family-base);
   /* Component 50 × 0.8 */
   --admin-sidebar-width: 211.4286px;
   /* Main.x × 0.8 */

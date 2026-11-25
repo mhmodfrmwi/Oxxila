@@ -52,7 +52,11 @@ export function UtilityBarSettingsCard() {
   }
 
   const hasContent = values.promos.some(
-    (promo) => promo.title.trim() || promo.subtitle.trim(),
+    (promo) =>
+      promo.titleEn.trim() ||
+      promo.titleAr.trim() ||
+      promo.subtitleEn.trim() ||
+      promo.subtitleAr.trim(),
   )
 
   return (
@@ -143,30 +147,58 @@ export function UtilityBarSettingsCard() {
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className={labelClass} htmlFor={`${formId}-${index}-title`}>
-                      {t('admin.websiteContent.utilityBar.promoTitle')}
+                    <label className={labelClass} htmlFor={`${formId}-${index}-titleEn`}>
+                      {t('admin.websiteContent.utilityBar.promoTitleEn')}
                     </label>
                     <input
-                      id={`${formId}-${index}-title`}
+                      id={`${formId}-${index}-titleEn`}
                       type="text"
-                      value={promo.title}
+                      value={promo.titleEn}
                       disabled={saving}
-                      onChange={(event) => setPromoField(index, 'title', event.target.value)}
+                      onChange={(event) => setPromoField(index, 'titleEn', event.target.value)}
                       placeholder={t('admin.websiteContent.utilityBar.titlePlaceholder')}
                       className={cn(fieldClass, 'mt-2')}
                     />
                   </div>
                   <div>
-                    <label className={labelClass} htmlFor={`${formId}-${index}-subtitle`}>
-                      {t('admin.websiteContent.utilityBar.promoSubtitle')}
+                    <label className={labelClass} htmlFor={`${formId}-${index}-titleAr`}>
+                      {t('admin.websiteContent.utilityBar.promoTitleAr')}
                     </label>
                     <input
-                      id={`${formId}-${index}-subtitle`}
+                      id={`${formId}-${index}-titleAr`}
                       type="text"
-                      value={promo.subtitle}
+                      dir="rtl"
+                      value={promo.titleAr}
                       disabled={saving}
-                      onChange={(event) => setPromoField(index, 'subtitle', event.target.value)}
+                      onChange={(event) => setPromoField(index, 'titleAr', event.target.value)}
+                      className={cn(fieldClass, 'mt-2')}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass} htmlFor={`${formId}-${index}-subtitleEn`}>
+                      {t('admin.websiteContent.utilityBar.promoSubtitleEn')}
+                    </label>
+                    <input
+                      id={`${formId}-${index}-subtitleEn`}
+                      type="text"
+                      value={promo.subtitleEn}
+                      disabled={saving}
+                      onChange={(event) => setPromoField(index, 'subtitleEn', event.target.value)}
                       placeholder={t('admin.websiteContent.utilityBar.subtitlePlaceholder')}
+                      className={cn(fieldClass, 'mt-2')}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass} htmlFor={`${formId}-${index}-subtitleAr`}>
+                      {t('admin.websiteContent.utilityBar.promoSubtitleAr')}
+                    </label>
+                    <input
+                      id={`${formId}-${index}-subtitleAr`}
+                      type="text"
+                      dir="rtl"
+                      value={promo.subtitleAr}
+                      disabled={saving}
+                      onChange={(event) => setPromoField(index, 'subtitleAr', event.target.value)}
                       className={cn(fieldClass, 'mt-2')}
                     />
                   </div>

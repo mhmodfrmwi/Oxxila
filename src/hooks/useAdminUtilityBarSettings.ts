@@ -9,8 +9,10 @@ import {
 import { invalidateUtilityBarCache } from '../utils/utilityBarCache'
 
 export interface UtilityBarPromoForm {
-  title: string
-  subtitle: string
+  titleEn: string
+  titleAr: string
+  subtitleEn: string
+  subtitleAr: string
 }
 
 export interface UtilityBarSettingsForm {
@@ -18,17 +20,27 @@ export interface UtilityBarSettingsForm {
   rotateIntervalSeconds: number
 }
 
-const emptyPromo = (): UtilityBarPromoForm => ({ title: '', subtitle: '' })
+const emptyPromo = (): UtilityBarPromoForm => ({
+  titleEn: '',
+  titleAr: '',
+  subtitleEn: '',
+  subtitleAr: '',
+})
 
 const EMPTY_FORM: UtilityBarSettingsForm = {
   promos: [emptyPromo(), emptyPromo()],
   rotateIntervalSeconds: 6,
 }
 
-function toForm(data: { promos: ApiUtilityBarPromo[]; rotateIntervalSeconds: number }): UtilityBarSettingsForm {
+function toForm(data: {
+  promos: ApiUtilityBarPromo[]
+  rotateIntervalSeconds: number
+}): UtilityBarSettingsForm {
   const promos = (data.promos ?? []).map((promo) => ({
-    title: promo.title ?? '',
-    subtitle: promo.subtitle ?? '',
+    titleEn: promo.titleEn || promo.title || '',
+    titleAr: promo.titleAr || '',
+    subtitleEn: promo.subtitleEn || promo.subtitle || '',
+    subtitleAr: promo.subtitleAr || '',
   }))
   return {
     promos: promos.length > 0 ? promos : [emptyPromo()],
@@ -94,9 +106,13 @@ export function useAdminUtilityBarSettings() {
     setError(null)
     try {
       const response = await updateUtilityBarSettings({
-        promos: values.promos.map(({ title, subtitle }) => ({
-          title: title.trim(),
-          subtitle: subtitle.trim(),
+        promos: values.promos.map(({ titleEn, titleAr, subtitleEn, subtitleAr }) => ({
+          title: titleEn.trim(),
+          titleEn: titleEn.trim(),
+          titleAr: titleAr.trim(),
+          subtitle: subtitleEn.trim(),
+          subtitleEn: subtitleEn.trim(),
+          subtitleAr: subtitleAr.trim(),
         })),
         rotateIntervalSeconds: values.rotateIntervalSeconds,
       })

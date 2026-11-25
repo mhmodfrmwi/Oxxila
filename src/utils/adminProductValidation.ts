@@ -28,7 +28,8 @@ export const ADMIN_PRODUCT_CATALOG_TYPES = [
 ] as const
 
 export interface AdminProductFormValues {
-  name: string
+  nameEn: string
+  nameAr: string
   price: string
   stock: string
   category: string
@@ -38,6 +39,9 @@ export interface AdminProductFormValues {
   description: string
   advantages: string
   composition: string
+  descriptionAr: string
+  advantagesAr: string
+  compositionAr: string
 }
 
 export type AdminProductFormErrors = Partial<
@@ -52,7 +56,8 @@ export function isMongoId(value: string): boolean {
 
 export function emptyAdminProductForm(): AdminProductFormValues {
   return {
-    name: '',
+    nameEn: '',
+    nameAr: '',
     price: '',
     stock: '',
     category: '',
@@ -62,6 +67,9 @@ export function emptyAdminProductForm(): AdminProductFormValues {
     description: '',
     advantages: '',
     composition: '',
+    descriptionAr: '',
+    advantagesAr: '',
+    compositionAr: '',
   }
 }
 
@@ -70,12 +78,20 @@ export function validateAdminProductCreate(
   values: AdminProductFormValues,
 ): AdminProductFormErrors {
   const errors: AdminProductFormErrors = {}
-  const name = values.name.trim()
+  const nameEn = values.nameEn.trim()
+  const nameAr = values.nameAr.trim()
 
-  if (!name) {
-    errors.name = 'Product name is required'
-  } else if (name.length < ADMIN_PRODUCT_NAME_MIN || name.length > ADMIN_PRODUCT_NAME_MAX) {
-    errors.name = 'Name must be 2-200 characters'
+  if (!nameEn) {
+    errors.nameEn = 'English product name is required'
+  } else if (
+    nameEn.length < ADMIN_PRODUCT_NAME_MIN ||
+    nameEn.length > ADMIN_PRODUCT_NAME_MAX
+  ) {
+    errors.nameEn = 'English name must be 2-200 characters'
+  }
+
+  if (nameAr.length > ADMIN_PRODUCT_NAME_MAX) {
+    errors.nameAr = 'Arabic name must be at most 200 characters'
   }
 
   if (values.price.trim() === '') {
@@ -117,14 +133,20 @@ export function validateAdminProductUpdate(
   values: AdminProductFormValues,
 ): AdminProductFormErrors {
   const errors: AdminProductFormErrors = {}
-  const name = values.name.trim()
+  const nameEn = values.nameEn.trim()
+  const nameAr = values.nameAr.trim()
 
-  if (name && (name.length < ADMIN_PRODUCT_NAME_MIN || name.length > ADMIN_PRODUCT_NAME_MAX)) {
-    errors.name = 'Name must be 2-200 characters'
+  if (
+    nameEn &&
+    (nameEn.length < ADMIN_PRODUCT_NAME_MIN || nameEn.length > ADMIN_PRODUCT_NAME_MAX)
+  ) {
+    errors.nameEn = 'English name must be 2-200 characters'
   }
-  if (!name) {
-    // Edit still requires a name in our UI (field always sent).
-    errors.name = 'Product name is required'
+  if (!nameEn) {
+    errors.nameEn = 'English product name is required'
+  }
+  if (nameAr.length > ADMIN_PRODUCT_NAME_MAX) {
+    errors.nameAr = 'Arabic name must be at most 200 characters'
   }
 
   if (values.price.trim() === '') {
@@ -167,6 +189,9 @@ function applyOptionalTextAndConcernErrors(
   values: AdminProductFormValues,
   errors: AdminProductFormErrors,
 ) {
+  for (const key of ['descriptionAr', 'advantagesAr', 'compositionAr'] as const) {
+    if (values[key].length > ADMIN_PRODUCT_TEXT_MAX) errors[key] = `${key} max 2000 characters`
+  }
   if (values.description.length > ADMIN_PRODUCT_TEXT_MAX) {
     errors.description = 'description max 2000 characters'
   }

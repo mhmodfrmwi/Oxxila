@@ -13,6 +13,8 @@ export type ApiAdminBrand = ApiBrand & {
 export interface AdminBrandRow {
   id: string
   name: string
+  nameEn: string
+  nameAr: string
   slug: string
   logo: string | null
   description: string
@@ -30,14 +32,16 @@ export interface AdminBrandsListParams {
 }
 
 export interface AdminBrandWriteFields {
-  name: string
+  nameEn: string
+  nameAr: string
   description?: string
   category?: string
   isActive?: boolean
 }
 
 export interface AdminBrandFormValues {
-  name: string
+  nameEn: string
+  nameAr: string
   description: string
   category: string
   isActive: boolean

@@ -72,7 +72,9 @@ export function HowItWorksSettingsCard() {
             <Skeleton key={index} className="h-11 w-full rounded-xl" />
           ))}
         </div>
-      ) : error && !values.title && values.steps.every((step) => !step.title) ? (
+      ) : error &&
+        !values.titleEn &&
+        values.steps.every((step) => !step.titleEn) ? (
         <EmptyState
           title={t('admin.settings.loadErrorTitle')}
           description={error}
@@ -84,18 +86,34 @@ export function HowItWorksSettingsCard() {
         />
       ) : (
         <form className="space-y-4" onSubmit={(event) => void handleSubmit(event)} noValidate>
-          <div>
-            <label className={labelClass} htmlFor={`${formId}-title-input`}>
-              {t('admin.websiteContent.howItWorks.sectionTitle')}
-            </label>
-            <input
-              id={`${formId}-title-input`}
-              type="text"
-              value={values.title}
-              disabled={saving || !canUpdate}
-              onChange={(event) => setField('title', event.target.value)}
-              className={fieldClass}
-            />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className={labelClass} htmlFor={`${formId}-title-en`}>
+                {t('admin.websiteContent.howItWorks.sectionTitleEn')}
+              </label>
+              <input
+                id={`${formId}-title-en`}
+                type="text"
+                value={values.titleEn}
+                disabled={saving || !canUpdate}
+                onChange={(event) => setField('titleEn', event.target.value)}
+                className={fieldClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass} htmlFor={`${formId}-title-ar`}>
+                {t('admin.websiteContent.howItWorks.sectionTitleAr')}
+              </label>
+              <input
+                id={`${formId}-title-ar`}
+                type="text"
+                dir="rtl"
+                value={values.titleAr}
+                disabled={saving || !canUpdate}
+                onChange={(event) => setField('titleAr', event.target.value)}
+                className={fieldClass}
+              />
+            </div>
           </div>
 
           <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
@@ -184,29 +202,59 @@ export function HowItWorksSettingsCard() {
                   </p>
                   <div className="space-y-2">
                     <div>
-                      <label className={labelClass} htmlFor={`${formId}-step-title-${index}`}>
-                        {t('admin.websiteContent.howItWorks.stepTitle')}
+                      <label className={labelClass} htmlFor={`${formId}-step-title-en-${index}`}>
+                        {t('admin.websiteContent.howItWorks.stepTitleEn')}
                       </label>
                       <input
-                        id={`${formId}-step-title-${index}`}
+                        id={`${formId}-step-title-en-${index}`}
                         type="text"
-                        value={step.title}
+                        value={step.titleEn}
                         disabled={saving || !canUpdate}
-                        onChange={(event) => setStepField(index, 'title', event.target.value)}
+                        onChange={(event) => setStepField(index, 'titleEn', event.target.value)}
                         className={fieldClass}
                       />
                     </div>
                     <div>
-                      <label className={labelClass} htmlFor={`${formId}-step-desc-${index}`}>
-                        {t('admin.websiteContent.howItWorks.stepDescription')}
+                      <label className={labelClass} htmlFor={`${formId}-step-title-ar-${index}`}>
+                        {t('admin.websiteContent.howItWorks.stepTitleAr')}
+                      </label>
+                      <input
+                        id={`${formId}-step-title-ar-${index}`}
+                        type="text"
+                        dir="rtl"
+                        value={step.titleAr}
+                        disabled={saving || !canUpdate}
+                        onChange={(event) => setStepField(index, 'titleAr', event.target.value)}
+                        className={fieldClass}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass} htmlFor={`${formId}-step-desc-en-${index}`}>
+                        {t('admin.websiteContent.howItWorks.stepDescriptionEn')}
                       </label>
                       <textarea
-                        id={`${formId}-step-desc-${index}`}
-                        value={step.description}
+                        id={`${formId}-step-desc-en-${index}`}
+                        value={step.descriptionEn}
                         disabled={saving || !canUpdate}
                         rows={3}
                         onChange={(event) =>
-                          setStepField(index, 'description', event.target.value)
+                          setStepField(index, 'descriptionEn', event.target.value)
+                        }
+                        className={cn(fieldClass, 'resize-y')}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass} htmlFor={`${formId}-step-desc-ar-${index}`}>
+                        {t('admin.websiteContent.howItWorks.stepDescriptionAr')}
+                      </label>
+                      <textarea
+                        id={`${formId}-step-desc-ar-${index}`}
+                        dir="rtl"
+                        value={step.descriptionAr}
+                        disabled={saving || !canUpdate}
+                        rows={3}
+                        onChange={(event) =>
+                          setStepField(index, 'descriptionAr', event.target.value)
                         }
                         className={cn(fieldClass, 'resize-y')}
                       />

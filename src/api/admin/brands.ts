@@ -24,7 +24,8 @@ function toQuery(params: AdminBrandsListParams): string {
 }
 
 function appendWriteFields(body: FormData, fields: AdminBrandWriteFields) {
-  body.append('name', fields.name)
+  body.append('nameEn', fields.nameEn)
+  body.append('nameAr', fields.nameAr)
   if (fields.description !== undefined) {
     body.append('description', fields.description)
   }
@@ -38,7 +39,8 @@ function appendWriteFields(body: FormData, fields: AdminBrandWriteFields) {
 
 function toJsonBody(fields: AdminBrandWriteFields): Record<string, unknown> {
   const body: Record<string, unknown> = {
-    name: fields.name,
+    nameEn: fields.nameEn,
+    nameAr: fields.nameAr,
   }
   if (fields.description !== undefined) {
     body.description = fields.description

@@ -9,6 +9,7 @@ import type {
   ApiAdminCategory,
 } from '../types/adminCategories'
 import { mapApiAuditBlock } from './adminAuditFormat'
+import { catalogDisplayName } from './catalogDisplayName'
 
 function auditCreatorName(category: ApiAdminCategory): string | null {
   const audit = mapApiAuditBlock(category.audit)
@@ -29,9 +30,13 @@ export const ADMIN_CATEGORY_NAME_MAX = 50
 function mapApiSubcategoryToTreeSub(
   subcategory: NonNullable<ApiAdminCategory['subcategories']>[number],
 ): AdminCategoryTreeSubcategory {
+  const nameEn = subcategory.nameEn ?? subcategory.name ?? ''
+  const nameAr = subcategory.nameAr ?? ''
   return {
     id: String(subcategory._id),
-    name: subcategory.name ?? '',
+    name: catalogDisplayName(subcategory, 'en') || nameEn,
+    nameEn,
+    nameAr,
     slug: subcategory.slug ?? '',
     isActive: subcategory.isActive !== false,
     createdByName: null,
@@ -44,10 +49,14 @@ export function mapApiCategoryToTreeRow(
   const subcategories = Array.isArray(category.subcategories)
     ? category.subcategories.map(mapApiSubcategoryToTreeSub)
     : []
+  const nameEn = category.nameEn ?? category.name ?? ''
+  const nameAr = category.nameAr ?? ''
 
   return {
     id: String(category._id),
-    name: category.name ?? '',
+    name: catalogDisplayName(category, 'en') || nameEn,
+    nameEn,
+    nameAr,
     slug: category.slug ?? '',
     image: category.image ? String(category.image) : null,
     isActive: category.isActive !== false,
@@ -62,10 +71,14 @@ export function mapApiCategoryToAdminRow(
   const subcategories = Array.isArray(category.subcategories)
     ? category.subcategories
     : []
+  const nameEn = category.nameEn ?? category.name ?? ''
+  const nameAr = category.nameAr ?? ''
 
   return {
     id: String(category._id),
-    name: category.name ?? '',
+    name: catalogDisplayName(category, 'en') || nameEn,
+    nameEn,
+    nameAr,
     slug: category.slug ?? '',
     image: category.image ? String(category.image) : null,
     isActive: category.isActive !== false,
@@ -75,7 +88,8 @@ export function mapApiCategoryToAdminRow(
 
 export function emptyCategoryFormValues(): AdminCategoryFormValues {
   return {
-    name: '',
+    nameEn: '',
+    nameAr: '',
     isActive: true,
   }
 }
@@ -84,7 +98,8 @@ export function categoryToFormValues(
   category: AdminCategoryRow,
 ): AdminCategoryFormValues {
   return {
-    name: category.name,
+    nameEn: category.nameEn || category.name,
+    nameAr: category.nameAr || '',
     isActive: category.isActive,
   }
 }
@@ -93,7 +108,8 @@ export function formValuesToWriteFields(
   values: AdminCategoryFormValues,
 ): AdminCategoryWriteFields {
   return {
-    name: values.name.trim(),
+    nameEn: values.nameEn.trim(),
+    nameAr: values.nameAr.trim(),
     isActive: values.isActive,
   }
 }
@@ -116,15 +132,20 @@ export function validateCategoryForm(
   imageFile: File | null,
 ): AdminCategoryFormErrors {
   const errors: AdminCategoryFormErrors = {}
-  const name = values.name.trim()
+  const nameEn = values.nameEn.trim()
+  const nameAr = values.nameAr.trim()
 
-  if (!name) {
-    errors.name = 'Category name is required'
+  if (!nameEn) {
+    errors.nameEn = 'English name is required'
   } else if (
-    name.length < ADMIN_CATEGORY_NAME_MIN ||
-    name.length > ADMIN_CATEGORY_NAME_MAX
+    nameEn.length < ADMIN_CATEGORY_NAME_MIN ||
+    nameEn.length > ADMIN_CATEGORY_NAME_MAX
   ) {
-    errors.name = `Name must be ${ADMIN_CATEGORY_NAME_MIN}-${ADMIN_CATEGORY_NAME_MAX} characters`
+    errors.nameEn = `English name must be ${ADMIN_CATEGORY_NAME_MIN}-${ADMIN_CATEGORY_NAME_MAX} characters`
+  }
+
+  if (nameAr.length > ADMIN_CATEGORY_NAME_MAX) {
+    errors.nameAr = `Arabic name must be at most ${ADMIN_CATEGORY_NAME_MAX} characters`
   }
 
   if (imageFile) {

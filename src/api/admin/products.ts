@@ -23,6 +23,8 @@ function toQuery(params: AdminProductsListParams): string {
     ['priceMax', params.priceMax],
     ['period', params.period],
     ['isActive', params.isActive],
+    // Server skips the sales aggregation unless asked (storefront lists don't need it).
+    ['includePerformance', true],
   ]
   for (const [key, value] of entries) {
     if (value === undefined || value === '') continue
@@ -49,7 +51,8 @@ function appendConcerns(body: FormData, concerns: string[]) {
 }
 
 function appendWriteFields(body: FormData, fields: AdminProductWriteFields) {
-  body.append('name', fields.name)
+  body.append('nameEn', fields.nameEn)
+  body.append('nameAr', fields.nameAr)
   body.append('price', String(fields.price))
   body.append('stock', String(fields.stock))
   body.append('category', fields.category)
@@ -70,6 +73,9 @@ function appendWriteFields(body: FormData, fields: AdminProductWriteFields) {
   }
   if (fields.composition !== undefined) {
     body.append('composition', fields.composition)
+  }
+  for (const key of ['descriptionAr', 'advantagesAr', 'compositionAr'] as const) {
+    if (fields[key] !== undefined) body.append(key, fields[key] as string)
   }
   if (fields.isActive !== undefined) {
     body.append('isActive', String(fields.isActive))
@@ -137,7 +143,8 @@ export function getAdminProduct(id: string, options?: { signal?: AbortSignal }) 
 
 function toJsonWriteBody(fields: AdminProductWriteFields) {
   return {
-    name: fields.name,
+    nameEn: fields.nameEn,
+    nameAr: fields.nameAr,
     price: fields.price,
     stock: fields.stock,
     category: fields.category,
@@ -147,6 +154,9 @@ function toJsonWriteBody(fields: AdminProductWriteFields) {
     description: fields.description ?? '',
     advantages: fields.advantages ?? '',
     composition: fields.composition ?? '',
+    descriptionAr: fields.descriptionAr ?? '',
+    advantagesAr: fields.advantagesAr ?? '',
+    compositionAr: fields.compositionAr ?? '',
     ...(fields.images ? { images: fields.images } : {}),
     ...(fields.catalog !== undefined ? { catalog: fields.catalog } : {}),
     ...(fields.isActive !== undefined ? { isActive: fields.isActive } : {}),

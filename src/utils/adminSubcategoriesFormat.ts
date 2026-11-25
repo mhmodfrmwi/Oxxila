@@ -6,6 +6,7 @@ import type {
   AdminSubcategoryWriteFields,
   ApiAdminSubcategory,
 } from '../types/adminSubcategories'
+import { catalogDisplayName } from './catalogDisplayName'
 
 /** From subcategory upload middleware (`maxFileSizeMB: 2`). */
 export const ADMIN_SUBCATEGORY_FILE_MAX_BYTES = 2 * 1024 * 1024
@@ -24,7 +25,7 @@ function resolveCategory(
   if (category && typeof category === 'object') {
     return {
       id: category._id ? String(category._id) : '',
-      name: category.name ?? null,
+      name: catalogDisplayName(category, 'en') || category.name || null,
     }
   }
   if (typeof category === 'string' && category) {
@@ -39,10 +40,14 @@ export function mapApiSubcategoryToAdminRow(
   const { id: categoryId, name: categoryName } = resolveCategory(
     subcategory.category,
   )
+  const nameEn = subcategory.nameEn ?? subcategory.name ?? ''
+  const nameAr = subcategory.nameAr ?? ''
 
   return {
     id: String(subcategory._id),
-    name: subcategory.name ?? '',
+    name: catalogDisplayName(subcategory, 'en') || nameEn,
+    nameEn,
+    nameAr,
     slug: subcategory.slug ?? '',
     image: subcategory.image ? String(subcategory.image) : null,
     isActive: subcategory.isActive !== false,
@@ -53,7 +58,8 @@ export function mapApiSubcategoryToAdminRow(
 
 export function emptySubcategoryFormValues(): AdminSubcategoryFormValues {
   return {
-    name: '',
+    nameEn: '',
+    nameAr: '',
     category: '',
     isActive: true,
   }
@@ -63,7 +69,8 @@ export function subcategoryToFormValues(
   subcategory: AdminSubcategoryRow,
 ): AdminSubcategoryFormValues {
   return {
-    name: subcategory.name,
+    nameEn: subcategory.nameEn || subcategory.name,
+    nameAr: subcategory.nameAr || '',
     category: subcategory.categoryId,
     isActive: subcategory.isActive,
   }
@@ -73,7 +80,8 @@ export function formValuesToWriteFields(
   values: AdminSubcategoryFormValues,
 ): AdminSubcategoryWriteFields {
   return {
-    name: values.name.trim(),
+    nameEn: values.nameEn.trim(),
+    nameAr: values.nameAr.trim(),
     isActive: values.isActive,
     category: values.category.trim() || undefined,
   }
@@ -97,15 +105,20 @@ export function validateSubcategoryForm(
   imageFile: File | null,
 ): AdminSubcategoryFormErrors {
   const errors: AdminSubcategoryFormErrors = {}
-  const name = values.name.trim()
+  const nameEn = values.nameEn.trim()
+  const nameAr = values.nameAr.trim()
 
-  if (!name) {
-    errors.name = 'Subcategory name is required'
+  if (!nameEn) {
+    errors.nameEn = 'English name is required'
   } else if (
-    name.length < ADMIN_SUBCATEGORY_NAME_MIN ||
-    name.length > ADMIN_SUBCATEGORY_NAME_MAX
+    nameEn.length < ADMIN_SUBCATEGORY_NAME_MIN ||
+    nameEn.length > ADMIN_SUBCATEGORY_NAME_MAX
   ) {
-    errors.name = `Name must be ${ADMIN_SUBCATEGORY_NAME_MIN}-${ADMIN_SUBCATEGORY_NAME_MAX} characters`
+    errors.nameEn = `English name must be ${ADMIN_SUBCATEGORY_NAME_MIN}-${ADMIN_SUBCATEGORY_NAME_MAX} characters`
+  }
+
+  if (nameAr.length > ADMIN_SUBCATEGORY_NAME_MAX) {
+    errors.nameAr = `Arabic name must be at most ${ADMIN_SUBCATEGORY_NAME_MAX} characters`
   }
 
   if (!values.category.trim()) {

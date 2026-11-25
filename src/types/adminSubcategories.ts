@@ -4,10 +4,14 @@
 export interface ApiAdminSubcategory {
   _id: string
   name: string
+  nameEn?: string
+  nameAr?: string
   slug: string
   image?: string | null
   isActive?: boolean
-  category?: string | { _id: string; name?: string; slug?: string }
+  category?:
+    | string
+    | { _id: string; name?: string; nameEn?: string; nameAr?: string; slug?: string }
   createdAt?: string
   updatedAt?: string
 }
@@ -16,6 +20,8 @@ export interface ApiAdminSubcategory {
 export interface AdminSubcategoryRow {
   id: string
   name: string
+  nameEn: string
+  nameAr: string
   slug: string
   image: string | null
   isActive: boolean
@@ -30,14 +36,16 @@ export interface AdminSubcategoriesListParams {
 }
 
 export interface AdminSubcategoryWriteFields {
-  name: string
+  nameEn: string
+  nameAr: string
   isActive?: boolean
   /** Optional on update — may move the subcategory to another parent. */
   category?: string
 }
 
 export interface AdminSubcategoryFormValues {
-  name: string
+  nameEn: string
+  nameAr: string
   category: string
   isActive: boolean
 }

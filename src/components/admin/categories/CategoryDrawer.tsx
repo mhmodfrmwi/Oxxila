@@ -180,19 +180,36 @@ export function CategoryDrawer({
         </div>
 
         <div>
-          <label className={labelClass} htmlFor={`${formId}-name`}>
-            {t('admin.categories.drawer.name')}
+          <label className={labelClass} htmlFor={`${formId}-nameEn`}>
+            {t('admin.categories.drawer.nameEn')}
           </label>
           <input
-            id={`${formId}-name`}
+            id={`${formId}-nameEn`}
             type="text"
-            value={drawer.values.name}
+            value={drawer.values.nameEn}
             disabled={drawer.submitting}
-            onChange={(event) => drawer.setField('name', event.target.value)}
+            onChange={(event) => drawer.setField('nameEn', event.target.value)}
             maxLength={50}
             className={cn(fieldClass, 'mt-2')}
           />
-          <FieldError message={drawer.errors.name} />
+          <FieldError message={drawer.errors.nameEn} />
+        </div>
+
+        <div>
+          <label className={labelClass} htmlFor={`${formId}-nameAr`}>
+            {t('admin.categories.drawer.nameAr')}
+          </label>
+          <input
+            id={`${formId}-nameAr`}
+            type="text"
+            dir="rtl"
+            value={drawer.values.nameAr}
+            disabled={drawer.submitting}
+            onChange={(event) => drawer.setField('nameAr', event.target.value)}
+            maxLength={50}
+            className={cn(fieldClass, 'mt-2')}
+          />
+          <FieldError message={drawer.errors.nameAr} />
         </div>
 
         {mode === 'edit' && category?.slug ? (

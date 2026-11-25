@@ -14,6 +14,8 @@ export type ApiAdminCategory = ApiCategory & {
 export interface AdminCategoryRow {
   id: string
   name: string
+  nameEn: string
+  nameAr: string
   slug: string
   image: string | null
   isActive: boolean
@@ -24,6 +26,8 @@ export interface AdminCategoryRow {
 export interface AdminCategoryTreeSubcategory {
   id: string
   name: string
+  nameEn: string
+  nameAr: string
   slug: string
   isActive: boolean
   createdByName: string | null
@@ -33,6 +37,8 @@ export interface AdminCategoryTreeSubcategory {
 export interface AdminCategoryTreeRow {
   id: string
   name: string
+  nameEn: string
+  nameAr: string
   slug: string
   image: string | null
   isActive: boolean
@@ -49,12 +55,14 @@ export interface AdminCategoriesListParams {
 }
 
 export interface AdminCategoryWriteFields {
-  name: string
+  nameEn: string
+  nameAr: string
   isActive?: boolean
 }
 
 export interface AdminCategoryFormValues {
-  name: string
+  nameEn: string
+  nameAr: string
   isActive: boolean
 }
 

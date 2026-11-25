@@ -73,14 +73,20 @@ export function mapApiProductToAdminRow(product: AdminProductSource): AdminProdu
     product.category && typeof product.category === 'object' ? product.category : null
   const image = product.images?.find((src) => typeof src === 'string' && src.trim()) ?? null
 
+  const nameEn = product.nameEn?.trim() || product.name?.trim() || ''
+  const nameAr = product.nameAr?.trim() || ''
+
   return {
     id: product._id,
-    name: product.name?.trim() || '—',
+    name: nameEn || '—',
+    nameEn: nameEn || '—',
+    nameAr,
     image,
     /** Backend has no SKU field — never synthesize one. */
     sku: null,
     categoryId: category?._id ?? null,
-    categoryName: category?.name?.trim() || null,
+    categoryName:
+      category?.nameEn?.trim() || category?.name?.trim() || category?.nameAr?.trim() || null,
     stock,
     inventoryStatus: resolveInventoryStatus(stock),
     inventoryProgress: resolveInventoryProgress(stock),

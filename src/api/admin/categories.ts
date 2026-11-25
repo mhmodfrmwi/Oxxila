@@ -24,7 +24,8 @@ function toQuery(params: AdminCategoriesListParams): string {
 }
 
 function appendWriteFields(body: FormData, fields: AdminCategoryWriteFields) {
-  body.append('name', fields.name)
+  body.append('nameEn', fields.nameEn)
+  body.append('nameAr', fields.nameAr)
   if (fields.isActive !== undefined) {
     body.append('isActive', String(fields.isActive))
   }

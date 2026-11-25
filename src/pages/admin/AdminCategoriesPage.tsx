@@ -28,6 +28,8 @@ function treeRowToCategoryRow(row: AdminCategoryTreeRow): AdminCategoryRow {
   return {
     id: row.id,
     name: row.name,
+    nameEn: row.nameEn,
+    nameAr: row.nameAr,
     slug: row.slug,
     image: row.image,
     isActive: row.isActive,
@@ -42,6 +44,8 @@ function treeSubcategoryToRow(
   return {
     id: subcategory.id,
     name: subcategory.name,
+    nameEn: subcategory.nameEn,
+    nameAr: subcategory.nameAr,
     slug: subcategory.slug,
     image: null,
     isActive: subcategory.isActive,
@@ -54,6 +58,8 @@ function createSubcategoryStub(category: AdminCategoryTreeRow): AdminSubcategory
   return {
     id: '',
     name: '',
+    nameEn: '',
+    nameAr: '',
     slug: '',
     image: null,
     isActive: true,

@@ -74,7 +74,8 @@ function productToForm(product: ApiProduct): AdminProductFormValues {
   )
 
   return {
-    name: product.name ?? '',
+    nameEn: product.nameEn ?? product.name ?? '',
+    nameAr: product.nameAr ?? '',
     price: String(product.price ?? ''),
     stock: String(product.stock ?? ''),
     category: categoryId,
@@ -84,12 +85,16 @@ function productToForm(product: ApiProduct): AdminProductFormValues {
     description: product.description ?? '',
     advantages: product.advantages ?? '',
     composition: product.composition ?? '',
+    descriptionAr: product.descriptionAr ?? '',
+    advantagesAr: product.advantagesAr ?? '',
+    compositionAr: product.compositionAr ?? '',
   }
 }
 
 function toWriteFields(values: AdminProductFormValues): AdminProductWriteFields {
   return {
-    name: values.name.trim(),
+    nameEn: values.nameEn.trim(),
+    nameAr: values.nameAr.trim(),
     price: Number(values.price),
     stock: Number(values.stock),
     category: values.category,
@@ -99,6 +104,9 @@ function toWriteFields(values: AdminProductFormValues): AdminProductWriteFields 
     description: values.description.trim(),
     advantages: values.advantages.trim(),
     composition: values.composition.trim(),
+    descriptionAr: values.descriptionAr.trim(),
+    advantagesAr: values.advantagesAr.trim(),
+    compositionAr: values.compositionAr.trim(),
   }
 }
 

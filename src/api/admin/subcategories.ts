@@ -25,7 +25,8 @@ function appendWriteFields(
   body: FormData,
   fields: AdminSubcategoryWriteFields,
 ) {
-  body.append('name', fields.name)
+  body.append('nameEn', fields.nameEn)
+  body.append('nameAr', fields.nameAr)
   if (fields.isActive !== undefined) {
     body.append('isActive', String(fields.isActive))
   }
@@ -37,7 +38,10 @@ function appendWriteFields(
 function toJsonBody(
   fields: AdminSubcategoryWriteFields,
 ): Record<string, unknown> {
-  const body: Record<string, unknown> = { name: fields.name }
+  const body: Record<string, unknown> = {
+    nameEn: fields.nameEn,
+    nameAr: fields.nameAr,
+  }
   if (fields.isActive !== undefined) body.isActive = fields.isActive
   if (fields.category) body.category = fields.category
   return body

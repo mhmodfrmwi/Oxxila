@@ -6,6 +6,7 @@ import type {
   AdminBrandWriteFields,
   ApiAdminBrand,
 } from '../types/adminBrands'
+import { catalogDisplayName } from './catalogDisplayName'
 
 /** From brand upload middleware (`maxFileSizeMB: 2`). */
 export const ADMIN_BRAND_FILE_MAX_BYTES = 2 * 1024 * 1024
@@ -25,7 +26,7 @@ function resolveCategory(
   if (category && typeof category === 'object') {
     return {
       id: category._id ? String(category._id) : null,
-      name: category.name ?? null,
+      name: catalogDisplayName(category, 'en') || category.name || null,
     }
   }
   if (typeof category === 'string' && category) {
@@ -36,10 +37,14 @@ function resolveCategory(
 
 export function mapApiBrandToAdminRow(brand: ApiAdminBrand): AdminBrandRow {
   const { id: categoryId, name: categoryName } = resolveCategory(brand.category)
+  const nameEn = brand.nameEn ?? brand.name ?? ''
+  const nameAr = brand.nameAr ?? ''
 
   return {
     id: String(brand._id),
-    name: brand.name ?? '',
+    name: catalogDisplayName(brand, 'en') || nameEn,
+    nameEn,
+    nameAr,
     slug: brand.slug ?? '',
     logo: brand.logo ? String(brand.logo) : null,
     description: brand.description ?? '',
@@ -51,7 +56,8 @@ export function mapApiBrandToAdminRow(brand: ApiAdminBrand): AdminBrandRow {
 
 export function emptyBrandFormValues(): AdminBrandFormValues {
   return {
-    name: '',
+    nameEn: '',
+    nameAr: '',
     description: '',
     category: '',
     isActive: true,
@@ -60,7 +66,8 @@ export function emptyBrandFormValues(): AdminBrandFormValues {
 
 export function brandToFormValues(brand: AdminBrandRow): AdminBrandFormValues {
   return {
-    name: brand.name,
+    nameEn: brand.nameEn || brand.name,
+    nameAr: brand.nameAr || '',
     description: brand.description,
     category: brand.categoryId ?? '',
     isActive: brand.isActive,
@@ -71,7 +78,8 @@ export function formValuesToWriteFields(
   values: AdminBrandFormValues,
 ): AdminBrandWriteFields {
   const fields: AdminBrandWriteFields = {
-    name: values.name.trim(),
+    nameEn: values.nameEn.trim(),
+    nameAr: values.nameAr.trim(),
     isActive: values.isActive,
   }
 
@@ -101,15 +109,20 @@ export function validateBrandForm(
   logoFile: File | null,
 ): AdminBrandFormErrors {
   const errors: AdminBrandFormErrors = {}
-  const name = values.name.trim()
+  const nameEn = values.nameEn.trim()
+  const nameAr = values.nameAr.trim()
 
-  if (!name) {
-    errors.name = 'Brand name is required'
+  if (!nameEn) {
+    errors.nameEn = 'English name is required'
   } else if (
-    name.length < ADMIN_BRAND_NAME_MIN ||
-    name.length > ADMIN_BRAND_NAME_MAX
+    nameEn.length < ADMIN_BRAND_NAME_MIN ||
+    nameEn.length > ADMIN_BRAND_NAME_MAX
   ) {
-    errors.name = `Name must be ${ADMIN_BRAND_NAME_MIN}-${ADMIN_BRAND_NAME_MAX} characters`
+    errors.nameEn = `English name must be ${ADMIN_BRAND_NAME_MIN}-${ADMIN_BRAND_NAME_MAX} characters`
+  }
+
+  if (nameAr.length > ADMIN_BRAND_NAME_MAX) {
+    errors.nameAr = `Arabic name must be at most ${ADMIN_BRAND_NAME_MAX} characters`
   }
 
   const description = values.description.trim()

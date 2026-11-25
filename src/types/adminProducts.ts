@@ -28,6 +28,8 @@ export type AdminProductInventoryStatus = 'in_stock' | 'low_stock' | 'out_of_sto
 export interface AdminProductRow {
   id: string
   name: string
+  nameEn: string
+  nameAr: string
   image: string | null
   /** Null when the API does not provide a SKU — UI must show a placeholder. */
   sku: string | null
@@ -47,7 +49,8 @@ export type AdminProductSource = ApiProduct
 
 /** Writable fields for create/update (aligned with BE product body). */
 export interface AdminProductWriteFields {
-  name: string
+  nameEn: string
+  nameAr: string
   price: number
   stock: number
   category: string
@@ -57,6 +60,10 @@ export interface AdminProductWriteFields {
   description?: string
   advantages?: string
   composition?: string
+  /** Arabic copy — shown in Arabic; the fields above are the English text. */
+  descriptionAr?: string
+  advantagesAr?: string
+  compositionAr?: string
   /** Existing Cloudinary URLs to keep (JSON updates). */
   images?: string[]
   /** Pass `null` to clear an existing catalog file. */
