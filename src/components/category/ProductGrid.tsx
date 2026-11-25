@@ -14,8 +14,8 @@ export function ProductGrid({ products, className }: ProductGridProps) {
       className={cn(
         // Phones <400px: 1-up so cards stay readable · mobile 2-up (gap 12) · laptop 3 · desktop 4 — equal-height rows
         'grid w-full grid-cols-2 items-stretch gap-[var(--catalog-card-gap)] max-[399px]:grid-cols-1',
-        'md:grid-cols-3',
-        'xl:grid-cols-4',
+        // Tablet and up: cards stretch from 224px to fill the row (no empty gutter), as many per row as fit
+        'md:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))]',
         className,
       )}
     >

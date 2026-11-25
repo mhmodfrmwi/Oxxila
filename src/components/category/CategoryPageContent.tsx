@@ -278,7 +278,7 @@ export function CategoryPageContent() {
         />
 
         {/* Sidebar on inline-start in both LTR/RTL */}
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,24.25rem)_minmax(0,1fr)] lg:gap-4">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-4">
           <FilterSidebar
             className="lg:col-start-1 lg:row-span-2"
             filters={filters}
@@ -313,7 +313,7 @@ export function CategoryPageContent() {
               </p>
             )}
             {loading || (categorySlug && catalogLoading) ? (
-              <div className="grid w-full grid-cols-2 items-stretch gap-[var(--catalog-card-gap)] max-[399px]:grid-cols-1 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid w-full grid-cols-2 items-stretch gap-[var(--catalog-card-gap)] max-[399px]:grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))]">
                 {Array.from({ length: PRODUCTS_PER_PAGE }).map((_, index) => (
                   <div
                     key={index}

@@ -115,7 +115,7 @@ export function SearchPage() {
         )}
 
         {loading ? (
-          <div className="grid grid-cols-2 gap-4 min-[769px]:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 min-[769px]:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))]">
             {Array.from({ length: PRODUCTS_PER_PAGE }).map((_, index) => (
               <div
                 key={index}

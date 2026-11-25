@@ -134,7 +134,7 @@
 
   /* Catalog product grid — Figma 413:16491 / mobile 413:19442 */
   --catalog-card-gap: 12px;
-  --catalog-sidebar-width: 24.25rem; /* 388px */
+  --catalog-sidebar-width: 20rem; /* 320px */
   --catalog-card-shadow: 0 10px 28px -18px rgb(0 0 0 / 0.18);
   --catalog-card-shadow-dark: 0 10px 28px -16px rgb(0 0 0 / 0.55);
 

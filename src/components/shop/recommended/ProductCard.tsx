@@ -194,15 +194,15 @@ export function ProductCard({
           'border border-border-subtle',
           'shadow-[var(--catalog-card-shadow)]',
           'dark:border-white/20 dark:shadow-[var(--catalog-card-shadow-dark)]',
-          isGrid ? 'p-1.5 sm:p-3' : 'p-2',
+          isGrid ? 'p-1.5 sm:p-3 md:p-2' : 'p-2',
         )}
       >
-        <div className={cn('relative', isGrid ? 'px-0 pt-0 sm:px-0.5 sm:pt-1' : 'px-[5px] py-2')}>
+        <div className={cn('relative', isGrid ? 'px-0 pt-0 sm:px-0.5 sm:pt-1 md:px-[5px] md:py-2' : 'px-[5px] py-2')}>
           {/* Grid: 1:1 for mobile width; carousel keeps Figma 228/250 */}
           <div
             className={cn(
               'product-card-frame relative w-full overflow-hidden rounded-medium',
-              isGrid ? 'aspect-square max-[399px]:aspect-[4/3]' : 'aspect-[228/250]',
+              isGrid ? 'aspect-[228/250] max-[399px]:aspect-[4/3]' : 'aspect-[228/250]',
             )}
           >
             {!imageLoaded ? (
@@ -234,10 +234,10 @@ export function ProductCard({
                 className={cn(
                   'pointer-events-none absolute z-10',
                   // The brand logo is printed top-left on the photos, so badge top-right, heart top-left (each in its own corner).
-                  'right-2 top-2 sm:right-2.5 sm:top-2.5',
+                  'right-2 top-2 sm:right-2.5 sm:top-2.5 lg:right-3 lg:top-3',
                 )}
               >
-                <ProductBadge kind={badge} size="xs">
+                <ProductBadge kind={badge} size="card">
                   {badgeLabel}
                 </ProductBadge>
               </span>
@@ -256,17 +256,21 @@ export function ProductCard({
                   void handleWishlistToggle(event)
                 }}
                 className={cn(
-                  'pointer-events-auto absolute left-2 top-2 flex size-8 items-center justify-center rounded-full sm:left-2.5 sm:top-2.5 sm:size-9',
+                  'pointer-events-auto absolute left-2 top-2 flex size-8 items-center justify-center rounded-full sm:left-2.5 sm:top-2.5 sm:size-9 lg:left-3 lg:top-3 lg:size-9',
                   'shadow-[0_2px_10px_rgb(0_0_0/0.18)] backdrop-blur-sm',
                   'transition-[background-color,transform,color] duration-200 hover:scale-105 active:scale-95',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary',
                   'disabled:pointer-events-none disabled:opacity-60 motion-reduce:transition-none motion-reduce:hover:scale-100',
                   wishlisted
-                    ? 'bg-button-primary text-white'
-                    : 'bg-white/90 text-[#5d5a88] hover:bg-white hover:text-button-primary',
+                    ? 'bg-white/95 text-[#7b65fb]'
+                    : 'bg-white/90 text-[#5d5a88] hover:bg-white hover:text-[#7b65fb]',
                 )}
               >
-                <Heart size={16} strokeWidth={1.9} className={wishlisted ? 'fill-current' : undefined} aria-hidden />
+                <Heart
+                  strokeWidth={1.9}
+                  className={cn('size-4 sm:size-[18px]', wishlisted && 'fill-current')}
+                  aria-hidden
+                />
               </button>
             </div>
           </div>
