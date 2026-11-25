@@ -1,7 +1,9 @@
 // src/components/category/CategoriesLandingContent.tsx
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { HOME_PATH } from '../../config/routes'
 import { useLandingCatalogContext } from '../../hooks/useLandingCatalogContext'
+import { catalogDisplayName } from '../../utils/catalogDisplayName'
 import { categoryBrowsePath } from '../../utils/categoryBrowseParams'
 import { resolveProductImageUrl } from '../../utils/productImage'
 import { Footer } from '../landing/footer/Footer'
@@ -11,6 +13,7 @@ import { cn } from '../../lib/cn'
 import { cardHoverLiftClasses, focusRingClasses } from '../ui/interactionStyles'
 
 export function CategoriesLandingContent() {
+  const { t, i18n } = useTranslation()
   const { categories, loading, error } = useLandingCatalogContext()
   const activeCategories = categories.filter((category) => category.isActive !== false)
 
@@ -19,15 +22,16 @@ export function CategoriesLandingContent() {
       <div className="container-content pb-8 sm:pb-10">
         <Breadcrumb
           className="mb-5 sm:mb-6"
-          items={[{ label: 'Home', href: HOME_PATH }, { label: 'Categories' }]}
+          items={[
+            { label: t('breadcrumb.home'), href: HOME_PATH },
+            { label: t('breadcrumb.categories') },
+          ]}
         />
 
         <header className="mb-6 sm:mb-8">
-          <Heading variant="page" className="font-serif">
-            Categories
-          </Heading>
+          <Heading variant="page">{t('categoriesLanding.title')}</Heading>
           <p className="mt-2 text-sm text-secondary-text">
-            Browse our full catalog by category.
+            {t('categoriesLanding.subtitle')}
           </p>
         </header>
 
@@ -47,7 +51,7 @@ export function CategoriesLandingContent() {
           </p>
         ) : activeCategories.length === 0 ? (
           <p className="py-12 text-center text-sm text-secondary-text" role="status">
-            No categories available.
+            {t('categoriesLanding.noCategories')}
           </p>
         ) : (
           <ul className="grid grid-cols-2 gap-4 min-[769px]:grid-cols-3 xl:grid-cols-4 xl:gap-5">
@@ -71,7 +75,11 @@ export function CategoriesLandingContent() {
                   </div>
                   <div className="px-4 py-3">
                     <h2 className="font-serif text-sm font-medium text-primary-text sm:text-base">
-                      {category.name}
+                      {catalogDisplayName(
+                        category,
+                        i18n.resolvedLanguage ?? i18n.language,
+                        'category',
+                      )}
                     </h2>
                   </div>
                 </Link>

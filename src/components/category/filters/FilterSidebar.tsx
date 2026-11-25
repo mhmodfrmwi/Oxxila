@@ -1,5 +1,8 @@
-import { ChevronDown, SlidersHorizontal } from 'lucide-react'
-import { useState } from 'react'
+// src/components/category/filters/FilterSidebar.tsx
+import { AnimatePresence, motion } from 'framer-motion'
+import { X } from 'lucide-react'
+import { useEffect, useId, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import type { ApiBrand, ApiCategory, ApiSubCategory } from '../../../types/catalog'
@@ -7,7 +10,7 @@ import { AvailabilityFilter } from './AvailabilityFilter'
 import { BrandFilter } from './BrandFilter'
 import { CategoryFilter } from './CategoryFilter'
 import { ConcernsFilter } from './ConcernsFilter'
-import { countActiveFilters, type FilterState } from './filterState'
+import type { FilterState } from './filterState'
 import { filterClearAllClasses, filterSidebarHeadingClasses } from './filterStyles'
 import { OffersFilter } from './OffersFilter'
 import { PriceFilter } from './PriceFilter'
@@ -25,6 +28,110 @@ interface FilterSidebarProps {
   subcategories: ApiSubCategory[]
   subcategoriesLoading?: boolean
   brands: ApiBrand[]
+  /** Mobile drawer open state (controlled from results strip). */
+  mobileOpen?: boolean
+  onMobileOpenChange?: (open: boolean) => void
+}
+
+function FilterPanelBody({
+  filters,
+  onFiltersChange,
+  onFiltersReset,
+  categories,
+  activeCategorySlug,
+  subcategories,
+  subcategoriesLoading,
+  brands,
+  headingId,
+  showClose,
+  onClose,
+}: {
+  filters: FilterState
+  onFiltersChange: (patch: Partial<FilterState>) => void
+  onFiltersReset: () => void
+  categories: ApiCategory[]
+  activeCategorySlug?: string
+  subcategories: ApiSubCategory[]
+  subcategoriesLoading?: boolean
+  brands: ApiBrand[]
+  headingId?: string
+  showClose?: boolean
+  onClose?: () => void
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <>
+      <div className="mb-5 flex items-baseline justify-between gap-3">
+        <h2 id={headingId} className={filterSidebarHeadingClasses}>
+          {t('catalogBrowse.filters')}
+        </h2>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onFiltersReset}
+            className={cn(filterClearAllClasses, focusRingClasses, 'min-h-11 rounded-sm px-1')}
+          >
+            {t('catalogBrowse.clearAll')}
+          </button>
+          {showClose ? (
+            <button
+              type="button"
+              onClick={onClose}
+              className={cn(
+                'inline-flex size-11 items-center justify-center rounded-full text-secondary-text',
+                'hover:bg-surface-muted hover:text-primary-text',
+                focusRingClasses,
+              )}
+              aria-label={t('catalogBrowse.closeFilters')}
+            >
+              <X size={18} strokeWidth={1.75} aria-hidden />
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="filter-sidebar-groups">
+        <SensitivityFilter
+          selectedIds={filters.sensitivityIds}
+          onChange={(sensitivityIds) => onFiltersChange({ sensitivityIds })}
+        />
+        <CategoryFilter categories={categories} activeSlug={activeCategorySlug} />
+        <TypeOfCategoryFilter
+          selectedIds={filters.typeOfCategoryIds}
+          onChange={(typeOfCategoryIds) => onFiltersChange({ typeOfCategoryIds })}
+          subcategories={subcategories}
+          loading={subcategoriesLoading}
+          categorySelected={Boolean(activeCategorySlug)}
+        />
+        <ConcernsFilter
+          selectedIds={filters.concernIds}
+          onChange={(concernIds) => onFiltersChange({ concernIds })}
+        />
+        <OffersFilter
+          selectedIds={filters.offerIds}
+          onChange={(offerIds) => onFiltersChange({ offerIds })}
+        />
+        <BrandFilter
+          selectedIds={filters.brandIds}
+          onChange={(brandIds) => onFiltersChange({ brandIds })}
+          brands={brands}
+        />
+        <PriceFilter
+          value={filters.priceSort}
+          onChange={(priceSort) => onFiltersChange({ priceSort })}
+        />
+        <RatingFilter
+          selectedRating={filters.rating}
+          onChange={(rating) => onFiltersChange({ rating })}
+        />
+        <AvailabilityFilter
+          inStockOnly={filters.inStockOnly}
+          onChange={(inStockOnly) => onFiltersChange({ inStockOnly })}
+        />
+      </div>
+    </>
+  )
 }
 
 export function FilterSidebar({
@@ -37,121 +144,145 @@ export function FilterSidebar({
   subcategories,
   subcategoriesLoading,
   brands,
+  mobileOpen = false,
+  onMobileOpenChange,
 }: FilterSidebarProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const activeCount = countActiveFilters(filters)
+  const { t, i18n } = useTranslation()
+  const titleId = useId()
+  const panelRef = useRef<HTMLElement>(null)
+  const isRtl = i18n.dir() === 'rtl'
+  // Drawer from inline-end: right in LTR, left in RTL (task #5).
+  const enterX = isRtl ? '-100%' : '100%'
 
-  function clearAll() {
-    onFiltersReset()
-  }
+  useEffect(() => {
+    if (!mobileOpen) return
 
-  const filterGroups = (
-    <>
-      <SensitivityFilter
-        selectedIds={filters.sensitivityIds}
-        onChange={(sensitivityIds) => onFiltersChange({ sensitivityIds })}
-      />
-      <CategoryFilter categories={categories} activeSlug={activeCategorySlug} />
-      <TypeOfCategoryFilter
-        selectedIds={filters.typeOfCategoryIds}
-        onChange={(typeOfCategoryIds) => onFiltersChange({ typeOfCategoryIds })}
-        subcategories={subcategories}
-        loading={subcategoriesLoading}
-        categorySelected={Boolean(activeCategorySlug)}
-      />
-      <ConcernsFilter
-        selectedIds={filters.concernIds}
-        onChange={(concernIds) => onFiltersChange({ concernIds })}
-      />
-      <OffersFilter
-        selectedIds={filters.offerIds}
-        onChange={(offerIds) => onFiltersChange({ offerIds })}
-      />
-      <BrandFilter
-        selectedIds={filters.brandIds}
-        onChange={(brandIds) => onFiltersChange({ brandIds })}
-        brands={brands}
-      />
-      <PriceFilter
-        value={filters.priceSort}
-        onChange={(priceSort) => onFiltersChange({ priceSort })}
-      />
-      <RatingFilter
-        selectedRating={filters.rating}
-        onChange={(rating) => onFiltersChange({ rating })}
-      />
-      <AvailabilityFilter
-        inStockOnly={filters.inStockOnly}
-        onChange={(inStockOnly) => onFiltersChange({ inStockOnly })}
-      />
-    </>
-  )
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const frame = window.requestAnimationFrame(() => {
+      panelRef.current?.focus()
+    })
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        onMobileOpenChange?.(false)
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      window.cancelAnimationFrame(frame)
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [mobileOpen, onMobileOpenChange])
 
   return (
-    <aside
-      className={cn(
-        'w-full lg:max-w-[17.5rem] shrink-0',
-        'lg:sticky lg:top-6 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto',
-        className,
-      )}
-      aria-label="Product filters"
-    >
-      <button
-        type="button"
+    <>
+      {/* Desktop sidebar — full page height, page scrolls (no inner scrollbar) */}
+      <aside
         className={cn(
-          'mb-4 flex w-full items-center justify-between gap-3 rounded-2xl border border-border-subtle bg-card px-4 py-3.5',
-          'text-sm font-medium text-primary-text shadow-sm shadow-black/[0.04]',
-          'dark:shadow-none',
-          'transition-colors hover:border-accent-muted/50',
-          focusRingClasses,
-          'lg:hidden',
+          'hidden w-full shrink-0 lg:block lg:max-w-[24.25rem]',
+          'lg:rounded-small lg:bg-card lg:p-medium',
+          className,
         )}
-        aria-expanded={isOpen}
-        aria-controls="filter-sidebar-panel"
-        onClick={() => setIsOpen((open) => !open)}
+        aria-label={t('catalogBrowse.filters')}
       >
-        <span className="flex min-w-0 items-center gap-2.5">
-          <SlidersHorizontal size={18} className="shrink-0 text-secondary-text" aria-hidden />
-          <span>Filter</span>
-          {activeCount > 0 && (
-            <span
-              className={cn(
-                'flex h-5 min-w-5 items-center justify-center rounded-full px-1.5',
-                'bg-button-primary text-[10px] font-semibold text-on-emphasis',
-              )}
-            >
-              {activeCount}
-            </span>
-          )}
-        </span>
-        <ChevronDown
-          size={18}
-          strokeWidth={1.75}
-          className={cn(
-            'shrink-0 text-secondary-text transition-transform duration-200',
-            isOpen && 'rotate-180',
-          )}
-          aria-hidden
+        <FilterPanelBody
+          filters={filters}
+          onFiltersChange={onFiltersChange}
+          onFiltersReset={onFiltersReset}
+          categories={categories}
+          activeCategorySlug={activeCategorySlug}
+          subcategories={subcategories}
+          subcategoriesLoading={subcategoriesLoading}
+          brands={brands}
         />
-      </button>
+      </aside>
 
-      <div
-        id="filter-sidebar-panel"
-        className={cn(!isOpen && 'hidden', 'lg:block')}
-      >
-        <div className="mb-4 flex items-baseline justify-between gap-3 lg:mb-5">
-          <h2 className={filterSidebarHeadingClasses}>Filter</h2>
-          <button
-            type="button"
-            onClick={clearAll}
-            className={cn(filterClearAllClasses, focusRingClasses, 'rounded-sm')}
+      {/* Mobile side drawer — Figma 413:19413 / 1446:18637 */}
+      <AnimatePresence>
+        {mobileOpen ? (
+          <div
+            className="fixed inset-0 z-[60] lg:hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
           >
-            Clear All
-          </button>
-        </div>
+            <motion.button
+              type="button"
+              tabIndex={-1}
+              className="absolute inset-0 bg-black/50"
+              aria-label={t('catalogBrowse.closeFilters')}
+              onClick={() => onMobileOpenChange?.(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
 
-        <div className="filter-sidebar-groups">{filterGroups}</div>
-      </div>
-    </aside>
+            <motion.aside
+              ref={panelRef}
+              tabIndex={-1}
+              className={cn(
+                'absolute inset-y-0 end-0 flex h-full w-[min(100%,24.25rem)] flex-col',
+                'bg-card outline-none shadow-2xl',
+              )}
+              initial={{ x: enterX }}
+              animate={{ x: 0 }}
+              exit={{ x: enterX }}
+              transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+            >
+              <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
+                <FilterPanelBody
+                  filters={filters}
+                  onFiltersChange={onFiltersChange}
+                  onFiltersReset={onFiltersReset}
+                  categories={categories}
+                  activeCategorySlug={activeCategorySlug}
+                  subcategories={subcategories}
+                  subcategoriesLoading={subcategoriesLoading}
+                  brands={brands}
+                  headingId={titleId}
+                  showClose
+                  onClose={() => onMobileOpenChange?.(false)}
+                />
+              </div>
+
+              <div className="shrink-0 border-t border-border-subtle bg-card px-5 py-4">
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onFiltersReset()
+                      onMobileOpenChange?.(false)
+                    }}
+                    className={cn(
+                      'inline-flex min-h-11 flex-1 items-center justify-center rounded-extra-small',
+                      'border border-border-subtle font-display text-extra-small text-primary-text',
+                      focusRingClasses,
+                    )}
+                  >
+                    {t('catalogBrowse.clearAll')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onMobileOpenChange?.(false)}
+                    className={cn(
+                      'inline-flex min-h-11 flex-1 items-center justify-center rounded-extra-small',
+                      'bg-button-primary font-display text-extra-small text-on-emphasis',
+                      focusRingClasses,
+                    )}
+                  >
+                    {t('catalogBrowse.applyFilters')}
+                  </button>
+                </div>
+              </div>
+            </motion.aside>
+          </div>
+        ) : null}
+      </AnimatePresence>
+    </>
   )
 }

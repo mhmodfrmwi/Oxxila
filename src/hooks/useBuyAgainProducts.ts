@@ -1,5 +1,6 @@
 // src/hooks/useBuyAgainProducts.ts
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getRecommendations } from '../api/users'
 import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
 import { useAuth } from '../context/AuthContext'
@@ -7,6 +8,8 @@ import { mapApiProductToRecommendedProduct } from '../utils/productDetailMappers
 
 export function useBuyAgainProducts() {
   const { isAuthenticated } = useAuth()
+  const { i18n } = useTranslation()
+  const language = i18n.language
   const [products, setProducts] = useState<RecommendedProduct[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -24,7 +27,7 @@ export function useBuyAgainProducts() {
       try {
         const response = await getRecommendations()
         if (cancelled) return
-        setProducts((response.data ?? []).map(mapApiProductToRecommendedProduct))
+        setProducts((response.data ?? []).map((product) => mapApiProductToRecommendedProduct(product, language)))
       } catch {
         if (!cancelled) setProducts([])
       } finally {
@@ -37,7 +40,7 @@ export function useBuyAgainProducts() {
     return () => {
       cancelled = true
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, language])
 
   return {
     enabled: isAuthenticated,

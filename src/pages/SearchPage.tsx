@@ -1,6 +1,9 @@
 // src/pages/SearchPage.tsx
 import { useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { SHOP_PATH } from '../config/routes'
+import { Button } from '../components/ui/Button'
 import { Layout } from '../components/layout/Layout'
 import { Footer } from '../components/landing/footer/Footer'
 import { CategoryToolbar } from '../components/category/CategoryToolbar'
@@ -34,6 +37,8 @@ function parsePage(value: string | null): number {
 }
 
 export function SearchPage() {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const { brands } = useLandingCatalogContext()
 
@@ -59,18 +64,18 @@ export function SearchPage() {
 
   const brandName = useMemo(() => {
     if (!brandId.trim()) return ''
-    return brands.find((brand) => brand._id === brandId.trim())?.name ?? 'Brand'
-  }, [brandId, brands])
+    return brands.find((brand) => brand._id === brandId.trim())?.name ?? t('search.brand')
+  }, [brandId, brands, t])
 
   const title = useMemo(() => {
     const parts: string[] = []
     if (keyword.trim()) parts.push(`“${keyword.trim()}”`)
     if (brandId.trim()) parts.push(brandName)
     if (concerns.trim()) parts.push(concerns.replace(/-/g, ' '))
-    if (parts.length === 0) return 'Search products'
-    if (keyword.trim() && parts.length === 1) return `Search results for ${parts[0]}`
-    return `Results for ${parts.join(' · ')}`
-  }, [keyword, concerns, brandId, brandName])
+    if (parts.length === 0) return t('search.page.title')
+    if (keyword.trim() && parts.length === 1) return t('search.page.resultsFor', { terms: parts[0] })
+    return t('search.page.resultsFor', { terms: parts.join(' · ') })
+  }, [keyword, concerns, brandId, brandName, t])
 
   function updateParams(patch: { sort?: SortOption; page?: number }) {
     const next = new URLSearchParams(searchParams)
@@ -99,7 +104,7 @@ export function SearchPage() {
 
         {!hasQuery && (
           <p className="py-12 text-center text-sm text-secondary-text">
-            Enter a search term in the header or browse by skin concern from the shop page.
+            {t('search.page.empty')}
           </p>
         )}
 
@@ -122,7 +127,13 @@ export function SearchPage() {
         ) : products.length > 0 ? (
           <ProductGrid products={products} />
         ) : hasQuery ? (
-          <p className="py-12 text-center text-sm text-secondary-text">No products found.</p>
+          <div className="flex flex-col items-center gap-4 py-16 text-center" role="status">
+            <p className="text-base text-primary-text">{t('search.page.noResults')}</p>
+            <p className="max-w-md text-sm text-secondary-text">{t('search.page.noResultsHint')}</p>
+            <Button type="button" variant="primary" pill onClick={() => navigate(SHOP_PATH)}>
+              {t('search.browseAll')}
+            </Button>
+          </div>
         ) : null}
 
         {hasQuery && (

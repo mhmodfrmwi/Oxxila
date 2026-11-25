@@ -60,9 +60,17 @@ export function buildProductQueryParams(
     params.subCategory = subCategoryIds.join(',')
   }
 
-  // Backend accepts a single brand id; multi-brand is handled client-side after fetch.
-  if (filters.brandIds.length === 1) {
-    params.brand = filters.brandIds[0]
+  // Backend accepts comma-separated brand ids, a minimum rating and in-stock.
+  if (filters.brandIds.length > 0) {
+    params.brand = filters.brandIds.join(',')
+  }
+
+  if (filters.rating != null) {
+    params.ratingMin = filters.rating
+  }
+
+  if (filters.inStockOnly) {
+    params.inStock = true
   }
 
   const concerns = mapConcernIdsToApi(filters.concernIds)

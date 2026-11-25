@@ -1,3 +1,5 @@
+// src/components/category/filters/AvailabilityFilter.tsx
+import { useTranslation } from 'react-i18next'
 import { FilterSection } from './FilterSection'
 
 interface AvailabilityFilterProps {
@@ -6,8 +8,9 @@ interface AvailabilityFilterProps {
 }
 
 export function AvailabilityFilter({ inStockOnly, onChange }: AvailabilityFilterProps) {
+  const { t } = useTranslation()
   return (
-    <FilterSection title="Availability">
+    <FilterSection title={t('categoryFilters.sections.availability')}>
       <label className="filter-option-row">
         <input
           type="checkbox"
@@ -15,7 +18,7 @@ export function AvailabilityFilter({ inStockOnly, onChange }: AvailabilityFilter
           onChange={(event) => onChange(event.target.checked)}
           className="filter-checkbox"
         />
-        <span>Available only</span>
+        <span>{t('categoryFilters.availableOnly')}</span>
       </label>
     </FilterSection>
   )

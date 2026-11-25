@@ -1,10 +1,16 @@
+// src/components/category/filters/FilterCheckboxList.tsx
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/cn'
 import { focusRingClasses } from '../../ui/interactionStyles'
 import type { FilterOption } from './filterOptionsData'
 
+type CheckboxOption = Pick<FilterOption, 'id' | 'label'> & {
+  labelKey?: string
+}
+
 interface FilterCheckboxListProps {
-  options: readonly FilterOption[]
+  options: readonly CheckboxOption[]
   selectedIds: string[]
   onChange: (ids: string[]) => void
   initialVisibleCount?: number
@@ -18,6 +24,7 @@ export function FilterCheckboxList({
   initialVisibleCount,
   className,
 }: FilterCheckboxListProps) {
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   const hasCollapse = initialVisibleCount != null && options.length > initialVisibleCount
   const visibleOptions =
@@ -43,7 +50,11 @@ export function FilterCheckboxList({
                 onChange={() => toggleOption(option.id)}
                 className="filter-checkbox"
               />
-              <span>{option.label}</span>
+              <span>
+                {option.labelKey
+                  ? t(option.labelKey, { defaultValue: option.label })
+                  : option.label}
+              </span>
             </label>
           </li>
         ))}
@@ -55,7 +66,7 @@ export function FilterCheckboxList({
           onClick={() => setExpanded(true)}
           className={cn('filter-more-link', focusRingClasses, 'rounded-sm')}
         >
-          more
+          {t('categoryFilters.showMore')}
         </button>
       )}
     </div>

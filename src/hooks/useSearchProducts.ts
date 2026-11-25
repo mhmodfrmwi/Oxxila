@@ -1,5 +1,6 @@
 // src/hooks/useSearchProducts.ts
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getProducts } from '../api/catalog'
 import type { SortOption } from '../components/category/categoryData'
 import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
@@ -37,6 +38,8 @@ export function useSearchProducts({
   const trimmedConcerns = concerns.trim()
   const hasQuery = Boolean(trimmedKeyword || trimmedBrand || trimmedConcerns)
 
+  const { i18n } = useTranslation()
+  const language = i18n.language
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [products, setProducts] = useState<RecommendedProduct[]>([])
@@ -60,12 +63,13 @@ export function useSearchProducts({
           ...(trimmedConcerns ? { concerns: trimmedConcerns } : {}),
           page,
           limit,
-          sort: sortOptionToApiSort(sort),
+          // With a keyword the default order is best-match; an explicit sort still wins.
+          sort: trimmedKeyword && sort === 'newest' ? 'relevance' : sortOptionToApiSort(sort),
         })
 
         if (cancelled) return
 
-        setProducts((response.data ?? []).map(mapApiProductToRecommendedProduct))
+        setProducts((response.data ?? []).map((product) => mapApiProductToRecommendedProduct(product, language)))
         setPagination(response.pagination ?? null)
       } catch (loadError) {
         if (cancelled) return
@@ -82,7 +86,7 @@ export function useSearchProducts({
     return () => {
       cancelled = true
     }
-  }, [hasQuery, trimmedKeyword, trimmedBrand, trimmedConcerns, sort, page, limit])
+  }, [hasQuery, trimmedKeyword, trimmedBrand, trimmedConcerns, sort, page, limit, language])
 
   if (!hasQuery) {
     return emptySearchResult

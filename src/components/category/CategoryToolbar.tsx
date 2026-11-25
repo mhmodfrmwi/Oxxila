@@ -1,10 +1,9 @@
 // src/components/category/CategoryToolbar.tsx
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, SlidersHorizontal } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { focusRingClasses } from '../ui/interactionStyles'
-import { typeSmallClasses } from '../ui/typography'
-import { sortOptions, type SortOption } from './categoryData'
+import type { SortOption } from './categoryData'
 
 interface CategoryToolbarProps {
   categoryName: string
@@ -12,7 +11,42 @@ interface CategoryToolbarProps {
   totalResults: number
   sort: SortOption
   onSortChange: (sort: SortOption) => void
+  /** Current page range start (1-based). */
+  rangeFrom?: number
+  /** Opens the mobile filter drawer. */
+  onOpenFilters?: () => void
+  /** Active filter count for the mobile Filters badge. */
+  activeFilterCount?: number
   className?: string
+}
+
+function SortSelect({
+  sort,
+  onSortChange,
+  className,
+}: {
+  sort: SortOption
+  onSortChange: (sort: SortOption) => void
+  className?: string
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <label className={cn('relative block', className)}>
+      <span className="sr-only">{t('categorySort.label')}</span>
+      <select
+        value={sort}
+        onChange={(event) => onSortChange(event.target.value as SortOption)}
+        className="catalog-sort-select"
+      >
+        <option value="newest">{t('categorySort.newest')}</option>
+        <option value="price-asc">{t('categorySort.priceAsc')}</option>
+        <option value="price-desc">{t('categorySort.priceDesc')}</option>
+        <option value="rating">{t('categorySort.rating')}</option>
+      </select>
+      <ChevronDown className="catalog-sort-chevron" strokeWidth={1.75} aria-hidden />
+    </label>
+  )
 }
 
 export function CategoryToolbar({
@@ -21,57 +55,82 @@ export function CategoryToolbar({
   totalResults,
   sort,
   onSortChange,
+  rangeFrom = 1,
+  onOpenFilters,
+  activeFilterCount = 0,
   className,
 }: CategoryToolbarProps) {
   const { t } = useTranslation()
+  const rangeTo = Math.max(rangeFrom - 1 + productCount, rangeFrom)
+  const displayTotal = Math.max(totalResults, productCount)
+  const from = productCount === 0 ? 0 : rangeFrom
+  const to = productCount === 0 ? 0 : rangeTo
+  const namedQuery =
+    categoryName.trim() && categoryName.trim().toLowerCase() !== 'categories'
+      ? categoryName.trim()
+      : ''
+  const resultsLabel = namedQuery
+    ? t('catalogBrowse.resultsRangeNamed', {
+        from,
+        to,
+        total: displayTotal || 0,
+        query: namedQuery,
+      })
+    : t('catalogBrowse.resultsRange', {
+        from,
+        to,
+        total: displayTotal || 0,
+      })
 
   return (
-    <div
-      className={cn(
-        'flex flex-col gap-4 border-b border-border-subtle pb-5 sm:flex-row sm:items-end sm:justify-between',
-        className,
-      )}
-    >
-      <div className="min-w-0 space-y-1">
-        <h1 className="font-serif text-2xl font-medium text-primary-text sm:text-[1.75rem]">
-          {categoryName}
-        </h1>
-        <p className="text-sm text-secondary-text">
-          <span className="font-medium text-primary-text">{productCount} Products</span>
-          {' '}
-          more than {totalResults.toLocaleString()} result for &ldquo;{categoryName}&rdquo;
-        </p>
-      </div>
+    <div className={cn('space-y-3', className)}>
+      {/* Mobile strip Figma 413:19416 · desktop results line 413:16462 */}
+      <div
+        className={cn(
+          'flex items-center gap-3 px-4 py-3',
+          '-mx-[var(--page-gutter)] bg-card',
+          'lg:mx-0 lg:bg-transparent lg:px-0 lg:py-0',
+        )}
+      >
+        {onOpenFilters ? (
+          <button
+            type="button"
+            onClick={onOpenFilters}
+            className={cn(
+              'relative inline-flex size-11 shrink-0 items-center justify-center',
+              'rounded-extra-small border border-border-subtle bg-input text-icon-primary',
+              'lg:hidden',
+              focusRingClasses,
+            )}
+            aria-label={t('catalogBrowse.openFilters')}
+          >
+            <SlidersHorizontal className="size-5" strokeWidth={1.75} aria-hidden />
+            {activeFilterCount > 0 ? (
+              <span className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-button-primary px-1 text-[10px] font-semibold text-on-emphasis">
+                {activeFilterCount > 99 ? '99+' : activeFilterCount}
+              </span>
+            ) : null}
+          </button>
+        ) : null}
 
-      <div className="relative shrink-0">
-        <label htmlFor="category-sort" className="sr-only">
-          {t('categorySort.label')}
-        </label>
-        <select
-          id="category-sort"
-          value={sort}
-          onChange={(event) => onSortChange(event.target.value as SortOption)}
+        {/* Body font (Nohemi / IBM Plex) — not display/serif */}
+        <p
           className={cn(
-            'appearance-none rounded-input border border-border-subtle bg-card py-2.5 pr-10 pl-4',
-            typeSmallClasses,
-            'text-left text-primary-text',
-            'focus:border-button-primary focus:outline-none focus:ring-2 focus:ring-button-primary/30',
-            focusRingClasses,
-            'min-w-[11rem]',
+            'min-w-0 flex-1 font-sans text-small font-medium leading-[1.4] text-secondary-text',
+            'lg:text-primary-text',
           )}
         >
-          {sortOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {t(option.labelKey)}
-            </option>
-          ))}
-        </select>
-        <ChevronDown
-          size={16}
-          className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-secondary-text"
-          aria-hidden
+          {resultsLabel}
+        </p>
+
+        <SortSelect
+          sort={sort}
+          onSortChange={onSortChange}
+          className="ms-auto hidden shrink-0 lg:block"
         />
       </div>
+
+      <SortSelect sort={sort} onSortChange={onSortChange} className="w-full lg:hidden" />
     </div>
   )
 }

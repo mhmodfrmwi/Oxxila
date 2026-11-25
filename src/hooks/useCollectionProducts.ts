@@ -1,5 +1,6 @@
 // src/hooks/useCollectionProducts.ts
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getProducts } from '../api/catalog'
 import type { CollectionConfig } from '../config/collections'
 import type { RecommendedProduct } from '../components/shop/recommended/recommendedProductsData'
@@ -22,6 +23,8 @@ export function useCollectionProducts(
   page: number,
   limit: number,
 ): CollectionProductsState {
+  const { i18n } = useTranslation()
+  const language = i18n.language
   const [state, setState] = useState<CollectionProductsState>({
     loading: true,
     error: null,
@@ -51,7 +54,7 @@ export function useCollectionProducts(
         setState({
           loading: false,
           error: null,
-          products: (response.data ?? []).map(mapApiProductToRecommendedProduct),
+          products: (response.data ?? []).map((product) => mapApiProductToRecommendedProduct(product, language)),
           pagination: response.pagination ?? null,
         })
       } catch (error) {
@@ -70,7 +73,7 @@ export function useCollectionProducts(
     return () => {
       cancelled = true
     }
-  }, [config, sort, page, limit])
+  }, [config, sort, page, limit, language])
 
   return state
 }

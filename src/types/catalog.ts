@@ -1,21 +1,27 @@
 export interface ApiBrand {
   _id: string
   name: string
+  nameEn?: string
+  nameAr?: string
   logo: string
   slug: string
   isActive?: boolean
-  category?: string | { _id: string; name?: string; slug?: string }
+  category?: string | { _id: string; name?: string; nameEn?: string; nameAr?: string; slug?: string }
 }
 
 export interface ApiCategory {
   _id: string
   name: string
+  nameEn?: string
+  nameAr?: string
   image: string
   slug: string
   isActive?: boolean
   subcategories?: Array<{
     _id: string
     name: string
+    nameEn?: string
+    nameAr?: string
     slug: string
     image?: string
     isActive?: boolean
@@ -24,7 +30,14 @@ export interface ApiCategory {
 
 export interface ApiProduct {
   _id: string
+  /** Why the server recommended this (set by /recommendations and /related). */
+  recommendationReason?: 'category' | 'subCategory' | 'brand' | 'concerns' | 'popular'
   name: string
+  nameEn?: string
+  nameAr?: string
+  descriptionAr?: string
+  advantagesAr?: string
+  compositionAr?: string
   images: string[]
   price: number
   priceAfterDiscount: number | null
@@ -40,7 +53,7 @@ export interface ApiProduct {
    */
   performance?: number
   brand?: ApiBrand
-  category?: { _id: string; name: string; slug: string }
+  category?: { _id: string; name: string; nameEn?: string; nameAr?: string; slug: string }
   description?: string
   advantages?: string
   composition?: string
@@ -61,6 +74,8 @@ export interface ApiProduct {
 export interface ApiSubCategory {
   _id: string
   name: string
+  nameEn?: string
+  nameAr?: string
   slug: string
   image?: string
 }

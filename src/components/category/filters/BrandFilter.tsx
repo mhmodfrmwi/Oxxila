@@ -1,7 +1,10 @@
+// src/components/category/filters/BrandFilter.tsx
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/cn'
-import { focusRingClasses } from '../../ui/interactionStyles'
 import type { ApiBrand } from '../../../types/catalog'
+import { catalogDisplayName } from '../../../utils/catalogDisplayName'
 import { resolveProductImageUrl } from '../../../utils/productImage'
+import { focusRingClasses } from '../../ui/interactionStyles'
 import { FilterSection } from './FilterSection'
 
 interface BrandFilterProps {
@@ -11,6 +14,9 @@ interface BrandFilterProps {
 }
 
 export function BrandFilter({ selectedIds, onChange, brands }: BrandFilterProps) {
+  const { t, i18n } = useTranslation()
+  const locale = i18n.resolvedLanguage ?? i18n.language
+
   function toggleBrand(id: string) {
     if (selectedIds.includes(id)) {
       onChange(selectedIds.filter((item) => item !== id))
@@ -24,10 +30,11 @@ export function BrandFilter({ selectedIds, onChange, brands }: BrandFilterProps)
   }
 
   return (
-    <FilterSection title="Brand">
+    <FilterSection title={t('categoryFilters.sections.brand')}>
       <ul className="flex flex-wrap gap-2">
         {brands.map((brand) => {
           const isSelected = selectedIds.includes(brand._id)
+          const label = catalogDisplayName(brand, locale, 'brand')
 
           return (
             <li key={brand._id} className="min-w-0 max-w-full">
@@ -49,11 +56,11 @@ export function BrandFilter({ selectedIds, onChange, brands }: BrandFilterProps)
                     />
                   ) : (
                     <span className="flex h-full w-full items-center justify-center text-xs font-medium text-secondary-text">
-                      {brand.name.charAt(0)}
+                      {label.charAt(0)}
                     </span>
                   )}
                 </span>
-                <span className="filter-brand-name">{brand.name}</span>
+                <span className="filter-brand-name">{label}</span>
               </button>
             </li>
           )

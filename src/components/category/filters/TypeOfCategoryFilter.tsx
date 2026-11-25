@@ -2,6 +2,7 @@
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../../lib/cn'
 import type { ApiSubCategory } from '../../../types/catalog'
+import { catalogDisplayName } from '../../../utils/catalogDisplayName'
 import { FilterCheckboxList } from './FilterCheckboxList'
 import { FilterSection } from './FilterSection'
 
@@ -21,10 +22,11 @@ export function TypeOfCategoryFilter({
   loading = false,
   categorySelected = false,
 }: TypeOfCategoryFilterProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const locale = i18n.resolvedLanguage ?? i18n.language
   const options = subcategories.map((subcategory) => ({
     id: subcategory._id,
-    label: subcategory.name,
+    label: catalogDisplayName(subcategory, locale, 'subcategory'),
   }))
 
   const waitingForCategory = !categorySelected

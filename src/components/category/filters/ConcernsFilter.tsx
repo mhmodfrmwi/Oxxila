@@ -1,3 +1,5 @@
+// src/components/category/filters/ConcernsFilter.tsx
+import { useTranslation } from 'react-i18next'
 import { FilterCheckboxList } from './FilterCheckboxList'
 import { concernOptions, concernsCollapsedCount } from './filterOptionsData'
 import { FilterSection } from './FilterSection'
@@ -8,8 +10,9 @@ interface ConcernsFilterProps {
 }
 
 export function ConcernsFilter({ selectedIds, onChange }: ConcernsFilterProps) {
+  const { t } = useTranslation()
   return (
-    <FilterSection title="Concerns">
+    <FilterSection title={t('categoryFilters.sections.concerns')}>
       <FilterCheckboxList
         options={concernOptions}
         selectedIds={selectedIds}

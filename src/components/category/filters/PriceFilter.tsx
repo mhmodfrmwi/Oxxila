@@ -1,11 +1,7 @@
+// src/components/category/filters/PriceFilter.tsx
+import { useTranslation } from 'react-i18next'
 import { FilterSection } from './FilterSection'
 import type { PriceSort } from './filterState'
-
-const priceOptions: { value: PriceSort; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'low-to-high', label: 'Low to high' },
-  { value: 'high-to-low', label: 'High to low' },
-]
 
 interface PriceFilterProps {
   value: PriceSort
@@ -13,8 +9,15 @@ interface PriceFilterProps {
 }
 
 export function PriceFilter({ value, onChange }: PriceFilterProps) {
+  const { t } = useTranslation()
+  const priceOptions: { value: PriceSort; labelKey: string }[] = [
+    { value: 'all', labelKey: 'categoryFilters.priceAll' },
+    { value: 'low-to-high', labelKey: 'categoryFilters.priceLowToHigh' },
+    { value: 'high-to-low', labelKey: 'categoryFilters.priceHighToLow' },
+  ]
+
   return (
-    <FilterSection title="Price">
+    <FilterSection title={t('categoryFilters.sections.price')}>
       <ul className="filter-checkbox-list-items">
         {priceOptions.map((option) => (
           <li key={option.value}>
@@ -27,7 +30,7 @@ export function PriceFilter({ value, onChange }: PriceFilterProps) {
                 onChange={() => onChange(option.value)}
                 className="filter-radio"
               />
-              <span>{option.label}</span>
+              <span>{t(option.labelKey)}</span>
             </label>
           </li>
         ))}

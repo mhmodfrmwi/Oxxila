@@ -10,6 +10,6 @@ export const filterSectionChevronClasses =
 export const filterClearAllClasses =
   'text-[length:calc(var(--font-size-small)*0.8125)] font-normal text-[var(--filter-sidebar-clear)] transition-colors hover:text-primary-text'
 
-/** Sidebar main heading */
+/** Sidebar main heading — Figma Typography/heading6 */
 export const filterSidebarHeadingClasses =
-  'font-serif text-[length:calc(var(--font-size-small)*1.375)] font-medium leading-none text-primary-text'
+  'font-display text-heading-6 font-medium leading-[1.5] text-primary-text'

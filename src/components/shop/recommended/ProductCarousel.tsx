@@ -1,180 +1,122 @@
 // src/components/shop/recommended/ProductCarousel.tsx
-import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useCallback, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CarouselFrame } from '../../carousel/CarouselFrame'
-import { carouselTransition } from '../../carousel/carouselMotion'
 import { cn } from '../../../lib/cn'
-import { focusRingClasses } from '../../ui/interactionStyles'
 import { ProductCard } from './ProductCard'
 import type { RecommendedProduct } from './recommendedProductsData'
-
-const SWIPE_THRESHOLD = 48
-/** Matches Tailwind `gap-5` — keep in sync with track `gap-5` class */
-const TRACK_GAP_PX = 20
 
 interface ProductCarouselProps {
   products: readonly RecommendedProduct[]
   ariaLabel?: string
   className?: string
+  /** Show the small "why recommended" chip on each card. */
+  showReason?: boolean
 }
 
-function CarouselArrow({
-  direction,
-  onClick,
-  disabled,
-  className,
-  label,
-}: {
-  direction: 'prev' | 'next'
-  onClick: () => void
-  disabled: boolean
-  className?: string
-  label: string
-}) {
-  const Icon = direction === 'prev' ? ChevronLeft : ChevronRight
+const arrowClasses = cn(
+  'absolute top-[38%] z-30 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full',
+  'border border-border-subtle bg-card text-foreground shadow-[var(--catalog-card-shadow)]',
+  'transition-[opacity,transform] duration-200 hover:scale-105',
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-button-primary',
+  'disabled:pointer-events-none disabled:opacity-0 md:flex',
+  'dark:border-white/20 dark:shadow-[var(--catalog-card-shadow-dark)]',
+)
 
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      disabled={disabled}
-      onClick={onClick}
-      className={cn(
-        'flex h-11 w-11 items-center justify-center rounded-full sm:h-12 sm:w-12',
-        'bg-button-primary/25 text-primary-text backdrop-blur-[2px]',
-        'transition-[opacity,background-color,transform] duration-300 ease-out',
-        '[@media(hover:hover)]:hover:bg-button-primary/40',
-        focusRingClasses,
-        'disabled:pointer-events-none disabled:opacity-0',
-        'dark:bg-button-primary/30 dark:text-on-emphasis',
-        'dark:[@media(hover:hover)]:hover:bg-button-primary/45',
-        className,
-      )}
-    >
-      <Icon className="h-5 w-5" aria-hidden />
-    </button>
-  )
-}
-
-export function ProductCarousel({ products, ariaLabel, className }: ProductCarouselProps) {
-  const { t } = useTranslation()
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [stepPx, setStepPx] = useState(0)
-  const [maxIndex, setMaxIndex] = useState(0)
-  const viewportRef = useRef<HTMLDivElement>(null)
+/**
+ * Horizontal product rail built on native scroll-snap.
+ *
+ * Native overflow scrolling follows the document direction, so in Arabic the
+ * rail starts on the right and swipes/arrows move the correct way — no
+ * physical-X transform math (the old framer track was forced LTR and broke RTL).
+ */
+export function ProductCarousel({ products, ariaLabel, className, showReason }: ProductCarouselProps) {
+  const { t, i18n } = useTranslation()
+  const isRtl = i18n.dir() === 'rtl'
   const trackRef = useRef<HTMLDivElement>(null)
+  const [canPrev, setCanPrev] = useState(false)
+  const [canNext, setCanNext] = useState(false)
   const resolvedAriaLabel = ariaLabel ?? t('shop.recommended.ariaLabel')
 
-  useLayoutEffect(() => {
-    const viewport = viewportRef.current
+  const updateEdges = useCallback(() => {
     const track = trackRef.current
-    if (!viewport || !track?.firstElementChild) return
+    if (!track) return
+    // scrollLeft is 0 at the start edge and negative toward the end in RTL.
+    const progress = Math.abs(track.scrollLeft)
+    const max = track.scrollWidth - track.clientWidth
+    setCanPrev(progress > 4)
+    setCanNext(max - progress > 4)
+  }, [])
 
-    const update = () => {
-      const card = track.firstElementChild as HTMLElement
-      const cardStep = card.offsetWidth + TRACK_GAP_PX
-      const totalWidth = products.length * cardStep - TRACK_GAP_PX
-      const maxScroll = Math.max(0, totalWidth - viewport.offsetWidth)
-      const steps = cardStep > 0 ? Math.ceil(maxScroll / cardStep) : 0
-
-      setStepPx(cardStep)
-      setMaxIndex(steps)
-      setActiveIndex((current) => Math.min(current, steps))
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+    updateEdges()
+    const observer = new ResizeObserver(updateEdges)
+    observer.observe(track)
+    track.addEventListener('scroll', updateEdges, { passive: true })
+    return () => {
+      observer.disconnect()
+      track.removeEventListener('scroll', updateEdges)
     }
+  }, [updateEdges, products.length, isRtl])
 
-    update()
-    const observer = new ResizeObserver(update)
-    observer.observe(viewport)
-    observer.observe(track.firstElementChild)
-
-    return () => observer.disconnect()
-  }, [products.length])
-
-  const goTo = useCallback(
-    (index: number) => {
-      setActiveIndex(Math.max(0, Math.min(index, maxIndex)))
+  const scrollByPage = useCallback(
+    (direction: 1 | -1) => {
+      const track = trackRef.current
+      if (!track) return
+      const card = track.firstElementChild as HTMLElement | null
+      const step = card ? card.offsetWidth + 16 : track.clientWidth * 0.8
+      const visibleCards = Math.max(1, Math.floor(track.clientWidth / step))
+      const distance = step * visibleCards * direction
+      track.scrollBy({ left: isRtl ? -distance : distance, behavior: 'smooth' })
     },
-    [maxIndex],
+    [isRtl],
   )
-
-  const goPrev = useCallback(() => goTo(activeIndex - 1), [activeIndex, goTo])
-  const goNext = useCallback(() => goTo(activeIndex + 1), [activeIndex, goTo])
 
   if (products.length === 0) return null
 
-  const canScroll = maxIndex > 0
-  const prevLabel = t('shop.carousel.previous')
-  const nextLabel = t('shop.carousel.next')
+  // Physical arrow placement: "previous" sits at the start edge of the reading direction.
+  const PrevIcon = isRtl ? ChevronRight : ChevronLeft
+  const NextIcon = isRtl ? ChevronLeft : ChevronRight
 
   return (
-    <CarouselFrame className={className}>
+    <div className={cn('relative', className)}>
       <div
-        ref={viewportRef}
-        className="overflow-hidden pr-2 sm:pr-4 lg:pr-14"
+        ref={trackRef}
+        className={cn(
+          'flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain scroll-smooth pb-3 sm:gap-4',
+          '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+        )}
+        role="region"
         aria-roledescription="carousel"
         aria-label={resolvedAriaLabel}
       >
-        <motion.div
-          ref={trackRef}
-          className="flex snap-x snap-mandatory gap-5"
-          animate={{ x: -activeIndex * stepPx }}
-          transition={carouselTransition}
-          drag={canScroll ? 'x' : false}
-          dragConstraints={{
-            left: -maxIndex * stepPx,
-            right: 0,
-          }}
-          dragElastic={0.08}
-          onDragEnd={(_, info) => {
-            if (info.offset.x < -SWIPE_THRESHOLD) goNext()
-            else if (info.offset.x > SWIPE_THRESHOLD) goPrev()
-          }}
-        >
-          {products.map((product) => (
-            <div key={product.id} className="shrink-0 snap-start">
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </motion.div>
+        {products.map((product) => (
+          <div key={product.id} className="shrink-0 snap-start">
+            <ProductCard product={product} showReason={showReason} />
+          </div>
+        ))}
       </div>
 
-      {canScroll && (
-        <>
-          <CarouselArrow
-            direction="prev"
-            onClick={goPrev}
-            disabled={activeIndex === 0}
-            label={prevLabel}
-            className="absolute top-[calc(50%-2.5rem)] left-0 z-10 hidden -translate-y-1/2 lg:flex"
-          />
-          <CarouselArrow
-            direction="next"
-            onClick={goNext}
-            disabled={activeIndex >= maxIndex}
-            label={nextLabel}
-            className="absolute top-[calc(50%-2.5rem)] right-0 z-10 -translate-y-1/2"
-          />
-        </>
-      )}
-
-      {canScroll && (
-        <div className="mt-5 flex items-center justify-center gap-3 lg:hidden">
-          <CarouselArrow
-            direction="prev"
-            onClick={goPrev}
-            disabled={activeIndex === 0}
-            label={prevLabel}
-          />
-          <CarouselArrow
-            direction="next"
-            onClick={goNext}
-            disabled={activeIndex >= maxIndex}
-            label={nextLabel}
-          />
-        </div>
-      )}
-    </CarouselFrame>
+      <button
+        type="button"
+        className={cn(arrowClasses, '-start-4')}
+        onClick={() => scrollByPage(-1)}
+        disabled={!canPrev}
+        aria-label={t('common.previous', { defaultValue: 'Previous' })}
+      >
+        <PrevIcon size={20} aria-hidden />
+      </button>
+      <button
+        type="button"
+        className={cn(arrowClasses, '-end-4')}
+        onClick={() => scrollByPage(1)}
+        disabled={!canNext}
+        aria-label={t('common.next', { defaultValue: 'Next' })}
+      >
+        <NextIcon size={20} aria-hidden />
+      </button>
+    </div>
   )
 }

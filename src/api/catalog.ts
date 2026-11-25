@@ -19,7 +19,10 @@ export interface GetProductsParams {
   keyword?: string
   category?: string
   subCategory?: string
+  /** One id or comma-separated ids. */
   brand?: string
+  ratingMin?: number
+  inStock?: boolean
   concerns?: string
   isSensitiveSkin?: boolean
   isCertified?: boolean
@@ -76,6 +79,16 @@ function buildQuery(params?: GetProductsParams) {
 
 export function getProducts(params?: GetProductsParams) {
   return apiRequest<ApiProduct[]>(`/products${buildQuery(params)}`)
+}
+
+/** Related products for a product page (public). */
+export function getRelatedProducts(id: string, limit = 12) {
+  return apiRequest<ApiProduct[]>(`/products/${id}/related?limit=${limit}`)
+}
+
+/** Hydrate product ids (guest browsing history), order preserved. */
+export function getProductsByIds(ids: string[]) {
+  return apiRequest<ApiProduct[]>('/products/by-ids', { method: 'POST', body: { ids } })
 }
 
 export function getProductById(id: string, auth = false) {
@@ -152,5 +165,37 @@ export function deleteReview(reviewId: string) {
   return apiRequest<undefined>(`/reviews/${reviewId}`, {
     method: 'DELETE',
     auth: true,
+  })
+}
+
+export interface SearchSuggestion {
+  id: string
+  slug: string
+  nameEn: string
+  nameAr: string
+  image: string | null
+  price: number
+  priceAfterDiscount: number | null
+  brand: { nameEn: string; nameAr: string } | null
+}
+
+export interface SearchSuggestionEntity {
+  id: string
+  slug?: string
+  nameEn: string
+  nameAr: string
+}
+
+export interface SearchSuggestions {
+  products: SearchSuggestion[]
+  brands: SearchSuggestionEntity[]
+  categories: SearchSuggestionEntity[]
+}
+
+/** Smart suggestions: Arabic-normalized, typo-tolerant. Empty `q` returns popular products. */
+export function getSearchSuggestions(q: string, options?: { signal?: AbortSignal; limit?: number }) {
+  const search = new URLSearchParams({ q, limit: String(options?.limit ?? 6) })
+  return apiRequest<SearchSuggestions>(`/search/suggest?${search.toString()}`, {
+    signal: options?.signal,
   })
 }

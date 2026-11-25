@@ -2,41 +2,44 @@
  * Filter sidebar design tokens — scoped to category-filters.css
  * Light/dark values match Figma filter sidebar frames.
  */
+/* Figma 1446:18637 — section cards use page background; chips use card surface */
 [data-theme='light'] {
-  --filter-section-bg: #f8f9ff;
-  --filter-chip-bg: #ffffff;
-  --filter-sidebar-clear: #9491b8;
+  --filter-section-bg: var(--background);
+  --filter-chip-bg: var(--card-background);
+  --filter-sidebar-clear: var(--secondary-text);
+  --filter-control-size: 1.25rem; /* 20px checkbox/radio */
 }
 
 [data-theme='dark'] {
-  --filter-section-bg: #252538;
-  --filter-chip-bg: #2f2d40;
-  --filter-sidebar-clear: #c0b5de;
+  --filter-section-bg: var(--background);
+  --filter-chip-bg: var(--card-background);
+  --filter-sidebar-clear: var(--secondary-text);
+  --filter-control-size: 1.25rem;
 }
 
-/* Vertical rhythm between filter groups */
+/* Vertical rhythm between filter groups — Figma gap 16px */
 .filter-sidebar-groups {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--gap-small);
 }
 
-/* Accordion section card */
+/* Accordion section card — Figma rounded-small + 16px pad */
 .filter-section-card {
-  border-radius: 1rem;
+  border-radius: var(--corner-small);
   background-color: var(--filter-section-bg);
-  padding: 1rem 1.125rem;
+  padding: var(--gap-small);
 }
 
 .filter-section-header {
   display: flex;
   width: 100%;
-  min-height: 1.5rem;
+  min-height: 2.75rem; /* ≥44px touch */
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   border-radius: 0.25rem;
-  text-align: left;
+  text-align: start;
 }
 
 .filter-section-panel {
@@ -82,10 +85,10 @@
   -webkit-appearance: none;
   appearance: none;
   flex-shrink: 0;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 9999px;
-  border: 1px solid var(--border-subtle);
+  width: var(--filter-control-size);
+  height: var(--filter-control-size);
+  border-radius: 6px;
+  border: 1px solid var(--secondary-text);
   background-color: transparent;
   cursor: pointer;
   transition:
@@ -116,10 +119,10 @@
   -webkit-appearance: none;
   appearance: none;
   flex-shrink: 0;
-  width: 1rem;
-  height: 1rem;
+  width: var(--filter-control-size);
+  height: var(--filter-control-size);
   border-radius: 9999px;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--secondary-text);
   background-color: transparent;
   cursor: pointer;
   transition:
@@ -213,8 +216,9 @@
   border-radius: 0.375rem;
   border: 1px solid var(--border-subtle);
   background-color: var(--filter-chip-bg);
-  padding: 0.375rem 0.625rem 0.375rem 0.375rem;
-  text-align: left;
+  padding-block: 0.375rem;
+  padding-inline: 0.375rem 0.625rem;
+  text-align: start;
   transition:
     border-color 0.2s ease,
     background-color 0.2s ease;
