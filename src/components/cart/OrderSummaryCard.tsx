@@ -219,6 +219,18 @@ export function OrderSummaryCard({
           }
           value={formatCartPrice(subtotal)}
         />
+        {/* A placed order keeps the code it used, so show it even when it only waived shipping. */}
+        {(isReview || isConfirmation) && cart.couponCode && (
+          <SummaryRow
+            label={t('cart.summary.couponCode')}
+            value={
+              <span className="cart-summary-coupon-chip" dir="ltr">
+                <Ticket size={13} strokeWidth={2} aria-hidden />
+                {cart.couponCode}
+              </span>
+            }
+          />
+        )}
         {discountAmount > 0 && (
           <SummaryRow
             label={

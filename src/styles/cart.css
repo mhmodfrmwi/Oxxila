@@ -691,3 +691,19 @@ h1.cart-page-title {
     font-size: 0.8125rem;
   }
 }
+
+/* Applied coupon code shown in the summary of a placed order */
+.cart-summary-coupon-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--support-success) 16%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--support-success) 55%, transparent);
+  color: var(--support-success);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

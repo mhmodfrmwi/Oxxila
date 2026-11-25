@@ -733,6 +733,7 @@
       "estimatedTax": "Estimated Tax",
       "storeCredit": "Store credit",
       "returnCredit": "Return Credit",
+      "couponCode": "Coupon",
       "total": "Total",
       "promoCode": "Promo code",
       "promoPlaceholder": "Promo Code",
