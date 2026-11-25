@@ -8,11 +8,7 @@ import {
   type EnabledPaymentGateway,
   type PaymentGatewayCode,
 } from '../api/orders'
-import {
-  createMyAddress,
-  getUserProfile,
-  type CreateAddressPayload,
-} from '../api/users'
+import { getUserProfile } from '../api/users'
 import {
   getShippingCountries,
   getShippingGovernorates,
@@ -48,13 +44,18 @@ function sortEnabledMethods(gateways: EnabledPaymentGateway[]): PaymentMethodId[
 
 export interface NewAddressFormState {
   label: string
+  /** Delivery phone for this order/address (prefilled from the account, editable). */
+  phone: string
   governorateId: string
   districtId: string
   addressLine: string
+  /** Save to the address book — on by default so the next order is one click. */
+  saveAddress: boolean
 }
 
 export interface NewAddressFormErrors {
   label?: string
+  phone?: string
   governorateId?: string
   districtId?: string
   addressLine?: string
@@ -62,9 +63,17 @@ export interface NewAddressFormErrors {
 
 const emptyNewAddressForm: NewAddressFormState = {
   label: '',
+  phone: '',
   governorateId: '',
   districtId: '',
   addressLine: '',
+  saveAddress: true,
+}
+
+/** 8–15 digits with an optional leading + / 00 (matches the API validator). */
+const PHONE_PATTERN = /^(\+|00)?\d{8,15}$/
+function isValidPhone(value: string): boolean {
+  return PHONE_PATTERN.test(value.replace(/[\s\-().]/g, ''))
 }
 
 function validateNewAddressForm(
@@ -73,6 +82,11 @@ function validateNewAddressForm(
   t: (key: string) => string,
 ): NewAddressFormErrors {
   const errors: NewAddressFormErrors = {}
+  if (!form.phone.trim()) {
+    errors.phone = t('checkout.payment.phoneRequired')
+  } else if (!isValidPhone(form.phone)) {
+    errors.phone = t('checkout.payment.phoneInvalid')
+  }
   if (!form.governorateId.trim()) {
     errors.governorateId = t('checkout.payment.governmentRequired')
   }
@@ -108,7 +122,7 @@ function resolveDistrictIdForShipping(address: {
 }
 
 export function usePaymentPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const toast = useToast()
@@ -132,7 +146,8 @@ export function usePaymentPage() {
     refreshAddresses,
   } = useCartAddresses()
 
-  const [phone, setPhone] = useState('')
+  // Account phone — only used to prefill the new-address form.
+  const [profilePhone, setProfilePhone] = useState('')
   const [governorates, setGovernorates] = useState<ShippingGovernorate[]>([])
   const [districts, setDistricts] = useState<ShippingDistrict[]>([])
   const [hasDistricts, setHasDistricts] = useState(true)
@@ -141,7 +156,6 @@ export function usePaymentPage() {
   const [showNewAddressForm, setShowNewAddressForm] = useState(false)
   const [newAddressForm, setNewAddressForm] = useState<NewAddressFormState>(emptyNewAddressForm)
   const [newAddressErrors, setNewAddressErrors] = useState<NewAddressFormErrors>({})
-  const [savingAddress, setSavingAddress] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId | null>(null)
   const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<PaymentMethodId[]>([])
   const [pageLoading, setPageLoading] = useState(true)
@@ -171,7 +185,7 @@ export function usePaymentPage() {
         if (cancelled) return
 
         if (profileResult.status === 'fulfilled') {
-          setPhone(profileResult.value.data?.phone ?? '')
+          setProfilePhone(profileResult.value.data?.phone ?? '')
         }
 
         if (gatewaysResult.status === 'fulfilled') {
@@ -222,21 +236,29 @@ export function usePaymentPage() {
     }
   }, [isAuthenticated])
 
+  // Shipping is priced from the chosen saved address, or from the form's zone while adding a new one.
+  const shippingGovernorateId = showNewAddressForm
+    ? newAddressForm.governorateId
+    : (selectedAddress?.governorate.id ?? '')
+  const shippingDistrictId = showNewAddressForm
+    ? newAddressForm.districtId
+    : selectedAddress
+      ? resolveDistrictIdForShipping(selectedAddress)
+      : ''
+
   useEffect(() => {
-    if (!selectedAddress) {
+    if (!shippingGovernorateId || !shippingDistrictId) {
       setShippingPrice(null)
       setShippingLoading(false)
       return
     }
 
     let cancelled = false
-    const governorateId = selectedAddress.governorate.id
-    const districtId = resolveDistrictIdForShipping(selectedAddress)
 
     async function loadShipping() {
       setShippingLoading(true)
       try {
-        const response = await resolveShippingPrice(governorateId, districtId)
+        const response = await resolveShippingPrice(shippingGovernorateId, shippingDistrictId)
         if (cancelled) return
         const price = response.data?.shippingPrice
         setShippingPrice(typeof price === 'number' ? price : null)
@@ -252,7 +274,7 @@ export function usePaymentPage() {
     return () => {
       cancelled = true
     }
-  }, [selectedAddress])
+  }, [shippingGovernorateId, shippingDistrictId])
 
   function selectAddress(addressId: string) {
     setSelectedAddressId(addressId)
@@ -265,7 +287,7 @@ export function usePaymentPage() {
   function openNewAddressForm() {
     setShowNewAddressForm(true)
     setSelectedAddressId(null)
-    setNewAddressForm(emptyNewAddressForm)
+    setNewAddressForm({ ...emptyNewAddressForm, phone: profilePhone })
     setNewAddressErrors({})
     setDistricts([])
     setHasDistricts(true)
@@ -290,6 +312,12 @@ export function usePaymentPage() {
     if (addressLoading || addressLoadError) return
     if (addresses.length === 0) setShowNewAddressForm(true)
   }, [addressLoading, addressLoadError, addresses.length])
+
+  // Prefill the form phone from the account once it is known (never overwrites typing).
+  useEffect(() => {
+    if (!profilePhone) return
+    setNewAddressForm((current) => (current.phone ? current : { ...current, phone: profilePhone }))
+  }, [profilePhone])
 
   function updateNewAddressField<K extends keyof NewAddressFormState>(
     key: K,
@@ -361,65 +389,48 @@ export function usePaymentPage() {
     }
   }, [showNewAddressForm, newAddressForm.governorateId, t])
 
-  async function handleCreateAddress() {
-    if (zonesError) {
-      setSubmitError(zonesError)
-      toast.error(t('checkout.payment.paymentFailed'), zonesError)
-      return
-    }
-
-    const validation = validateNewAddressForm(newAddressForm, hasDistricts, t)
-    if (Object.keys(validation).length > 0) {
-      setNewAddressErrors(validation)
-      toast.error(t('checkout.payment.invalidForm'), t('checkout.payment.completeBilling'))
-      return
-    }
-
-    if (zonesLoading) {
-      toast.error(t('checkout.payment.paymentFailed'), t('checkout.payment.loadingShipping'))
-      return
-    }
-
-    const payload: CreateAddressPayload = {
-      governorateId: newAddressForm.governorateId.trim(),
-      districtId: newAddressForm.districtId.trim() || 'other',
-      addressLine: newAddressForm.addressLine.trim(),
-      label: newAddressForm.label.trim() || undefined,
-    }
-
-    setSavingAddress(true)
-    setSubmitError(null)
-    try {
-      const response = await createMyAddress(payload)
-      const created = response.data?.address
-      await refreshAddresses()
-      if (created?._id) {
-        setSelectedAddressId(created._id)
-      }
-      setShowNewAddressForm(false)
-      setNewAddressForm(emptyNewAddressForm)
-      toast.success(t('checkout.address.toastAdded'))
-    } catch (error) {
-      const message =
-        error instanceof ApiError ? error.message : t('checkout.address.unableToSave')
-      setSubmitError(message)
-      toast.error(t('checkout.address.unableToSave'), message)
-    } finally {
-      setSavingAddress(false)
-    }
-  }
-
   async function handlePayNow() {
     if (submittingRef.current) return
 
     setSubmitError(null)
 
-    if (!selectedAddressId) {
-      toast.error(
-        t('checkout.payment.invalidForm'),
-        t('checkout.payment.selectAddressRequired'),
-      )
-      return
+    // Saved address → send its id; new address → validate and send it inline with the order.
+    let addressPayload:
+      | { addressId: string }
+      | {
+          governorateId: string
+          districtId: string
+          addressLine: string
+          phone: string
+          saveAddress: boolean
+          label?: string
+        }
+    if (showNewAddressForm || !selectedAddressId) {
+      if (zonesError) {
+        setSubmitError(zonesError)
+        toast.error(t('checkout.payment.paymentFailed'), zonesError)
+        return
+      }
+      const validation = validateNewAddressForm(newAddressForm, hasDistricts, t)
+      if (Object.keys(validation).length > 0) {
+        setNewAddressErrors(validation)
+        toast.error(t('checkout.payment.invalidForm'), t('checkout.payment.completeBilling'))
+        return
+      }
+      if (zonesLoading) {
+        toast.error(t('checkout.payment.paymentFailed'), t('checkout.payment.loadingShipping'))
+        return
+      }
+      addressPayload = {
+        governorateId: newAddressForm.governorateId.trim(),
+        districtId: newAddressForm.districtId.trim() || 'other',
+        addressLine: newAddressForm.addressLine.trim(),
+        phone: newAddressForm.phone.replace(/[\s\-().]/g, ''),
+        saveAddress: newAddressForm.saveAddress,
+        label: newAddressForm.label.trim() || undefined,
+      }
+    } else {
+      addressPayload = { addressId: selectedAddressId }
     }
 
     if (!paymentMethod) {
@@ -431,15 +442,13 @@ export function usePaymentPage() {
     }
 
     const provider = resolveProvider(paymentMethod)
+    const locale = i18n.language.startsWith('en') ? ('en' as const) : ('ar' as const)
 
     submittingRef.current = true
     setSubmitting(true)
     try {
       if (provider === 'cod') {
-        const response = await createCodOrder({
-          paymentMethod: 'cod',
-          addressId: selectedAddressId,
-        })
+        const response = await createCodOrder({ paymentMethod: 'cod', locale, ...addressPayload })
         const created = response.data
         if (created?._id) {
           toast.success(t('checkout.payment.orderPlaced'))
@@ -450,10 +459,7 @@ export function usePaymentPage() {
         return
       }
 
-      const response = await createPaymentSession({
-        provider,
-        addressId: selectedAddressId,
-      })
+      const response = await createPaymentSession({ provider, locale, ...addressPayload })
       const paymentSessionId = String(response.data?.paymentSessionId ?? '').trim()
       const checkoutUrl = response.data?.url?.trim() || ''
       if (!paymentSessionId || !checkoutUrl) {
@@ -496,7 +502,7 @@ export function usePaymentPage() {
     couponLoading,
     applyCoupon,
     removeCoupon,
-    phone,
+    profilePhone,
     addresses,
     selectedAddressId,
     selectedAddress,
@@ -511,8 +517,6 @@ export function usePaymentPage() {
     newAddressForm,
     newAddressErrors,
     updateNewAddressField,
-    handleCreateAddress,
-    savingAddress,
     governorates,
     districts,
     hasDistricts,

@@ -1,4 +1,5 @@
-import { Check, Loader2, X } from 'lucide-react'
+import { BrandLoader } from '../ui/BrandLoader'
+import { Check, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatCartPrice } from '../../utils/formatProductPrice'
 import { formatOrderReferenceId } from '../../utils/orderFormat'
@@ -6,16 +7,6 @@ import type { PaymentCallbackStatus } from '../../hooks/usePaymentCallbackPage'
 import type { ApiOrder } from '../../types/order'
 import { Button } from '../ui/Button'
 import { CheckoutStepper } from './CheckoutStepper'
-
-function LoadingDots() {
-  return (
-    <div className="payment-callback-dots" aria-hidden>
-      <span className="payment-callback-dot payment-callback-dot--active" />
-      <span className="payment-callback-dot" />
-      <span className="payment-callback-dot" />
-    </div>
-  )
-}
 
 interface PaymentCallbackViewProps {
   status: PaymentCallbackStatus
@@ -55,15 +46,8 @@ export function PaymentCallbackView({
       >
         {status === 'loading' && (
           <div className="payment-callback-state">
-            <Loader2
-              className="payment-callback-spinner"
-              size={48}
-              strokeWidth={1.5}
-              aria-hidden
-            />
-            <h1 className="payment-callback-title">{t('checkout.callback.verifyingTitle')}</h1>
+            <BrandLoader size="inline" message={t('checkout.callback.verifyingTitle')} />
             <p className="payment-callback-message">{t('checkout.callback.verifyingMessage')}</p>
-            <LoadingDots />
             {sessionId && (
               <p className="payment-callback-session">{t('checkout.callback.session', { sessionId })}</p>
             )}

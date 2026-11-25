@@ -7,6 +7,10 @@ interface PaymentMethodCardProps {
   selected: boolean
   onSelect: () => void
   label: string
+  /** Short helper line under the label (e.g. "Visa & Mastercard"). */
+  hint?: string
+  /** Drives the accent colour of the icon chip. */
+  method?: 'stripe' | 'paymob' | 'cod'
   icon?: ReactNode
   className?: string
 }
@@ -15,6 +19,8 @@ export function PaymentMethodCard({
   selected,
   onSelect,
   label,
+  hint,
+  method,
   icon,
   className,
 }: PaymentMethodCardProps) {
@@ -27,16 +33,21 @@ export function PaymentMethodCard({
         focusRingClasses,
         className,
       )}
+      data-method={method}
       onClick={onSelect}
-      aria-pressed={selected}
+      role="radio"
+      aria-checked={selected}
     >
-      <span className="payment-method-card-radio" aria-hidden />
       {icon ? (
         <span className="payment-method-card-icon" aria-hidden>
           {icon}
         </span>
       ) : null}
-      <span className="payment-method-card-label">{label}</span>
+      <span className="payment-method-card-text">
+        <span className="payment-method-card-label">{label}</span>
+        {hint ? <span className="payment-method-card-hint">{hint}</span> : null}
+      </span>
+      <span className="payment-method-card-radio" aria-hidden />
     </button>
   )
 }

@@ -11,7 +11,7 @@ interface OrderPageHeaderProps {
 }
 
 export function OrderPageHeader({ order, trackingNumber, className }: OrderPageHeaderProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   return (
     <header className={cn('track-order-header', className)}>
@@ -20,7 +20,7 @@ export function OrderPageHeader({ order, trackingNumber, className }: OrderPageH
           {t('checkout.track.orderHash', { id: formatOrderReferenceId(order) })}
         </h1>
         <p className="track-order-date">
-          {t('checkout.track.placedOn', { date: formatOrderDate(order.createdAt) })}
+          {t('checkout.track.placedOn', { date: formatOrderDate(order.createdAt, i18n.language) })}
         </p>
       </div>
 
@@ -37,7 +37,7 @@ export function OrderPageHeader({ order, trackingNumber, className }: OrderPageH
           <span className="track-order-header-meta-label">
             {t('checkout.track.currentStatus')}
           </span>
-          <span className="track-order-status-badge">{order.orderStatusLabel}</span>
+          <span className="track-order-status-badge">{t(`checkout.track.status.${order.orderStatus}`, { defaultValue: order.orderStatusLabel })}</span>
         </div>
       </div>
     </header>

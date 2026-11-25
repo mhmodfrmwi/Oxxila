@@ -28,11 +28,17 @@ export interface ApiInstagramPost {
 export interface ApiHowItWorksStep {
   index: number
   title: string
+  titleEn?: string
+  titleAr?: string
   description: string
+  descriptionEn?: string
+  descriptionAr?: string
 }
 
 export interface ApiHowItWorksSettings {
   title: string
+  titleEn?: string
+  titleAr?: string
   thumbnailImage: string
   videoUrl: string
   steps: ApiHowItWorksStep[]
@@ -41,7 +47,11 @@ export interface ApiHowItWorksSettings {
 export interface ApiUtilityBarPromo {
   index?: number
   title: string
+  titleEn?: string
+  titleAr?: string
   subtitle: string
+  subtitleEn?: string
+  subtitleAr?: string
 }
 
 export interface ApiUtilityBarSettings {
@@ -115,15 +125,26 @@ export function getHowItWorksSettings() {
 export function updateHowItWorksSettings(
   payload: {
     title?: string
+    titleEn?: string
+    titleAr?: string
     videoUrl?: string
     thumbnailImage?: string
-    steps?: Array<{ title: string; description: string }>
+    steps?: Array<{
+      title?: string
+      titleEn?: string
+      titleAr?: string
+      description?: string
+      descriptionEn?: string
+      descriptionAr?: string
+    }>
   },
   thumbnailFile?: File | null,
 ) {
   if (thumbnailFile) {
     const body = new FormData()
-    if (payload.title !== undefined) body.append('title', payload.title)
+    if (payload.titleEn !== undefined) body.append('titleEn', payload.titleEn)
+    else if (payload.title !== undefined) body.append('title', payload.title)
+    if (payload.titleAr !== undefined) body.append('titleAr', payload.titleAr)
     if (payload.videoUrl !== undefined) body.append('videoUrl', payload.videoUrl)
     body.append('steps', JSON.stringify(payload.steps ?? []))
     body.append('thumbnailImage', thumbnailFile)
@@ -224,5 +245,25 @@ export function updateContentPage(
     method: 'PUT',
     auth: true,
     body: payload,
+  })
+}
+
+export interface ApiDeliverySettings {
+  messageEn: string
+  messageAr: string
+  minDays: number
+  maxDays: number
+}
+
+/** General delivery-time note (public) — shown on confirmation/tracking; editable in the dashboard. */
+export function getDeliverySettings() {
+  return apiRequest<ApiDeliverySettings>('/settings/delivery')
+}
+
+export function updateDeliverySettings(body: Partial<ApiDeliverySettings>) {
+  return apiRequest<ApiDeliverySettings>('/settings/delivery', {
+    method: 'PUT',
+    auth: true,
+    body,
   })
 }

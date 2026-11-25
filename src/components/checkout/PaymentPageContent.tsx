@@ -2,7 +2,8 @@
 import { ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router-dom'
-import { CART_PATH } from '../../config/routes'
+import { CART_PATH, PAYMENT_PATH } from '../../config/routes'
+import { rememberReturnTo } from '../../utils/authReturnTo'
 import { usePaymentPage } from '../../hooks/usePaymentPage'
 import { cn } from '../../lib/cn'
 import { OrderSummaryCard } from '../cart/OrderSummaryCard'
@@ -39,7 +40,6 @@ export function PaymentPageContent() {
     couponLoading,
     applyCoupon,
     removeCoupon,
-    phone,
     addresses,
     selectedAddressId,
     addressLoading,
@@ -48,12 +48,9 @@ export function PaymentPageContent() {
     selectAddress,
     showNewAddressForm,
     openNewAddressForm,
-    showSavedAddresses,
     newAddressForm,
     newAddressErrors,
     updateNewAddressField,
-    handleCreateAddress,
-    savingAddress,
     governorates,
     districts,
     hasDistricts,
@@ -70,7 +67,9 @@ export function PaymentPageContent() {
   } = usePaymentPage()
 
   if (!isAuthenticated) {
-    return <Navigate to={loginPath} replace />
+    // Come back here after sign-in; the guest cart merges into the account on login.
+    rememberReturnTo(PAYMENT_PATH)
+    return <Navigate to={loginPath} replace state={{ from: PAYMENT_PATH, reason: 'checkout' }} />
   }
 
   if (!cartLoading && !cartLoadError && cart && cart.items.length === 0) {
@@ -78,10 +77,18 @@ export function PaymentPageContent() {
   }
 
   const loading = cartLoading || pageLoading
-  const payableTotal =
-    cart && typeof shippingPrice === 'number'
-      ? cart.totalPrice + shippingPrice
-      : undefined
+  // The server applies store credit AFTER shipping, so recompute with shipping included
+  // (cart.totalPrice only knows the pre-shipping credit and over-charges when credit is large).
+  const effectiveShipping = cart?.freeShipping ? 0 : shippingPrice
+  const summaryCart =
+    cart && typeof effectiveShipping === 'number'
+      ? (() => {
+          const base = Math.max(0, cart.subtotal - (cart.discountAmount ?? 0) + effectiveShipping)
+          const credit = Math.min(cart.storeCreditBalance ?? 0, base)
+          return { ...cart, storeCreditApplied: credit, totalPrice: Math.max(0, base - credit) }
+        })()
+      : cart
+  const payableTotal = summaryCart && typeof effectiveShipping === 'number' ? summaryCart.totalPrice : undefined
 
   return (
     <>
@@ -96,7 +103,7 @@ export function PaymentPageContent() {
         </button>
 
         <header className="payment-page-header">
-          <Heading variant="page" className="font-serif">
+          <Heading variant="page">
             {t('checkout.payment.title')}
           </Heading>
         </header>
@@ -128,7 +135,6 @@ export function PaymentPageContent() {
             <div className="grid gap-8 payment-layout lg:items-start lg:gap-10">
               <div className="min-w-0">
                 <PaymentMethodSection
-                  phone={phone}
                   addresses={addresses}
                   selectedAddressId={selectedAddressId}
                   addressLoading={addressLoading}
@@ -137,12 +143,9 @@ export function PaymentPageContent() {
                   selectAddress={selectAddress}
                   showNewAddressForm={showNewAddressForm}
                   openNewAddressForm={openNewAddressForm}
-                  showSavedAddresses={showSavedAddresses}
                   newAddressForm={newAddressForm}
                   newAddressErrors={newAddressErrors}
                   updateNewAddressField={updateNewAddressField}
-                  handleCreateAddress={handleCreateAddress}
-                  savingAddress={savingAddress}
                   governorates={governorates}
                   districts={districts}
                   hasDistricts={hasDistricts}
@@ -163,18 +166,18 @@ export function PaymentPageContent() {
               </div>
 
               <OrderSummaryCard
-                cart={cart}
+                cart={summaryCart ?? cart}
                 mode="review"
                 className="payment-order-summary"
-                shippingPrice={shippingPrice}
+                shippingPrice={effectiveShipping}
                 totalPrice={payableTotal}
                 couponLoading={couponLoading}
                 onApplyCoupon={applyCoupon}
                 onRemoveCoupon={removeCoupon}
                 ctaLabel={t('cart.summary.payNow')}
                 onCtaClick={() => void handlePayNow()}
-                ctaDisabled={submitting || !selectedAddressId || !paymentMethod}
-                showPromo={false}
+                ctaDisabled={submitting || !(selectedAddressId || showNewAddressForm) || !paymentMethod}
+                showPromo
                 trustBadgeVariant="payment"
                 footerNote={t('checkout.payment.securityNote')}
               />

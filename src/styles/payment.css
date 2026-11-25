@@ -263,6 +263,11 @@
   background: var(--card-background);
 }
 
+/* Selects: leave room for the chevron on the END side (left in RTL) so it never overlaps the text */
+.payment-billing-fields select {
+  padding-inline: 0.875rem 2.75rem;
+}
+
 .payment-billing-fields textarea.payment-field-textarea {
   min-height: 5.25rem;
   padding-block: 0.75rem;
@@ -280,57 +285,41 @@
 .payment-method-options {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.625rem;
 }
 
 .payment-method-card {
+  --method-color: var(--primary-button);
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.875rem;
   width: 100%;
-  min-height: 2.75rem;
+  min-height: 3.75rem;
   height: auto;
-  padding: 0.65rem 0.9rem;
-  border-radius: 0.875rem;
-  border: 1px solid var(--border-subtle);
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  border: 1.5px solid var(--border-subtle);
   background: var(--card-background);
   text-align: start;
   cursor: pointer;
   box-shadow: none;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* One accent per method so they are recognisable at a glance */
+.payment-method-card[data-method='stripe'] { --method-color: #635bff; }
+.payment-method-card[data-method='paymob'] { --method-color: #0f9fbf; }
+.payment-method-card[data-method='cod'] { --method-color: var(--support-success); }
+
 .payment-method-card:hover {
-  border-color: color-mix(in srgb, var(--primary-button) 35%, var(--border-subtle));
-  box-shadow: none;
+  border-color: color-mix(in srgb, var(--method-color) 45%, var(--border-subtle));
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--method-color) 12%, transparent);
 }
 
 .payment-method-card--selected {
-  border-color: var(--primary-button);
-  background: color-mix(in srgb, var(--primary-button) 8%, var(--card-background));
-  box-shadow: none;
-}
-
-.payment-method-card-radio {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
-  border-radius: 9999px;
-  border: 1.5px solid var(--border-subtle);
-  background: var(--card-background);
-  position: relative;
-}
-
-.payment-method-card--selected .payment-method-card-radio {
-  border-color: var(--primary-button);
-}
-
-.payment-method-card--selected .payment-method-card-radio::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  border-radius: 9999px;
-  background: var(--primary-button);
+  border-color: var(--method-color);
+  background: color-mix(in srgb, var(--method-color) 7%, var(--card-background));
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--method-color) 16%, transparent);
 }
 
 .payment-method-card-icon {
@@ -338,29 +327,66 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.625rem;
-  background: color-mix(in srgb, var(--primary-button) 10%, transparent);
-  color: var(--secondary-text);
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.875rem;
+  background: color-mix(in srgb, var(--method-color) 13%, transparent);
+  color: var(--method-color);
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .payment-method-card-icon svg {
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 1.375rem;
+  height: 1.375rem;
 }
 
 .payment-method-card--selected .payment-method-card-icon {
-  background: color-mix(in srgb, var(--primary-button) 16%, transparent);
-  color: var(--primary-button);
+  background: var(--method-color);
+  color: #fff;
+}
+
+.payment-method-card-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .payment-method-card-label {
-  font-family: var(--font-family-serif, var(--font-family-base));
-  font-size: 0.875rem;
-  font-weight: var(--font-weight-medium);
-  line-height: 1.2;
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.25;
   color: var(--primary-text);
+}
+
+.payment-method-card-hint {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--secondary-text);
+}
+
+.payment-method-card-radio {
+  position: relative;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1.5px solid color-mix(in srgb, var(--secondary-text) 55%, transparent);
+  background: var(--card-background);
+  transition: border-color 0.2s ease;
+}
+
+.payment-method-card--selected .payment-method-card-radio {
+  border-color: var(--method-color);
+}
+
+.payment-method-card--selected .payment-method-card-radio::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 9999px;
+  background: var(--method-color);
 }
 
 .payment-billing-checkbox {
@@ -415,14 +441,23 @@
   }
 }
 
+/* ---------- Order review card (checkout) ---------- */
+.payment-order-items {
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
 .payment-review-item {
   display: grid;
-  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
-  gap: 0.625rem;
-  align-items: start;
-  padding: 0.625rem 0;
+  grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
   border-bottom: 1px solid var(--border-subtle);
 }
+
+.payment-review-item:first-child { padding-top: 0; }
 
 .payment-review-item:last-child {
   border-bottom: none;
@@ -430,53 +465,50 @@
 }
 
 .payment-review-item-image {
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 0.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 12px;
   object-fit: cover;
-  border: 1px solid var(--border-subtle);
-  background: var(--surface-muted);
+  background: #fff;
 }
 
 .payment-review-item-name {
-  font-family: var(--font-family-serif, var(--font-family-base));
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: var(--font-weight-medium);
   line-height: 1.35;
   color: var(--primary-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .payment-review-item-qty {
-  margin-top: 0.125rem;
-  font-size: 0.6875rem;
+  margin-top: 2px;
+  font-size: 0.75rem;
   line-height: 1.3;
   color: var(--secondary-text);
 }
 
 .payment-review-item-price {
-  font-family: var(--font-family-serif, var(--font-family-base));
-  font-size: 0.8125rem;
-  font-weight: var(--font-weight-medium);
-  line-height: 1.3;
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
   color: var(--primary-text);
   white-space: nowrap;
-  padding-top: 0.125rem;
 }
 
 .payment-pay-btn {
-  min-height: 3rem;
-  height: 3rem;
+  min-height: 3.25rem;
+  height: 3.25rem;
   padding-inline: 1.25rem;
-  font-family: var(--font-family-serif, var(--font-family-base));
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: var(--font-weight-medium);
   letter-spacing: 0;
 }
 
 .payment-order-summary.cart-summary-card {
-  border-radius: 1.375rem;
-  padding: 1.25rem 1.125rem 1.375rem;
-  box-shadow: 0 6px 24px rgb(93 90 136 / 0.08);
+  padding: 22px;
 }
 
 @media (min-width: 1024px) {
@@ -485,87 +517,64 @@
   }
 }
 
-[data-theme='dark'] .payment-order-summary.cart-summary-card {
-  box-shadow: 0 4px 24px rgb(0 0 0 / 0.25);
-}
-
 .payment-order-summary-title {
-  margin-bottom: 0.875rem;
-  font-size: 1.0625rem;
-  line-height: 1.2;
+  margin-bottom: 16px;
+  font-size: 1.125rem;
+  line-height: 1.3;
   color: var(--primary-text);
-}
-
-.payment-order-items {
-  margin: 0 0 0.75rem;
-  padding: 0;
-  list-style: none;
 }
 
 .payment-order-summary-rows {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-}
-
-.payment-order-summary-rows .cart-summary-row {
-  font-size: 0.8125rem;
-  line-height: 1.3;
+  gap: 10px;
 }
 
 .payment-order-summary .cart-summary-divider {
-  margin: 0.75rem 0;
+  margin: 16px 0;
 }
 
 .payment-order-summary-total {
-  align-items: center;
-}
-
-.payment-order-summary .cart-summary-total-label {
-  font-size: 1.0625rem;
-  line-height: 1.2;
-}
-
-.payment-order-summary .cart-summary-total-value {
-  font-size: 1.125rem;
-  font-weight: var(--font-weight-semibold);
-  color: var(--primary-button);
+  align-items: baseline;
 }
 
 .payment-order-summary .payment-pay-btn {
-  margin-top: 0.875rem;
+  margin-top: 18px;
 }
 
-.payment-order-trust-badges {
-  margin-top: 0.75rem;
-  gap: 0.5rem;
+/* Trust badges: a tidy row of three (icon over label) instead of a tall stack */
+.payment-order-summary .payment-order-trust-badges {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
 }
 
-.payment-security-note {
-  margin-top: 0.625rem;
-  font-family: var(--font-family-serif, var(--font-family-base));
-  font-size: 0.625rem;
-  line-height: 1.45;
+.payment-order-summary .payment-trust-badge {
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
   text-align: center;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--secondary-text);
 }
 
-.payment-trust-badge {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.375rem;
-  text-align: center;
-  font-size: 0.5rem;
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--primary-link);
+.payment-order-summary .cart-trust-badge-icon {
+  padding: 6px;
 }
 
-.payment-trust-badge svg {
-  width: 1rem;
-  height: 1rem;
+.payment-security-note {
+  margin-top: 14px;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--secondary-text);
 }
 
 @media (min-width: 1024px) {

@@ -44,7 +44,9 @@ export function TrackOrderPageContent() {
     error,
     actionError,
     canCancel,
+    canReturn,
     handleCancelOrder,
+    handleReturnOrder,
     handleContinueShopping,
   } = useTrackOrderPage()
 
@@ -103,8 +105,22 @@ export function TrackOrderPageContent() {
                 <OrderShippingInfoCard
                   order={order}
                   recipientName={customerName || t('checkout.confirmation.customer')}
-                  phone={customerPhone}
+                  // The phone typed at checkout for this order; older orders fall back to the account phone.
+                  phone={order.shippingAddress.phone || customerPhone}
                 />
+
+                {/* One action at a time: Cancel until it ships, Return after delivery (within the window). */}
+                {canReturn && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    fullWidth
+                    className="track-order-cancel-btn"
+                    onClick={handleReturnOrder}
+                  >
+                    {t('checkout.track.returnOrder')}
+                  </Button>
+                )}
 
                 {canCancel && (
                   <Button

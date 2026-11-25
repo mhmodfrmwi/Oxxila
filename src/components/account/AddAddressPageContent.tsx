@@ -146,6 +146,18 @@ export function AddAddressPageContent() {
                 placeholder={t('checkout.address.labelPlaceholder')}
                 error={errors.label}
               />
+              <InputField
+                label={t('checkout.payment.phoneLabel')}
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                dir="ltr"
+                value={form.phone}
+                onChange={(event) => updateField('phone', event.target.value)}
+                placeholder={t('checkout.payment.phonePlaceholder')}
+                error={errors.phone}
+              />
 
               <SelectField
                 label={t('checkout.address.government')}

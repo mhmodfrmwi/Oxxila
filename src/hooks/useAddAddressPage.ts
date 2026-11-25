@@ -26,6 +26,8 @@ import { zoneRefId } from '../utils/userAddress'
 
 export interface AddressFormState {
   label: string
+  /** Delivery phone for this address. */
+  phone: string
   governorateId: string
   districtId: string
   addressLine: string
@@ -33,6 +35,7 @@ export interface AddressFormState {
 
 export interface AddressFormErrors {
   label?: string
+  phone?: string
   governorateId?: string
   districtId?: string
   addressLine?: string
@@ -40,6 +43,7 @@ export interface AddressFormErrors {
 
 const emptyForm: AddressFormState = {
   label: '',
+  phone: '',
   governorateId: '',
   districtId: '',
   addressLine: '',
@@ -59,6 +63,11 @@ function validateForm(
   } else if (hasDistricts && form.districtId !== 'other' && !/^[a-f\d]{24}$/i.test(form.districtId)) {
     errors.districtId = t('checkout.address.cityRequired')
   }
+  if (!form.phone.trim()) {
+    errors.phone = t('checkout.payment.phoneRequired')
+  } else if (!/^(\+|00)?\d{8,15}$/.test(form.phone.replace(/[\s\-().]/g, ''))) {
+    errors.phone = t('checkout.payment.phoneInvalid')
+  }
   if (!form.addressLine.trim()) {
     errors.addressLine = t('checkout.address.addressRequired')
   } else if (form.addressLine.trim().length < 6) {
@@ -74,6 +83,7 @@ function buildAddressPayload(form: AddressFormState): CreateAddressPayload {
     governorateId: form.governorateId.trim(),
     districtId: form.districtId.trim() || 'other',
     addressLine: form.addressLine.trim(),
+    phone: form.phone.replace(/[\s\-().]/g, ''),
     label: form.label.trim() || undefined,
   }
 }
@@ -81,6 +91,7 @@ function buildAddressPayload(form: AddressFormState): CreateAddressPayload {
 function formFromAddress(address: UserAddress): AddressFormState {
   return {
     label: address.label ?? '',
+    phone: address.phone ?? '',
     governorateId: zoneRefId(address.governorate),
     districtId: address.isOther ? 'other' : zoneRefId(address.district) || 'other',
     addressLine: address.addressLine ?? '',
@@ -133,6 +144,8 @@ export function useAddAddressPage() {
         const nextAddresses = addressesResponse.data?.addresses ?? []
         setAddresses(nextAddresses)
         setPhone(profileResponse.data?.phone ?? '')
+        // New addresses default to the account phone; the shopper can change it per address.
+        setForm((current) => (current.phone ? current : { ...current, phone: profileResponse.data?.phone ?? '' }))
 
         const countries = countriesResponse.data ?? []
         const defaultCountry = countries[0]

@@ -12,6 +12,8 @@ export interface ApiOrderShippingAddress {
   governorateName: string
   districtName: string
   addressLine: string
+  /** Delivery contact captured at checkout (may be absent on older orders). */
+  phone?: string
   isOther?: boolean
 }
 
@@ -64,6 +66,13 @@ export interface ApiOrder {
   orderStatus: string
   orderStatusLabel: string
   createdAt: string
+  deliveredAt?: string | null
+  cancelledAt?: string | null
+  /** Server-owned action flags (single source of truth for the Cancel/Return buttons). */
+  canCancel?: boolean
+  canReturn?: boolean
+  returnWindowDays?: number
+  returnWindowEndsAt?: string | null
   tracking: ApiOrderTracking
   /** Populated after admin assigns a carrier with a delivery window. */
   delivery?: ApiOrderDeliveryEstimate | null

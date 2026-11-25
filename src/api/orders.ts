@@ -7,6 +7,8 @@ export interface InlineCheckoutAddressPayload {
   governorateId: string
   districtId?: string | 'other'
   addressLine: string
+  /** Delivery contact for this order (independent of the account phone). */
+  phone?: string
   saveAddress?: boolean
   label?: string
   setAsDefault?: boolean
@@ -17,6 +19,9 @@ export interface SavedCheckoutAddressPayload {
   addressId: string
 }
 
+/** Shopper language at checkout — the order emails use it. */
+export type CheckoutLocale = 'ar' | 'en'
+
 export type CheckoutAddressPayload =
   | SavedCheckoutAddressPayload
   | InlineCheckoutAddressPayload
@@ -24,21 +29,25 @@ export type CheckoutAddressPayload =
 export interface CreateCodOrderPayload extends InlineCheckoutAddressPayload {
   paymentMethod: 'cod'
   addressId?: never
+  locale?: CheckoutLocale
 }
 
 export interface CreateCodOrderWithAddressIdPayload {
   paymentMethod: 'cod'
   addressId: string
+  locale?: CheckoutLocale
 }
 
 export interface CreatePaymentSessionPayload extends InlineCheckoutAddressPayload {
   provider: 'stripe' | 'paymob'
   addressId?: never
+  locale?: CheckoutLocale
 }
 
 export interface CreatePaymentSessionWithAddressIdPayload {
   provider: 'stripe' | 'paymob'
   addressId: string
+  locale?: CheckoutLocale
 }
 
 export interface PaymentSessionResponse {

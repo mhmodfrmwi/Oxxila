@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { getPaymentSessionStatus } from '../api/orders'
-import { HOME_PATH, LOGIN_PATH, CHECKOUT_PATH, trackOrderPath } from '../config/routes'
+import { HOME_PATH, LOGIN_PATH, CHECKOUT_PATH, orderConfirmationPath } from '../config/routes'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import type { ApiOrder } from '../types/order'
@@ -14,7 +14,8 @@ import {
 
 const POLL_INTERVAL_MS = 3000
 const MAX_ATTEMPTS = 20
-const SUCCESS_REDIRECT_MS = 2000
+/** Brief "payment confirmed" beat, then the confirmation page. */
+const SUCCESS_REDIRECT_MS = 1200
 
 export type PaymentCallbackStatus = 'loading' | 'success' | 'failed'
 
@@ -81,7 +82,7 @@ export function usePaymentCallbackPage() {
             void refreshCart()
             timer = setTimeout(() => {
               if (!cancelled) {
-                navigate(trackOrderPath(resolvedOrderId), { replace: true })
+                navigate(orderConfirmationPath(resolvedOrderId), { replace: true })
               }
             }, SUCCESS_REDIRECT_MS)
             return

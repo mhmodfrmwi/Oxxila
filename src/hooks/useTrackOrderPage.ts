@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getMe } from '../api/auth'
 import { cancelMyOrder, getMyOrder } from '../api/orders'
-import { LOGIN_PATH, SHOP_PATH } from '../config/routes'
+import { LOGIN_PATH, RETURNS_PATH, SHOP_PATH } from '../config/routes'
 import { useAuth } from '../context/AuthContext'
 import { ApiError } from '../lib/api'
 import type { ApiOrder } from '../types/order'
-import { canCancelOrder } from '../utils/orderTracking'
+import { canCancelOrder, canReturnOrder } from '../utils/orderTracking'
 
 export function useTrackOrderPage() {
   const { t } = useTranslation()
@@ -84,6 +84,10 @@ export function useTrackOrderPage() {
     }
   }
 
+  function handleReturnOrder() {
+    navigate(RETURNS_PATH)
+  }
+
   function handleContinueShopping() {
     navigate(SHOP_PATH)
   }
@@ -100,7 +104,9 @@ export function useTrackOrderPage() {
     error,
     actionError,
     canCancel: order ? canCancelOrder(order) : false,
+    canReturn: order ? canReturnOrder(order) : false,
     handleCancelOrder,
+    handleReturnOrder,
     handleContinueShopping,
   }
 }

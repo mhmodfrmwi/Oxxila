@@ -163,9 +163,51 @@ export function getTrackOrderStatusSteps(order: ApiOrder): OrderStatusDisplaySte
   })
 }
 
-/** Matches backend USER_CANCELLABLE_STATUSES for buyer cancel. */
-export function canCancelOrder(order: Pick<ApiOrder, 'orderStatus'>) {
-  return order.orderStatus === 'pending' || order.orderStatus === 'processing'
+/** Buyer cancel: trust the server flag; fall back to the statuses it allows for older payloads. */
+export function canCancelOrder(order: Pick<ApiOrder, 'orderStatus' | 'canCancel'>) {
+  if (typeof order.canCancel === 'boolean') return order.canCancel
+  return ['pending', 'confirmed', 'processing'].includes(order.orderStatus)
+}
+
+/** Delivered and still inside the return window (server-computed; false when unknown). */
+export function canReturnOrder(order: Pick<ApiOrder, 'canReturn'>) {
+  return order.canReturn === true
+}
+
+export type TrackBannerTone = 'info' | 'success' | 'warning' | 'danger' | 'muted'
+
+/**
+ * What the track-page banner says for each order status. Keys resolve under
+ * `checkout.track.banner.<key>` (title/subtitle); `useNote` means the subtitle is the
+ * dashboard-managed delivery note instead of fixed copy.
+ */
+export function getTrackBanner(order: Pick<ApiOrder, 'orderStatus'>): {
+  key: string
+  tone: TrackBannerTone
+  useNote: boolean
+  showTracking: boolean
+} {
+  switch (order.orderStatus) {
+    case 'pending':
+    case 'confirmed':
+      return { key: 'received', tone: 'info', useNote: true, showTracking: false }
+    case 'processing':
+      return { key: 'preparing', tone: 'info', useNote: true, showTracking: false }
+    case 'shipped':
+    case 'out_for_delivery':
+      return { key: 'onItsWay', tone: 'info', useNote: false, showTracking: true }
+    case 'failed_attempt':
+      return { key: 'failedAttempt', tone: 'warning', useNote: false, showTracking: true }
+    case 'delivered':
+      return { key: 'delivered', tone: 'success', useNote: false, showTracking: false }
+    case 'partially_returned':
+    case 'returned':
+      return { key: 'returned', tone: 'muted', useNote: false, showTracking: false }
+    case 'cancelled':
+      return { key: 'cancelled', tone: 'danger', useNote: false, showTracking: false }
+    default:
+      return { key: 'received', tone: 'info', useNote: true, showTracking: false }
+  }
 }
 
 export type OrderStatusBadgeTone =

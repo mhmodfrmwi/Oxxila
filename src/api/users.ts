@@ -82,6 +82,8 @@ export interface UserAddress {
   governorate: UserAddressZoneRef
   district: UserAddressZoneRef | null
   addressLine: string
+  /** Delivery phone for this address (older addresses may not have one). */
+  phone?: string
   isOther: boolean
   isDefault: boolean
 }
@@ -90,6 +92,7 @@ export interface CreateAddressPayload {
   governorateId: string
   districtId?: string | 'other' | null
   addressLine: string
+  phone?: string
   label?: string
   isDefault?: boolean
 }

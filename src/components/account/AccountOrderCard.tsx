@@ -91,7 +91,7 @@ export function AccountOrderCard({
           : t('checkout.payment.card')
 
   return (
-    <article className="rounded-2xl border border-border-subtle bg-card p-4 shadow-sm sm:p-5">
+    <article className="relative rounded-2xl border border-border-subtle bg-card p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -102,7 +102,16 @@ export function AccountOrderCard({
               aria-hidden
             />
             <h2 className="font-serif text-lg font-medium text-primary-text sm:text-xl">
-              {t('profile.orders.orderNumber', { id: orderNumber })}
+              {/* Stretched link: the whole card opens Track Order; action buttons sit above it (z-10). */}
+              <Link
+                to={trackPath}
+                className={cn(
+                  'rounded-sm after:absolute after:inset-0 after:z-0 after:rounded-2xl after:content-[""]',
+                  focusRingClasses,
+                )}
+              >
+                {t('profile.orders.orderNumber', { id: orderNumber })}
+              </Link>
             </h2>
           </div>
           <p className="mt-1 text-sm text-secondary-text">
@@ -114,11 +123,15 @@ export function AccountOrderCard({
 
         <div className="flex flex-wrap items-center gap-2">
           <StatusChip
-            label={order.orderStatusLabel || order.orderStatus}
+            label={t(`checkout.track.status.${order.orderStatus}`, {
+              defaultValue: order.orderStatusLabel || order.orderStatus,
+            })}
             tone={orderStatusBadgeTone(order.orderStatus)}
           />
           <StatusChip
-            label={order.paymentStatusLabel || order.paymentStatus}
+            label={t(`checkout.track.paymentStatus.${order.paymentStatus}`, {
+              defaultValue: order.paymentStatusLabel || order.paymentStatus,
+            })}
             tone={paymentStatusBadgeTone(order.paymentStatus)}
           />
           {returnRequest && (
@@ -149,7 +162,7 @@ export function AccountOrderCard({
         />
       </dl>
 
-      <div className="mt-5 flex flex-wrap gap-2">
+      <div className="relative z-10 mt-5 flex flex-wrap gap-2">
         <Link
           to={trackPath}
           className={cn(
